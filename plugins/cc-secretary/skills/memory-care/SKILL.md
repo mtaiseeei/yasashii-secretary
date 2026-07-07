@@ -10,8 +10,8 @@ description: >
 秘書の「記憶」を安全に育てるスキル。記憶はユーザーの `secretary/memory/` 配下に置く。
 決定・好みを覚え、うっかり消えないように守り、中断しても続きから再開できるようにする。
 
-ユーザーに話しかける前に、必ず `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`（やさしい言葉ルール）を読むこと。
-報告は3行以内・専門用語は言い換え併記・次に何が起きるかを一言。
+ユーザーに話しかける前に、必ず `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`（言葉づかいルール）を読むこと。
+報告は3行以内（やったこと／結果／次に何が起きるか）。一般に通じる技術用語はそのまま使い、馴染みの薄い語だけ初出で簡潔に補足する。
 
 ## 記憶の置き場所（`secretary/memory/`・フラット構造）
 
@@ -23,7 +23,7 @@ secretary/memory/
 └── _resume.md     ← 再起動しおり（中断時だけ作る一時ファイル。終わったら消す）
 ```
 
-部署フォルダ・隠しフォルダ・`case-NNN`・`patterns/` は作らない（「秘書＋道具箱」のフラット構成を保つ）。
+部署フォルダ・隠しフォルダ・`case-NNN`・`patterns/` は作らない（フラットな構成を保つ）。
 
 ## 決定的な操作はヘルパーに任せる（大切）
 
@@ -81,5 +81,5 @@ secretary/memory/
 
 ## 参照
 
-- やさしい言葉ルール（必読）: `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`
+- 言葉づかいルール（必読）: `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`
 - 決定的シームのヘルパー: `${CLAUDE_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.sh`

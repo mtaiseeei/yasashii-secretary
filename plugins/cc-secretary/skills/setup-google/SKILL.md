@@ -11,8 +11,8 @@ Gmail・Googleカレンダー・Googleドライブを秘書が参照できるよ
 **接続は Claude の設定画面から公式コネクタ（OAuth＝アプリ同士を安全につなぐ仕組み）でつなぎます。**
 むずかしい開発者向けの下準備（管理コンソールでの設定や鍵ファイルの用意）は**一切要りません**。設定画面のボタン操作だけで完結します。
 
-ユーザーに話しかける前に、必ず `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`（やさしい言葉ルール）を読むこと。
-報告は3行以内・専門用語は言い換え併記・次に何が起きるかを一言。進行は「計画→道具→確認→結果」で見せる。
+ユーザーに話しかける前に、必ず `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`（言葉づかいルール）を読むこと。
+報告は3行以内（やったこと／結果／次に何が起きるか）。一般に通じる技術用語はそのまま使い、馴染みの薄い語だけ初出で簡潔に補足する。進行は「計画→道具→確認→結果」で見せる。
 
 ## はじめに一言（予告と不安の先回り）
 
@@ -87,6 +87,6 @@ Claude の**設定画面 → コネクタ（Connectors）**を開き、次を有
 
 ## 参照
 
-- やさしい言葉ルール（必読）: `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`
+- 言葉づかいルール（必読）: `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`
 - 再起動しおり: `${CLAUDE_PLUGIN_ROOT}/skills/memory-care/SKILL.md`
 - 接続後の活用: `${CLAUDE_PLUGIN_ROOT}/skills/daily/SKILL.md`

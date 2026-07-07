@@ -239,7 +239,7 @@ section "4. git 初期化（init・日本語初回コミット・push なし）"
   git config user.email "regression@example.com"
   git config user.name "regression"
   git add -A
-  git commit -q -m "秘書の家を作成（初回セットアップ）"
+  git commit -q -m "秘書ディレクトリを作成（初回セットアップ）"
 ) >/dev/null 2>&1
 
 check "secretary/ が git 初期化済み" "[ -d '$DEST/.git' ]"
@@ -484,6 +484,32 @@ check "workspace-tools.sh に外部本文の保存指示が無い（同期しな
 
 # 新シームに資格情報が保存されない
 check "成果物・TODO に資格情報の実値が無い" "! grep -rnEi '(password|api[_-]?key|secret|token)\\s*[:=]\\s*[A-Za-z0-9]' '$DEST/docs' '$DEST/inbox'"
+
+# ---------------------------------------------------------------------------
+section "9. 文言規約（改訂 ui.md・過度な平易化の一掃）"
+# ---------------------------------------------------------------------------
+# 配布物全体を対象に検査する: プラグイン本体（plugins/cc-secretary・templates 含む）に加え、
+# リポジトリ直下のマーケットプレイス定義（.claude-plugin/marketplace.json）と LICENSE も含める。
+# （marketplace.json の metadata.description はユーザーが marketplace add 時に見る配布物文言）
+DIST=("$PLUGIN" "$REPO/.claude-plugin" "$REPO/LICENSE")
+# (1) 幼稚なメタファー「秘書の家」等・住まい擬人化の一掃（ゼロ許容）
+check "配布物に『秘書の家』が無い（ゼロ件・marketplace.json 含む）" "! grep -rq '秘書の家' \"\${DIST[@]}\""
+check "配布物に『お家/おうち』が無い（同種比喩ゼロ）" "! grep -rqE 'お家|おうち' \"\${DIST[@]}\""
+check "配布物に住まい擬人化『ローカルに住む』が無い" "! grep -rq 'ローカルに住む' \"\${DIST[@]}\""
+# (2) 旧語彙方針「専門用語は必ず言い換え併記」の撤廃（配布物に残っていない）
+check "配布物に旧規定『言い換え併記』が無い" "! grep -rq '言い換え併記' \"\${DIST[@]}\""
+check "配布物に旧規定『専門用語は必ず』が無い" "! grep -rq '専門用語は必ず' \"\${DIST[@]}\""
+check "配布物に旧規定『言い換えを併記』が無い" "! grep -rq '言い換えを併記' \"\${DIST[@]}\""
+# (3) rules/plain-language.md が改訂 ui.md の方針を反映
+check "plain-language が『そのまま使う語』方針を明記" "grep -q 'そのまま使う' '$RULES'"
+check "plain-language が『初出のみ補足』方針を明記" "grep -q '初出' '$RULES'"
+check "plain-language が幼稚メタファー禁止を明記" "grep -q 'メタファー' '$RULES' && grep -q '秘書ディレクトリ' '$RULES'"
+check "plain-language が過度な平易化をしない旨を明記" "grep -q '過度な平易化' '$RULES'"
+# (4) 呼称の統一: secretary/ を「秘書ディレクトリ／秘書フォルダ」で呼ぶ
+check "onboarding 完了メッセージが『秘書ディレクトリ』を使う" "grep -q '秘書ディレクトリ' '$ONBOARD_SKILL'"
+check "plugin.json description に『秘書の家』が無い" "! grep -q '秘書の家' '$PLUGINJSON'"
+# (5) 一般に通じる技術用語をそのまま使う方針（そのまま使う語リストの存在）
+check "plain-language にそのまま使う語リスト（ディレクトリ・コミット等）" "grep -q 'ディレクトリ' '$RULES' && grep -q 'コミット' '$RULES' && grep -q 'コネクタ' '$RULES'"
 
 # ---------------------------------------------------------------------------
 section "結果"

@@ -7,7 +7,7 @@ tags:
 
 # {{CREATED_DATE}} 決まったこと
 
-- 秘書の家（`secretary/`）を作成した。
+- 秘書ディレクトリ（`secretary/`）を作成した。
 - 呼び方は「{{OWNER_NAME}}」に決めた。
 - 主に使うサービスは「{{PRIMARY_SERVICE}}」（{{PRIMARY_SERVICE_DETAIL}}）。
 - 秘書に任せたいことは「{{TASKS}}」。

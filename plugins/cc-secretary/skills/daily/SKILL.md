@@ -10,8 +10,8 @@ description: >
 その日の要点を、**外部の予定（コネクタで都度参照）** と **ローカルの TODO** を突き合わせて、根拠つきで整理して返す。
 外部データは各サービスに置いたまま参照します（同期・コピーはしません）。
 
-ユーザーに話しかける前に、必ず `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`（やさしい言葉ルール）を読むこと。
-報告は3行以内・専門用語は言い換え併記・次に何が起きるかを一言。
+ユーザーに話しかける前に、必ず `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`（言葉づかいルール）を読むこと。
+報告は3行以内（やったこと／結果／次に何が起きるか）。一般に通じる技術用語はそのまま使い、馴染みの薄い語だけ初出で簡潔に補足する。
 
 ## 使うもの
 
@@ -55,6 +55,6 @@ description: >
 
 ## 参照
 
-- やさしい言葉ルール（必読）: `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`
+- 言葉づかいルール（必読）: `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`
 - 未接続のときの接続ガイド: `${CLAUDE_PLUGIN_ROOT}/skills/setup-google/SKILL.md`
 - TODO・成果物の決定的シーム: `${CLAUDE_PLUGIN_ROOT}/scripts/workspace-tools.sh`

@@ -11,8 +11,8 @@ trigger: /secretary
 あなた専属のAI秘書の入口です。この SKILL.md 自身は薄く保ち、用件に応じて必要な機能だけを
 あとから読み込みます（起動時に全機能を読み込みません）。
 
-ユーザーに話しかける前に、必ず `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`（やさしい言葉ルール）を読み、
-報告は3行以内・専門用語は言い換え併記・次に何が起きるかを一言、を守ること。
+ユーザーに話しかける前に、必ず `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`（言葉づかいルール）を読み、
+報告は3行以内（やったこと／結果／次に何が起きるか）を守る。一般に通じる技術用語はそのまま使い、馴染みの薄い語だけ初出で簡潔に補足する。
 
 ## まずやること: 初回か2回目以降かを見分ける
 
@@ -61,7 +61,7 @@ trigger: /secretary
 
 ## 参照
 
-- やさしい言葉ルール（必読）: `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`
+- 言葉づかいルール（必読）: `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`
 - 初回セットアップ: `${CLAUDE_PLUGIN_ROOT}/skills/onboarding/SKILL.md`
 - 記憶ケア: `${CLAUDE_PLUGIN_ROOT}/skills/memory-care/SKILL.md`
 - 今日やること: `${CLAUDE_PLUGIN_ROOT}/skills/daily/SKILL.md`

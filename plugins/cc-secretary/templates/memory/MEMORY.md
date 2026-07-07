@@ -11,5 +11,5 @@
 
 ## 記録の目次
 
-- [{{CREATED_DATE}} 秘書の家を作成](decisions/{{CREATED_DATE}}-decisions.md) — 初回セットアップ。呼び方・使うサービス・任せたいことを記録
+- [{{CREATED_DATE}} 秘書ディレクトリを作成](decisions/{{CREATED_DATE}}-decisions.md) — 初回セットアップ。呼び方・使うサービス・任せたいことを記録
 - [好み・環境](preferences.md) — 呼び方・口調・使うサービス
