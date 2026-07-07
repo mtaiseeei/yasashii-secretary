@@ -332,6 +332,38 @@ check "guarded-write で secretary/ 外に書かれない" "[ ! -e '$WORK/OUTSID
 check "封じ込め後も外部センチネルが無事" "[ \"\$(cat '$SENTINEL')\" = '消してはいけない外部ファイル' ]"
 rm -f "$SENTINEL"
 
+# 封じ込めハードニング: symlink 越え（対象自身・中間ディレクトリ）を実解決して拒否する
+mkdir -p "$WORK/outside"
+echo "EXTERNAL-ORIGINAL" > "$WORK/outside/real.txt"
+# (d) 最終要素が外向き symlink → 書き込みが外へ届かない
+ln -s "$WORK/outside/real.txt" "$DEST/memory/evil_link.md"
+printf 'HACKED\n' | bash "$TOOLS" guarded-write "$DEST" "evil_link.md" >/dev/null 2>&1
+check "symlink（最終要素）越えの書き込みは拒否（exit 3）" "[ $? -eq 3 ]"
+check "symlink 越え後も外部の実ファイルが不変" "[ \"\$(cat '$WORK/outside/real.txt')\" = 'EXTERNAL-ORIGINAL' ]"
+# (e) 最終要素 symlink への削除も拒否（外部の実体を消さない）
+bash "$TOOLS" delete "$DEST" "evil_link.md" --confirm >/dev/null 2>&1
+check "symlink（最終要素）越えの削除は拒否（exit 3）" "[ $? -eq 3 ]"
+check "symlink 越え削除後も外部の実ファイルが残る" "[ -f '$WORK/outside/real.txt' ]"
+# (f) 中間ディレクトリが外向き symlink → 書き込みが外へ届かない
+ln -s "$WORK/outside" "$DEST/memory/evil_dir"
+printf 'HACKED\n' | bash "$TOOLS" guarded-write "$DEST" "evil_dir/real.txt" >/dev/null 2>&1
+check "symlink（中間ディレクトリ）越えの書き込みは拒否（exit 3）" "[ $? -eq 3 ]"
+check "中間 symlink 越え後も外部の実ファイルが不変" "[ \"\$(cat '$WORK/outside/real.txt')\" = 'EXTERNAL-ORIGINAL' ]"
+rm -f "$DEST/memory/evil_link.md" "$DEST/memory/evil_dir"
+
+# エッジ rel（'.' / 空 / 親方向）は偽装成功させず非ゼロで拒否する（exit 0 を返さない）
+for badrel in "." "" ".." "../x"; do
+  bash "$TOOLS" delete "$DEST" "$badrel" --confirm >/dev/null 2>&1
+  check "delete rel='$badrel' は非ゼロで拒否（偽装成功なし）" "[ $? -ne 0 ]"
+done
+printf 'x\n' | bash "$TOOLS" guarded-write "$DEST" "." >/dev/null 2>&1
+check "guarded-write rel='.' は非ゼロで拒否" "[ $? -ne 0 ]"
+printf 'x\n' | bash "$TOOLS" guarded-write "$DEST" "" >/dev/null 2>&1
+check "guarded-write rel='' は非ゼロで拒否" "[ $? -ne 0 ]"
+# エッジ rel 後も境界内の既存記憶（preferences.md）に副作用がない
+check "エッジ rel 後も preferences.md が健在" "[ -f '$DEST/memory/preferences.md' ] && grep -q '呼び方' '$DEST/memory/preferences.md'"
+rm -rf "$WORK/outside"
+
 # 再起動しおり: 無→書く→有→読める→閉じる→無
 bash "$TOOLS" resume-check "$DEST" >/dev/null 2>&1
 check "しおりは初期状態で無い（check exit≠0）" "[ $? -ne 0 ]"
