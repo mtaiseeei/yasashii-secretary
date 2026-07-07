@@ -34,6 +34,8 @@ DESIGN.md の開発フェーズ P1〜P4 をスプリント列に展開する。
 | [sprint-005](sprints/sprint-005.md) | やさしいハーネス同梱＋開発の入口（build） | P3 |
 | [sprint-006](sprints/sprint-006.md) | 公開整備（README・docs・クレジット・カリキュラム導線） | P4 |
 
+Patch: [sprint-001-patch-001](sprints/sprint-001-patch-001.md)（`Type: micro`）— templates を `plugins/cc-secretary/templates/` へ移設し、SKILL 参照を `${CLAUDE_PLUGIN_ROOT}` 相対に統一。
+
 ## 絶対ルール（最優先・回帰厳禁）
 
 1. `~/workspace/agentic-harness` は変更禁止。同梱ハーネスはリポジトリ内に複製して改変する。

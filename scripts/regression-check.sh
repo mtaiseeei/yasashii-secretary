@@ -19,7 +19,10 @@ set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$SCRIPT_DIR/.." && pwd)"
 PLUGIN="$REPO/plugins/cc-secretary"
-TEMPLATES="$REPO/templates"
+# 雛形は配布プラグイン配下（plugins/cc-secretary/templates/）。
+# SKILL と同じく ${CLAUDE_PLUGIN_ROOT} 相対で解決し、未設定時はプラグイン配下にフォールバックする。
+PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$PLUGIN}"
+TEMPLATES="$PLUGIN_ROOT/templates"
 
 PASS=0
 FAIL=0
@@ -124,14 +127,27 @@ check "secretary の name が 'secretary'" "[ '$SNAME' = 'secretary' ]"
 check "onboarding の name が 'onboarding'" "[ '$ONAME' = 'onboarding' ]"
 check "name が一意（重複なし）" "[ '$SNAME' != '$ONAME' ]"
 
-# 段階ロード・雛形・仕様への参照先が実在（デッドリンクがない）。
-# 対象: SKILL 内の plugins/cc-secretary/... / templates/... / docs/spec/... の相対参照。
+# 同梱ファイル参照は ${CLAUDE_PLUGIN_ROOT} 相対に統一されている（constraints.md L40 / domain.md）。
+# (a) ${CLAUDE_PLUGIN_ROOT}/... の参照先が全て実在（プラグイン配下で解決）
 deadlinks=0
 while IFS= read -r ref; do
   ref="${ref%/}"   # 末尾スラッシュ（ディレクトリ参照）を正規化
-  [ -e "$REPO/$ref" ] || { echo "  デッドリンク: $ref"; deadlinks=$((deadlinks+1)); }
-done < <(grep -rhoE '(plugins/cc-secretary|templates|docs/spec)/[A-Za-z0-9_./-]+(\.md|/)?' "$SECRETARY_SKILL" "$ONBOARD_SKILL" | sort -u)
-check "SKILL の参照先（skills/rules/templates/spec）が全て実在" "[ $deadlinks -eq 0 ]"
+  [ -e "$PLUGIN_ROOT/$ref" ] || { echo "  デッドリンク: \${CLAUDE_PLUGIN_ROOT}/$ref"; deadlinks=$((deadlinks+1)); }
+done < <(grep -rhoE '\$\{CLAUDE_PLUGIN_ROOT\}/[A-Za-z0-9_./-]+(\.md|/)?' "$SECRETARY_SKILL" "$ONBOARD_SKILL" \
+          | sed -E 's#^\$\{CLAUDE_PLUGIN_ROOT\}/##' | sort -u)
+check "SKILL の \${CLAUDE_PLUGIN_ROOT} 参照先が全て実在" "[ $deadlinks -eq 0 ]"
+
+# (b) 雛形が新配置（plugins/cc-secretary/templates/）に存在する
+check "雛形が plugins/cc-secretary/templates/ に存在" "[ -f '$PLUGIN/templates/AGENTS.md' ] && [ -f '$PLUGIN/templates/CLAUDE.md' ]"
+
+# (c) 同梱ファイルへのリポジトリ直下相対参照（plugins/cc-secretary/... や bare templates/）が残っていない
+check "SKILL に plugins/cc-secretary/ 直下相対の同梱参照が無い" \
+  "! grep -rqE 'plugins/cc-secretary/' '$SECRETARY_SKILL' '$ONBOARD_SKILL'"
+check "SKILL に \${CLAUDE_PLUGIN_ROOT} を伴わない bare templates/ 参照が無い" \
+  "! grep -rhoE '[^./{]templates/' '$SECRETARY_SKILL' '$ONBOARD_SKILL' | grep -q ."
+# (d) 絶対パス直書き（先頭スラッシュのコード参照）が無い
+check "SKILL に絶対パス直書きが無い" \
+  "! grep -rhoE '\`/[A-Za-z]' '$SECRETARY_SKILL' '$ONBOARD_SKILL' | grep -q ."
 
 # ---------------------------------------------------------------------------
 section "3. オンボーディング生成物（テンプレ実体化ドライラン）"

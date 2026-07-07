@@ -11,7 +11,7 @@ trigger: /secretary
 あなた専属のAI秘書の入口です。この SKILL.md 自身は薄く保ち、用件に応じて必要な機能だけを
 あとから読み込みます（起動時に全機能を読み込みません）。
 
-ユーザーに話しかける前に、必ず `plugins/cc-secretary/rules/plain-language.md`（やさしい言葉ルール）を読み、
+ユーザーに話しかける前に、必ず `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`（やさしい言葉ルール）を読み、
 報告は3行以内・専門用語は言い換え併記・次に何が起きるかを一言、を守ること。
 
 ## まずやること: 初回か2回目以降かを見分ける
@@ -19,7 +19,7 @@ trigger: /secretary
 作業中のフォルダ（カレントディレクトリ）に `secretary/` フォルダがあるかを確認する。
 
 - **`secretary/` が無い → 初回**。オンボーディング（初回セットアップ）へ進む。
-  読み込む: `plugins/cc-secretary/skills/onboarding/SKILL.md`
+  読み込む: `${CLAUDE_PLUGIN_ROOT}/skills/onboarding/SKILL.md`
   ひとこと予告してから始める。例: 「はじめまして。数問だけ伺って、秘書の家を用意します。」
 
 - **`secretary/` がある → 2回目以降**。下の「用件のふりわけ」へ進む。
@@ -36,12 +36,12 @@ trigger: /secretary
 | 「思い出して」「振り返って」「記憶」 | 記憶ケア（memory-care） | 後日ご案内（準備中） |
 | 「Google / Microsoft につなぎたい」「メール見て」 | コネクタ接続ガイド | 後日ご案内（準備中） |
 | 「作って」「開発したい」 | 開発の入口（build） | 後日ご案内（準備中） |
-| 「もう一度セットアップ」「作り直したい」 | オンボーディング | `plugins/cc-secretary/skills/onboarding/SKILL.md` |
+| 「もう一度セットアップ」「作り直したい」 | オンボーディング | `${CLAUDE_PLUGIN_ROOT}/skills/onboarding/SKILL.md` |
 
 準備中の機能を求められたら、正直に「その機能は準備中です」と伝え、いまできること
 （記憶の確認・メモの整理・秘書の家の中身の案内）を代わりに提案する。断定せず、できないことはできないと言う。
 
 ## 参照
 
-- やさしい言葉ルール（必読）: `plugins/cc-secretary/rules/plain-language.md`
-- 初回セットアップ: `plugins/cc-secretary/skills/onboarding/SKILL.md`
+- やさしい言葉ルール（必読）: `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`
+- 初回セットアップ: `${CLAUDE_PLUGIN_ROOT}/skills/onboarding/SKILL.md`
