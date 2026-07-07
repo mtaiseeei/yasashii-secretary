@@ -27,7 +27,7 @@ related:
 - 開発機能は **agentic-harnessを複製し、非エンジニア向けに平易化したフォークを同梱**（現行 `workspace/agentic-harness` は変更しない）
 - 公開範囲は **public + MIT**（cc-companyのクレジット表記を継承）
 - 秘書の作業フォルダは **見えるフォルダ・英語名**（my-vault風）
-- プラグイン名は **secretary軸**で「開発もできるスーパー秘書」の方向。仮称 `super-secretary`
+- プラグイン名は **`cc-secretary`** に決定（2026-07-08。「開発もできるスーパー秘書」コンセプト）
 
 ## アーキテクチャの基本原則
 
@@ -75,7 +75,7 @@ secretary/                  ← 秘書の家（初回セットアップで git i
 ```
 <repo>/                                  ← public / MIT
 ├── .claude-plugin/marketplace.json
-├── plugins/super-secretary/
+├── plugins/cc-secretary/
 │   ├── .claude-plugin/plugin.json
 │   ├── skills/
 │   │   ├── secretary/SKILL.md           ← 薄いルーター（起動・モード判定のみ）

@@ -1,4 +1,4 @@
-# super-secretary（仮称）
+# cc-secretary
 
 ゆるAIコーディング塾 第2期の目玉として配布する、非エンジニア向けAI秘書プラグイン（Claude Code plugin / public / MIT）。
 cc-company の配布導線・オンボーディングUX・記憶保護と、my-vault の規律（スコープ表・根拠ルール・出力規約・スキル分割）を融合する。
