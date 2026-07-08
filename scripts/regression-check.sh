@@ -116,15 +116,22 @@ ONBOARD_SKILL="$PLUGIN/skills/onboarding/SKILL.md"
 MEMCARE_SKILL="$PLUGIN/skills/memory-care/SKILL.md"
 SETUP_GOOGLE_SKILL="$PLUGIN/skills/setup-google/SKILL.md"
 DAILY_SKILL="$PLUGIN/skills/daily/SKILL.md"
+SETUP_MS_SKILL="$PLUGIN/skills/setup-microsoft/SKILL.md"
+SETUP_NOTION_SKILL="$PLUGIN/skills/setup-notion/SKILL.md"
+CONNECTIONS_SKILL="$PLUGIN/skills/connections/SKILL.md"
 RULES="$PLUGIN/rules/plain-language.md"
 # SKILL 群の参照スキャン対象（同梱ファイル参照の検査に使う）
-SKILLS=("$SECRETARY_SKILL" "$ONBOARD_SKILL" "$MEMCARE_SKILL" "$SETUP_GOOGLE_SKILL" "$DAILY_SKILL")
+SKILLS=("$SECRETARY_SKILL" "$ONBOARD_SKILL" "$MEMCARE_SKILL" "$SETUP_GOOGLE_SKILL" "$DAILY_SKILL" \
+        "$SETUP_MS_SKILL" "$SETUP_NOTION_SKILL" "$CONNECTIONS_SKILL")
 
 check "secretary/SKILL.md が存在" "[ -f '$SECRETARY_SKILL' ]"
 check "onboarding/SKILL.md が存在" "[ -f '$ONBOARD_SKILL' ]"
 check "memory-care/SKILL.md が存在" "[ -f '$MEMCARE_SKILL' ]"
 check "setup-google/SKILL.md が存在" "[ -f '$SETUP_GOOGLE_SKILL' ]"
 check "daily/SKILL.md が存在" "[ -f '$DAILY_SKILL' ]"
+check "setup-microsoft/SKILL.md が存在" "[ -f '$SETUP_MS_SKILL' ]"
+check "setup-notion/SKILL.md が存在" "[ -f '$SETUP_NOTION_SKILL' ]"
+check "connections/SKILL.md が存在" "[ -f '$CONNECTIONS_SKILL' ]"
 check "rules/plain-language.md が存在" "[ -f '$RULES' ]"
 
 # frontmatter の name を取り出す（1行目 --- 以降）
@@ -134,13 +141,19 @@ ONAME="$(name_of "$ONBOARD_SKILL")"
 MNAME="$(name_of "$MEMCARE_SKILL")"
 GNAME="$(name_of "$SETUP_GOOGLE_SKILL")"
 DNAME="$(name_of "$DAILY_SKILL")"
+MSNAME="$(name_of "$SETUP_MS_SKILL")"
+NNAME="$(name_of "$SETUP_NOTION_SKILL")"
+CNAME="$(name_of "$CONNECTIONS_SKILL")"
 check "secretary の name が 'secretary'" "[ '$SNAME' = 'secretary' ]"
 check "onboarding の name が 'onboarding'" "[ '$ONAME' = 'onboarding' ]"
 check "memory-care の name が 'memory-care'" "[ '$MNAME' = 'memory-care' ]"
 check "setup-google の name が 'setup-google'" "[ '$GNAME' = 'setup-google' ]"
 check "daily の name が 'daily'" "[ '$DNAME' = 'daily' ]"
+check "setup-microsoft の name が 'setup-microsoft'" "[ '$MSNAME' = 'setup-microsoft' ]"
+check "setup-notion の name が 'setup-notion'" "[ '$NNAME' = 'setup-notion' ]"
+check "connections の name が 'connections'" "[ '$CNAME' = 'connections' ]"
 check "name が一意（重複なし）" \
-  "[ \"\$(printf '%s\n' '$SNAME' '$ONAME' '$MNAME' '$GNAME' '$DNAME' | sort -u | wc -l | tr -d ' ')\" = '5' ]"
+  "[ \"\$(printf '%s\n' '$SNAME' '$ONAME' '$MNAME' '$GNAME' '$DNAME' '$MSNAME' '$NNAME' '$CNAME' | sort -u | wc -l | tr -d ' ')\" = '8' ]"
 
 # 同梱ファイル参照は ${CLAUDE_PLUGIN_ROOT} 相対に統一されている（constraints.md L40 / domain.md）。
 # (a) ${CLAUDE_PLUGIN_ROOT}/... の参照先が全て実在（プラグイン配下で解決）
@@ -601,6 +614,52 @@ check "H2: onboarding が無確認で上書き・再 git init しない旨を明
 # --- F7: templates/AGENTS.md の家系メタファー・旧言い換え併記の撤去 ---
 check "F7: AGENTS.md に家系メタファーが無い" "! grep -qE '秘書の家|この家|お家|おうち' '$PLUGIN/templates/AGENTS.md'"
 check "F7: AGENTS.md に旧規定『言い換え併記』が無い" "! grep -qE '言い換え併記|専門用語は必ず' '$PLUGIN/templates/AGENTS.md'"
+
+# ---------------------------------------------------------------------------
+section "11. 接続拡張（Microsoft / Notion / 診断・sprint-004）"
+# ---------------------------------------------------------------------------
+# --- setup-microsoft: 公式コネクタ前提（Azure 手作業を案内しない）---
+az_leak=0
+for term in 'Azure Portal' 'Azure AD' 'アプリ登録' 'アプリの登録' 'アクセス許可' 'クライアントシークレット' 'MS365_MCP_CLIENT_ID' 'デバイスコード'; do
+  grep -qF "$term" "$SETUP_MS_SKILL" && { echo "  Azure 手作業語が露出: $term"; az_leak=$((az_leak+1)); }
+done
+check "setup-microsoft に Azure 手作業手順が無い" "[ $az_leak -eq 0 ]"
+check "setup-microsoft に『設定画面からコネクタ接続』の導線" "grep -q '設定画面' '$SETUP_MS_SKILL' && grep -q 'コネクタ' '$SETUP_MS_SKILL'"
+check "setup-microsoft に接続確認テスト手順" "grep -q '直近の予定' '$SETUP_MS_SKILL' || grep -q 'つながったか' '$SETUP_MS_SKILL'"
+check "setup-microsoft に英語エラーの言い換え型" "grep -q '英語' '$SETUP_MS_SKILL' && grep -q '言い換え' '$SETUP_MS_SKILL'"
+check "setup-microsoft が接続前にしおりを書く（resume-write）" "grep -q 'resume-write' '$SETUP_MS_SKILL'"
+check "setup-microsoft が資格情報を保存しない旨を明記" "grep -q '保存' '$SETUP_MS_SKILL' && grep -q 'トークン' '$SETUP_MS_SKILL'"
+check "setup-microsoft が plain-language を参照" "grep -q 'plain-language.md' '$SETUP_MS_SKILL'"
+
+# --- Notion（任意）---
+check "setup-notion が任意であることを明記" "grep -q '任意' '$SETUP_NOTION_SKILL'"
+check "setup-notion が未接続でも他機能を壊さない旨を明記" "grep -q '他の機能' '$SETUP_NOTION_SKILL' || grep -q '他機能' '$SETUP_NOTION_SKILL'"
+check "setup-notion が mcp.notion.com を案内" "grep -q 'mcp.notion.com' '$SETUP_NOTION_SKILL'"
+check "setup-notion に英語エラーの言い換え型" "grep -q '英語' '$SETUP_NOTION_SKILL' && grep -q '言い換え' '$SETUP_NOTION_SKILL'"
+check "setup-notion が plain-language を参照" "grep -q 'plain-language.md' '$SETUP_NOTION_SKILL'"
+
+# --- 接続診断（connections）---
+check "connections が状態を一覧で返す（接続済み/未接続/エラー）" "grep -q '接続済み' '$CONNECTIONS_SKILL' && grep -q '未接続' '$CONNECTIONS_SKILL' && grep -q 'エラー' '$CONNECTIONS_SKILL'"
+check "connections が実エラーで原因確定の型を持つ" "grep -q '実エラーで原因確定' '$CONNECTIONS_SKILL' || grep -q '推測で断定しない' '$CONNECTIONS_SKILL'"
+check "connections が未接続を接続導線へ橋渡し" "grep -q 'setup-google/SKILL.md' '$CONNECTIONS_SKILL' && grep -q 'setup-microsoft/SKILL.md' '$CONNECTIONS_SKILL'"
+check "connections が3行報告（次にやること）" "grep -q '次にやること' '$CONNECTIONS_SKILL' || grep -q '次は' '$CONNECTIONS_SKILL'"
+check "connections が Notion 任意・国内チャット未対応を明記" "grep -q '任意' '$CONNECTIONS_SKILL' && (grep -q 'Chatwork' '$CONNECTIONS_SKILL' || grep -q '国内チャット' '$CONNECTIONS_SKILL')"
+check "connections が plain-language を参照" "grep -q 'plain-language.md' '$CONNECTIONS_SKILL'"
+
+# --- 同期しない不変条件: 接続導線・診断が外部本文をローカルに保存しない ---
+check "setup-microsoft が本文をローカルに保存しない旨" "grep -q 'ローカルに保存していません' '$SETUP_MS_SKILL' || grep -q '記憶には保存しません' '$SETUP_MS_SKILL'"
+check "connections が本文をローカルに保存しない旨" "grep -q '本文はローカルに保存しない' '$CONNECTIONS_SKILL' || grep -q '全文は取り込まない' '$CONNECTIONS_SKILL'"
+
+# --- 語彙方針: 新規4文言に家系メタファーが無い ---
+check "sprint-004 の新規文言に家系メタファーが無い" \
+  "! grep -rqE '秘書の家|この家|お家|おうち' '$SETUP_MS_SKILL' '$SETUP_NOTION_SKILL' '$CONNECTIONS_SKILL'"
+# --- 配布 SKILL の docs/spec 非参照（sprint-004 追加分も）---
+check "sprint-004 の新規 SKILL が docs/spec を参照しない" \
+  "! grep -rqE 'docs/spec|docs/sprints' '$SETUP_MS_SKILL' '$SETUP_NOTION_SKILL' '$CONNECTIONS_SKILL'"
+# --- ルーターに Microsoft/Notion/診断モードが接続済み（準備中でない）---
+check "ルーターに setup-microsoft モード" "grep -q 'skills/setup-microsoft/SKILL.md' '$SECRETARY_SKILL'"
+check "ルーターに setup-notion モード" "grep -q 'skills/setup-notion/SKILL.md' '$SECRETARY_SKILL'"
+check "ルーターに connections（診断）モード" "grep -q 'skills/connections/SKILL.md' '$SECRETARY_SKILL'"
 
 # ---------------------------------------------------------------------------
 section "結果"
