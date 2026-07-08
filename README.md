@@ -96,12 +96,13 @@ cc-secretary/                         ← public / MIT
 ```
 
 - SKILL は薄いルーター＋段階ロード。起動時に全機能を読み込みません。
-- 開発機能は agentic-harness（Planner → Generator → Evaluator の自律開発ループ）を**複製し、非エンジニア向けに平易化**して同梱しています。
+- 開発機能は [mtaiseeei/agentic-harness](https://github.com/mtaiseeei/agentic-harness)（Planner → Generator → Evaluator の自律開発ループ）を**継承し、非エンジニア向けに平易化**して同梱しています。
 - 設計方針の正本は [`docs/DESIGN.md`](docs/DESIGN.md)、実装可能仕様は [`docs/spec/`](docs/spec/)、開発ループの契約は [`docs/sprints/`](docs/sprints/) にあります（開発内部）。
 
 ### 開発（やさしいハーネス）
 
 「〇〇を作って」と言うと、`build` スキルが**計画→実装→検証**のループ（Planner → Generator → Evaluator）に接続します。
+このループは [mtaiseeei/agentic-harness](https://github.com/mtaiseeei/agentic-harness) を継承したものです。
 非エンジニアには「いま計画→実装→検証のどこにいるか」を見せながら進めます。裏側の契約（docs/spec・sprint・rubric）は
 AI が理解しやすいよう技術的文脈のまま維持しています。
 
