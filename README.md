@@ -91,15 +91,14 @@ cc-secretary/                         ← public / MIT
 │   ├── agents/                       ← planner/generator/evaluator（やさしいハーネス）
 │   ├── harness/                      ← 同梱ハーネス（ループ手順書・契約テンプレ・スクリプト）
 │   ├── rules/plain-language.md       ← 言葉づかいルール（報告3行・語彙方針の一元定義）
-│   ├── templates/                    ← 秘書ディレクトリの雛形
+│   ├── templates/                    ← 秘書ディレクトリの雛形（`${CLAUDE_PLUGIN_ROOT}` 相対で参照）
 │   └── scripts/                      ← 決定的シーム（成果物保存・TODO・封じ込めガード）
-├── templates は plugins 配下（`${CLAUDE_PLUGIN_ROOT}` 相対で参照）
 ├── docs/guide/                       ← 公開向け使い方ドキュメント（この README の続き）
 └── docs/（spec・DESIGN・sprints・progress・feedback）← 開発内部ドキュメント
 ```
 
 - SKILL は薄いルーター＋段階ロード。起動時に全機能を読み込みません。
-- 開発機能は `~/workspace` の agentic-harness を**複製し、非エンジニア向けに平易化**して同梱しています（元は変更しません）。
+- 開発機能は agentic-harness（Planner → Generator → Evaluator の自律開発ループ）を**複製し、非エンジニア向けに平易化**して同梱しています。
 - 設計方針の正本は [`docs/DESIGN.md`](docs/DESIGN.md)、実装可能仕様は [`docs/spec/`](docs/spec/)、開発ループの契約は [`docs/sprints/`](docs/sprints/) にあります（開発内部）。
 
 ### 開発（やさしいハーネス）
