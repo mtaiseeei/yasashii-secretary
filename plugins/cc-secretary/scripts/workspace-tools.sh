@@ -26,6 +26,15 @@ refuse(){ echo "$1" >&2; exit 3; }
 _HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$_HERE/lib/path-guard.sh"
 
+# _safe_path の返り値を人向けメッセージにして拒否する（メインレベルで呼ぶこと）。
+_guard_reject(){ # $1=rc, $2=human-target
+  case "$1" in
+    4) refuse "秘書ディレクトリが symlink です。安全のため操作できません: $2" ;;
+    2) refuse "秘書ディレクトリが見つかりません: $2" ;;
+    *) refuse "秘書ディレクトリ（secretary/）の外は操作できません: $2" ;;
+  esac
+}
+
 cmd="${1:-}"; shift || true
 case "$cmd" in
   save-deliverable)
@@ -42,16 +51,10 @@ case "$cmd" in
     body="$(cat)"
     [ -n "$(printf '%s' "$body" | tr -d '[:space:]')" ] || refuse "本文が空です。空の成果物は保存しません。"
     yyyy="${date%%-*}"; rest="${date#*-}"; mm="${rest%%-*}"
-    reldir="docs/${yyyy}/${mm}"
-    mkdir -p "$sec/$reldir"
-    rel="${reldir}/${date}_${slug}.md"
-    # 保存先が secretary/ 配下に収まることを確認（封じ込め・共有ガード）
-    tgt="$(_safe_path "$sec" "$rel")"; rc=$?
-    if [ "$rc" -eq 2 ]; then
-      refuse "保存先のフォルダを用意できませんでした: $rel"
-    elif [ "$rc" -ne 0 ]; then
-      refuse "秘書ディレクトリ（secretary/）の外には保存できません: $rel"
-    fi
+    rel="docs/${yyyy}/${mm}/${date}_${slug}.md"
+    # M5/H1: 先に封じ込め検証（基点 symlink・範囲外・symlink 越えを拒否）。mkdir は検証後にのみ行う。
+    tgt="$(_safe_path "$sec" "$rel")" || _guard_reject "$?" "$rel"
+    mkdir -p "$(dirname "$tgt")"
     # 出力規約: frontmatter（createdAt / tags）必須・見出しに固有名詞（タイトル）
     # タグはカンマ区切り。配列を使わず移植的に分解する（bash 3.2 でも安全）。
     tagblock=""
@@ -80,9 +83,9 @@ case "$cmd" in
     [ -n "$sec" ] && [ -n "$text" ] || die_usage "secretary と TODO 本文を指定"
     # 根拠ルール: 根拠（サービス名＋リンク/ID＋日付）が無い TODO は受け付けない
     [ -n "$(printf '%s' "$ref" | tr -d '[:space:]')" ] || refuse "根拠（サービス名＋リンク/ID＋日付）が空です。根拠なしでは追記しません。"
-    mkdir -p "$sec/inbox"
-    tgt="$(_safe_path "$sec" "inbox/todo.md")"; rc=$?
-    [ "$rc" -eq 0 ] || refuse "秘書ディレクトリ（secretary/）の外には書けません: inbox/todo.md"
+    # H1/M5: 先に封じ込め検証。mkdir は検証後。
+    tgt="$(_safe_path "$sec" "inbox/todo.md")" || _guard_reject "$?" "inbox/todo.md"
+    mkdir -p "$(dirname "$tgt")"
     if [ ! -f "$tgt" ]; then
       {
         printf -- '# TODO（クイックキャプチャ）\n\n'
@@ -95,7 +98,8 @@ case "$cmd" in
 
   todo-list)
     sec="${1:-}"; [ -n "$sec" ] || die_usage "secretary を指定"
-    tgt="$sec/inbox/todo.md"
+    # M5: 読み取りも同一ガードを通す（外向き symlink の todo を読まない）
+    tgt="$(_safe_path "$sec" "inbox/todo.md")" || _guard_reject "$?" "inbox/todo.md"
     [ -f "$tgt" ] || { echo "まだ TODO はありません。" >&2; exit 1; }
     cat "$tgt"
     ;;

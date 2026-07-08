@@ -1,4 +1,4 @@
 {
-  "_NOTE": "cc-secretary は外部データを『公式リモートコネクタ優先・都度参照』で扱う方針のため、このファイルは意図的に最小です。Gmail / Googleカレンダー / Googleドライブ / Microsoft 365 / Notion などは、ローカルにMCPサーバーを立てず、Claude 側の設定画面（コネクタ）からOAuthで接続します。接続の案内は後続スプリントの setup-google / setup-microsoft スキルが行います。ローカルの同期コピーやキャッシュ層は作りません。",
+  "_NOTE": "cc-secretary は外部データを『公式リモートコネクタ優先・都度参照』で扱う方針のため、このファイルは意図的に最小です。Gmail / Googleカレンダー / Googleドライブ は、ローカルにMCPサーバーを立てず、Claude 側の設定画面（コネクタ）からOAuthで接続します。接続の案内は今のところ Google のみ（setup-google スキル）で、Microsoft / Notion は後続で対応予定です。ローカルの同期コピーやキャッシュ層は作りません。",
   "mcpServers": {}
 }

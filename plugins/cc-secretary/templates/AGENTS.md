@@ -1,16 +1,16 @@
 # 秘書への指示（AGENTS.md）
 
 このファイルは、あなた専属の秘書への指示の正本です。秘書は作業のたびに、まずここを読みます。
-（`{{OWNER_NAME}}` さんとのやり取りは、この家＝`secretary/` の中に記憶と成果物を残していきます。）
+（`{{OWNER_NAME}}` さんとのやり取りは、秘書ディレクトリ＝`secretary/` の中に記憶と成果物を残していきます。）
 
 ## オーナー情報
 
 - 呼び方: {{OWNER_NAME}}
 - 主に使うサービス: {{PRIMARY_SERVICE}}（{{PRIMARY_SERVICE_DETAIL}}）
 - 秘書に任せたいこと: {{TASKS}}
-- この家を作った日: {{CREATED_DATE}}
+- 秘書ディレクトリを作った日: {{CREATED_DATE}}
 
-## この家（secretary/）の中身
+## 秘書ディレクトリ（secretary/）の中身
 
 ```
 secretary/
