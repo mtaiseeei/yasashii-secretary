@@ -119,10 +119,12 @@ DAILY_SKILL="$PLUGIN/skills/daily/SKILL.md"
 SETUP_MS_SKILL="$PLUGIN/skills/setup-microsoft/SKILL.md"
 SETUP_NOTION_SKILL="$PLUGIN/skills/setup-notion/SKILL.md"
 CONNECTIONS_SKILL="$PLUGIN/skills/connections/SKILL.md"
+BUILD_SKILL="$PLUGIN/skills/build/SKILL.md"
 RULES="$PLUGIN/rules/plain-language.md"
-# SKILL 群の参照スキャン対象（同梱ファイル参照の検査に使う）
+# ユーザー向け SKILL 群の参照スキャン対象（同梱ファイル参照の検査に使う）。
+# ハーネス内部契約（agents/・harness/）は別カテゴリ（AI 向け・技術維持）で section 12 が扱う。
 SKILLS=("$SECRETARY_SKILL" "$ONBOARD_SKILL" "$MEMCARE_SKILL" "$SETUP_GOOGLE_SKILL" "$DAILY_SKILL" \
-        "$SETUP_MS_SKILL" "$SETUP_NOTION_SKILL" "$CONNECTIONS_SKILL")
+        "$SETUP_MS_SKILL" "$SETUP_NOTION_SKILL" "$CONNECTIONS_SKILL" "$BUILD_SKILL")
 
 check "secretary/SKILL.md が存在" "[ -f '$SECRETARY_SKILL' ]"
 check "onboarding/SKILL.md が存在" "[ -f '$ONBOARD_SKILL' ]"
@@ -132,6 +134,7 @@ check "daily/SKILL.md が存在" "[ -f '$DAILY_SKILL' ]"
 check "setup-microsoft/SKILL.md が存在" "[ -f '$SETUP_MS_SKILL' ]"
 check "setup-notion/SKILL.md が存在" "[ -f '$SETUP_NOTION_SKILL' ]"
 check "connections/SKILL.md が存在" "[ -f '$CONNECTIONS_SKILL' ]"
+check "build/SKILL.md が存在" "[ -f '$BUILD_SKILL' ]"
 check "rules/plain-language.md が存在" "[ -f '$RULES' ]"
 
 # frontmatter の name を取り出す（1行目 --- 以降）
@@ -144,6 +147,7 @@ DNAME="$(name_of "$DAILY_SKILL")"
 MSNAME="$(name_of "$SETUP_MS_SKILL")"
 NNAME="$(name_of "$SETUP_NOTION_SKILL")"
 CNAME="$(name_of "$CONNECTIONS_SKILL")"
+BNAME="$(name_of "$BUILD_SKILL")"
 check "secretary の name が 'secretary'" "[ '$SNAME' = 'secretary' ]"
 check "onboarding の name が 'onboarding'" "[ '$ONAME' = 'onboarding' ]"
 check "memory-care の name が 'memory-care'" "[ '$MNAME' = 'memory-care' ]"
@@ -152,8 +156,9 @@ check "daily の name が 'daily'" "[ '$DNAME' = 'daily' ]"
 check "setup-microsoft の name が 'setup-microsoft'" "[ '$MSNAME' = 'setup-microsoft' ]"
 check "setup-notion の name が 'setup-notion'" "[ '$NNAME' = 'setup-notion' ]"
 check "connections の name が 'connections'" "[ '$CNAME' = 'connections' ]"
+check "build の name が 'build'" "[ '$BNAME' = 'build' ]"
 check "name が一意（重複なし）" \
-  "[ \"\$(printf '%s\n' '$SNAME' '$ONAME' '$MNAME' '$GNAME' '$DNAME' '$MSNAME' '$NNAME' '$CNAME' | sort -u | wc -l | tr -d ' ')\" = '8' ]"
+  "[ \"\$(printf '%s\n' '$SNAME' '$ONAME' '$MNAME' '$GNAME' '$DNAME' '$MSNAME' '$NNAME' '$CNAME' '$BNAME' | sort -u | wc -l | tr -d ' ')\" = '9' ]"
 
 # 同梱ファイル参照は ${CLAUDE_PLUGIN_ROOT} 相対に統一されている（constraints.md L40 / domain.md）。
 # (a) ${CLAUDE_PLUGIN_ROOT}/... の参照先が全て実在（プラグイン配下で解決）
@@ -597,9 +602,12 @@ check "M9: 空白入り決定ファイルも索引に載る" "grep -qF '2026-07-
 check "M4: memory-tools.sh に実行権限" "[ -x '$TOOLS' ]"
 check "M4: workspace-tools.sh に実行権限" "[ -x '$WT' ]"
 
-# --- M6: 配布 SKILL が同梱されない docs/spec・docs/sprints を参照しない ---
-check "M6: 配布物に docs/spec 参照が無い" "! grep -rq 'docs/spec' '$PLUGIN'"
-check "M6: 配布物に docs/sprints 参照が無い" "! grep -rq 'docs/sprints' '$PLUGIN'"
+# --- M6: 秘書機能の配布 SKILL が同梱されない docs/spec・docs/sprints を参照しない ---
+# 対象は秘書ユーザー向け SKILL（skills/）と rules/。
+# 例外: ハーネス内部契約（agents/・harness/）は開発対象プロジェクトの docs/spec/sprints を指す
+#       AI 向け技術契約であり、cc-secretary の開発専用ファイル参照ではない（section 12 で別途扱う）。
+check "M6: 秘書向け SKILL/rules に docs/spec 参照が無い" "! grep -rq 'docs/spec' '$PLUGIN/skills' '$PLUGIN/rules'"
+check "M6: 秘書向け SKILL/rules に docs/sprints 参照が無い" "! grep -rq 'docs/sprints' '$PLUGIN/skills' '$PLUGIN/rules'"
 
 # --- M8: .mcp.json が未実装の setup-microsoft に言及しない ---
 check "M8: .mcp.json に setup-microsoft の言及が無い" "! grep -q 'setup-microsoft' '$PLUGIN/.mcp.json'"
@@ -660,6 +668,99 @@ check "sprint-004 の新規 SKILL が docs/spec を参照しない" \
 check "ルーターに setup-microsoft モード" "grep -q 'skills/setup-microsoft/SKILL.md' '$SECRETARY_SKILL'"
 check "ルーターに setup-notion モード" "grep -q 'skills/setup-notion/SKILL.md' '$SECRETARY_SKILL'"
 check "ルーターに connections（診断）モード" "grep -q 'skills/connections/SKILL.md' '$SECRETARY_SKILL'"
+
+# ---------------------------------------------------------------------------
+section "12. やさしいハーネス同梱＋build（sprint-005）"
+# ---------------------------------------------------------------------------
+HARNESS_SRC="$HOME/workspace/agentic-harness"
+BASELINE="$REPO/scripts/harness-source-baseline.sha256"
+AGENTS_DIR="$PLUGIN/agents"
+HLOOP="$PLUGIN/harness/skills/harness-loop/SKILL.md"
+INITSH="$PLUGIN/harness/scripts/init-guidance.sh"
+
+# --- A1: 複製元 agentic-harness の非改変（C5・最優先・ゼロ許容）---
+NOW_FILE="$WORK/harness-now.sha256"
+( cd "$HARNESS_SRC" 2>/dev/null && find . -type f -not -path './.git/*' -print0 | sort -z | xargs -0 shasum -a 256 ) > "$NOW_FILE" 2>/dev/null
+check "A1: 複製元が sha256 マニフェストと一致（非改変）" "[ -s '$NOW_FILE' ] && diff -q '$BASELINE' '$NOW_FILE' >/dev/null"
+check "A1: 複製元 git HEAD が記録値と一致" "[ \"\$(git -C '$HARNESS_SRC' rev-parse HEAD 2>/dev/null)\" = '56ce6938cd76111dcb050ee8ed51f28a3e1a79db' ]"
+check "A1: 複製元 git 作業ツリーがクリーン（未変更）" "[ -z \"\$(git -C '$HARNESS_SRC' status --porcelain 2>/dev/null)\" ]"
+check "A1: 複製先が元リポジトリへ symlink していない" "[ -z \"\$(find '$AGENTS_DIR' '$PLUGIN/harness' -type l 2>/dev/null)\" ]"
+
+# --- A2: 複製物の構文有効性（C2・ゼロ許容）---
+PNAME="$(name_of "$AGENTS_DIR/planner.md")"
+G2NAME="$(name_of "$AGENTS_DIR/generator.md")"
+ENAME="$(name_of "$AGENTS_DIR/evaluator.md")"
+HLNAME="$(name_of "$HLOOP")"
+check "A2: planner の name が 'planner'" "[ '$PNAME' = 'planner' ]"
+check "A2: generator の name が 'generator'" "[ '$G2NAME' = 'generator' ]"
+check "A2: evaluator の name が 'evaluator'" "[ '$ENAME' = 'evaluator' ]"
+check "A2: agents の name が一意" "[ \"\$(printf '%s\n' '$PNAME' '$G2NAME' '$ENAME' | sort -u | wc -l | tr -d ' ')\" = '3' ]"
+check "A2: harness-loop の name が 'harness-loop'" "[ '$HLNAME' = 'harness-loop' ]"
+check "A2: init-guidance.sh が bash 構文チェックを通る" "bash -n '$INITSH'"
+check "A2: init-guidance.sh に実行権限" "[ -x '$INITSH' ]"
+# 複製物（agents/build/harness-loop）の ${CLAUDE_PLUGIN_ROOT} 参照が全て実在
+vdead=0
+while IFS= read -r ref; do
+  ref="${ref%/}"
+  [ -e "$PLUGIN_ROOT/$ref" ] || { echo "  デッドリンク: \${CLAUDE_PLUGIN_ROOT}/$ref"; vdead=$((vdead+1)); }
+done < <(grep -rhoE '\$\{CLAUDE_PLUGIN_ROOT\}/[A-Za-z0-9_./-]+(\.md|\.sh|/)?' \
+           "$AGENTS_DIR/planner.md" "$AGENTS_DIR/generator.md" "$AGENTS_DIR/evaluator.md" "$HLOOP" "$BUILD_SKILL" \
+           | sed -E 's#^\$\{CLAUDE_PLUGIN_ROOT\}/##' | sort -u)
+check "A2: 複製物の \${CLAUDE_PLUGIN_ROOT} 参照先が全て実在" "[ $vdead -eq 0 ]"
+
+# --- A3: 配置の衝突回避（C1）---
+check "A3: harness テンプレと秘書テンプレが別ディレクトリに存在" \
+  "[ -f '$PLUGIN/harness/templates/AGENTS.md' ] && [ -f '$PLUGIN/templates/AGENTS.md' ]"
+check "A3: harness/AGENTS.md と 秘書/AGENTS.md が別物（内容が異なる）" \
+  "! diff -q '$PLUGIN/harness/templates/AGENTS.md' '$PLUGIN/templates/AGENTS.md' >/dev/null 2>&1"
+
+# --- B4: (1) ヒアリング日常語化（C4）---
+check "B4: planner のヒアリングが日常語＋具体例" "grep -q '見る人を制限しますか' '$AGENTS_DIR/planner.md'"
+
+# --- B5: (2) 報告の型固定（各エージェントが plain-language を参照）---
+check "B5: planner が plain-language を参照" "grep -q 'plain-language.md' '$AGENTS_DIR/planner.md'"
+check "B5: generator が plain-language を参照" "grep -q 'plain-language.md' '$AGENTS_DIR/generator.md'"
+check "B5: evaluator が plain-language を参照" "grep -q 'plain-language.md' '$AGENTS_DIR/evaluator.md'"
+
+# --- B6: (3) 進行の見せ方（計画→実装→検証／計画→道具→確認→結果）---
+prog_re='計画→実装→検証|計画→道具→確認→結果'
+check "B6: planner に進行宣言がある" "grep -qE '$prog_re' '$AGENTS_DIR/planner.md'"
+check "B6: generator に進行宣言がある" "grep -qE '$prog_re' '$AGENTS_DIR/generator.md'"
+check "B6: evaluator に進行宣言がある" "grep -qE '$prog_re' '$AGENTS_DIR/evaluator.md'"
+check "B6: harness-loop に進行宣言がある" "grep -qE '$prog_re' '$HLOOP'"
+
+# --- C7: build 入口（C1, C3）---
+check "C7: build が harness-loop を参照" "grep -q 'harness/skills/harness-loop/SKILL.md' '$BUILD_SKILL'"
+check "C7: build が3エージェントを参照" "grep -q 'agents/planner.md' '$BUILD_SKILL' && grep -q 'agents/generator.md' '$BUILD_SKILL' && grep -q 'agents/evaluator.md' '$BUILD_SKILL'"
+check "C7: build に進行宣言がある" "grep -qE '$prog_re' '$BUILD_SKILL'"
+check "C7: build が plain-language を参照" "grep -q 'plain-language.md' '$BUILD_SKILL'"
+check "C7: ルーターに build モード" "grep -q 'skills/build/SKILL.md' '$SECRETARY_SKILL'"
+
+# --- D8: ユーザー向け複製文言に家系メタファーが無い（内部契約テンプレは技術維持で対象外）---
+check "D8: 複製のユーザー向け文言（agents/build/harness-loop）に家系メタファーが無い" \
+  "! grep -rqE '秘書の家|この家|お家|おうち' '$AGENTS_DIR' '$BUILD_SKILL' '$HLOOP'"
+
+# --- D8(境界要素): evaluator は6軸スコア・証跡ルールの内部値を維持しつつ平易な言い換えを併置 ---
+check "D8: evaluator が rubric の6軸・閾値・証跡の内部値を維持" \
+  "grep -q '6軸' '$AGENTS_DIR/evaluator.md' && grep -q '閾値' '$AGENTS_DIR/evaluator.md' && grep -q '証跡' '$AGENTS_DIR/evaluator.md'"
+check "D8: evaluator が内部値を保ったまま平易な言い換えを併置" \
+  "grep -q '内部の値' '$AGENTS_DIR/evaluator.md' && grep -q '言い換え' '$AGENTS_DIR/evaluator.md'"
+
+# --- D9(一元化): 平易化文言を rules/plain-language.md に集約し、5面から参照（重複コピーを増やさない）---
+oneref=0
+for f in "$AGENTS_DIR/planner.md" "$AGENTS_DIR/generator.md" "$AGENTS_DIR/evaluator.md" "$BUILD_SKILL" "$HLOOP"; do
+  grep -q 'plain-language.md' "$f" || { echo "  未参照: $f"; oneref=$((oneref+1)); }
+done
+check "D9: planner/generator/evaluator/build/harness-loop が plain-language を一元参照" "[ $oneref -eq 0 ]"
+
+# --- D10(hooks 非衝突): cc-secretary は二重起動する SessionStart フックを登録していない ---
+# 設計判断: ハーネスの hooks は複製せず、build を明示入口にする（session-start 注入で本体起動と干渉させない）。
+check "D10: cc-secretary に hooks.json が同梱されていない（登録しない設計）" \
+  "[ -z \"\$(find '$PLUGIN' -name 'hooks.json' 2>/dev/null)\" ]"
+check "D10: cc-secretary に session-start 系フックが複製されていない" \
+  "[ -z \"\$(find '$PLUGIN' -name 'session-start.sh' 2>/dev/null)\" ]"
+check "D10: プラグイン定義に SessionStart フック登録が無い（二重起動なし）" \
+  "! grep -rq 'SessionStart' '$PLUGIN/.claude-plugin' '$REPO/.claude-plugin'"
 
 # ---------------------------------------------------------------------------
 section "結果"

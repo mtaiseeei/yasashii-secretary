@@ -48,11 +48,11 @@ trigger: /secretary
 | 「Notion につなぎたい」 | Notion 接続ガイド（任意・setup-notion） | `${CLAUDE_PLUGIN_ROOT}/skills/setup-notion/SKILL.md` |
 | 「繋がってる？」「接続の調子」「診断して」「どれが使える？」 | 接続診断（connections） | `${CLAUDE_PLUGIN_ROOT}/skills/connections/SKILL.md` |
 | 「保存して」「文書にして」「まとめて残して」「企画書にして」 | 成果物保存（出力規約） | 下記「成果物を保存するとき」 |
-| 「作って」「開発したい」 | 開発の入口（build） | 後日ご案内（準備中） |
+| 「作って」「開発したい」「アプリ／ツールにして」 | 開発の入口（build） | `${CLAUDE_PLUGIN_ROOT}/skills/build/SKILL.md` |
 | 「もう一度セットアップ」「作り直したい」 | 再セットアップ（保護あり） | 下記「作り直し（再セットアップ）の保護」 |
 
-準備中の機能（開発）を求められたら、正直に「その機能は準備中です」と伝え、いまできることを代わりに提案する。断定せず、できないことはできないと言う。
 国内チャット（Chatwork / LINE 等）はまだ対応していない（公式コネクタが無いため）。Notion は任意で、繋がなくても他の機能は普通に使える。
+準備中の機能を求められたら、正直に「その機能は準備中です」と伝え、いまできることを代わりに提案する。断定せず、できないことはできないと言う。
 
 ## 作り直し（再セットアップ）の保護
 
@@ -82,4 +82,5 @@ trigger: /secretary
 - Microsoft 接続: `${CLAUDE_PLUGIN_ROOT}/skills/setup-microsoft/SKILL.md`
 - Notion 接続（任意）: `${CLAUDE_PLUGIN_ROOT}/skills/setup-notion/SKILL.md`
 - 接続診断: `${CLAUDE_PLUGIN_ROOT}/skills/connections/SKILL.md`
+- 開発の入口（やさしいハーネス）: `${CLAUDE_PLUGIN_ROOT}/skills/build/SKILL.md`
 - 成果物・TODO の決定的シーム: `${CLAUDE_PLUGIN_ROOT}/scripts/workspace-tools.sh`
