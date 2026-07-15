@@ -11,11 +11,6 @@
 #   workspace-tools.sh todo-add        <secretary> <TODO本文> <根拠(サービス名 | リンク/ID | 日付)>
 #       inbox/todo.md に「- [ ] 本文 （根拠: …）」を追記する。根拠が空なら拒否（根拠ルール）。
 #   workspace-tools.sh todo-list       <secretary>
-#   workspace-tools.sh todo-done       <secretary> <番号> [--confirm]
-#       番号は todo-list の「- [ ]」行の上からの数え。--confirm なしでは消さず、
-#       「何を消すか」を提示して中断する（消し込みの保護。無確認の削除をしない）。
-#   workspace-tools.sh todo-carry      <secretary> <番号> <YYYY-MM-DD(繰越先)> [--confirm]
-#       番号の TODO に「（繰越: 日付）」を付けて翌日分として残す。--confirm なしでは変更しない。
 #
 # 終了コード: 0=成功 / 2=使い方エラー / 3=保護・封じ込めにより拒否
 #
@@ -109,56 +104,7 @@ case "$cmd" in
     cat "$tgt"
     ;;
 
-  todo-done)
-    # 消し込み（完了した TODO を一覧から消す）。保護: --confirm なしでは実行しない。
-    sec="${1:-}"; num="${2:-}"; flag="${3:-}"
-    [ -n "$sec" ] && [ -n "$num" ] || die_usage "secretary と TODO の番号を指定（例: todo-done secretary 2 --confirm）"
-    case "$num" in ''|0|*[!0-9]*) die_usage "番号は 1 以上の数字で指定してください: $num";; esac
-    # 消し込みも同一の封じ込めガードを通す（外向き symlink の todo を触らない）
-    tgt="$(_safe_path "$sec" "inbox/todo.md")" || _guard_reject "$?" "inbox/todo.md"
-    [ -f "$tgt" ] || refuse "まだ TODO はありません: inbox/todo.md"
-    line="$(awk -v n="$num" '/^- \[ \]/{c++; if(c==n){print; exit}}' "$tgt")"
-    [ -n "$line" ] || die_usage "その番号の TODO が見つかりません: $num（todo-list で番号を確かめてください）"
-    if [ "$flag" != "--confirm" ]; then
-      # 消し込みの保護: 何を消すかを提示して中断する（無確認の削除をしない）
-      echo "確認: これから完了として消すのは次の TODO です。" >&2
-      echo "  $line" >&2
-      echo "本当に消してよければ、ユーザーの確認のうえ --confirm を付けて実行します。" >&2
-      refuse "未確認のため消し込みませんでした。"
-    fi
-    tmp="$(mktemp)"
-    awk -v n="$num" '/^- \[ \]/{c++; if(c==n) next} {print}' "$tgt" > "$tmp" && mv "$tmp" "$tgt" \
-      || { rm -f "$tmp"; refuse "消し込みに失敗しました: inbox/todo.md"; }
-    echo "完了として消しました: $line"
-    ;;
-
-  todo-carry)
-    # 繰越（未完了の TODO を翌日分として残す）。保護: --confirm なしでは実行しない。
-    sec="${1:-}"; num="${2:-}"; carry="${3:-}"; flag="${4:-}"
-    [ -n "$sec" ] && [ -n "$num" ] && [ -n "$carry" ] || die_usage "secretary・番号・繰越先の日付を指定（例: todo-carry secretary 1 2026-07-16 --confirm）"
-    case "$num" in ''|0|*[!0-9]*) die_usage "番号は 1 以上の数字で指定してください: $num";; esac
-    # 繰越先の日付は YYYY-MM-DD 厳密形式のみ
-    case "$carry" in
-      [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) : ;;
-      *) die_usage "繰越先の日付は YYYY-MM-DD 形式で指定してください（例: 2026-07-16）: $carry";;
-    esac
-    tgt="$(_safe_path "$sec" "inbox/todo.md")" || _guard_reject "$?" "inbox/todo.md"
-    [ -f "$tgt" ] || refuse "まだ TODO はありません: inbox/todo.md"
-    line="$(awk -v n="$num" '/^- \[ \]/{c++; if(c==n){print; exit}}' "$tgt")"
-    [ -n "$line" ] || die_usage "その番号の TODO が見つかりません: $num（todo-list で番号を確かめてください）"
-    if [ "$flag" != "--confirm" ]; then
-      echo "確認: これから明日へ繰り越すのは次の TODO です（消さずに残します）。" >&2
-      echo "  $line → （繰越: $carry）を付けます" >&2
-      echo "よければ、ユーザーの確認のうえ --confirm を付けて実行します。" >&2
-      refuse "未確認のため繰り越しませんでした。"
-    fi
-    tmp="$(mktemp)"
-    awk -v n="$num" -v d="$carry" '/^- \[ \]/{c++; if(c==n){print $0 "（繰越: " d "）"; next}} {print}' "$tgt" > "$tmp" && mv "$tmp" "$tgt" \
-      || { rm -f "$tmp"; refuse "繰越に失敗しました: inbox/todo.md"; }
-    echo "明日へ繰り越しました（繰越: $carry）: $line"
-    ;;
-
   *)
-    die_usage "不明なコマンド: '$cmd'（save-deliverable|todo-add|todo-list|todo-done|todo-carry）"
+    die_usage "不明なコマンド: '$cmd'（save-deliverable|todo-add|todo-list）"
     ;;
 esac
