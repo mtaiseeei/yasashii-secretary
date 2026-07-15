@@ -89,6 +89,7 @@ description: >
    - `${CLAUDE_PLUGIN_ROOT}/templates/memory/MEMORY.md` → `secretary/memory/MEMORY.md`
    - `${CLAUDE_PLUGIN_ROOT}/templates/memory/preferences.md` → `secretary/memory/preferences.md`
    - `${CLAUDE_PLUGIN_ROOT}/templates/memory/decisions/_first-decision.md` → `secretary/memory/decisions/{{CREATED_DATE}}-decisions.md`（名前を日付にする）
+   - **コピーしないもの**: `${CLAUDE_PLUGIN_ROOT}/templates/prompts/` は定時実行の登録に使う貼り付け用テンプレートで、秘書ディレクトリの一部ではない。`secretary/` にはコピーしない。
 3. コピーした各ファイルの中の `{{...}}` を、上の対応表の値ですべて置き換える。
 4. 秘書ディレクトリの中身が、次の構造になっていることを確かめる:
    ```

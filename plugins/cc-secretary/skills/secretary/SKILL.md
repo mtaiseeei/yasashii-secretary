@@ -43,6 +43,8 @@ trigger: /secretary
 |---|---|---|
 | 「覚えて」「記憶して」「決めた」「消して」「振り返って」「前回の続き」 | 記憶ケア（memory-care） | `${CLAUDE_PLUGIN_ROOT}/skills/memory-care/SKILL.md` |
 | 「今日やること」「今日の予定」「TODO」「段取り」 | 今日やること（daily） | `${CLAUDE_PLUGIN_ROOT}/skills/daily/SKILL.md` |
+| 「おはよう」「朝イチ」「今日のブリーフ」「毎朝届くようにしたい」 | 朝ブリーフ（morning） | `${CLAUDE_PLUGIN_ROOT}/skills/morning/SKILL.md` |
+| 「おつかれ」「今日の振り返り」「一日の締め」「今日を締めて」 | 夕方の振り返り（evening） | `${CLAUDE_PLUGIN_ROOT}/skills/evening/SKILL.md` |
 | 「Google につなぎたい」「Gmail／カレンダーを見て」 | Google 接続ガイド（setup-google） | `${CLAUDE_PLUGIN_ROOT}/skills/setup-google/SKILL.md` |
 | 「Microsoft につなぎたい」「Outlook／Teams を見て」 | Microsoft 接続ガイド（setup-microsoft） | `${CLAUDE_PLUGIN_ROOT}/skills/setup-microsoft/SKILL.md` |
 | 「Notion につなぎたい」 | Notion 接続ガイド（任意・setup-notion） | `${CLAUDE_PLUGIN_ROOT}/skills/setup-notion/SKILL.md` |
@@ -78,6 +80,8 @@ trigger: /secretary
 - 初回セットアップ: `${CLAUDE_PLUGIN_ROOT}/skills/onboarding/SKILL.md`
 - 記憶ケア: `${CLAUDE_PLUGIN_ROOT}/skills/memory-care/SKILL.md`
 - 今日やること: `${CLAUDE_PLUGIN_ROOT}/skills/daily/SKILL.md`
+- 朝ブリーフ（定時実行の案内つき）: `${CLAUDE_PLUGIN_ROOT}/skills/morning/SKILL.md`
+- 夕方の振り返り: `${CLAUDE_PLUGIN_ROOT}/skills/evening/SKILL.md`
 - Google 接続: `${CLAUDE_PLUGIN_ROOT}/skills/setup-google/SKILL.md`
 - Microsoft 接続: `${CLAUDE_PLUGIN_ROOT}/skills/setup-microsoft/SKILL.md`
 - Notion 接続（任意）: `${CLAUDE_PLUGIN_ROOT}/skills/setup-notion/SKILL.md`
