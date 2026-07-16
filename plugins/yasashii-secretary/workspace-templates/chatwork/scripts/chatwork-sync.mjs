@@ -36,7 +36,8 @@ function apiFailure(status) {
 
 async function requestJson(path) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15_000);
+  const timeout = Number(process.env.CHATWORK_API_TIMEOUT_MS || 15_000);
+  const timer = setTimeout(() => controller.abort(), timeout);
   try {
     const response = await fetch(`${API_BASE}${path}`, {
       headers: { "x-chatworktoken": TOKEN, accept: "application/json" },
@@ -45,10 +46,10 @@ async function requestJson(path) {
     if (!response.ok) throw Object.assign(new Error("api"), apiFailure(response.status));
     return await response.json();
   } catch (error) {
-    if (error.code) throw error;
-    if (error.name === "AbortError") {
-      throw Object.assign(new Error("timeout"), { code: "network", message: "Chatworkへの接続が時間切れになりました。" });
+    if (controller.signal.aborted || error.name === "AbortError") {
+      throw Object.assign(new Error("timeout"), { code: "timeout", message: "Chatworkへの接続が時間切れになりました。時間を置いて再実行してください。" });
     }
+    if (error.code) throw error;
     throw Object.assign(new Error("network"), { code: "network", message: "Chatworkへ接続できませんでした。ネットワークを確認してください。" });
   } finally {
     clearTimeout(timer);
@@ -95,16 +96,21 @@ function readRooms(root) {
   return new Map((data.rooms || []).map((room) => [String(room.roomId), { roomId: String(room.roomId), name: String(room.name) }]));
 }
 
-async function initialSync(root) {
+async function syncRooms(root, mode) {
   const config = readJson(join(root, "chatwork", "config.json"));
   if (!config || !Array.isArray(config.selectedRoomIds)) fail("Chatwork設定を読み取れません。wizardで設定してください。", 3);
+  if (process.env.CHATWORK_TRIGGER === "schedule" && (!config.scheduleEnabled || !config.automaticPushConsent)) {
+    fail("自動同期への同意が無効なため、schedule同期を開始しません。", 3);
+  }
   const selected = [...new Set(config.selectedRoomIds.map(roomId))];
   if (selected.length === 0) fail("取得するroomが選ばれていません。", 3);
   const rooms = readRooms(root);
   const unknown = selected.filter((id) => !rooms.has(id));
   if (unknown.length > 0) fail("room一覧にないRoom IDが設定されています。room一覧を更新してください。", 3);
 
+  const previousState = readJson(join(root, "chatwork", "state", "sync.json"), { version: 1, lastSuccessAt: null, cursors: {} });
   const results = [];
+  const prepared = [];
   for (const id of selected) {
     const room = rooms.get(id);
     try {
@@ -115,7 +121,7 @@ async function initialSync(root) {
       const merged = new Map((previous.messages || []).map((message) => [String(message.messageId), message]));
       for (const message of incoming) merged.set(message.messageId, message);
       const messages = [...merged.values()].sort((a, b) => a.sentAt - b.sentAt || a.messageId.localeCompare(b.messageId));
-      writeJson(historyPath, { version: 1, room, updatedAt: NOW, apiWindow: { limit: 100, returned: incoming.length }, messages });
+      prepared.push({ historyPath, value: { version: 1, room, updatedAt: NOW, apiWindow: { limit: 100, returned: incoming.length }, messages } });
       results.push({ roomId: id, roomName: room.name, status: "success", fetched: incoming.length, stored: messages.length });
     } catch (error) {
       results.push({ roomId: id, roomName: room.name, status: "failed", fetched: 0, error: error.code || "unknown", message: error.message });
@@ -123,21 +129,40 @@ async function initialSync(root) {
   }
   const succeeded = results.filter((item) => item.status === "success").length;
   const status = succeeded === results.length ? "success" : succeeded === 0 ? "failed" : "partial";
+  if (status !== "success") {
+    writeJson(join(root, "chatwork", "state", "sync.json"), {
+      version: 1,
+      status,
+      attemptedAt: NOW,
+      lastSuccessAt: previousState.lastSuccessAt || null,
+      cursors: previousState.cursors || {},
+      results,
+      message: "取得を完了できなかったため、前回の履歴と取得位置を保持しました。",
+    });
+    const failureKinds = [...new Set(results.filter((item) => item.status === "failed").map((item) => item.error || "unknown"))].join(",");
+    fail(`一部または全部のroomを取得できませんでした。失敗種別: ${failureKinds}。前回の履歴と取得位置は保持しています。`, 4);
+  }
+  for (const item of prepared) writeJson(item.historyPath, item.value);
+  const cursors = Object.fromEntries(prepared.map((item) => {
+    const id = item.value.room.roomId;
+    const last = item.value.messages.at(-1);
+    return [id, last ? { messageId: last.messageId, sentAt: last.sentAt } : (previousState.cursors?.[id] || null)];
+  }));
   writeJson(join(root, "chatwork", "state", "sync.json"), {
     version: 1,
-    status,
+    status: "success",
     attemptedAt: NOW,
-    lastSuccessAt: succeeded > 0 ? NOW : null,
+    lastSuccessAt: NOW,
+    cursors,
     results,
   });
   const fetched = results.reduce((total, item) => total + item.fetched, 0);
-  process.stdout.write(`初回取得: 成功${succeeded} room／失敗${results.length - succeeded} room／${fetched}件。\n`);
-  if (status !== "success") fail("一部または全部のroomを取得できませんでした。状態ファイルで対象roomと再試行方法を確認してください。", 4);
+  process.stdout.write(`${mode === "initial" ? "初回取得" : "同期"}: 成功${succeeded} room／失敗0 room／${fetched}件。\n`);
 }
 
 if (!TOKEN) fail("Repository Secret CHATWORK_API_TOKEN が設定されていません。", 3);
 const mode = process.argv[2];
 const root = resolve(process.argv[3] || process.cwd());
 if (mode === "discover") await discover(root);
-else if (mode === "initial") await initialSync(root);
-else fail("使い方: chatwork-sync.mjs discover|initial [repo-root]");
+else if (mode === "initial" || mode === "sync") await syncRooms(root, mode);
+else fail("使い方: chatwork-sync.mjs discover|initial|sync [repo-root]");

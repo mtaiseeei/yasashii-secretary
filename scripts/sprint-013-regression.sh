@@ -79,7 +79,7 @@ check_eval "wizardはgradient・shadow・画像・Tesla商標を使わない" "!
 check_eval "mobile 1 column・CTA縦積み・reduced motion" "grep -q 'max-width: 767px' '$CSS' && grep -q 'grid-template-columns: 1fr' '$CSS' && grep -q 'flex-direction: column-reverse' '$CSS' && grep -q 'prefers-reduced-motion' '$CSS'"
 check_eval "Token入力欄・token値surfaceが無い" "! grep -RqiE 'type=\"password\"|name=\"token\"|CHATWORK_API_TOKEN=' '$HTML' '$CSS' '$JS' '$CHATWORK/SKILL.md'"
 check_eval "6頻度・既定1時間・run数を挙動データで定義" "node -e \"const s=require('fs').readFileSync(process.argv[1],'utf8'); for(const v of ['30m','1h','3h','6h','12h','manual','1440','720','240','120','60']) if(!s.includes(v)) process.exit(1)\" '$JS'"
-check_eval "wizardはprivate repoを検証し確定後だけ設定commit・push" "grep -q 'verifyPrivateRepo' '$CHATWORK/scripts/wizard-server.mjs' && grep -q 'Chatworkのroomと同期間隔を設定' '$CHATWORK/scripts/wizard-server.mjs' && grep -q '\[\"push\"\]' '$CHATWORK/scripts/wizard-server.mjs'"
+check_eval "wizardはprivate repoを検証し確定後だけ設定commit・push" "grep -q 'verifyPrivateRepo' '$CHATWORK/scripts/wizard-server.mjs' && grep -q 'applyChatworkConfig' '$CHATWORK/scripts/wizard-server.mjs' && grep -q '\[\"push\"\]' '$CHATWORK/scripts/config-transaction.mjs'"
 
 cp "$TEMPLATES/.github/workflows/chatwork-sync.yml" "$WORK/workflow-invalid.yml"
 apply_patch <<PATCH

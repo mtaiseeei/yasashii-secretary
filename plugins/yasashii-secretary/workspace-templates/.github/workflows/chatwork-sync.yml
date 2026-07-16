@@ -4,19 +4,20 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: discover または initial
+        description: discover、initial、sync のいずれか
         required: true
         default: discover
         type: choice
         options:
           - discover
           - initial
+          - sync
 
 permissions:
   contents: write
 
 concurrency:
-  group: chatwork-sync
+  group: chatwork-sync-${{ github.repository }}
   cancel-in-progress: false
 
 jobs:
@@ -32,9 +33,10 @@ jobs:
         continue-on-error: true
         env:
           CHATWORK_API_TOKEN: ${{ secrets.CHATWORK_API_TOKEN }}
-        run: node chatwork/scripts/chatwork-sync.mjs "${{ inputs.mode }}" "$GITHUB_WORKSPACE"
+          CHATWORK_TRIGGER: ${{ github.event_name }}
+        run: node chatwork/scripts/chatwork-sync.mjs "${{ github.event_name == 'schedule' && 'sync' || inputs.mode }}" "$GITHUB_WORKSPACE"
       - name: 結果を同じrepoへ記録
-        if: always()
+        if: steps.chatwork.outcome == 'success'
         run: |
           git config user.name "yasashii-secretary[bot]"
           git config user.email "yasashii-secretary[bot]@users.noreply.github.com"
@@ -42,11 +44,11 @@ jobs:
           if git diff --cached --quiet; then
             echo "更新はありません"
           else
-            git commit -m "Chatworkの取得結果を更新"
+            git commit -m "Chatworkの選択room履歴を更新"
             git push
           fi
       - name: 取得失敗を通知
         if: steps.chatwork.outcome != 'success'
         run: |
-          echo "Chatworkの取得に失敗しました。stateファイルで原因を確認してください。" >&2
+          echo "Chatworkの取得に失敗しました。前回の履歴と取得位置は保持しています。" >&2
           exit 1

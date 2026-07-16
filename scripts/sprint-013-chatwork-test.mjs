@@ -101,7 +101,7 @@ check("基本検索not foundは保存済み範囲に限定", JSON.parse(missing.
 const wizardRoot = fixture("wizard");
 writeFileSync(join(wizardRoot, "chatwork", "rooms.json"), `${JSON.stringify({ version: 1, status: "ready", rooms: [{ roomId: "101", name: "空room" }, { roomId: "102", name: "営業" }] }, null, 2)}\n`);
 writeFileSync(join(wizardRoot, "chatwork", "state", "sync.json"), `${JSON.stringify({ version: 1, status: "success", results: [{ roomId: "101", roomName: "空room", status: "success", fetched: 0 }] }, null, 2)}\n`);
-const wizard = execFile(process.execPath, [wizardScript, "--root", wizardRoot, "--port", "0"], { env: { ...process.env, NODE_ENV: "test", YASASHII_CHATWORK_SKIP_DISPATCH: "1", YASASHII_CHATWORK_TEST_PRIVATE: "1" } });
+const wizard = execFile(process.execPath, [wizardScript, "--root", wizardRoot, "--port", "0"], { env: { ...process.env, NODE_ENV: "test", YASASHII_CHATWORK_SKIP_DISPATCH: "1", YASASHII_CHATWORK_TEST_PRIVATE: "1", YASASHII_CHATWORK_SKIP_GIT: "1", YASASHII_CHATWORK_TEST_SECRET: "1" } });
 let output = "";
 wizard.stdout.on("data", (chunk) => { output += chunk; });
 for (let attempt = 0; attempt < 50 && !output.includes("http://"); attempt += 1) await new Promise((wait) => setTimeout(wait, 50));
@@ -146,10 +146,10 @@ await fetch(`${url}api/bootstrap`);
 check("閲覧・キャンセル相当は設定副作用0", readFileSync(join(wizardRoot, "chatwork", "config.json"), "utf8") === before);
 const invalid = await fetch(`${url}api/confirm`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ selectedRoomIds: ["999"], interval: "1h" }) });
 check("未発見roomを確定できない", invalid.status === 400 && readFileSync(join(wizardRoot, "chatwork", "config.json"), "utf8") === before);
-const confirmed = await fetch(`${url}api/confirm`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ selectedRoomIds: ["101"], interval: "3h" }) });
+const confirmed = await fetch(`${url}api/confirm`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ selectedRoomIds: ["101"], interval: "3h", automaticPushConsent: true }) });
 const confirmedConfig = json(join(wizardRoot, "chatwork", "config.json"));
 check("確定後だけroomと頻度を保存", confirmed.status === 202 && confirmedConfig.selectedRoomIds.join() === "101" && confirmedConfig.interval === "3h");
-check("Sprint 013ではscheduleを有効化しない", confirmedConfig.scheduleEnabled === false);
+check("明示同意後だけscheduleを有効化", confirmedConfig.scheduleEnabled === true && confirmedConfig.automaticPushConsent === true);
 wizard.kill("SIGTERM");
 
 api.close();

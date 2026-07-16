@@ -46,6 +46,9 @@ h1 { max-width: 720px; margin: 0; color: #171a20; font-size: clamp(28px, 4vw, 40
 .summary dt { color: #5c5e62; }
 .summary dd { margin: 0; color: #171a20; font-weight: 500; line-height: 1.6; }
 .notice { margin-top: 32px; padding-left: 16px; border-left: 2px solid #171a20; line-height: 1.75; }
+.consent { margin-top: 24px; min-height: 48px; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid #d0d1d2; border-radius: 4px; line-height: 1.6; cursor: pointer; }
+.consent input { width: 20px; height: 20px; flex: 0 0 auto; accent-color: #171a20; }
+.consent input:focus-visible { outline: 3px solid #171a20; outline-offset: 3px; }
 .error { color: #8b1a1a; }
 .result-list { margin: 24px 0 0; padding: 0; list-style: none; }
 .result-list li { padding: 16px 0; border-bottom: 1px solid #e2e3e3; }

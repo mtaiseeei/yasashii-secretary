@@ -1,5 +1,5 @@
 const app = document.querySelector("#app");
-const state = { step: 1, rooms: [], selected: new Set(), interval: "1h", query: "" };
+const state = { step: 1, rooms: [], selected: new Set(), originalSelected: new Set(), interval: "1h", consent: false, query: "" };
 const frequencies = [
   ["30m", "30分", 1440], ["1h", "1時間（おすすめ）", 720], ["3h", "3時間", 240],
   ["6h", "6時間", 120], ["12h", "12時間", 60], ["manual", "手動のみ", 0],
@@ -48,19 +48,32 @@ function renderReview() {
   state.step = 3; progress(3);
   const selectedRooms = state.rooms.filter((room) => state.selected.has(room.roomId));
   const frequency = frequencies.find(([value]) => value === state.interval);
-  app.innerHTML = `<p class="eyebrow">STEP 3 / 4</p><h1>保存内容を確認してください。</h1><p class="lead">確定するまでrepoや履歴は変更しません。確定後、room設定を保存して初回取得を始めます。</p>
+  const removed = state.rooms.filter((room) => state.originalSelected.has(room.roomId) && !state.selected.has(room.roomId));
+  const automatic = state.interval !== "manual";
+  app.innerHTML = `<p class="eyebrow">STEP 3 / 4</p><h1>保存内容を確認してください。</h1><p class="lead">確定するまでrepoや履歴は変更しません。確定後、設定とworkflowを同じcommitへ反映します。</p>
     <dl class="summary"><div class="summary-row"><dt>対象room</dt><dd>${selectedRooms.map((room) => escape(room.name)).join("、")}</dd></div><div class="summary-row"><dt>同期間隔</dt><dd>${frequency[1]}（約 ${frequency[2].toLocaleString("ja-JP")} runs / 30日）</dd></div><div class="summary-row"><dt>保存先</dt><dd>秘書・通常projectと同じprivate GitHub repo</dd></div></dl>
-    <p class="notice">共同編集者は保存された本文を読めます。初回取得は各roomの最新100件以内で、導入前や100件より前の履歴は含まれないことがあります。定期的な自動pushは次の設定で同意した後だけ有効になります。</p>${actions("確定して初回取得")}`;
-  app.querySelector('[data-action="next"]').onclick = confirm;
+    <p class="notice">共同編集者は保存された本文を読めます。各roomの最新100件以内を取得し、導入前や100件より前の履歴は含まれないことがあります。${removed.length ? `${removed.map((room) => escape(room.name)).join("、")} は今後の取得だけを止め、保存済み履歴は削除しません。` : ""}</p>
+    ${automatic ? '<label class="consent"><input id="automatic-consent" type="checkbox"> <span>選択roomの履歴を、この頻度で自動取得・commit・pushすることに同意します。</span></label>' : '<p class="notice">手動のみではscheduleを作らず、検索時も確認後だけ同期します。</p>'}
+    ${actions("設定を確定する")}`;
+  const confirmButton = app.querySelector('[data-action="next"]');
+  if (automatic) {
+    const checkbox = app.querySelector("#automatic-consent");
+    checkbox.checked = state.consent;
+    confirmButton.disabled = !state.consent;
+    checkbox.onchange = () => { state.consent = checkbox.checked; confirmButton.disabled = !state.consent; };
+  } else {
+    state.consent = false;
+  }
+  confirmButton.onclick = confirm;
   app.querySelector('[data-action="back"]').onclick = renderFrequency;
 }
 
 async function confirm() {
   const button = app.querySelector('[data-action="next"]');
-  button.disabled = true; button.textContent = "設定を保存中…";
-  const response = await fetch("/api/confirm", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ selectedRoomIds: [...state.selected], interval: state.interval }) });
+  button.disabled = true; button.textContent = "設定を反映中…";
+  const response = await fetch("/api/confirm", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ selectedRoomIds: [...state.selected], interval: state.interval, automaticPushConsent: state.consent }) });
   const result = await response.json();
-  if (!response.ok) { button.disabled = false; button.textContent = "確定して初回取得"; app.insertAdjacentHTML("beforeend", `<p class="error" role="alert">${escape(result.error)}</p>`); return; }
+  if (!response.ok) { button.disabled = false; button.textContent = "設定を確定する"; app.insertAdjacentHTML("beforeend", `<p class="error" role="alert">${escape(result.error)}</p>`); return; }
   renderResult();
 }
 
@@ -93,7 +106,9 @@ fetch("/api/bootstrap").then((response) => response.json()).then(({ rooms, confi
   }
   state.rooms = rooms.rooms || [];
   state.selected = new Set(config.selectedRoomIds || []);
+  state.originalSelected = new Set(config.selectedRoomIds || []);
   state.interval = config.interval || "1h";
+  state.consent = config.automaticPushConsent === true;
   if (state.rooms.length === 0) {
     app.innerHTML = '<p class="eyebrow">ROOM DISCOVERY</p><h1>参加中のroomは0件でした。</h1><p class="lead">これは正常な取得結果です。Chatworkの参加roomを確認してからroom一覧を更新してください。</p>';
     return;

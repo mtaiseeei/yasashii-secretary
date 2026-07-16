@@ -6,6 +6,7 @@ import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
+import { applyChatworkConfig } from "./config-transaction.mjs";
 
 const exec = promisify(execFile);
 const INTERVALS = new Set(["30m", "1h", "3h", "6h", "12h", "manual"]);
@@ -69,30 +70,22 @@ async function bodyJson(request) {
   return JSON.parse(body || "{}");
 }
 
-async function runInitial() {
+async function runSync(mode) {
   if (process.env.YASASHII_CHATWORK_SKIP_DISPATCH === "1") {
     dispatch = { status: "fixture", message: "合成fixtureの初回取得結果を表示しています。" };
     return;
   }
   const gh = process.env.YASASHII_GH_BIN || "gh";
-  const git = process.env.YASASHII_GIT_BIN || "git";
   dispatch = { status: "dispatching", message: "初回取得workflowを開始しています。" };
   try {
-    await exec(git, ["add", "--", "chatwork/config.json"], { cwd: root, timeout: 30_000 });
-    try {
-      await exec(git, ["diff", "--cached", "--quiet"], { cwd: root, timeout: 30_000 });
-    } catch {
-      await exec(git, ["commit", "-m", "Chatworkのroomと同期間隔を設定"], { cwd: root, timeout: 30_000 });
-      await exec(git, ["push"], { cwd: root, timeout: 60_000 });
-    }
-    await exec(gh, ["workflow", "run", "chatwork-sync.yml", "-f", "mode=initial"], { cwd: root, timeout: 30_000 });
+    await exec(gh, ["workflow", "run", "chatwork-sync.yml", "-f", `mode=${mode}`], { cwd: root, timeout: 30_000 });
     dispatch = { status: "waiting", message: "GitHub Actionsの完了を待っています。" };
     await new Promise((resolveWait) => setTimeout(resolveWait, 2500));
     const listed = await exec(gh, ["run", "list", "--workflow", "chatwork-sync.yml", "--limit", "1", "--json", "databaseId"], { cwd: root, timeout: 30_000 });
     const runs = JSON.parse(listed.stdout || "[]");
     if (!runs[0]?.databaseId) throw new Error("run-not-found");
     await exec(gh, ["run", "watch", String(runs[0].databaseId), "--exit-status"], { cwd: root, timeout: 5 * 60_000 });
-    await exec(git, ["pull", "--ff-only"], { cwd: root, timeout: 60_000 });
+    await exec(process.env.YASASHII_GIT_BIN || "git", ["pull", "--ff-only"], { cwd: root, timeout: 60_000 });
     dispatch = { status: "success", message: "初回取得が完了し、repoへ反映しました。" };
   } catch {
     dispatch = { status: "failed", message: "初回取得を完了できませんでした。GitHub Actionsの結果を確認して再実行してください。" };
@@ -119,12 +112,14 @@ const server = createServer(async (request, response) => {
       if (selectedRoomIds.length === 0) return send(response, 400, { error: "roomを1つ以上選んでください。" });
       if (selectedRoomIds.some((id) => !/^\d+$/.test(id) || !allowed.has(id))) return send(response, 400, { error: "room一覧にないRoom IDは保存できません。" });
       if (!INTERVALS.has(input.interval)) return send(response, 400, { error: "同期間隔を選び直してください。" });
-      writeJson(join(root, "chatwork", "config.json"), { version: 1, selectedRoomIds, interval: input.interval, scheduleEnabled: false });
-      dispatch = { status: "queued", message: "設定を保存し、初回取得を準備しています。" };
-      void runInitial();
-      return send(response, 202, { status: "accepted" });
-    } catch {
-      return send(response, 400, { error: "設定を読み取れませんでした。入力内容を確認してください。" });
+      const previous = readJson(join(root, "chatwork", "config.json"), { selectedRoomIds: [] });
+      const applied = await applyChatworkConfig({ root, selectedRoomIds, interval: input.interval, automaticPushConsent: input.automaticPushConsent === true });
+      const mode = (previous.selectedRoomIds || []).length === 0 ? "initial" : "sync";
+      dispatch = { status: "queued", message: "設定とworkflowを同じcommitへ反映し、取得を準備しています。" };
+      void runSync(mode);
+      return send(response, 202, { status: "accepted", config: applied.config });
+    } catch (error) {
+      return send(response, 400, { error: error.message || "設定を読み取れませんでした。入力内容を確認してください。", code: error.code || "invalid" });
     }
   }
   if (request.method !== "GET") return send(response, 405, { error: "Method not allowed" });

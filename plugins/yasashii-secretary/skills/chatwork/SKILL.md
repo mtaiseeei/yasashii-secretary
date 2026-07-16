@@ -1,6 +1,6 @@
 ---
 name: chatwork
-description: Chatworkの初回接続、room選択、同期状態の確認、保存済み履歴の検索を行う。ユーザーが「Chatworkにつなぎたい」「roomを選びたい」「Chatworkで探して」「/chatwork」と依頼したときに使う。
+description: Chatworkの初回接続、room・同期間隔の設定変更、同期状態の確認、保存済み履歴の検索、確認付き手動同期を行う。ユーザーが「Chatworkにつなぎたい」「roomや頻度を変えたい」「Chatworkで探して」「/chatwork」と依頼したときに使う。
 ---
 
 # Chatwork
@@ -38,27 +38,37 @@ repo rootの次を確認し、状態と次の行動を1つだけ返す。
 
 5. 表示された `http://127.0.0.1:<port>/` を開く。Token入力欄は作らない。
 
-wizardの確定はroom設定を保存し、初回取得workflowを開始する。30分／1時間／3時間／6時間／12時間／
-手動のみを選べるが、この段階では定期scheduleを有効化しない。確定前のキャンセルでは変更しない。
+wizardの確定前に、対象room、頻度、同じprivate repoへ本文を保存すること、自動commit・pushを示す。
+30分／1時間／3時間／6時間／12時間は明示同意後だけ17分起点のscheduleを有効化する。
+手動のみはscheduleを作らない。確定前のキャンセルでは変更せず、room解除でも取得済み履歴を削除しない。
 
 ## 保存済み履歴を検索する
 
-`git pull --ff-only` の成功後に次を実行する。
+低自由度の検索手順は `search-flow.mjs` に任せる。最初は `--choice` を付けない。
 
-`node "${CLAUDE_PLUGIN_ROOT}/skills/chatwork/scripts/search.mjs" --root . --query "<キーワード>" [--room "<room名またはRoom ID>"] [--account "<発言者>"] [--from YYYY-MM-DD] [--to YYYY-MM-DD]`
+`node "${CLAUDE_PLUGIN_ROOT}/skills/chatwork/scripts/search-flow.mjs" --root . --query "<キーワード>" [--room "<room名またはRoom ID>"] [--account "<発言者>"] [--from YYYY-MM-DD] [--to YYYY-MM-DD]`
 
-foundならroom名、日付、該当箇所を根拠として返す。not foundなら「現在の保存済み履歴には見つからない」
-と伝え、Chatworkに存在しないとは断定しない。確認付き手動同期と再検索はsprint-014の導線を使う。
+`found`ならroom名、日付、該当箇所を根拠として返す。`needs-choice`ならhostの
+AskUserQuestionまたはstructured inputで、scriptが返した3択をそのまま提示する。通常の自由文質問へ置き換えない。
+
+- 同期して再検索: 同じコマンドへ `--choice sync` を追加する。
+- 同期しない: `--choice decline` を追加する。
+- 対象roomを見直す: `--choice review` を追加し、wizardへ戻る。
+
+`sync`だけがworkflowを開始する。scriptはpull→検索→dispatch→wait→成功確認→pull→同条件retryの順を固定する。
+失敗・timeout・競合では前回履歴を検索可能なままにし、不要なcommit・pushを行わない。
 
 ## 取得境界
 
 - 読むのは選択済みRoom IDだけ。room選択解除だけで取得済み履歴を削除しない。
 - 初回は各roomの最新100件以内。0件は正常で、今後の同期から蓄積される。
 - message IDで重複を防ぎ、API応答から消えただけの過去データを削除しない。
-- 失敗時は認証、rate limit、network、room単位の部分失敗を区別する。Tokenや本文をエラーへ含めない。
+- 失敗時は認証、rate limit、network、GitHub権限、workflow失敗、timeout、git競合、room単位の部分失敗を区別する。Tokenや本文をエラーへ含めない。
+- 同期失敗時は最終成功時刻と取得位置を進めず、roomが1件でも失敗した回は履歴を更新しない。
 
 ## 参照
 
 - wizard server: `${CLAUDE_PLUGIN_ROOT}/skills/chatwork/scripts/wizard-server.mjs`
 - search: `${CLAUDE_PLUGIN_ROOT}/skills/chatwork/scripts/search.mjs`
+- search flow: `${CLAUDE_PLUGIN_ROOT}/skills/chatwork/scripts/search-flow.mjs`
 - 言葉づかい: `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`
