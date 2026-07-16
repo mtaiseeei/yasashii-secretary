@@ -64,6 +64,26 @@ const review = await evaluate(`({
 })`);
 await evaluate(`document.querySelector('#automatic-consent').click();true`);
 const consent = await evaluate(`({checked:document.querySelector('#automatic-consent').checked,confirmDisabled:document.querySelector('[data-action="next"]').disabled})`);
+await evaluate(`document.querySelector('[data-action="next"]').click();true`);
+await waitFor(`document.querySelector('#app h1')?.textContent.includes('初回設定の結果')`);
+const initialResult = await evaluate(`({text:document.querySelector('#app').innerText})`);
+
+await open(1440, 900);
+const savedInitial = await evaluate(`({selected:document.querySelectorAll('.room-list input:checked').length})`);
+await evaluate(`document.querySelector('input[value="102"]').click();document.querySelector('[data-action="next"]').click();true`);
+await waitFor(`document.querySelectorAll('input[name="interval"]').length === 6`);
+await evaluate(`document.querySelector('input[name="interval"][value="manual"]').click();document.querySelector('[data-action="next"]').click();true`);
+await waitFor(`document.querySelector('#automatic-consent') === null && document.querySelector('[data-action="next"]') !== null`);
+await evaluate(`document.querySelector('[data-action="next"]').click();true`);
+await waitFor(`document.querySelector('#app h1')?.textContent.includes('設定変更が完了')`);
+const changedResult = await evaluate(`({text:document.querySelector('#app').innerText})`);
+
+await open(1440, 900);
+await evaluate(`document.querySelector('[data-action="next"]').click();true`);
+await waitFor(`document.querySelectorAll('input[name="interval"]').length === 6`);
+await evaluate(`document.querySelector('input[name="interval"][value="1h"]').click();document.querySelector('[data-action="next"]').click();true`);
+await waitFor(`document.querySelector('#automatic-consent') !== null`);
+await evaluate(`document.querySelector('#automatic-consent').click();true`);
 await evaluate(`(() => {
   const nativeFetch=window.fetch.bind(window);
   window.fetch=(url,options)=>String(url).endsWith('/api/confirm')
@@ -83,11 +103,15 @@ const mobile = await evaluate(`({
   buttonHeights:[...document.querySelectorAll('button')].map((button)=>button.getBoundingClientRect().height),
   labels:[...document.querySelectorAll('input')].every((input)=>input.closest('label')||document.querySelector('label[for="'+input.id+'"]'))
 })`);
-const report = { initial, review, consent, errorState, mobile, browserErrors: errors };
+const report = { initial, review, consent, initialResult, savedInitial, changedResult, errorState, mobile, browserErrors: errors };
 const passed = initial.rooms === 4 && initial.selected === 0 && initial.nextDisabled
   && review.text.includes("営業チーム") && review.text.includes("6時間") && review.text.includes("自動取得・commit・push")
   && !review.consentChecked && review.confirmDisabled && review.ctaCount === 2
   && consent.checked && !consent.confirmDisabled
+  && initialResult.text.includes("初回設定の結果") && initialResult.text.includes("商品開発") && initialResult.text.includes("成功・1件")
+  && savedInitial.selected === 2
+  && changedResult.text.includes("設定変更が完了") && changedResult.text.includes("営業チーム") && changedResult.text.includes("手動のみ") && changedResult.text.includes("無効")
+  && !changedResult.text.includes("初回設定の結果") && !changedResult.text.includes("商品開発") && !changedResult.text.includes("成功・1件")
   && errorState.message.includes("GitHubの書込権限") && errorState.buttonEnabled
   && mobile.actionDirection === "column-reverse" && !mobile.horizontalOverflow
   && mobile.buttonHeights.every((height) => height >= 44) && mobile.labels && errors.length === 0;

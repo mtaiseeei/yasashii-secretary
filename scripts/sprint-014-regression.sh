@@ -26,6 +26,7 @@ check_eval "dispatch→wait→success→pull→retry順をscriptで固定" "node
 check_eval "failure分類はauth・rate・network・GitHub権限・workflow・timeout・git競合・部分room" "for code in auth rate-limit network github-permission workflow-failure timeout git-conflict partial-room; do grep -q \"\$code\" '$CHATWORK/scripts/search-flow.mjs' || exit 1; done"
 check_eval "wizardは自動push同意checkboxとerror roleを持つ" "grep -q 'automatic-consent' '$CHATWORK/assets/wizard/app.js' && grep -q 'role=\"alert\"' '$CHATWORK/assets/wizard/app.js'"
 check_eval "wizardは解除済みroom履歴を削除しない説明" "grep -q '保存済み履歴は削除しません' '$CHATWORK/assets/wizard/app.js'"
+check_eval "wizardは初回設定と設定変更の結果を分離" "grep -q 'configuration-change' '$CHATWORK/scripts/wizard-server.mjs' && grep -q '設定変更が完了しました' '$CHATWORK/assets/wizard/app.js' && grep -q '現在の対象room' '$CHATWORK/assets/wizard/app.js' && grep -q 'schedule' '$CHATWORK/assets/wizard/app.js'"
 check_eval "wizard design・responsive・accessibilityを維持" "grep -q '#3e6ae1' '$CHATWORK/assets/wizard/style.css' && grep -q 'max-width: 767px' '$CHATWORK/assets/wizard/style.css' && grep -q 'focus-visible' '$CHATWORK/assets/wizard/style.css' && grep -q 'min-height: 48px' '$CHATWORK/assets/wizard/style.css'"
 check_eval "READMEと公開guideがChatwork導入を一続きで案内" "grep -q 'Chatworkをつなぐ' '$REPO/README.md' && grep -q 'gh secret set CHATWORK_API_TOKEN' '$REPO/README.md' && grep -q '同期して再検索' '$REPO/README.md' && grep -q 'Chatworkをつなぐ・探す' '$REPO/docs/guide/features.md'"
 check_eval "配布SKILLは開発docs・絶対path非依存" "! grep -RqiE 'docs/(spec|sprints|progress|feedback)|/Users/' '$CHATWORK'"

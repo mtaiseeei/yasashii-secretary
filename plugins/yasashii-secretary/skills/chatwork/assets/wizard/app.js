@@ -81,6 +81,25 @@ async function renderResult() {
   state.step = 4; progress(4);
   const response = await fetch("/api/status");
   const result = await response.json();
+  const configurationChange = result.dispatch.operation === "configuration-change";
+  if (configurationChange) {
+    const config = result.dispatch.config || {};
+    const selected = new Set((config.selectedRoomIds || []).map(String));
+    const selectedRooms = state.rooms.filter((room) => selected.has(room.roomId));
+    const frequency = frequencies.find(([value]) => value === config.interval) || frequencies[1];
+    const schedule = config.scheduleEnabled === true;
+    const done = ["success", "failed", "fixture"].includes(result.dispatch.status);
+    const heading = result.dispatch.status === "failed"
+      ? "設定は変更しましたが、同期を完了できませんでした。"
+      : done ? "設定変更が完了しました。" : "設定変更を進めています。";
+    app.innerHTML = `<p class="eyebrow">STEP 4 / 4</p><h1>${heading}</h1><p class="lead">${escape(result.dispatch.message || "設定の反映状態を確認しています。")}</p>
+      <dl class="summary"><div class="summary-row"><dt>現在の対象room</dt><dd>${selectedRooms.map((room) => escape(room.name)).join("、")}</dd></div><div class="summary-row"><dt>現在の同期間隔</dt><dd>${frequency[1]}</dd></div><div class="summary-row"><dt>schedule</dt><dd>${schedule ? "有効（自動取得・commit・push）" : "無効（手動のみ）"}</dd></div></dl>
+      <p class="notice">roomを解除しても、保存済み履歴は削除していません。</p>
+      <div class="actions"><button class="button button-secondary" data-action="close">設定を終了</button></div>`;
+    app.querySelector('[data-action="close"]').onclick = () => { app.innerHTML = '<p class="eyebrow">COMPLETE</p><h1>設定画面を閉じて大丈夫です。</h1><p class="lead">次は /chatwork から保存済み履歴を検索できます。</p>'; };
+    if (!done) window.setTimeout(renderResult, 2000);
+    return;
+  }
   const sync = result.sync;
   const done = ["success", "failed", "fixture"].includes(result.dispatch.status);
   const results = ["success", "fixture"].includes(result.dispatch.status) ? (sync?.results || []) : [];

@@ -16,7 +16,7 @@ const root = resolve(args.get("--root") || process.cwd());
 const port = Number(args.get("--port") || 8765);
 const host = "127.0.0.1";
 const assets = resolve(dirname(fileURLToPath(import.meta.url)), "..", "assets", "wizard");
-let dispatch = { status: "idle", message: "" };
+let dispatch = { status: "idle", operation: null, config: null, message: "" };
 
 function verifyPrivateRepo() {
   if (process.env.NODE_ENV === "test" && process.env.YASASHII_CHATWORK_TEST_PRIVATE === "1") return;
@@ -70,25 +70,45 @@ async function bodyJson(request) {
   return JSON.parse(body || "{}");
 }
 
-async function runSync(mode) {
+async function runSync(mode, config) {
+  const operation = mode === "initial" ? "initial" : "configuration-change";
   if (process.env.YASASHII_CHATWORK_SKIP_DISPATCH === "1") {
-    dispatch = { status: "fixture", message: "合成fixtureの初回取得結果を表示しています。" };
+    dispatch = operation === "initial"
+      ? { status: "fixture", operation, config, message: "合成fixtureの初回取得結果を表示しています。" }
+      : { status: "fixture", operation, config, message: "設定変更を反映しました。保存済み履歴はそのまま残しています。" };
     return;
   }
   const gh = process.env.YASASHII_GH_BIN || "gh";
-  dispatch = { status: "dispatching", message: "初回取得workflowを開始しています。" };
+  dispatch = {
+    status: "dispatching",
+    operation,
+    config,
+    message: operation === "initial" ? "初回取得workflowを開始しています。" : "設定変更後の同期workflowを開始しています。",
+  };
   try {
     await exec(gh, ["workflow", "run", "chatwork-sync.yml", "-f", `mode=${mode}`], { cwd: root, timeout: 30_000 });
-    dispatch = { status: "waiting", message: "GitHub Actionsの完了を待っています。" };
+    dispatch = { status: "waiting", operation, config, message: "GitHub Actionsの完了を待っています。" };
     await new Promise((resolveWait) => setTimeout(resolveWait, 2500));
     const listed = await exec(gh, ["run", "list", "--workflow", "chatwork-sync.yml", "--limit", "1", "--json", "databaseId"], { cwd: root, timeout: 30_000 });
     const runs = JSON.parse(listed.stdout || "[]");
     if (!runs[0]?.databaseId) throw new Error("run-not-found");
     await exec(gh, ["run", "watch", String(runs[0].databaseId), "--exit-status"], { cwd: root, timeout: 5 * 60_000 });
     await exec(process.env.YASASHII_GIT_BIN || "git", ["pull", "--ff-only"], { cwd: root, timeout: 60_000 });
-    dispatch = { status: "success", message: "初回取得が完了し、repoへ反映しました。" };
+    dispatch = {
+      status: "success",
+      operation,
+      config,
+      message: operation === "initial" ? "初回取得が完了し、repoへ反映しました。" : "設定変更後の同期が完了し、repoへ反映しました。",
+    };
   } catch {
-    dispatch = { status: "failed", message: "初回取得を完了できませんでした。GitHub Actionsの結果を確認して再実行してください。" };
+    dispatch = {
+      status: "failed",
+      operation,
+      config,
+      message: operation === "initial"
+        ? "初回取得を完了できませんでした。GitHub Actionsの結果を確認して再実行してください。"
+        : "設定は変更しましたが、同期を完了できませんでした。GitHub Actionsの結果を確認して再実行してください。",
+    };
   }
 }
 
@@ -115,8 +135,9 @@ const server = createServer(async (request, response) => {
       const previous = readJson(join(root, "chatwork", "config.json"), { selectedRoomIds: [] });
       const applied = await applyChatworkConfig({ root, selectedRoomIds, interval: input.interval, automaticPushConsent: input.automaticPushConsent === true });
       const mode = (previous.selectedRoomIds || []).length === 0 ? "initial" : "sync";
-      dispatch = { status: "queued", message: "設定とworkflowを同じcommitへ反映し、取得を準備しています。" };
-      void runSync(mode);
+      const operation = mode === "initial" ? "initial" : "configuration-change";
+      dispatch = { status: "queued", operation, config: applied.config, message: "設定とworkflowを同じcommitへ反映し、取得を準備しています。" };
+      void runSync(mode, applied.config);
       return send(response, 202, { status: "accepted", config: applied.config });
     } catch (error) {
       return send(response, 400, { error: error.message || "設定を読み取れませんでした。入力内容を確認してください。", code: error.code || "invalid" });

@@ -6,6 +6,7 @@ import { chmodSync, cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, re
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
+import { runInNewContext } from "node:vm";
 import { applyChatworkConfig } from "../plugins/yasashii-secretary/skills/chatwork/scripts/config-transaction.mjs";
 import { INTERVALS } from "../plugins/yasashii-secretary/skills/chatwork/scripts/schedule.mjs";
 
@@ -179,6 +180,7 @@ for (const [mode, code] of [["auth", "auth"], ["rate", "rate-limit"], ["network"
 
 const wizardRoot = fixture("wizard");
 writeFileSync(join(wizardRoot, "chatwork", "rooms.json"), `${JSON.stringify({ version: 1, status: "ready", rooms: [{ roomId: "101", name: "営業" }, { roomId: "102", name: "開発" }] }, null, 2)}\n`);
+writeFileSync(join(wizardRoot, "chatwork", "state", "sync.json"), `${JSON.stringify({ version: 1, status: "success", results: [{ roomId: "101", roomName: "営業", status: "success", fetched: 0 }, { roomId: "102", roomName: "開発", status: "success", fetched: 1 }] }, null, 2)}\n`);
 const wizard = execFile(process.execPath, [wizardScript, "--root", wizardRoot, "--port", "0"], { env: { ...process.env, NODE_ENV: "test", YASASHII_CHATWORK_SKIP_DISPATCH: "1", YASASHII_CHATWORK_TEST_PRIVATE: "1", YASASHII_CHATWORK_SKIP_GIT: "1", YASASHII_CHATWORK_TEST_SECRET: "1" } });
 let wizardOutput = ""; wizard.stdout.on("data", (chunk) => { wizardOutput += chunk; });
 for (let index = 0; index < 60 && !wizardOutput.includes("http://"); index += 1) await new Promise((wait) => setTimeout(wait, 50));
@@ -187,11 +189,28 @@ check("設定変更wizardはloopbackで起動", Boolean(wizardUrl));
 const wizardBefore = readFileSync(join(wizardRoot, "chatwork", "config.json"), "utf8");
 const noConsent = await fetch(`${wizardUrl}api/confirm`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ selectedRoomIds: ["101"], interval: "1h", automaticPushConsent: false }) });
 check("wizard同意前はconfig変更0", noConsent.status === 400 && readFileSync(join(wizardRoot, "chatwork", "config.json"), "utf8") === wizardBefore);
-const accepted = await fetch(`${wizardUrl}api/confirm`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ selectedRoomIds: ["101"], interval: "12h", automaticPushConsent: true }) });
-check("wizard同意後はconfig・実schedule一致", accepted.status === 202 && json(join(wizardRoot, "chatwork", "config.json")).interval === "12h" && readFileSync(join(wizardRoot, ".github", "workflows", "chatwork-sync.yml"), "utf8").includes("17 */12 * * *"));
+const accepted = await fetch(`${wizardUrl}api/confirm`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ selectedRoomIds: ["101", "102"], interval: "6h", automaticPushConsent: true }) });
+check("wizard同意後はconfig・実schedule一致", accepted.status === 202 && json(join(wizardRoot, "chatwork", "config.json")).interval === "6h" && readFileSync(join(wizardRoot, ".github", "workflows", "chatwork-sync.yml"), "utf8").includes("17 */6 * * *"));
 writeFileSync(join(wizardRoot, "chatwork", "history", "102.json"), `${JSON.stringify({ messages: [message(88)] })}\n`);
 await fetch(`${wizardUrl}api/confirm`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ selectedRoomIds: ["101"], interval: "manual", automaticPushConsent: false }) });
 check("room解除は今後の取得だけ停止し既存履歴を保持", existsSync(join(wizardRoot, "chatwork", "history", "102.json")) && !readFileSync(join(wizardRoot, ".github", "workflows", "chatwork-sync.yml"), "utf8").includes("  schedule:"));
+const changedStatus = await (await fetch(`${wizardUrl}api/status`)).json();
+check("設定変更statusは現在のroom・頻度・scheduleを返す", changedStatus.dispatch.operation === "configuration-change" && changedStatus.dispatch.config.selectedRoomIds.join() === "101" && changedStatus.dispatch.config.interval === "manual" && changedStatus.dispatch.config.scheduleEnabled === false);
+const appSource = readFileSync(join(plugin, "skills", "chatwork", "assets", "wizard", "app.js"), "utf8");
+const appDom = { innerHTML: "", querySelector: () => ({ onclick: null }) };
+const browserContext = {
+  document: { querySelector: (selector) => selector === "#app" ? appDom : null, querySelectorAll: () => [] },
+  fetch: (url) => String(url).endsWith("/api/status") ? Promise.resolve({ json: async () => changedStatus }) : new Promise(() => {}),
+  window: { setTimeout: () => {} },
+  console,
+  Set,
+};
+runInNewContext(appSource, browserContext);
+runInNewContext('state.rooms = [{ roomId: "101", name: "営業" }, { roomId: "102", name: "開発" }]', browserContext);
+await browserContext.renderResult();
+const currentResultOnly = appDom.innerHTML.includes("設定変更が完了しました") && appDom.innerHTML.includes("営業") && appDom.innerHTML.includes("手動のみ") && appDom.innerHTML.includes("無効") && !appDom.innerHTML.includes("初回設定の結果") && !appDom.innerHTML.includes(">開発<") && !appDom.innerHTML.includes("成功・1件");
+if (!currentResultOnly) process.stderr.write(`設定変更DOM: ${appDom.innerHTML}\n`);
+check("設定変更結果は現在値だけを表示し旧初回結果を再表示しない", currentResultOnly);
 wizard.kill("SIGTERM");
 
 const distributed = files(plugin).filter((path) => /skills\/chatwork|workspace-templates/.test(path)).map((path) => readFileSync(path, "utf8")).join("\n");

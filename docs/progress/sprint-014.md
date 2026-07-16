@@ -74,3 +74,12 @@
 - manual search: 3択すべてと、承認時のeventsが`pull-before-search,search-local,structured-choice,dispatch,wait,success-confirmed,pull-after-sync,retry-same-query`であることを確認する。
 - error: auth、rate limit、network、GitHub権限、workflow failure、timeout、git競合、部分room失敗で前回履歴・成功時刻・cursorが保持され、token／本文がerrorへ出ないことを確認する。
 - live gate: 許可済みRepository Secretと非機密test roomで、実room一覧、1回の同期、workflow成功、commit、pull後検索を伏せ字証跡にする。
+
+## Retry 1 — 設定変更結果の現在値表示
+
+- 初回設定と設定変更を `operation` で区別し、設定変更後は現在の対象room、現在の同期間隔、schedule有効／無効だけを結果stepへ表示するよう修正した。
+- `sync.json` に残る初回取得履歴は削除せず、設定変更結果では旧room・旧取得件数を現在の結果として再表示しない。
+- 合成DOM回帰と実ブラウザ回帰へ「2 room・6時間 → 1 room・手動のみ」を追加し、現在値の表示と旧初回結果の非表示を検証対象にした。
+- Retry 1検証は、合成挙動 `PASS=46 FAIL=0`、専用回帰 `PASS=34 FAIL=0`、全offline回帰 `PASS=298 FAIL=0`。
+- running wizardをChromeで実操作し、変更後の営業チーム、手動のみ、schedule無効を確認。旧見出し、旧roomの商品開発、旧取得件数の成功・1件はすべて非表示で、browser error／warnは0件だった。
+- external live gateはこのRetryでは実行していない。専用private test workspace、Repository Secret、workflow dispatch、実Chatwork API、remote pushには触れていない。
