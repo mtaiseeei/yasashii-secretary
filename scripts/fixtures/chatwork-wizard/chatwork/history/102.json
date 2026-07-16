@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "room": { "roomId": "102", "name": "商品開発" },
+  "updatedAt": "2026-07-16T12:00:00Z",
+  "apiWindow": { "limit": 100, "returned": 1 },
+  "messages": [
+    {
+      "messageId": "9001",
+      "roomId": "102",
+      "roomName": "商品開発",
+      "accountId": "7",
+      "accountName": "合成人物",
+      "sentAt": 1784160000,
+      "updatedAt": 1784160000,
+      "body": "合成fixtureのメッセージです。実ユーザーのデータは含みません。"
+    }
+  ]
+}

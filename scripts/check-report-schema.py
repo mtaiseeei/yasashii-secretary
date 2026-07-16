@@ -121,8 +121,8 @@ def validate(plugin: Path) -> list[str]:
         errors.append("serializer owner lacks unique-owner declaration")
 
     surfaces = user_surfaces(plugin)
-    if len(surfaces) != 16:
-        errors.append(f"unexpected user-facing surface count: {len(surfaces)} (expected 16)")
+    if len(surfaces) != 17:
+        errors.append(f"unexpected user-facing surface count: {len(surfaces)} (expected 17)")
 
     schema_owners = {owner}
     for path in surfaces:
@@ -161,7 +161,7 @@ def main() -> int:
         for error in errors:
             print(f"SCHEMA_ERROR {error}", file=sys.stderr)
         return 1
-    print("SCHEMA_OK owner=rules/plain-language.md surfaces=16 conflicts=0")
+    print("SCHEMA_OK owner=rules/plain-language.md surfaces=17 conflicts=0")
     return 0
 
 

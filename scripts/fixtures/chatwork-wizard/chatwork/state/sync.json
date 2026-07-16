@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "status": "success",
+  "attemptedAt": "2026-07-16T12:00:00Z",
+  "lastSuccessAt": "2026-07-16T12:00:00Z",
+  "results": [
+    { "roomId": "101", "roomName": "営業チーム", "status": "success", "fetched": 0, "stored": 0 },
+    { "roomId": "102", "roomName": "商品開発", "status": "success", "fetched": 1, "stored": 1 }
+  ]
+}

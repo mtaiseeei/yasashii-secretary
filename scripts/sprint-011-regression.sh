@@ -102,8 +102,8 @@ for surface in "${REFERENCE_SURFACES[@]}"; do
   serializer_reference_ok "$surface" || { printf '  serializer参照不整合: %s\n' "$surface"; reference_bad=$((reference_bad+1)); }
 done
 check "plain-languageのserializer唯一正本はI1-I3境界を満たす" "serializer_contract_ok '$RULES'"
-check "templates/tones/全11スキルは正本参照だけでschema重複0" \
-  "[ '${#REFERENCE_SURFACES[@]}' -eq 16 ] && [ '$reference_bad' -eq 0 ]"
+check "templates/tones/全12スキルは正本参照だけでschema重複0" \
+  "[ '${#REFERENCE_SURFACES[@]}' -eq 17 ] && [ '$reference_bad' -eq 0 ]"
 SCHEMA_OWNER_COUNT="$(grep -Rsl '^やったこと:' "$PLUGIN/rules" "$PLUGIN/skills" "$PLUGIN/templates" --include='*.md' | wc -l | tr -d ' ')"
 check "固定schemaの所有ファイルはplain-language 1件だけ" \
   "[ '$SCHEMA_OWNER_COUNT' -eq 1 ] && grep -q '^やったこと:' '$RULES'"
@@ -167,7 +167,7 @@ missing_pref_ref=0
 while IFS= read -r skill; do
   grep -q 'preferences.md' "$skill" || { printf '  preferences参照なし: %s\n' "$skill"; missing_pref_ref=$((missing_pref_ref+1)); }
 done < <(find "$PLUGIN/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | sort)
-check "全11スキルがpreferencesを参照" "[ '$missing_pref_ref' -eq 0 ] && [ \"\$(find '$PLUGIN/skills' -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')\" -eq 11 ]"
+check "全12スキルがpreferencesを参照" "[ '$missing_pref_ref' -eq 0 ] && [ \"\$(find '$PLUGIN/skills' -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')\" -eq 12 ]"
 
 # 部分更新・追記・確認後のjournal/commit
 SEC="$WORK/main/secretary"

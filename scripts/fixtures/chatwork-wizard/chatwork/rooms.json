@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "status": "ready",
+  "fetchedAt": "2026-07-16T12:00:00Z",
+  "rooms": [
+    { "roomId": "101", "name": "営業チーム" },
+    { "roomId": "102", "name": "商品開発" },
+    { "roomId": "103", "name": "経営会議" },
+    { "roomId": "104", "name": "採用プロジェクト" }
+  ]
+}

@@ -1,5 +1,5 @@
 {
   "name": "yasashii-secretary",
-  "description": "あなた専属のAI秘書。記憶と成果物はローカルに置き、外部データは公式コネクタで都度参照する。数問のオンボーディングで秘書ディレクトリ（secretary/）を作る。",
-  "version": "0.1.0"
+  "description": "あなた専属のAI秘書。記憶、通常のプロジェクト、選択したChatwork room履歴を1つのprivate GitHub repoで管理する。",
+  "version": "0.2.0"
 }

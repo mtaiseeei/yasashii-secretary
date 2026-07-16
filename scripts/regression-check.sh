@@ -142,11 +142,12 @@ SETUP_NOTION_SKILL="$PLUGIN/skills/setup-notion/SKILL.md"
 CONNECTIONS_SKILL="$PLUGIN/skills/connections/SKILL.md"
 BUILD_SKILL="$PLUGIN/skills/build/SKILL.md"
 SETTINGS_SKILL="$PLUGIN/skills/settings/SKILL.md"
+CHATWORK_SKILL="$PLUGIN/skills/chatwork/SKILL.md"
 RULES="$PLUGIN/rules/plain-language.md"
 # ユーザー向け SKILL 群の参照スキャン対象（同梱ファイル参照の検査に使う）。
 # 別プラグインへの参照導線と同梱物の不在は section 12 が扱う。
 SKILLS=("$SECRETARY_SKILL" "$ONBOARD_SKILL" "$MEMCARE_SKILL" "$SETUP_GOOGLE_SKILL" "$DAILY_SKILL" "$WEEKLY_SKILL" \
-        "$SETUP_MS_SKILL" "$SETUP_NOTION_SKILL" "$CONNECTIONS_SKILL" "$BUILD_SKILL" "$SETTINGS_SKILL")
+        "$SETUP_MS_SKILL" "$SETUP_NOTION_SKILL" "$CONNECTIONS_SKILL" "$BUILD_SKILL" "$SETTINGS_SKILL" "$CHATWORK_SKILL")
 
 check "secretary/SKILL.md が存在" "[ -f '$SECRETARY_SKILL' ]"
 check "onboarding/SKILL.md が存在" "[ -f '$ONBOARD_SKILL' ]"
@@ -159,6 +160,7 @@ check "setup-notion/SKILL.md が存在" "[ -f '$SETUP_NOTION_SKILL' ]"
 check "connections/SKILL.md が存在" "[ -f '$CONNECTIONS_SKILL' ]"
 check "build/SKILL.md が存在" "[ -f '$BUILD_SKILL' ]"
 check "settings/SKILL.md が存在" "[ -f '$SETTINGS_SKILL' ]"
+check "chatwork/SKILL.md が存在" "[ -f '$CHATWORK_SKILL' ]"
 check "rules/plain-language.md が存在" "[ -f '$RULES' ]"
 
 # frontmatter の name を取り出す（1行目 --- 以降）
@@ -174,6 +176,7 @@ NNAME="$(name_of "$SETUP_NOTION_SKILL")"
 CNAME="$(name_of "$CONNECTIONS_SKILL")"
 BNAME="$(name_of "$BUILD_SKILL")"
 PNAME="$(name_of "$SETTINGS_SKILL")"
+CWNAME="$(name_of "$CHATWORK_SKILL")"
 check "secretary の name が 'secretary'" "[ '$SNAME' = 'secretary' ]"
 check "onboarding の name が 'onboarding'" "[ '$ONAME' = 'onboarding' ]"
 check "memory-care の name が 'memory-care'" "[ '$MNAME' = 'memory-care' ]"
@@ -185,8 +188,9 @@ check "setup-notion の name が 'setup-notion'" "[ '$NNAME' = 'setup-notion' ]"
 check "connections の name が 'connections'" "[ '$CNAME' = 'connections' ]"
 check "build の name が 'build'" "[ '$BNAME' = 'build' ]"
 check "settings の name が 'settings'" "[ '$PNAME' = 'settings' ]"
+check "chatwork の name が 'chatwork'" "[ '$CWNAME' = 'chatwork' ]"
 check "name が一意（重複なし）" \
-  "[ \"\$(printf '%s\n' '$SNAME' '$ONAME' '$MNAME' '$GNAME' '$DNAME' '$WNAME' '$MSNAME' '$NNAME' '$CNAME' '$BNAME' '$PNAME' | sort -u | wc -l | tr -d ' ')\" = '11' ]"
+  "[ \"\$(printf '%s\n' '$SNAME' '$ONAME' '$MNAME' '$GNAME' '$DNAME' '$WNAME' '$MSNAME' '$NNAME' '$CNAME' '$BNAME' '$PNAME' '$CWNAME' | sort -u | wc -l | tr -d ' ')\" = '12' ]"
 
 # 同梱ファイル参照は ${CLAUDE_PLUGIN_ROOT} 相対に統一されている（constraints.md L40 / domain.md）。
 # (a) ${CLAUDE_PLUGIN_ROOT}/... の参照先が全て実在（プラグイン配下で解決）
@@ -205,7 +209,7 @@ check "雛形が plugins/yasashii-secretary/templates/ に存在" "[ -f '$PLUGIN
 check "SKILL に plugins/yasashii-secretary/ 直下相対の同梱参照が無い" \
   "! grep -rqE 'plugins/yasashii-secretary/' \"\${SKILLS[@]}\""
 check "SKILL に \${CLAUDE_PLUGIN_ROOT} を伴わない bare templates/ 参照が無い" \
-  "! grep -rhoE '[^./{]templates/' \"\${SKILLS[@]}\" | grep -q ."
+  "! grep -rnE '[^./{]templates/' \"\${SKILLS[@]}\" | grep -v '\${CLAUDE_PLUGIN_ROOT}' | grep -q ."
 # (d) 絶対パス直書き（先頭スラッシュのコード参照）が無い
 check "SKILL に絶対パス直書きが無い" \
   "! grep -rhoE '\`/[A-Za-z]' \"\${SKILLS[@]}\" | grep -q ."
@@ -874,10 +878,10 @@ skill_miss=0
 for s in $(ls "$PLUGIN/skills"); do
   grep -q "$s" "$README" || { echo "  README に未記載のスキル: $s"; skill_miss=$((skill_miss+1)); }
 done
-check "README の機能一覧が実スキル全11件と一致" "[ $skill_miss -eq 0 ]"
+check "README の機能一覧が実スキル全12件と一致" "[ $skill_miss -eq 0 ]"
 # README が実在しないスキルを機能として掲げていない（記載スキル名が実ディレクトリに存在）
-check "README が国内チャットを『今できる』と謳っていない（対象外と明記）" \
-  "grep -q '対象外' '$README' && (grep -q 'Chatwork' '$README' || grep -q '国内チャット' '$README')"
+check "README がChatwork対応と未対応チャットを区別" \
+  "grep -q 'Chatwork 接続・room選択・履歴検索' '$README' && grep -q 'LINE等の未対応チャット' '$README'"
 
 # --- 3: 公開 docs の分離 ---
 check "公開ガイド docs/guide/ が存在" "[ -f '$GUIDE/README.md' ]"
@@ -958,6 +962,17 @@ if bash "$SPRINT012_PATCH001_REGRESSION"; then
   ok "sprint-012-patch-001回帰が全て成功"
 else
   ng "sprint-012-patch-001回帰に失敗"
+fi
+
+# ---------------------------------------------------------------------------
+section "19. single-repo Git-first + Chatwork初回設定（sprint-013）"
+# ---------------------------------------------------------------------------
+SPRINT013_REGRESSION="$REPO/scripts/sprint-013-regression.sh"
+check "sprint-013実動作回帰が存在し実行可能" "[ -x '$SPRINT013_REGRESSION' ]"
+if bash "$SPRINT013_REGRESSION"; then
+  ok "sprint-013実動作回帰が全て成功"
+else
+  ng "sprint-013実動作回帰に失敗"
 fi
 
 # ---------------------------------------------------------------------------
