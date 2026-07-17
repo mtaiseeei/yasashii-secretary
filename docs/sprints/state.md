@@ -39,7 +39,7 @@
 | sprint-018 | done | [contract](sprint-018.md) | [progress](../progress/sprint-018.md) | [feedback](../feedback/sprint-018.md) |
 | sprint-019 | done | [contract](sprint-019.md) | [progress](../progress/sprint-019.md) | [feedback](../feedback/sprint-019.md) |
 | sprint-020 | done | [contract](sprint-020.md) | [progress](../progress/sprint-020.md) | [feedback](../feedback/sprint-020.md) |
-| sprint-020-patch-001 | active | [contract](sprint-020-patch-001.md) | - | - |
+| sprint-020-patch-001 | awaiting-eval | [contract](sprint-020-patch-001.md) | [progress](../progress/sprint-020-patch-001.md) | - |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
