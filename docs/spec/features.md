@@ -86,6 +86,7 @@
 ### F24 Chatwork接続・room選択wizard
 
 - ChatworkとGoogle Chatは同じローカルwizard骨格を共有する。Chatworkの各画面には「Chatworkの設定」を見出しとaccessible nameで明示し、primary CTAの背景色を `#F03747` にする。
+- 主導線は、最初に「今すること」を1文で示し、1画面1判断・1段落1要点にする。`Repository Secret`、`workflow`、`commit・push`等は目的を日常語で先に伝え、正式名称は判断に必要な場面か「詳しい説明」に置く。
 - `/chatwork` から接続状態と次の行動を確認でき、未設定ならChatworkのAPI Token取得、GitHub上の安全な保管場所への登録、ルーム選択を順に進められる。
 - API Token取得ではChatwork公式のTokenページと発行ヘルプへ直接進める。組織契約でTokenページを利用できない場合は、実際にAPIを使うアカウントで組織管理者へ利用申請し、承認後に同じ設定へ戻る導線を示す。承認前はルーム一覧取得へ進めない。
 - Tokenはwizardや会話へ貼らせない。現在のGitHub repoのowner／nameから組み立てたSecret追加画面を「GitHub上の安全な保管場所を開く」と案内し、利用者自身が名前 `CHATWORK_API_TOKEN` で登録する。固定ownerや固定repo pathへ誘導しない。
@@ -174,6 +175,7 @@
 ### F32 各社所有Google CloudプロジェクトとユーザーOAuth
 
 - READMEに「Google Chatをつなぐ（少し高度な設定）」を設け、Google Workspace管理者またはGoogle Cloudプロジェクトを作成できる人向けであることを最初に示す。
+- 主導線では「今すること」を1文で先に示し、Google CloudやOAuthの準備を1画面1判断へ分ける。`loopback`、`scope`、OAuth client JSON等の内部詳細は主説明に並べず、必要な正式名称と役割を「詳しい説明」または「管理者向け」に置く。
 - 利用者の会社ごとに、そのGoogle Workspace組織が所有するGoogle Cloudプロジェクトを使う。OAuth Audienceは `Internal`、OAuth Clientは `Desktop app` とし、ShigApps共通の外部向けOAuthアプリは使わない。
 - Google Chat APIと、発言者名の補完に必要なGoogle People APIを有効にする。権限は `chat.spaces.readonly`、`chat.messages.readonly`、`contacts.readonly` だけに限定し、未使用の `chat.memberships.readonly` は要求しない。People APIで一部の同僚名を補完できない場合があることと代替表示をREADMEで説明する。
 - ローカルwizardはダウンロードしたOAuth client JSONを資格情報として扱う。client secret、認可コード、access token、refresh token、client JSON全文は厳格secretとして永続物へ表示・保存しない。client IDは識別子であり、一時的なOAuth認可URLと管理者チェックリストには表示できるが、tracked file、Git差分・履歴、ログ、journal、fixture、スクリーンショット、評価証跡、再読込後も残るDOMへ保存しない。
