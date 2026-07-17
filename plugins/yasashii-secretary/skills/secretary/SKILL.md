@@ -54,12 +54,19 @@ trigger: /secretary
 | 「Chatworkにつなぎたい」「roomを選びたい」「Chatworkで探して」「/chatwork」 | Chatwork接続・room設定・履歴検索（chatwork） | `${CLAUDE_PLUGIN_ROOT}/skills/chatwork/SKILL.md` |
 | 「繋がってる？」「接続の調子」「診断して」「どれが使える？」 | 接続診断（connections） | `${CLAUDE_PLUGIN_ROOT}/skills/connections/SKILL.md` |
 | 「設定変えたい」「もっとフランクに」「専門用語そのままで」「呼び方を変えて」 | 個人設定（settings） | `${CLAUDE_PLUGIN_ROOT}/skills/settings/SKILL.md` |
+| 「プロジェクトにまとめたい」「案件を整理したい」「プロジェクトの状況」「完了にしたい」「再開したい」 | 継続する仕事の整理（projects） | `${CLAUDE_PLUGIN_ROOT}/skills/projects/SKILL.md` |
 | 「保存して」「文書にして」「まとめて残して」「企画書にして」 | 成果物保存（出力規約） | 下記「成果物を保存するとき」 |
 | 「作って」「開発したい」「アプリ／ツールにして」 | 開発の入口（build） | `${CLAUDE_PLUGIN_ROOT}/skills/build/SKILL.md` |
 | 「もう一度セットアップ」「作り直したい」 | 再セットアップ（保護あり） | 下記「作り直し（再セットアップ）の保護」 |
 
 LINE等の未対応サービスは準備中。ChatworkだけはRepository SecretとGitHub Actionsを使う読取専用同期に対応する。Notion は任意で、繋がなくても他の機能は普通に使える。
 準備中の機能を求められたら、正直に「その機能は準備中です」と伝え、いまできることを代わりに提案する。断定せず、できないことはできないと言う。
+
+どのロード先でも、同じ成果に向けた複数行動・複数セッションを含む候補シグナルが2つ以上揃ったら、
+`${CLAUDE_PLUGIN_ROOT}/skills/projects/SKILL.md` の候補確認だけを段階ロードする。候補検出は完全自動ではない。
+単発成果物、同じ会話で完了する作業、一つだけのTODOへは提案しない。候補を検出しても自動作成せず、
+理由を1〜2点に絞って「この内容は今後も続きそうです。プロジェクトとしてまとめますか？」と構造化質問で確認する。
+確認前、拒否、キャンセルではprojectファイル、journal、commit、remoteを変更しない。
 
 ## 会話中の節目（全モード共通）
 
@@ -70,7 +77,8 @@ LINE等の未対応サービスは準備中。ChatworkだけはRepository Secret
   - `<そのターンのユーザー入力全文>`には、ユーザーが送った文字列を句読点・助詞・決定表現まで一字も削らず、並べ替えず、言い換えずに入れる。引用符も足さない。
   - 挨拶、解釈、補足、曖昧さの質問、「よろしければ」等の再確認、2行目を足さない。この1行自体が記録可否の確認である。
   - この確認ターンではツールを呼ばず、decision・journal・commitを一切変更しない。ユーザーが**次の別ターンで明示的に了承した後だけ**、確認した原文を
-    `memory-tools.sh remember-decision`へ渡す。否定・訂正・別の話題なら記録しない。
+    一般事項なら`memory-tools.sh remember-decision`へ、確認済みPJ固有事項なら`project-tools.mjs add-decision`へ渡す。
+    PJ固有の本文を一般memoryへ二重保存しない。否定・訂正・別の話題なら記録しない。
 - 決定検出はLLMによるため完全自動ではない。会話の締めでは、当日のdecisionを確認し、0件なら会話を読み返して
   決定候補の拾い漏れを1回だけ確認する。都度＋締めの二段構えで補う。
 - 結論のない相談が一区切りしたときは、**「要点を案件メモに残しますね: <確認する要点>」** と1行で確認する。
@@ -109,5 +117,6 @@ LINE等の未対応サービスは準備中。ChatworkだけはRepository Secret
 - 接続診断: `${CLAUDE_PLUGIN_ROOT}/skills/connections/SKILL.md`
 - 個人設定: `${CLAUDE_PLUGIN_ROOT}/skills/settings/SKILL.md`
 - 週次ふりかえり・索引退避: `${CLAUDE_PLUGIN_ROOT}/skills/weekly/SKILL.md`
+- 継続する仕事の整理: `${CLAUDE_PLUGIN_ROOT}/skills/projects/SKILL.md`
 - 開発の入口（やさしいハーネス）: `${CLAUDE_PLUGIN_ROOT}/skills/build/SKILL.md`
 - 成果物・TODO の決定的シーム: `${CLAUDE_PLUGIN_ROOT}/scripts/workspace-tools.sh`

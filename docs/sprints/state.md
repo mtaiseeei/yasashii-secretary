@@ -2,7 +2,7 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-014-patch-001
+- Current ID: sprint-015
 - Retry Count: 0
 - Next Planned: TBD
 
@@ -33,6 +33,7 @@
 | sprint-013 | done | [contract](sprint-013.md) | [progress](../progress/sprint-013.md) | [feedback](../feedback/sprint-013.md) |
 | sprint-014 | done | [contract](sprint-014.md) | [progress](../progress/sprint-014.md) | [feedback](../feedback/sprint-014.md) |
 | sprint-014-patch-001 | done | [contract](sprint-014-patch-001.md) | [progress](../progress/sprint-014-patch-001.md) | [feedback](../feedback/sprint-014-patch-001.md) |
+| sprint-015 | done | [contract](sprint-015.md) | [progress](../progress/sprint-015.md) | [feedback](../feedback/sprint-015.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
@@ -52,3 +53,8 @@
 - 2026-07-17: 完成版 `89376b2` までpublic mainへpush。ユーザーからChatwork設定wizardの非エンジニア向け文言、GitHub Actions処理時間、API Token取得・組織管理者申請・Secret直接導線の改善依頼を受け、`sprint-014-patch-001`（Type: micro）を開始。
 - 2026-07-17: sprint-014-patch-001 GeneratorがToken取得・組織管理者申請・動的Secret登録導線と非エンジニア向け表示を実装。全offline回帰298件・専用回帰100件・browser回帰が0 FAILのため独立Evaluatorへ引き渡し。
 - 2026-07-17: sprint-014-patch-001は独立Evaluatorで合格。受入基準12/12、専用回帰41件（内包合成59件）・全offline回帰298件が0 FAIL、desktop・mobile・200%相当と安全・accessibility gateも違反0件で完了。
+- 2026-07-17: ユーザーがGoogle Chatを除く改善を承認。開発以外の継続業務を同じprivate workspace内でプロジェクト管理し、別repo開発PJは参照ポインタで接続する `sprint-015` を計画。
+- 2026-07-17: sprint-015 Generatorが候補確認、ライト／フル運用、正本境界、別repo開発PJポインタ、完了／再開を実装。専用回帰58件・全offline回帰298件が0 FAILのため独立Evaluatorへ引き渡し。
+- 2026-07-17: sprint-015 初回評価はimplementation-issueで不合格。GitHub PAT形式の資格情報拒否、completed PJの同一案件候補除外、候補外JSONの `eligible: false` の3点をGeneratorへ差し戻し（Retry 1）。
+- 2026-07-17: sprint-015 Retry 1で資格情報の共通拒否、既存PJ照合route、`eligible`のboolean固定を修正。専用回帰68件・全offline回帰298件が0 FAILのため独立Evaluatorへ再引き渡し。
+- 2026-07-17: sprint-015 Retry 1は独立Evaluatorで合格。受入基準16/16、独立候補6件・資格情報31件、専用68件・全offline 298件が0 FAIL。Chatwork画像のREADME掲載も別枠で表示・秘密非露出を確認し、Google Chatは対象外のまま完了。

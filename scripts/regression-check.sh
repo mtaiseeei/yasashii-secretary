@@ -878,7 +878,7 @@ skill_miss=0
 for s in $(ls "$PLUGIN/skills"); do
   grep -q "$s" "$README" || { echo "  README に未記載のスキル: $s"; skill_miss=$((skill_miss+1)); }
 done
-check "README の機能一覧が実スキル全12件と一致" "[ $skill_miss -eq 0 ]"
+check "README の機能一覧が実スキル全件と一致" "[ $skill_miss -eq 0 ]"
 # README が実在しないスキルを機能として掲げていない（記載スキル名が実ディレクトリに存在）
 check "README がChatwork対応と未対応チャットを区別" \
   "grep -q 'Chatwork 接続・ルーム選択・履歴検索' '$README' && grep -q 'LINE等の未対応チャット' '$README'"

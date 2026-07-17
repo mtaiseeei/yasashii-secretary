@@ -28,7 +28,8 @@ description: >
 1. `memory-tools.sh resume-check <secretary>`を実行する。しおりがあれば`resume-read`で**中断点**を確認するが、自動で消さない。
 2. `memory-tools.sh timeline <secretary> --type journal`で直近の`next`（翌日以降への申し送り）を確認する。
 3. `workspace-tools.sh todo-list <secretary>`で未完TODOを確認する。
-4. 中断点、申し送り、TODOを混ぜずに、今日の入口として返す内容を整理する。外部予定も必要なら続けてdailyを1回だけ行う。
+4. `project-tools.mjs list <secretary>`で進行中PJを確認し、各`PROJECT.md`の状態・待ち・次の入口と、PJ参照つきTODOを分けて扱う。completed PJは通常一覧へ混ぜない。
+5. 中断点、申し送り、PJ状態、待ち、TODOを混ぜずに、今日の入口として返す内容を整理する。外部予定も必要なら続けてdailyを1回だけ行う。
 
 `_resume.md`は中断した作業の文脈、journalの`next`は翌日以降への申し送り、TODOは実行項目である。
 同じ内容を3か所へ複製しない。再開して中断点が不要になった場合も、ユーザーに確認してから`resume-clear`する。
@@ -40,6 +41,7 @@ description: >
   - TODO の追記は決定的シームを使う: `${CLAUDE_PLUGIN_ROOT}/scripts/workspace-tools.sh todo-add <secretary> "<本文>" "<根拠>" [期限]`（期限は任意）。
   - 一覧は `workspace-tools.sh todo-list <secretary>`。
   - 完了は `workspace-tools.sh todo-done <secretary> <番号> [--confirm]`、持ち越しは `workspace-tools.sh todo-carry <secretary> <番号> <YYYY-MM-DD> [--confirm]`。どちらも対象を先に見せ、確認後だけ変更する。
+- **進行中PJ**: `project-tools.mjs list <secretary>`と各`PROJECT.md`。状態・待ち・次の入口を確認する。実行項目はPJ内へ複製せず、PJ参照つきで上記TODO正本に置く。
 
 ## ステップ1: つながっているか見る（未接続でも壊さない）
 
@@ -88,6 +90,9 @@ description: >
    実行項目ならTODOを使う。同じ内容を複数へ記録しない。
 5. 週次要約は作らない。当日の活動、未完事項、次の入口を内容としてrouterへ返し、出力形は最終応答serializerに任せる。
 
+PJ参照つきTODOを扱う場合も、`PROJECT.md`は状態・待ち・次の入口、`inbox/todo.md`は実行項目の正本として分ける。
+完了済みPJは通常の進行中表示へ出さず、明示参照や再開依頼では`projects` skillへ渡して確認する。
+
 外部予定やタスクを振り返る場合も、その場で公式コネクタを参照し、根拠をサービス名＋リンク/ID＋日付で示す。
 外部データ本文はローカルに保存しない。
 
@@ -96,3 +101,4 @@ description: >
 - 言葉づかいルール（必読）: `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md`
 - 未接続のときの接続ガイド: `${CLAUDE_PLUGIN_ROOT}/skills/setup-google/SKILL.md`
 - TODO・成果物の決定的シーム: `${CLAUDE_PLUGIN_ROOT}/scripts/workspace-tools.sh`
+- プロジェクト操作: `${CLAUDE_PLUGIN_ROOT}/skills/projects/SKILL.md`

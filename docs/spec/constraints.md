@@ -23,7 +23,7 @@
 5. private repoの共同編集者は保存されたChatwork本文を読める。wizardはroom選択確定前にこの影響を表示し、ユーザーは所属組織の情報管理方針に従う。
 6. 初回オンボーディングはrepo作成、初期commit、初回pushを完了条件とする。既存remoteがある場合は現在のrepoを使う確認を行い、Chatwork専用repoを黙って作らない。
 7. scheduleによるChatworkの自動commit・pushは、対象room・頻度・保存内容を示して同意を得た後だけ許可する。検索不成立等から開始する予期しない手動同期は、実行直前に構造化質問で確認する。
-8. 通常の秘書・開発成果のpushは同じrepoのGit運用に従う。Chatworkを別repoへ分離したり、秘書の記憶・成果物だけを永続的なローカル専用正本にしたりしない。
+8. 通常の秘書・一般プロジェクト成果のpushは同じworkspace repoのGit運用に従う。別repoを正本にした開発PJはそのrepoのGit運用に従い、workspace側へ履歴や正本を複製しない。Chatworkを別repoへ分離したり、秘書の記憶・成果物だけを永続的なローカル専用正本にしたりしない。
 9. Chatworkの取得は選択roomだけに限定し、message ID単位で冪等、つまり同じ取得を繰り返しても重複しない。API応答に無いことだけを理由に取得済み履歴を削除しない。
 10. Chatwork APIの最新100件制約をユーザーへ明示する。導入前履歴の欠落、初回0件、100件より古い履歴を取得できない状態をエラーや「存在しない」の根拠にしない。
 11. コミットメッセージは、何をしたかが分かる日本語1行とし、可能な範囲で固有名詞を含める。`git log` を予備のタイムラインとして使える粒度を保つ。
@@ -47,7 +47,7 @@
 ### journal の限定例外
 
 - journal は追記専用の事実ログ。定義済みシームが成功した事実だけは、ユーザー確認なしで副作用として追記してよい。
-- 無確認追記を許すシームは `save-deliverable`、`todo-add`、`todo-done`、`todo-carry`、`remember-decision`、`topic-add`、settings の設定変更に限定する。
+- 無確認追記を許すシームは `save-deliverable`、`todo-add`、`todo-done`、`todo-carry`、`remember-decision`、`topic-add`、確認済みPJに対する定義済みproject操作、settings の設定変更に限定する。
 - `journal-add` は末尾appendのみ、空本文拒否、既存行の書換・削除機能なし。会話全文・逐語ログ・未確認の推測は書かない。
 - `decided` と `topics` は、シームを呼ぶ前に節目プロトコルの確認を受ける。journal自体の副作用で確認を省略してよいという意味ではない。
 
@@ -55,6 +55,7 @@
 
 - 過去の decision 行を書き換えない。変更・撤回は新しい日付ファイルに、元の決定・日付・新しい決定・理由を追記する。
 - 表示時は新しい決定を優先する。週次で矛盾を統合するときもユーザー確認を挟む。
+- 確認済みPJ固有の決定はライト `PROJECT.md` またはフル `DECISIONS.md` を正本とする。決定本文を一般memoryにも複写せず、timeline用記録はプロジェクト名と参照先を含む短い記録に留める。
 
 ## 4. 既定値＋opt-in 上書き
 
@@ -114,3 +115,19 @@
 - GitHub Actions billing: `https://docs.github.com/en/billing/concepts/product-billing/github-actions`
 
 公開ガイドには「公式情報は2026年7月確認。サービス側の変更により手順・料金・利用枠が変わる可能性がある」と明記する。
+
+## 9. プロジェクト管理
+
+1. プロジェクト候補の検出と作成を分ける。候補を検出しても、ユーザーが了承する前にディレクトリ、ファイル、journal、commit、remoteを変更しない。
+2. 候補提案は、少なくとも2つの候補シグナルがあり、そのうち1つが複数行動または複数セッションである場合に限る。単発成果物、同じ会話で完了する作業、一つだけのTODOを形式的にプロジェクト化しない。
+3. 一般PJの正本は `secretary/projects/<project>/` 内に置く。path guard、symlink拒否、空上書き禁止、削除2段階、資格情報禁止を既存の記憶・成果物と同じ強さで適用する。
+4. ライト運用は `PROJECT.md` 1枚から開始し、空テンプレだけを生成しない。既存情報があれば、ユーザーが指定した最小範囲の根拠から概要・現状・要確認事項を起こす。
+5. フル昇格は、Decisions 10件超、メモ10件超または状態以外で読みにくい、PJ固有ガードレールが必要、PJ直下10ファイル超のいずれかと、ユーザー承認の両方を必要とする。トリガー到達だけで自動昇格しない。
+6. フル運用の役割は `AGENTS.md`=指示、`PROJECT.md`=状態、`DECISIONS.md`=判断、`MEMORY.md`=事実とし、`CLAUDE.md` は `AGENTS.md` へのポインタだけにする。別の `INDEX.md` を作らず、索引は `AGENTS.md` に内包する。
+7. PJ固有の決定はユーザー確認後だけ記録し、同じ操作で `PROJECT.md` の現在状況と日付を更新する。未確定の判断はDecisionsへ入れず、要確認事項に置く。
+8. 実行タスクは `secretary/inbox/todo.md` または接続済みサービスを正本とし、PJ内に生きた `TODO.md` を作らない。プロジェクト文書は状態・待ち・次の入口を示し、同じタスク本文を複数の正本へ置かない。
+9. 一般PJの確定成果物は `outputs/`、旧版・backup・superseded文書は `archive/` に置く。フル運用でファイルを移動・追加・削除したときは、同じ操作で `AGENTS.md` の索引と関連リンクを更新する。最新版を判断できない場合は移動せず確認する。
+10. 開発PJは既存の `build` と `yasashii-harness` 導線を維持する。別repo化は作成・接続・公開範囲を確認した後だけ行い、workspace側には `AGENTS.md` と概要スナップショットの `PROJECT.md` を参照ポインタとして置く。正本repoの仕様、判断ログ、進行状態、成果物を二重管理しない。
+11. 一般PJを外部repoへ黙って分離せず、別repo開発PJの正本を `secretary/projects/` へ黙って複製しない。正本がどこかを各PJの `PROJECT.md` で一意に示す。
+12. 一般PJの完了・再開はユーザー確認後だけ行う。完了は `status: completed`、再開は `status: active` とし、確認前・拒否・失敗ではPROJECT、journal、commitを変更しない。status欠落をcompletedと推定しない。
+13. 完了時は完了日・結果・残件を `PROJECT.md` に残し、進行中一覧から外すが、検索・timeline・明示参照から除外せず、ディレクトリを自動移動・削除しない。再開時も過去の完了記録を削除・上書きしない。

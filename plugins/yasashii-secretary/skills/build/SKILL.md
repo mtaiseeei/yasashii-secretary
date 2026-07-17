@@ -54,6 +54,13 @@ description: >
 進行は「計画→実装→検証」のどこにいるかを示します。Generatorの自己評価だけで完了にせず、
 Evaluatorの合格と状態記録まで行います。やさしさを理由に、役割分離、評価閾値、回帰ゼロ許容は緩めません。
 
+## 4. 別repoを正本にする開発プロジェクト
+
+開発PJを別repoに分ける場合も、黙ってrepoやremoteを作らない。作成、接続、公開範囲を確認し、了承後だけ
+`${CLAUDE_PLUGIN_ROOT}/skills/projects/SKILL.md` の `create-dev-pointer` を使う。
+workspace側は `AGENTS.md` と概要スナップショットの `PROJECT.md` だけを持ち、実装仕様、判断ログ、
+Sprint状態、コード、成果物を複製しない。実装と履歴は正本repoで扱う。
+
 ## 小さな変更
 
 Harness管理下かどうかを確認し、管理下なら `state.md` と契約に従って直接修正／micro-patch／通常Sprintに分類します。
