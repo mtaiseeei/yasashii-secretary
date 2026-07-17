@@ -143,11 +143,13 @@ CONNECTIONS_SKILL="$PLUGIN/skills/connections/SKILL.md"
 BUILD_SKILL="$PLUGIN/skills/build/SKILL.md"
 SETTINGS_SKILL="$PLUGIN/skills/settings/SKILL.md"
 CHATWORK_SKILL="$PLUGIN/skills/chatwork/SKILL.md"
+UPDATE_SKILL="$PLUGIN/skills/update/SKILL.md"
+PROJECTS_SKILL="$PLUGIN/skills/projects/SKILL.md"
 RULES="$PLUGIN/rules/plain-language.md"
 # ユーザー向け SKILL 群の参照スキャン対象（同梱ファイル参照の検査に使う）。
 # 別プラグインへの参照導線と同梱物の不在は section 12 が扱う。
 SKILLS=("$SECRETARY_SKILL" "$ONBOARD_SKILL" "$MEMCARE_SKILL" "$SETUP_GOOGLE_SKILL" "$DAILY_SKILL" "$WEEKLY_SKILL" \
-        "$SETUP_MS_SKILL" "$SETUP_NOTION_SKILL" "$CONNECTIONS_SKILL" "$BUILD_SKILL" "$SETTINGS_SKILL" "$CHATWORK_SKILL")
+        "$SETUP_MS_SKILL" "$SETUP_NOTION_SKILL" "$CONNECTIONS_SKILL" "$BUILD_SKILL" "$SETTINGS_SKILL" "$CHATWORK_SKILL" "$UPDATE_SKILL" "$PROJECTS_SKILL")
 
 check "secretary/SKILL.md が存在" "[ -f '$SECRETARY_SKILL' ]"
 check "onboarding/SKILL.md が存在" "[ -f '$ONBOARD_SKILL' ]"
@@ -161,6 +163,8 @@ check "connections/SKILL.md が存在" "[ -f '$CONNECTIONS_SKILL' ]"
 check "build/SKILL.md が存在" "[ -f '$BUILD_SKILL' ]"
 check "settings/SKILL.md が存在" "[ -f '$SETTINGS_SKILL' ]"
 check "chatwork/SKILL.md が存在" "[ -f '$CHATWORK_SKILL' ]"
+check "update/SKILL.md が存在" "[ -f '$UPDATE_SKILL' ]"
+check "projects/SKILL.md が存在" "[ -f '$PROJECTS_SKILL' ]"
 check "rules/plain-language.md が存在" "[ -f '$RULES' ]"
 
 # frontmatter の name を取り出す（1行目 --- 以降）
@@ -177,6 +181,8 @@ CNAME="$(name_of "$CONNECTIONS_SKILL")"
 BNAME="$(name_of "$BUILD_SKILL")"
 PNAME="$(name_of "$SETTINGS_SKILL")"
 CWNAME="$(name_of "$CHATWORK_SKILL")"
+UNAME="$(name_of "$UPDATE_SKILL")"
+JNAME="$(name_of "$PROJECTS_SKILL")"
 check "secretary の name が 'secretary'" "[ '$SNAME' = 'secretary' ]"
 check "onboarding の name が 'onboarding'" "[ '$ONAME' = 'onboarding' ]"
 check "memory-care の name が 'memory-care'" "[ '$MNAME' = 'memory-care' ]"
@@ -189,8 +195,10 @@ check "connections の name が 'connections'" "[ '$CNAME' = 'connections' ]"
 check "build の name が 'build'" "[ '$BNAME' = 'build' ]"
 check "settings の name が 'settings'" "[ '$PNAME' = 'settings' ]"
 check "chatwork の name が 'chatwork'" "[ '$CWNAME' = 'chatwork' ]"
+check "update の name が 'update'" "[ '$UNAME' = 'update' ]"
+check "projects の name が 'projects'" "[ '$JNAME' = 'projects' ]"
 check "name が一意（重複なし）" \
-  "[ \"\$(printf '%s\n' '$SNAME' '$ONAME' '$MNAME' '$GNAME' '$DNAME' '$WNAME' '$MSNAME' '$NNAME' '$CNAME' '$BNAME' '$PNAME' '$CWNAME' | sort -u | wc -l | tr -d ' ')\" = '12' ]"
+  "[ \"\$(printf '%s\n' '$SNAME' '$ONAME' '$MNAME' '$GNAME' '$DNAME' '$WNAME' '$MSNAME' '$NNAME' '$CNAME' '$BNAME' '$PNAME' '$CWNAME' '$UNAME' '$JNAME' | sort -u | wc -l | tr -d ' ')\" = '14' ]"
 
 # 同梱ファイル参照は ${CLAUDE_PLUGIN_ROOT} 相対に統一されている（constraints.md L40 / domain.md）。
 # (a) ${CLAUDE_PLUGIN_ROOT}/... の参照先が全て実在（プラグイン配下で解決）
@@ -996,6 +1004,17 @@ if bash "$SPRINT016_REGRESSION"; then
   ok "sprint-016公開面・維持項目・負テストが全て成功"
 else
   ng "sprint-016回帰に失敗"
+fi
+
+# ---------------------------------------------------------------------------
+section "22. 読み取り専用の更新診断（sprint-017）"
+# ---------------------------------------------------------------------------
+SPRINT017_REGRESSION="$REPO/scripts/sprint-017-regression.sh"
+check "sprint-017回帰が存在し実行可能" "[ -x '$SPRINT017_REGRESSION' ]"
+if bash "$SPRINT017_REGRESSION"; then
+  ok "sprint-017更新診断・release整合・負テストが全て成功"
+else
+  ng "sprint-017回帰に失敗"
 fi
 
 # ---------------------------------------------------------------------------

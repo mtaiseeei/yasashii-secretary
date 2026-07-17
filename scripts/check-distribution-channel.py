@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sprint 016: current public/distribution surfaces must be channel-neutral."""
+"""Current public/distribution surfaces must stay channel-neutral and releasable."""
 
 from __future__ import annotations
 
@@ -22,9 +22,8 @@ CURRENT_FILES = {
     "docs/proposal-2026-07-15-realignment.md": "current proposal",
     "docs/spec.md": "current specification index",
     "docs/sprints/state.md": "current orchestration state",
-    "docs/sprints/sprint-016.md": "current sprint contract",
-    "docs/progress/sprint-016.md": "current generator handoff",
-    "docs/feedback/sprint-016.md": "current evaluator handoff",
+    "docs/sprints/sprint-017.md": "current sprint contract",
+    "docs/progress/sprint-017.md": "current generator handoff",
 }
 
 TARGET_PREFIXES = {
@@ -155,11 +154,11 @@ def protected_history_changes(root: Path) -> list[str]:
     for path in changed:
         if path.startswith(("backup/", "docs/evidence/", "docs/feedback/")):
             protected.append(path)
-        elif path.startswith("docs/progress/") and path != "docs/progress/sprint-016.md":
+        elif path.startswith("docs/progress/") and path != "docs/progress/sprint-017.md":
             protected.append(path)
         elif path.startswith("docs/sprints/") and path not in {
             "docs/sprints/state.md",
-            "docs/sprints/sprint-016.md",
+            "docs/sprints/sprint-017.md",
         }:
             protected.append(path)
     return protected
@@ -190,12 +189,15 @@ def preservation_errors(root: Path) -> list[str]:
         errors.append("plugin identity changed")
     if entry.get("source") != "./plugins/yasashii-secretary":
         errors.append("plugin source changed")
-    if entry.get("version") != "0.2.0" or plugin.get("version") != "0.2.0":
-        errors.append("version changed inside Sprint 016")
-    if any(root.glob("CHANGELOG*")):
-        errors.append("CHANGELOG leaked from the next sprint")
-    if (root / "plugins/yasashii-secretary/skills/update").exists():
-        errors.append("update skill leaked from the next sprint")
+    if entry.get("version") != "0.3.0" or plugin.get("version") != "0.3.0":
+        errors.append("release version is not 0.3.0 on both manifests")
+    if not (root / "plugins/yasashii-secretary/CHANGELOG.md").is_file():
+        errors.append("distributed CHANGELOG is missing")
+    if not (root / "plugins/yasashii-secretary/skills/update/SKILL.md").is_file():
+        errors.append("read-only update skill is missing")
+    for required in ("update-diagnose.mjs", "update-ledger.mjs"):
+        if not (root / "plugins/yasashii-secretary/scripts" / required).is_file():
+            errors.append(f"update support script is missing: {required}")
     if (root / "plugins/yasashii-secretary/migrations").exists():
         errors.append("workspace migration leaked from the next sprint")
 
@@ -276,9 +278,9 @@ def main() -> int:
             print(f"FAIL {error}")
         return 1
     print("PASS current target surfaces contain no legacy channel-specific expression")
-    print("PASS MIT, direct credit, forkedFrom, identities, and version are preserved")
+    print("PASS MIT, direct credit, forkedFrom, identities, and release version are preserved")
     print("PASS protected audit records and completed sprint contracts are unchanged")
-    print("PASS no next-sprint update surface or future chat integration leaked")
+    print("PASS Sprint 017 update surfaces exist without migration or future chat integration leakage")
     return 0
 
 

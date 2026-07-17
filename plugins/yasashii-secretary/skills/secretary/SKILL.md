@@ -55,6 +55,7 @@ trigger: /secretary
 | 「繋がってる？」「接続の調子」「診断して」「どれが使える？」 | 接続診断（connections） | `${CLAUDE_PLUGIN_ROOT}/skills/connections/SKILL.md` |
 | 「設定変えたい」「もっとフランクに」「専門用語そのままで」「呼び方を変えて」 | 個人設定（settings） | `${CLAUDE_PLUGIN_ROOT}/skills/settings/SKILL.md` |
 | 「プロジェクトにまとめたい」「案件を整理したい」「プロジェクトの状況」「完了にしたい」「再開したい」 | 継続する仕事の整理（projects） | `${CLAUDE_PLUGIN_ROOT}/skills/projects/SKILL.md` |
+| 「最新版にして」「更新ある？」「バージョンを確認して」「自動更新はどうする？」 | 更新状況の読み取り専用診断（update） | `${CLAUDE_PLUGIN_ROOT}/skills/update/SKILL.md` |
 | 「保存して」「文書にして」「まとめて残して」「企画書にして」 | 成果物保存（出力規約） | 下記「成果物を保存するとき」 |
 | 「作って」「開発したい」「アプリ／ツールにして」 | 開発の入口（build） | `${CLAUDE_PLUGIN_ROOT}/skills/build/SKILL.md` |
 | 「もう一度セットアップ」「作り直したい」 | 再セットアップ（保護あり） | 下記「作り直し（再セットアップ）の保護」 |
@@ -118,5 +119,6 @@ LINE等の未対応サービスは準備中。ChatworkだけはRepository Secret
 - 個人設定: `${CLAUDE_PLUGIN_ROOT}/skills/settings/SKILL.md`
 - 週次ふりかえり・索引退避: `${CLAUDE_PLUGIN_ROOT}/skills/weekly/SKILL.md`
 - 継続する仕事の整理: `${CLAUDE_PLUGIN_ROOT}/skills/projects/SKILL.md`
+- 更新状況の確認: `${CLAUDE_PLUGIN_ROOT}/skills/update/SKILL.md`
 - 開発の入口（やさしいハーネス）: `${CLAUDE_PLUGIN_ROOT}/skills/build/SKILL.md`
 - 成果物・TODO の決定的シーム: `${CLAUDE_PLUGIN_ROOT}/scripts/workspace-tools.sh`

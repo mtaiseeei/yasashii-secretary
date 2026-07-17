@@ -132,6 +132,16 @@ description: >
 5. `${CLAUDE_PLUGIN_ROOT}/workspace-templates/` の中身を、`secretary/` の中ではなく作業中フォルダのrootへコピーする。
    これにより `.github/workflows/chatwork-sync.yml` と `chatwork/` が通常project、`secretary/` と同じrepoに並ぶ。
    既存ファイルと重なる場合は無確認で上書きせず、変更前に対象を示して確認する。
+6. **新規導入時だけ**、生成直後の状態を最小台帳へ記録する。これは将来の更新診断で、配布時のままか利用者が変更したかを区別するための基準であり、本文は保存しない。
+   `${CLAUDE_PLUGIN_ROOT}/scripts/update-ledger.mjs init` を使い、存在する生成物だけを `--managed-path` で指定する。
+   `--template-variable` に渡してよいのは `CREATED_DATE`、`CREATED_AT`、`REPORT_DETAIL` だけである。
+   氏名、役割、サービス、依頼内容、パスワード、token、API keyは渡さない。
+
+   ```text
+   node "${CLAUDE_PLUGIN_ROOT}/scripts/update-ledger.mjs" init --workspace . --plugin-root "${CLAUDE_PLUGIN_ROOT}" --managed-path secretary/AGENTS.md --managed-path secretary/CLAUDE.md --managed-path secretary/memory/MEMORY.md --managed-path secretary/memory/preferences.md --managed-path secretary/memory/decisions/YYYY-MM-DD-decisions.md --managed-path .github/workflows/chatwork-sync.yml --managed-path chatwork/config.json --managed-path chatwork/rooms.json --managed-path chatwork/scripts/chatwork-sync.mjs --template-variable CREATED_DATE=YYYY-MM-DD --template-variable CREATED_AT="YYYY-MM-DD HH:mm" --template-variable REPORT_DETAIL=みじかく --new-install --confirm
+   ```
+
+   `YYYY-MM-DD` 等は実際に使った非機密の値へ置き換える。既存workspace、再セットアップ、診断時には台帳を新規作成・上書きしない。
 
 > 注意（安全）: 資格情報（パスワード・トークン・APIキー）は書き込まない・コミットしない。
 > Chatwork以外の外部データ本文は保存しない。Chatworkは後で選択したroomだけを専用領域へ保存する。
