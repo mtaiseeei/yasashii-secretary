@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "0.3.0",
+  "toVersion": "0.4.0",
+  "operations": [
+    {
+      "id": "workspace-update-safety-v1",
+      "path": "secretary/AGENTS.md",
+      "type": "append-section",
+      "asset": "assets/update-safety-section.md",
+      "marker": "yasashii-secretary:update-safety:v1:start"
+    },
+    {
+      "id": "workspace-update-entry-v1",
+      "path": "secretary/CLAUDE.md",
+      "type": "append-section",
+      "asset": "assets/update-entry-pointer.md",
+      "marker": "yasashii-secretary:update-entry:v1:start"
+    }
+  ]
+}

@@ -85,13 +85,16 @@ with tempfile.TemporaryDirectory(prefix="sprint017-workspace-") as temp:
     (workspace / "secretary/memory/decisions").mkdir(parents=True)
     (workspace / ".claude").mkdir()
     (workspace / "secretary/AGENTS.md").write_text("safe template\n")
+    (workspace / "secretary/CLAUDE.md").write_text("pointer\n")
+    (workspace / "secretary/memory/MEMORY.md").write_text("index\n")
     (workspace / "secretary/memory/preferences.md").write_text("detail: short\n")
     (workspace / ".claude/settings.json").write_text('{"enabledPlugins":{}}\n')
     run(["git", "init", "-q"], cwd=workspace)
 
     init = run([
         "node", str(ledger), "init", "--workspace", str(workspace), "--plugin-root", str(fake_plugin),
-        "--managed-path", "secretary/AGENTS.md", "--managed-path", "secretary/memory/preferences.md",
+        "--managed-path", "secretary/AGENTS.md", "--managed-path", "secretary/CLAUDE.md",
+        "--managed-path", "secretary/memory/MEMORY.md", "--managed-path", "secretary/memory/preferences.md",
         "--template-variable", "CREATED_DATE=2026-07-17", "--template-variable", "REPORT_DETAIL=みじかく",
         "--new-install", "--confirm",
     ])
@@ -148,7 +151,7 @@ with tempfile.TemporaryDirectory(prefix="sprint017-workspace-") as temp:
     check("同一versionをsameと判定", outputs["check-only"].get("status") == "same")
     check("clean workspaceを判定", outputs["check-only"].get("workspace", {}).get("status") == "clean")
     check("side effect countersが全て0", all(all(value == 0 for value in item.get("sideEffects", {}).values()) for item in outputs.values()))
-    check("実更新希望でも未実装として停止", outputs["proceed-update"].get("selectedOutcome") == "実更新は未実装のため停止")
+    check("実更新希望でも診断中は停止", outputs["proceed-update"].get("selectedOutcome") == "説明を確認しました。実更新は別の最終確認後に開始できます")
 
     (workspace / "secretary/AGENTS.md").write_text("customized\n")
     customized_before = snapshot(workspace)
@@ -208,7 +211,7 @@ with tempfile.TemporaryDirectory(prefix="sprint017-workspace-") as temp:
 print("== static safety and public guidance ==")
 source = diagnose.read_text()
 check("診断scriptは書込APIとchild_processを使わない", not any(term in source for term in ("writeFile", "appendFile", "renameSync", "rmSync", "child_process")))
-check("workspace migrationを同梱しない", not (plugin / "migrations").exists())
+check("診断scriptからworkspace migrationを実行しない", "update-apply" not in source and "migrations" not in source)
 guide = (repo / "docs/guide/updates.md").read_text()
 skill = (plugin / "skills/update/SKILL.md").read_text()
 check("第三者marketplaceの自動更新既定offを明記", "第三者marketplaceの自動更新は既定で無効" in guide and "第三者marketplaceの自動更新は既定で無効" in skill)

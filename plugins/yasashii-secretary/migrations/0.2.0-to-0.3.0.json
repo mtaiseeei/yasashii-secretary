@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "0.2.0",
+  "toVersion": "0.3.0",
+  "operations": [],
+  "note": "workspaceの一括変更は行わず、既知の0.2.0基準と一致するファイルだけをbootstrap候補にします。"
+}

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -22,8 +23,8 @@ CURRENT_FILES = {
     "docs/proposal-2026-07-15-realignment.md": "current proposal",
     "docs/spec.md": "current specification index",
     "docs/sprints/state.md": "current orchestration state",
-    "docs/sprints/sprint-017.md": "current sprint contract",
-    "docs/progress/sprint-017.md": "current generator handoff",
+    "docs/sprints/sprint-018.md": "current sprint contract",
+    "docs/progress/sprint-018.md": "current generator handoff",
 }
 
 TARGET_PREFIXES = {
@@ -154,11 +155,11 @@ def protected_history_changes(root: Path) -> list[str]:
     for path in changed:
         if path.startswith(("backup/", "docs/evidence/", "docs/feedback/")):
             protected.append(path)
-        elif path.startswith("docs/progress/") and path != "docs/progress/sprint-017.md":
+        elif path.startswith("docs/progress/") and path != "docs/progress/sprint-018.md":
             protected.append(path)
         elif path.startswith("docs/sprints/") and path not in {
             "docs/sprints/state.md",
-            "docs/sprints/sprint-017.md",
+            "docs/sprints/sprint-018.md",
         }:
             protected.append(path)
     return protected
@@ -189,17 +190,18 @@ def preservation_errors(root: Path) -> list[str]:
         errors.append("plugin identity changed")
     if entry.get("source") != "./plugins/yasashii-secretary":
         errors.append("plugin source changed")
-    if entry.get("version") != "0.3.0" or plugin.get("version") != "0.3.0":
-        errors.append("release version is not 0.3.0 on both manifests")
+    release_version = entry.get("version")
+    if release_version != plugin.get("version") or not re.fullmatch(r"\d+\.\d+\.\d+", str(release_version or "")):
+        errors.append("release version is not a matching semver on both manifests")
     if not (root / "plugins/yasashii-secretary/CHANGELOG.md").is_file():
         errors.append("distributed CHANGELOG is missing")
     if not (root / "plugins/yasashii-secretary/skills/update/SKILL.md").is_file():
         errors.append("read-only update skill is missing")
-    for required in ("update-diagnose.mjs", "update-ledger.mjs"):
+    for required in ("update-diagnose.mjs", "update-ledger.mjs", "update-apply.mjs"):
         if not (root / "plugins/yasashii-secretary/scripts" / required).is_file():
             errors.append(f"update support script is missing: {required}")
-    if (root / "plugins/yasashii-secretary/migrations").exists():
-        errors.append("workspace migration leaked from the next sprint")
+    if not (root / "plugins/yasashii-secretary/migrations/0.3.0-to-0.4.0.json").is_file():
+        errors.append("version-specific workspace migration is missing")
 
     public_paths = [
         root / "README.md",
@@ -280,7 +282,7 @@ def main() -> int:
     print("PASS current target surfaces contain no legacy channel-specific expression")
     print("PASS MIT, direct credit, forkedFrom, identities, and release version are preserved")
     print("PASS protected audit records and completed sprint contracts are unchanged")
-    print("PASS Sprint 017 update surfaces exist without migration or future chat integration leakage")
+    print("PASS Sprint 018 update surfaces and version-specific migration exist without future chat integration leakage")
     return 0
 
 

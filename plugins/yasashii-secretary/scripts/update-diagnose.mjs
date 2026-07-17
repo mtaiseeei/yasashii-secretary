@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash } from "node:crypto";
-import { existsSync, lstatSync, readFileSync, realpathSync } from "node:fs";
+import { existsSync, lstatSync, readdirSync, readFileSync, realpathSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -24,6 +24,12 @@ const STATIC_MANAGED_PATHS = new Set([
   "chatwork/config.json",
   "chatwork/rooms.json",
   "chatwork/scripts/chatwork-sync.mjs",
+]);
+const REQUIRED_CORE_PATHS = new Set([
+  "secretary/AGENTS.md",
+  "secretary/CLAUDE.md",
+  "secretary/memory/MEMORY.md",
+  "secretary/memory/preferences.md",
 ]);
 const DEFAULT_MARKETPLACE_URL = "https://raw.githubusercontent.com/mtaiseeei/yasashii-secretary/main/.claude-plugin/marketplace.json";
 const DEFAULT_CHANGELOG_URL = "https://raw.githubusercontent.com/mtaiseeei/yasashii-secretary/main/plugins/yasashii-secretary/CHANGELOG.md";
@@ -211,6 +217,21 @@ function workspaceState(workspace) {
     if (!existsSync(target) || !lstatSync(target).isFile()) return { path: record.path, status: "customized" };
     return { path: record.path, status: sha256(target) === record.baselineHash ? "clean" : "customized" };
   });
+  const recordedPaths = new Set(records.map((record) => record.path));
+  const expectedPaths = new Set(REQUIRED_CORE_PATHS);
+  for (const path of STATIC_MANAGED_PATHS) {
+    if (existsSync(resolve(workspace, path))) expectedPaths.add(path);
+  }
+  const decisionsDirectory = resolve(workspace, "secretary/memory/decisions");
+  if (existsSync(decisionsDirectory) && lstatSync(decisionsDirectory).isDirectory() && !lstatSync(decisionsDirectory).isSymbolicLink()) {
+    for (const name of readdirSync(decisionsDirectory)) {
+      const path = `secretary/memory/decisions/${name}`;
+      if (isManagedPath(path)) expectedPaths.add(path);
+    }
+  }
+  for (const path of expectedPaths) {
+    if (!recordedPaths.has(path)) files.push({ path, status: "unknown-baseline" });
+  }
   const counts = {
     clean: files.filter((item) => item.status === "clean").length,
     customized: files.filter((item) => item.status === "customized").length,
@@ -253,7 +274,7 @@ function renderText(result) {
     `カスタマイズ衝突可能性: ${result.workspace.status}（clean=${result.workspace.counts.clean} / customized=${result.workspace.counts.customized} / unknown=${result.workspace.counts.unknownBaseline}）。${result.workspace.note}`,
     `選択結果: ${result.selectedOutcome}`,
     "選べること: 今回は確認だけ / 今回は見送る / 中止 / 実更新へ進む",
-    "実更新へ進む場合: Sprint 018で対応予定です。現在の版ではplugin更新、workspace変更、migration、commit、push、reload／restartを実行せず、ここで止まります。",
+    "実更新へ進む場合: この読み取り専用診断とは別の最終確認へ進みます。対象、保護commit、pushしないこと、戻し方を確認するまでは変更しません。",
     "自動更新: Claude Codeの /plugin → Marketplaces → yasashii-secretary から利用者自身で有効化できます。第三者marketplaceは既定で無効です。診断では設定を変更しません。",
     "注意: pluginが自動更新されても、workspaceへコピー済みのファイルは別管理のため自動では置き換わりません。",
   ].join("\n");
@@ -288,7 +309,7 @@ async function main() {
   const result = {
     mode: "diagnosis-read-only",
     selectedOutcome: selectedChoice === "proceed-update"
-      ? "実更新は未実装のため停止"
+      ? "説明を確認しました。実更新は別の最終確認後に開始できます"
       : selectedChoice === "decline"
         ? "今回は見送り"
         : selectedChoice === "cancel"
@@ -310,7 +331,7 @@ async function main() {
     },
     choices: [
       { id: "check-only", label: "今回は確認だけ", available: true },
-      { id: "proceed-update", label: "実更新へ進む", available: false, reason: "Sprint 018で対応予定。この診断では実行しません。" },
+      { id: "proceed-update", label: "実更新へ進む", available: true, reason: "この診断では変更せず、別の最終確認へ進みます。" },
     ],
   };
   process.stdout.write(args.flags.has("--json") ? `${JSON.stringify(result, null, 2)}\n` : `${renderText(result)}\n`);
