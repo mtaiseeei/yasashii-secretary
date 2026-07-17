@@ -1,5 +1,33 @@
 # 変更履歴
 
+## [0.6.0] - 2026-07-17
+
+### 対象者
+
+- 選択したGoogle Chat通常スペースを、3時間ごと等の間隔で継続取得したい方。
+
+### 変わること
+
+- Google Chatの1時間／3時間（おすすめ・初期値）／6時間／12時間／手動のみを、wizardの表示、設定、GitHub Actions workflowで一致させます。
+- スペースごとの取得位置と成功・失敗、取得範囲内の編集・削除、部分失敗からの再実行を扱います。
+- `/google-chat search` で見つからない場合、確認後だけ取得→完了待ち→pull→同条件再検索へ進めます。
+- refresh token失効、同意取消、scope不足、管理者ブロック、Audience不一致、API無効、rate limit、networkを区別します。
+
+### 設定・ファイルへの影響
+
+- 利用者が確認画面で明示同意した場合だけ、private workspaceへGoogle Chat設定、取得runtime、GitHub Actions workflowを生成してcommit・pushします。
+- public配布repoには利用者のSecret、workflow、設定、状態、履歴を置きません。対象から外したスペースの取得済み履歴も削除しません。
+
+### 必要な操作
+
+- `/google-chat` のwizardで現在のスペースと間隔を確認し、自動取得とcommit・pushへ同意する場合だけ設定を確定します。
+- 再認証が必要と表示された場合は、既存の選択と履歴を残したまま同じDesktop OAuthをやり直します。
+
+### 互換性上の注意
+
+- 編集・削除は、その取得でGoogle Chat APIが返した範囲だけ反映します。`createTime` 差分より古い変更が反映されないことは正常な仕様です。
+- Google People APIの `contacts.readonly` では、連絡先にない同僚名を補完できない場合があります。
+
 ## [0.5.0] - 2026-07-17
 
 ### 対象者

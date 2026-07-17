@@ -1,5 +1,5 @@
 {
   "name": "yasashii-secretary",
   "description": "あなた専属のAI秘書。記憶、通常のプロジェクト、選択したChatwork／Google Chat履歴を1つのprivate GitHub repoで管理する。",
-  "version": "0.5.0"
+  "version": "0.6.0"
 }

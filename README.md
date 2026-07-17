@@ -86,8 +86,16 @@ OAuthは、Googleのパスワードを秘書へ渡さず、許可した範囲だ
 初回取得は同じwizardセッション内で行い、対象、保存内容、共同編集者への可視性、「取得結果をこのリポジトリへ保存します（Gitのcommit・push）」へ明示同意した後だけ保存します。
 スペース別・Asia/Tokyoの日付別Markdownへ、本文、スレッド、発言者、添付メタデータを保存しますが、添付本文は取得しません。
 
+初回取得後は同じwizardから対象スペースと間隔を見直せます。3時間ごとがChatworkと共通のおすすめ・初期値です。
+確認画面で自動取得とcommit・pushへ同意した場合だけ、非公開のGitHubリポジトリに取得runtimeとGitHub Actions workflowを作ります。手動のみではscheduleを作りません。
+継続取得の開始時にも `spaceType=SPACE` を確認し、スペースごとに成功・失敗と取得位置を記録します。一部のスペースが失敗しても、成功したスペースの履歴と取得位置は保持し、次回に安全に再試行します。
+
+編集・削除は、その取得でGoogle Chat APIが返した範囲だけ反映します。`createTime` による差分範囲より古いメッセージの編集・削除が反映されないことは正常な仕様です。
+API応答から消えたことだけを理由に保存済み履歴を削除せず、対象から外したスペースの既存履歴も残します。
+
 Google People APIの `contacts.readonly` では、連絡先にない同僚名を補完できない場合があります。その場合は安定した代替表示を使い、故障や追加権限の要求にはしません。
-`/google-chat search` は保存済み履歴だけを検索します。見つからないときは、未選択スペース、組織の保持設定、APIが返さない履歴、検索条件の可能性があるため、Google Chatに存在しないと断定しません。
+`/google-chat search` は最初にGitの最新状態を取り込んで保存済み履歴を検索します。見つからない場合は、取得して再検索するかを確認し、承認後だけGitHub Actionsの完了を待って、もう一度同じ条件で検索します。
+拒否、timeout、失敗では勝手に取得やpullを進めません。refresh token失効、同意取消、scope不足、管理者ブロック、Audience不一致、API無効、rate limit、networkを区別し、再認証が必要な場合は既存の選択と履歴を残してwizardへ戻します。
 
 公式情報は2026年7月確認です。Google側の画面、scope分類、管理者設定は変更される可能性があります。詳しくは[Google Chatの認証](https://developers.google.com/workspace/chat/authenticate-authorize)と[Desktop appのloopback OAuth](https://developers.google.com/identity/protocols/oauth2/native-app)を確認してください。
 
@@ -157,6 +165,7 @@ Google People APIの `contacts.readonly` では、連絡先にない同僚名を
 
 - 外部データのローカル同期層（キャッシュ・全文コピー）は作りません。根拠は「サービス名＋リンク/ID＋日付」で引用します。
 - Chatworkの自動実行によるcommit・pushは、対象ルーム・自動取得の間隔・保存内容への明示同意後だけです。検索時の手動同期も実行直前に確認します。
+- Google Chatの自動実行によるcommit・pushも、対象スペース・自動取得の間隔・保存内容・共同編集者への可視性を確認した後だけです。public配布repoには利用者のworkflow、設定、状態、履歴、Secretを置きません。
 - 記憶の書き込み・削除は `secretary/` 配下に**封じ込め**（境界外・symlink 越えは拒否）、秘密情報らしきファイルは**コミットしない**設計です。
 
 ### 構成

@@ -1,6 +1,6 @@
 ---
 name: google-chat
-description: Google Chatの初回OAuth接続、通常スペース選択、初回履歴取得、保存済み履歴検索を行う。ユーザーが「Google Chatにつなぎたい」「GChatで探して」「/google-chat」と依頼したときに使う。
+description: Google ChatのOAuth接続、通常スペース選択、初回・定期取得、設定変更、確認付き履歴検索、再認証を行う。ユーザーが「Google Chatにつなぎたい」「GChatで探して」「/google-chat」と依頼したときに使う。
 ---
 
 # Google Chat（少し高度な設定）
@@ -18,8 +18,9 @@ Gmail等の公式Googleコネクタとは別の機能であり、各利用組織
 - OAuth client JSON待ち: `管理者作業待ち`。Cloud project、API、Audience、Desktop appを確認する。
 - OAuth待ち: `Google認証待ち`。loopbackのwizardへ進む。
 - 選択0件: `スペース選択待ち`。通常スペースを選ぶ。
-- `google-chat/state/sync.json` が成功: `初回取得済み`。検索へ進める。
-- 認証、管理者ブロック、API無効、部分失敗: `要確認`。原因別の次の行動を示す。
+- `google-chat/state/sync.json` が成功: `取得済み`。検索または設定変更へ進める。
+- `reauthorization-needed`: `再認証が必要`。既存の選択・履歴を保持してOAuthへ戻す。
+- 管理者ブロック、Audience不一致、scope不足、API無効、rate limit、network、部分失敗: `要確認`。原因別の次の行動を示す。
 
 ## 初回接続
 
@@ -47,7 +48,7 @@ Gmail等の公式Googleコネクタとは別の機能であり、各利用組織
 8. 取得結果の保存とGitのcommit・pushを確認画面で別々に示し、明示同意後だけ初回取得する。
 
 初回取得は同じwizardセッションのメモリ上にあるaccess tokenだけを使い、Repository Secretを読み戻さない。
-終了時にtokenを破棄する。Sprint 019ではworkflow dispatchや定期scheduleを起動しない。
+終了時にtokenを破棄する。初回取得の時点では定期scheduleを起動せず、その後の設定確認で明示同意を得る。
 
 ## 取得境界
 
@@ -59,12 +60,37 @@ Gmail等の公式Googleコネクタとは別の機能であり、各利用組織
 - 編集・削除の反映は、その取得実行でAPIが返した範囲だけ。過去の差分範囲外は正常仕様として説明する。
 - People APIで同僚名を補完できない場合は、安定した「Google Chatユーザー <識別子>」表示を使う。
 
+## 定期取得と設定変更
+
+初回取得後も同じwizardを起動し、対象スペースと間隔を見直せる。
+
+1. 既存の `google-chat/config.json`、`spaces.json`、`state/sync.json` を読み、現在値を先に示す。
+2. 1時間／3時間（おすすめ・初期値）／6時間／12時間／手動のみから選ぶ。Chatworkも3時間をおすすめ・初期値とする。
+3. 対象、保存内容、共同編集者への可視性、GitHub Actions、commit・pushを確認する。
+4. 明示同意後だけ、`config.json`、取得runtime、`.github/workflows/google-chat-sync.yml` を同じprivate workspaceへ生成してcommit・pushする。手動のみではscheduleを生成しない。
+5. 確定前、拒否、キャンセル、Git失敗では0変更または変更前へ戻す。対象から外したスペースの既存履歴は削除しない。
+
+継続取得はrefresh tokenから短命access tokenを取得し、開始時にも `spaceType=SPACE` を再確認する。
+スペースごとにcursor、成功、失敗を持ち、部分失敗時は成功スペースの履歴とcursorを保持する。
+編集・削除はその取得でAPIが返した範囲だけ反映し、`createTime` 差分より古い変更が反映されないことを正常仕様として説明する。
+
 ## 保存済み履歴を検索する
 
-`node "${CLAUDE_PLUGIN_ROOT}/skills/google-chat/scripts/search.mjs" --root . --query "<キーワード>" [--space "<スペース>"] [--sender "<発言者>"] [--from YYYY-MM-DD] [--to YYYY-MM-DD]`
+通常は確認付きの次の経路を使う。
 
-`found` はspace、日付、該当箇所を根拠として返す。`not-found-locally` は保存済み範囲の限界を示し、
-Google Chatに存在しないと断定しない。確認付きworkflow dispatchはSprint 020で扱い、先行実装しない。
+`node "${CLAUDE_PLUGIN_ROOT}/skills/google-chat/scripts/search-flow.mjs" --root . --query "<キーワード>" [--space "<スペース>"] [--sender "<発言者>"] [--from YYYY-MM-DD] [--to YYYY-MM-DD] --choice ask`
+
+最初にpullしてから保存済み履歴を検索する。`found` はspace、日付、該当箇所を根拠として返す。
+`not-found-locally` では構造化質問で「取得して再検索（推奨）／取得しない／対象スペースを見直す」を示す。
+承認時だけworkflow dispatch→完了待ち→成功確認→pull→同条件再検索へ進む。拒否、timeout、失敗では先へ進めず、
+Google Chatに存在しないと断定しない。
+
+## 再認証
+
+- refresh token失効、同意取消、scope不足はworkflowを繰り返さず、既存選択・履歴を保持して同じloopback OAuthへ戻す。
+- 管理者ブロック、Audience不一致、API無効は管理者確認へ進める。client IDと必要scopeだけを一時表示できるが、ログ、スクリーンショット、評価証跡、再読込後のDOMへ残さない。
+- rate limitとnetworkは再認証と混同せず、時間を置くか接続確認を案内する。無限再試行しない。
+- 新しいrefresh tokenのRepository Secret登録が成功した後だけ接続済みに戻す。取得済み履歴を再認証のために削除しない。
 
 ## キャンセルと失敗
 

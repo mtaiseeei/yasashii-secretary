@@ -1,0 +1,55 @@
+{
+  "desktop": {
+    "service": "Google Chatの設定",
+    "context": "Google Chatの設定",
+    "heading": "取得する通常スペースを見直します。",
+    "selected": [
+      "spaces/space-a",
+      "spaces/space-b"
+    ],
+    "cta": [
+      {
+        "bg": "rgb(17, 187, 98)",
+        "fg": "rgb(0, 0, 0)"
+      }
+    ],
+    "blue": 0,
+    "text": "Google Chatの設定\n\n設定変更 1 / 3\n\n取得する通常スペースを見直します。\n\n確定するまで設定、workflow、履歴、commit、pushは変更しません。選択を外しても取得済み履歴は削除しません。\n\nスペースを検索\n選択をすべて外す\n営業共有\nspace ID spaces/space-a\n企画共有\nspace ID spaces/space-b\n全社連絡\nspace ID spaces/space-c\n\n選択中: 2スペース。新しいスペースが見えない場合は再認証して一覧を更新します。\n\n再認証して一覧を更新\n間隔を確認する"
+  },
+  "frequency": {
+    "selected": "3h",
+    "text": "Google Chatの設定\n\n設定変更 2 / 3\n\n自動取得の間隔を見直します。\n\nChatworkとGoogle Chatは、どちらも3時間ごとがおすすめ・初期値です。\n\n1時間ごと\n3時間ごと（おすすめ・初期値）\n6時間ごと\n12時間ごと\n手動のみ\n\n手動のみでは定期scheduleを作りません。自動取得は毎時0分を避けて実行します。\n\n戻る\n変更内容を確認する"
+  },
+  "manualReview": {
+    "text": "Google Chatの設定\n\n設定変更 3 / 3\n\n現在の変更内容を確認してください。\n\n同意して確定するまで、設定、workflow、commit、pushは0件です。\n\n対象スペース\n営業共有、全社連絡\n自動取得の間隔\n手動のみ\n保存内容\n本文、スレッド、発言者、添付メタデータ。添付本文は取得しません\n保存先\n秘書・一般プロジェクト・Chatworkと同じ非公開のGitHubリポジトリ\n自動保存\n手動取得時だけ保存\n\n共同編集者は保存済み本文を読めます。編集・削除は、その取得でAPIが返した範囲だけ反映します。差分範囲より古い変更が反映されないことは正常な仕様です。\n\n設定ファイルと自動取得処理をこのリポジトリへcommit・pushすることに同意します。\n戻る\nこの内容で設定する",
+    "disabled": true,
+    "autoConsent": false,
+    "ctaCount": 2
+  },
+  "automaticReview": {
+    "text": "Google Chatの設定\n\n設定変更 3 / 3\n\n現在の変更内容を確認してください。\n\n同意して確定するまで、設定、workflow、commit、pushは0件です。\n\n対象スペース\n営業共有、全社連絡\n自動取得の間隔\n3時間ごと（おすすめ・初期値）\n保存内容\n本文、スレッド、発言者、添付メタデータ。添付本文は取得しません\n保存先\n秘書・一般プロジェクト・Chatworkと同じ非公開のGitHubリポジトリ\n自動保存\nGitHub Actionsが取得結果をGitのcommit・pushで保存\n\n共同編集者は保存済み本文を読めます。編集・削除は、その取得でAPIが返した範囲だけ反映します。差分範囲より古い変更が反映されないことは正常な仕様です。\n\n設定ファイルと自動取得処理をこのリポジトリへcommit・pushすることに同意します。\n選択スペースを3時間等の指定間隔で取得し、結果を自動commit・pushすることに同意します。\n戻る\nこの内容で設定する",
+    "disabled": true,
+    "gitChecked": false,
+    "autoChecked": false
+  },
+  "result": {
+    "text": "Google Chatの設定\n\n設定完了\n\n現在のGoogle Chat設定を保存しました。\n現在の対象\n営業共有、全社連絡\n現在の間隔\n3時間ごと（おすすめ・初期値）\n自動実行\n有効\n直近の取得\n一部失敗\n\n選択を外したスペースの既存履歴は削除していません。\n\n設定を終了",
+    "service": "Google Chatの設定"
+  },
+  "mobile": {
+    "overflow": false,
+    "actions": "column-reverse",
+    "buttons": [
+      44,
+      48,
+      48
+    ],
+    "labels": true
+  },
+  "zoom": {
+    "overflow": false,
+    "buttons": true,
+    "service": "Google Chatの設定"
+  },
+  "browserErrors": []
+}

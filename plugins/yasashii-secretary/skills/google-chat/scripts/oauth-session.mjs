@@ -103,6 +103,12 @@ export async function exchangeAuthorizationCode({ tokenUri, clientId, clientSecr
     if (source.includes("admin_policy_enforced") || source.includes("access_blocked")) {
       throw Object.assign(new Error("Google Workspace管理者により認証がブロックされています。API access controlsを確認してください。"), { code: "admin-blocked" });
     }
+    if (source.includes("org_internal") || source.includes("unauthorized_client") || source.includes("audience")) {
+      throw Object.assign(new Error("OAuth Audienceが利用者のGoogle Workspace組織と一致していません。Internal設定を確認してください。"), { code: "audience-mismatch" });
+    }
+    if (source.includes("invalid_scope") || source.includes("insufficient_scope")) {
+      throw Object.assign(new Error("Google Chatの読み取りに必要なscopeが不足しています。"), { code: "scope-insufficient" });
+    }
     if (source.includes("redirect_uri_mismatch")) {
       throw Object.assign(new Error("redirect_uri_mismatch: OAuth clientの種類とloopback設定を確認してください。"), { code: "redirect-uri-mismatch" });
     }

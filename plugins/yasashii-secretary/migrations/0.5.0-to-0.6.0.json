@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "0.5.0",
+  "toVersion": "0.6.0",
+  "operations": [],
+  "note": "この版の新しい接続設定は利用者の明示同意後だけ生成するため、既存workspaceを自動変更しません。"
+}
