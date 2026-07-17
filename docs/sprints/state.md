@@ -3,7 +3,7 @@
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
 - Current ID: sprint-020
-- Retry Count: 1
+- Retry Count: 2
 - Next Planned: TBD
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
@@ -77,3 +77,5 @@
 - 2026-07-17: sprint-019 Retry 1は独立Evaluatorで合格。受入基準15/15、C1〜C11全閾値、専用48/48、wrapper 12/12、全offline 310/310、全online 311/311、browser error 0。通常OAuth別タブ、cleanup全分岐、0件／1件local Git保存、push失敗時token破棄を独立確認し、sprint-020を開始。
 - 2026-07-17: sprint-020 Generatorが3時間推奨の定期取得、設定変更、確認付き再取得、再認証、space別cursor・部分失敗回復を実装。専用44件・wrapper 15件・全offline 314件・全online 315件、desktop／mobile／200%相当が0 FAIL。実Google Cloud／OAuth／API／Repository Secret／Actions／remote pushはexternal live gateのため未実施で、独立Evaluatorへ引き渡した。
 - 2026-07-17: sprint-020初回評価はlive gate前のimplementation-issueで不合格。既存staged fileが設定commitへ混入する、dispatch直後に過去runを今回の成功と誤認する、API無効403をadmin／scope blockへ誤分類する3件をGeneratorへ差し戻し（Retry 1）。専用44件・wrapper 15件・全offline 314件・全online 315件・browser評価は0 FAIL。
+- 2026-07-17: sprint-020 Retry 1で管理path限定commitと既存Git状態保持、今回dispatch後の新規runだけの追跡、403 ErrorInfo reason別分類を修正。Evaluator敵対的検査0 FAIL、新規敵対的10件・本体45件・wrapper 16件・全offline 314件・全online 315件が0 FAILのため独立Evaluatorへ再引き渡した。
+- 2026-07-17: sprint-020 Retry 1再評価は、管理path限定commitと403分類は合格したが、`createdAt` 欠落の新規run IDを今回runとして採用するimplementation-issueで不合格。時刻欠落／不正／dispatch前runをfail-closedで除外する修正をRetry 2へ差し戻した。専用45件・敵対的10件・wrapper 16件・全offline 314件・全online 315件・browserは0 FAIL。
