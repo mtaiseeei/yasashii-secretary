@@ -2,9 +2,9 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-017
+- Current ID: sprint-018
 - Retry Count: 0
-- Next Planned: sprint-018
+- Next Planned: TBD
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
      ユーザー確認で単段クレジットに正本改訂、回帰assert強化のうえ合格）。
@@ -35,7 +35,7 @@
 | sprint-014-patch-001 | done | [contract](sprint-014-patch-001.md) | [progress](../progress/sprint-014-patch-001.md) | [feedback](../feedback/sprint-014-patch-001.md) |
 | sprint-015 | done | [contract](sprint-015.md) | [progress](../progress/sprint-015.md) | [feedback](../feedback/sprint-015.md) |
 | sprint-016 | done | [contract](sprint-016.md) | [progress](../progress/sprint-016.md) | [feedback](../feedback/sprint-016.md) |
-| sprint-017 | active | [contract](sprint-017.md) | - | - |
+| sprint-017 | done | [contract](sprint-017.md) | [progress](../progress/sprint-017.md) | [feedback](../feedback/sprint-017.md) |
 | sprint-018 | planned | [contract](sprint-018.md) | - | - |
 
 ## Deferred / Superseded
@@ -65,3 +65,4 @@
 - 2026-07-17: sprint-016 Generatorが一般の非エンジニア向け公開面、決定的な対象分類、監査記録の除外理由、再混入を検知する負テストを実装。専用2件、sprint-015回帰68件、全offline回帰300件が0 FAILのため独立Evaluatorへ引き渡し。
 - 2026-07-17: sprint-016は独立Evaluatorで合格。受入基準10/10、専用2件、sprint-015回帰68件、全offline回帰300件が0 FAIL。現行対象78件で旧配布チャネル固有表現0件、README画像も固有表現・秘密情報0件を確認した。MIT、Shin-sibainu/cc-companyの単段クレジット、forkedFrom、version 0.2.0、過去監査記録、Git履歴を維持。ユーザー指示によりここで停止し、sprint-017はFableレビュー後まで着手しない。
 - 2026-07-17: Claudeレビューとユーザー承認を反映し、更新機能を読み取り専用の診断基盤 `sprint-017` と、明示確認後の更新実行 `sprint-018` に分割して契約化。両Sprintともplannedで、実装は未着手。
+- 2026-07-17: sprint-017は独立Evaluatorで合格。受入基準10/10、専用32/32、release負fixture 6/6、独自CLI 12ケース＋4選択、全offline 306/306、全online 307/307が成功。診断前後のplugin／workspace／Git／設定snapshotは一致し、実更新・migration・commit・push・設定変更の副作用0件を確認。公開versionは0.3.0。sprint-018はplannedのまま未着手。
