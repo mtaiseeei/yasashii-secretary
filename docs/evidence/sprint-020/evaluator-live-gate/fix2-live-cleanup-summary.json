@@ -1,0 +1,36 @@
+{
+  "evaluatedProductCommit": "21f5168abc2ef4a88a0b2135a9e2cc2f21897687",
+  "liveWorkspace": {
+    "private": true,
+    "worktreeClean": true,
+    "headMatchesUpstream": true,
+    "head": "074720a4785366b8b33b9e23b3af72b51c3bae93",
+    "selectedSpaceNames": 0,
+    "selectedSpaces": 0,
+    "interval": "manual",
+    "scheduleEnabled": false,
+    "automaticPushConsent": false,
+    "workflowSchedulePresent": false,
+    "workflowDispatchPresent": true,
+    "repositorySecretCount": 0,
+    "historyMarkdownFileCount": 1,
+    "historyMessageMarkerCount": 1,
+    "stateFileCount": 1,
+    "oauthGrantRevoked": false
+  },
+  "regression": {
+    "sprint020": { "pass": 50, "fail": 0 },
+    "adversarial": { "pass": 16, "fail": 0 },
+    "wrapper": { "pass": 16, "fail": 0 },
+    "offline": { "pass": 314, "fail": 0 },
+    "online": { "pass": 315, "fail": 0 }
+  },
+  "leakScan": {
+    "publicTrackedFileCount": 297,
+    "publicExactProtectedValueHits": 0,
+    "publicRootLiveAssets": 0,
+    "feedbackAndEvidenceFilesScanned": 34,
+    "feedbackAndEvidenceExactProtectedValueHits": 0
+  },
+  "verdict": "pending-oauth-revoke"
+}

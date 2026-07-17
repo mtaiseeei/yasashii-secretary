@@ -470,3 +470,79 @@ synthetic／local implementation issueは0件。
 - Retry 3のfeedback、Evaluator scripts、synthetic画像には、OAuth値、認可URL／callback、actual space resource／表示名、actual本文、actual発言者、actual添付名を含めていない。
 - 実Actionsログ全文は保存・転記していない。安全なscannerのhit件数だけを記録した。
 - public配布repoの利用者用Google Chat live資産は0件。private履歴とworkspaceは削除していない。
+
+---
+
+## Retry 3 修正後再評価 — OAuth解除待ち
+
+**判定:** 不合格（残条件1件）
+
+**分類:** `external-live-cleanup-pending`
+
+**評価対象commit:** `21f5168`
+
+Generatorの2段階修正により、全選択解除の保存と、Repository Secretsを先に削除した場合の停止保存が成立した。配布版と同じ実live wizardで、対象0件、手動のみ、明示同意、保存、commit、pushを完了し、Evaluatorがprivate test workspaceを読み取り専用で再確認した。
+
+実live状態は、選択0件、manual、schedule無効、自動push同意false、Repository Secret 0件で整合している。local HEADとupstreamは一致し、worktreeはcleanである。履歴Markdown 1件、message marker 1件、state 1件は保持され、停止処理による履歴削除はなかった。
+
+実装・回帰・live停止状態には、現時点でimplementation issueを認めない。ただし受入基準13はGoogle OAuth grant／token revokeまでを必須としており、これはユーザー確認待ちで未実施である。この1件が完了するまでSprint全体をPASSにはしない。
+
+### 修正後スコア
+
+| ID | 基準 | スコア | 閾値 | 判定 | 根拠 |
+|---|---|---:|---:|---|---|
+| C1 | 完成度 | 4/5 | 4 | PASS | 製品機能とlive停止は完了。OAuth解除だけ外部確認待ち |
+| C2 | 構文・整合 | 5/5 | 5 | PASS | 0件、manual、schedule無効、同意false、remoteが一致 |
+| C3 | 機能の実証 | 5/5 | 4 | PASS | 実OAuth、初回取得、2回のActions、検索、冪等性、停止を実証 |
+| C4 | 非エンジニア体験 | 5/5 | 4 | PASS | 0件＋manualへ実UIで進め、対象なし・停止・履歴保持を確認 |
+| C5 | 安全・規律 | 4/5 | 5 | FAIL | Secret削除、schedule停止、秘密非露出は成立。OAuth解除が未完了 |
+| C6 | 無回帰 | 5/5 | 5 | PASS | 専用50、敵対的16、wrapper16、offline 314、online 315が0 FAIL |
+| C7 | やさしさ | 5/5 | 4 | PASS | 停止結果と履歴保持が平易に表示される |
+| C8 | wizard体験・デザイン | 5/5 | 4 | PASS | 既存browser証跡に加え、0件＋manualの実操作が成立 |
+| C9 | 配布チャネル非依存 | 5/5 | 5 | PASS | 公開repoのlive資産0件、全体online回帰PASS |
+| C10 | 更新の安全性 | 5/5 | 5 | PASS | Sprint 017／018回帰を維持 |
+| C11 | Google Chat境界 | 4/5 | 5 | FAIL | read-only、SPACE限定、停止、Secret削除は成立。OAuth解除待ち |
+
+### 追加修正の独立回帰
+
+- `bash scripts/sprint-020-regression.sh`
+  - Sprint 020本体 `50/50`、敵対的 `16/16`、wrapper `16/16`、FAIL 0。
+  - Secret 0件でも対象0件＋manualをcommit／pushできる。
+  - 対象が残るmanualまたは自動取得は、従来どおりSecret 3件がなければ変更0件で拒否する。
+- clean cloneで `bash scripts/regression-check.sh --offline`
+  - 初回sandbox実行はloopback bindの `EPERM` だったため製品失敗と分離し、localhost許可環境で再実行。`PASS=314 FAIL=0`。
+- clean cloneで `bash scripts/regression-check.sh --online`
+  - `PASS=315 FAIL=0`。
+- `git diff --check`
+  - PASS。
+
+### live停止状態の独立確認
+
+| 項目 | 結果 |
+|---|---|
+| private test repository | privateのまま |
+| local／upstream | 同一commit、worktree clean |
+| 選択対象 | config上0件 |
+| 間隔 | manual |
+| schedule | config false、workflow schedule 0件 |
+| 自動push同意 | false |
+| Repository Secret | 名前一覧0件。値は取得していない |
+| 履歴 | Markdown 1件、message marker 1件を保持 |
+| state | 1件を保持 |
+| OAuth grant／token | 未解除。ユーザー確認待ち |
+
+非機密の集計証跡は `docs/evidence/sprint-020/evaluator-live-gate/fix2-live-cleanup-summary.json` に保存した。actual space名、resource、本文、発言者、添付名、OAuth値は含めていない。
+
+### 漏えい再検査
+
+- public配布repoのtracked 297件: live／OAuth保護値の完全一致hit 0、root live資産0件。
+- Sprint 020 feedback／evidence 34件: actual本文、発言者、message resource、OAuth client値の完全一致hit 0。
+- OAuth値、認可URL／callback、actual space名、actual本文、actual発言者、actual添付名は、feedback、画像、JSONへ記録していない。
+
+### 最終PASSに必要な残作業
+
+1. ユーザーの明示確認後、test用Google OAuth grant／tokenをrevokeする。
+2. revokeの成功を、秘密値を記録しない形でEvaluatorが確認する。
+3. 受入基準13、C5、C11をPASSへ更新し、最終判定を記録する。
+
+履歴とprivate test workspaceの削除は受入条件に含めず、実施しない。
