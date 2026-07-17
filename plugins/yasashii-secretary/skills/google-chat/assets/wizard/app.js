@@ -207,33 +207,44 @@ function renderResult(result) {
 function renderSettingsSpaces({ refreshed = false } = {}) {
   progress(1);
   const shown = state.spaces.filter((space) => `${space.displayName} ${space.name}`.toLocaleLowerCase("ja").includes(state.query.toLocaleLowerCase("ja")));
+  const noSelection = state.selected.size === 0;
   app.innerHTML = `<p class="eyebrow">設定変更 1 / 3</p><h1>取得する通常スペースを見直します。</h1><p class="lead">確定するまで設定、workflow、履歴、commit、pushは変更しません。選択を外しても取得済み履歴は削除しません。</p>${refreshed ? '<p class="notice" role="status">再認証後の最新スペース一覧を確認しました。既存の選択と履歴は保持しています。</p>' : ""}
     <div class="panel"><label class="search-label" for="settings-space-search">スペースを検索</label><input class="search" id="settings-space-search" type="search" value="${escape(state.query)}" placeholder="スペース名またはspace ID"><button class="text-button" data-action="clear" type="button">選択をすべて外す</button><ul class="room-list">${shown.map((space) => `<li><label class="choice"><input type="checkbox" value="${escape(space.name)}" ${state.selected.has(space.name) ? "checked" : ""}><span class="choice-copy"><span class="choice-title">${escape(space.displayName)}</span><span class="choice-meta">space ID ${escape(space.name)}</span></span></label></li>`).join("")}</ul><p class="hint">選択中: ${state.selected.size}スペース。新しいスペースが見えない場合は再認証して一覧を更新します。</p></div>
-    <div class="actions"><button class="button button-secondary" data-action="reauthorize">再認証して一覧を更新</button><button class="button button-primary" data-action="next">間隔を確認する</button></div>`;
+    ${noSelection ? '<p class="notice" role="status">0件のまま進み「手動のみ」を選ぶと、Google Chatの今後の取得を停止できます。取得済み履歴は残ります。</p>' : ""}
+    <div class="actions"><button class="button button-secondary" data-action="reauthorize">再認証して一覧を更新</button><button class="button button-primary" data-action="next">${noSelection ? "停止方法を確認する" : "間隔を確認する"}</button></div>`;
   app.querySelector("#settings-space-search").oninput = (event) => { state.query = event.target.value; renderSettingsSpaces(); app.querySelector("#settings-space-search").focus(); };
   app.querySelector('[data-action="clear"]').onclick = () => { state.selected.clear(); renderSettingsSpaces(); };
   app.querySelectorAll('.room-list input[type="checkbox"]').forEach((input) => input.onchange = () => { input.checked ? state.selected.add(input.value) : state.selected.delete(input.value); renderSettingsSpaces(); });
   const next = app.querySelector('[data-action="next"]');
-  next.disabled = state.selected.size === 0;
   next.onclick = renderSettingsFrequency;
   app.querySelector('[data-action="reauthorize"]').onclick = renderPrepare;
 }
 
 function renderSettingsFrequency() {
   progress(2);
-  app.innerHTML = `<p class="eyebrow">設定変更 2 / 3</p><h1>自動取得の間隔を見直します。</h1><p class="lead">ChatworkとGoogle Chatは、どちらも3時間ごとがおすすめ・初期値です。</p><div class="panel"><ul class="frequency-list">${frequencies.map(([value, label]) => `<li><label class="choice"><input type="radio" name="settings-interval" value="${value}" ${state.interval === value ? "checked" : ""}><span class="choice-copy"><span class="choice-title">${label}</span></span></label></li>`).join("")}</ul><p class="hint">手動のみでは定期scheduleを作りません。自動取得は毎時0分を避けて実行します。</p></div>${actions("変更内容を確認する")}`;
-  app.querySelectorAll('input[name="settings-interval"]').forEach((input) => input.onchange = () => { state.interval = input.value; });
-  app.querySelector('[data-action="next"]').onclick = renderSettingsReview;
+  const noSelection = state.selected.size === 0;
+  app.innerHTML = `<p class="eyebrow">設定変更 2 / 3</p><h1>自動取得の間隔を見直します。</h1><p class="lead">ChatworkとGoogle Chatは、どちらも3時間ごとがおすすめ・初期値です。</p><div class="panel"><ul class="frequency-list">${frequencies.map(([value, label]) => `<li><label class="choice"><input type="radio" name="settings-interval" value="${value}" ${state.interval === value ? "checked" : ""}><span class="choice-copy"><span class="choice-title">${label}</span></span></label></li>`).join("")}</ul><p class="hint">手動のみでは定期scheduleを作りません。自動取得は毎時0分を避けて実行します。</p></div>${noSelection ? '<p class="notice" data-selection-guidance role="status">対象が0件です。Google Chatの取得を停止し、履歴を残すには「手動のみ」を選んでください。</p>' : ""}${actions("変更内容を確認する")}`;
+  const next = app.querySelector('[data-action="next"]');
+  const update = () => {
+    const blocked = state.selected.size === 0 && state.interval !== "manual";
+    next.disabled = blocked;
+    const guidance = app.querySelector("[data-selection-guidance]");
+    if (guidance) guidance.textContent = blocked ? "対象が0件です。Google Chatの取得を停止し、履歴を残すには「手動のみ」を選んでください。" : "手動のみで今後の取得を停止します。取得済み履歴は削除しません。";
+  };
+  app.querySelectorAll('input[name="settings-interval"]').forEach((input) => input.onchange = () => { state.interval = input.value; update(); });
+  next.onclick = renderSettingsReview;
   app.querySelector('[data-action="back"]').onclick = renderSettingsSpaces;
+  update();
 }
 
 function renderSettingsReview() {
   progress(3);
-  const names = state.spaces.filter((space) => state.selected.has(space.name)).map((space) => escape(space.displayName)).join("、");
+  const selectedNames = state.spaces.filter((space) => state.selected.has(space.name)).map((space) => escape(space.displayName)).join("、");
+  const names = selectedNames || "なし（今後の取得を停止）";
   const frequency = frequencies.find(([value]) => value === state.interval)?.[1];
   const automatic = state.interval !== "manual";
   const rangeNote = "編集・削除は、その取得でAPIが返した範囲だけ反映します。差分範囲より古い変更が反映されないことは正常な仕様です。";
-  app.innerHTML = `<p class="eyebrow">設定変更 3 / 3</p><h1>現在の変更内容を確認してください。</h1><p class="lead">同意して確定するまで、設定、workflow、commit、pushは0件です。</p><dl class="summary"><div class="summary-row"><dt>対象スペース</dt><dd>${names}</dd></div><div class="summary-row"><dt>自動取得の間隔</dt><dd>${escape(frequency)}</dd></div><div class="summary-row"><dt>保存内容</dt><dd>本文、スレッド、発言者、添付メタデータ。添付本文は取得しません</dd></div><div class="summary-row"><dt>保存先</dt><dd>秘書・一般プロジェクト・Chatworkと同じ非公開のGitHubリポジトリ</dd></div><div class="summary-row"><dt>自動保存</dt><dd>${automatic ? "GitHub Actionsが取得結果をGitのcommit・pushで保存" : "手動取得時だけ保存"}</dd></div></dl><p class="notice">共同編集者は保存済み本文を読めます。${escape(rangeNote)}</p><label class="consent"><input id="settings-git-consent" type="checkbox"><span>設定ファイルと自動取得処理をこのリポジトリへcommit・pushすることに同意します。</span></label>${automatic ? '<label class="consent"><input id="settings-auto-consent" type="checkbox"><span>選択スペースを3時間等の指定間隔で取得し、結果を自動commit・pushすることに同意します。</span></label>' : ""}${actions("この内容で設定する")}`;
+  app.innerHTML = `<p class="eyebrow">設定変更 3 / 3</p><h1>現在の変更内容を確認してください。</h1><p class="lead">同意して確定するまで、設定、workflow、commit、pushは0件です。</p><dl class="summary"><div class="summary-row"><dt>対象スペース</dt><dd>${names}</dd></div><div class="summary-row"><dt>自動取得の間隔</dt><dd>${escape(frequency)}</dd></div><div class="summary-row"><dt>保存内容</dt><dd>本文、スレッド、発言者、添付メタデータ。添付本文は取得しません</dd></div><div class="summary-row"><dt>保存先</dt><dd>秘書・一般プロジェクト・Chatworkと同じ非公開のGitHubリポジトリ</dd></div><div class="summary-row"><dt>自動保存</dt><dd>${automatic ? "GitHub Actionsが取得結果をGitのcommit・pushで保存" : state.selected.size === 0 ? "停止（今後は取得しません）" : "手動取得時だけ保存"}</dd></div></dl><p class="notice">${state.selected.size === 0 ? "Google Chatの取得を停止します。取得済み履歴は削除しません。" : `共同編集者は保存済み本文を読めます。${escape(rangeNote)}`}</p><label class="consent"><input id="settings-git-consent" type="checkbox"><span>設定ファイルと自動取得処理をこのリポジトリへcommit・pushすることに同意します。</span></label>${automatic ? '<label class="consent"><input id="settings-auto-consent" type="checkbox"><span>選択スペースを3時間等の指定間隔で取得し、結果を自動commit・pushすることに同意します。</span></label>' : ""}${actions("この内容で設定する")}`;
   const confirm = app.querySelector('[data-action="next"]');
   const update = () => {
     state.commitPushConsent = app.querySelector("#settings-git-consent").checked;
@@ -265,10 +276,11 @@ async function applySettings() {
 
 function renderSettingsResult() {
   progress(4);
-  const names = state.spaces.filter((space) => state.config.selectedSpaceNames.includes(space.name)).map((space) => escape(space.displayName)).join("、");
+  const selectedNames = state.spaces.filter((space) => state.config.selectedSpaceNames.includes(space.name)).map((space) => escape(space.displayName)).join("、");
+  const names = selectedNames || "なし（取得を停止）";
   const frequency = frequencies.find(([value]) => value === state.config.interval)?.[1];
   const syncStatus = state.sync?.status === "partial" ? "一部失敗" : state.sync?.status === "failed" ? "失敗" : state.sync?.status === "success" ? "成功" : "まだありません";
-  app.innerHTML = `<p class="eyebrow">設定完了</p><h1>現在のGoogle Chat設定を保存しました。</h1><dl class="summary"><div class="summary-row"><dt>現在の対象</dt><dd>${names}</dd></div><div class="summary-row"><dt>現在の間隔</dt><dd>${escape(frequency)}</dd></div><div class="summary-row"><dt>自動実行</dt><dd>${state.config.scheduleEnabled ? "有効" : "無効（手動のみ）"}</dd></div><div class="summary-row"><dt>直近の取得</dt><dd>${syncStatus}</dd></div></dl><p class="notice">選択を外したスペースの既存履歴は削除していません。</p><div class="actions"><button class="button button-secondary" data-action="close">設定を終了</button></div>`;
+  app.innerHTML = `<p class="eyebrow">設定完了</p><h1>現在のGoogle Chat設定を保存しました。</h1><dl class="summary"><div class="summary-row"><dt>現在の対象</dt><dd>${names}</dd></div><div class="summary-row"><dt>現在の間隔</dt><dd>${escape(frequency)}</dd></div><div class="summary-row"><dt>自動実行</dt><dd>${state.config.scheduleEnabled ? "有効" : state.config.selectedSpaceNames.length === 0 ? "無効（取得停止）" : "無効（手動のみ）"}</dd></div><div class="summary-row"><dt>直近の取得</dt><dd>${syncStatus}</dd></div></dl><p class="notice">${state.config.selectedSpaceNames.length === 0 ? "Google Chatの今後の取得を停止しました。選択を外したスペースの既存履歴は削除していません。" : "選択を外したスペースの既存履歴は削除していません。"}</p><div class="actions"><button class="button button-secondary" data-action="close">設定を終了</button></div>`;
   app.querySelector('[data-action="close"]').onclick = renderComplete;
 }
 

@@ -160,3 +160,45 @@
 ### 残課題
 
 - 受入基準10〜13の実API live gateは引き続き未実施。synthetic／localの実装問題が0件であることを独立Evaluatorが確認した後、ユーザーの個別明示許可と非機密test資源が揃った場合だけ進める。
+
+## Retry 3 — live後始末の全スペース選択解除
+
+**ステータス:** 実装修正完了 - Evaluatorの独立再評価待ち
+
+### live gateで判明した実装不具合
+
+- 実API評価の後始末で最後のGoogle Chatスペースを外すと、設定変更wizardのCTAが無効になり、同じbackendの `POST /api/settings` も `space-required` で拒否していた。
+- schedule停止とRepository Secret削除はできても、受入基準13の「test space選択解除」を配布版と同じ利用者導線で完了できなかった。
+
+### 修正内容
+
+- **0件＋手動のみを停止状態として保存**: 既存接続の設定変更では、`interval=manual` の場合に限って通常スペース0件を許可する。保存後は `selectedSpaceNames=[]`、`selectedSpaces=[]`、`scheduleEnabled=false`、`automaticPushConsent=false` とし、workflowのscheduleを0件にする。
+- **自動取得の境界を維持**: 1h／3h／6h／12hで対象0件を送ると、画面のCTAとsettings API／transactionの両方が拒否する。通常スペース以外、候補外space、無同意のcommit・pushも従来どおり拒否する。
+- **既存履歴を保持**: 設定transactionの管理pathへ履歴を加えず、全選択解除は今後の取得だけを止める。既存履歴のfile内容がbyte保持されることを専用回帰とlocal bare remoteの敵対的回帰で確認した。
+- **停止導線を明示**: 設定変更の選択画面では0件でも「停止方法を確認する」へ進める。間隔画面では「手動のみ」になるまでCTAを無効にし、確認／結果画面で「対象なし」「取得停止」「既存履歴は残る」を表示する。初回接続の1件以上必須は変更していない。
+- **既存Git状態を保持**: 0件＋手動のみの設定commitでも、管理path限定commit、既存のstaged／unstaged／untracked状態、SPACE候補境界を維持する。明示したcommit・push同意前は0変更である。
+- **スコープ分離**: wizard全体をLess is Moreの文言へ整える追加要望は、このlive後始末修正へ混ぜず別Patch Sprintへ送る。本Retryは0件停止導線に必要な文言だけを変更した。
+
+### Retry 3 検証結果
+
+- Sprint 020本体: `node scripts/sprint-020-google-chat-test.mjs` → `SPRINT020_PASS=48 SPRINT020_FAIL=0`
+- Generator敵対的回帰: `node scripts/sprint-020-adversarial-test.mjs` → `SPRINT020_ADVERSARIAL_PASS=16 SPRINT020_ADVERSARIAL_FAIL=0`
+- Sprint 020専用wrapper: `bash scripts/sprint-020-regression.sh` → `SPRINT020_WRAPPER_PASS=16 SPRINT020_WRAPPER_FAIL=0`
+- running wizard: actual `wizard-server.mjs` とHeadless Chromeで、通常の3時間自動取得、0件＋自動拒否、0件＋手動成功、明示同意、結果現在値を操作。browser error 0件。
+- desktop 1440px、mobile 390px、200%相当: 横overflow 0、button 44px以上、input labelあり。Google Chat明示、primary CTA `rgb(17, 187, 98)`／黒前景、旧青0件、3時間推奨・初期値を維持。
+- 全offline回帰: 製品挙動を含む313件はPASS。並行するEvaluator所有の未commit追記 `docs/feedback/sprint-020.md` をSprint 016の保護記録検査が検出した1件だけがFAILした。Generatorは当該feedbackを編集せず、正本変更の確定後に同じ全回帰を再実行する必要がある。
+- 全online回帰: online固有確認を含む314件はPASS。同じ未commitのEvaluator保護記録1件だけがFAILした。公開GitHub参照とSprint 020専用回帰はすべてPASSした。
+- `git diff --check`、変更Node構文、strict secret形式、public repoの利用者用Google Chat資産0件 → PASS。
+
+### 独立再評価で重点確認してほしいこと
+
+1. live private test workspaceを配布版wizardで開き、最後のspaceを外して「手動のみ」で確定できること。
+2. remote側の設定が対象0件、manual、schedule無効、自動push同意falseで、workflow schedule 0件になること。
+3. Repository Secret 3件が0件のまま、既存履歴とprivate workspaceが保持されること。
+4. Google OAuth grant／token revokeを完了し、受入基準13の後始末全体を確認すること。
+5. 0件＋3時間等の自動取得はUIとAPIで拒否され、設定・workflow・commit・pushが変更されないこと。
+
+### 既知の課題
+
+- Generatorはlive private test workspace、Google OAuth grant、Repository Secretを操作していない。実環境の選択解除とOAuth revokeは、独立Evaluatorがユーザー許可済みのlive gateとして再確認する。
+- wizard全体の文言簡素化は別Patch Sprintの対象であり、本Retryには含めていない。

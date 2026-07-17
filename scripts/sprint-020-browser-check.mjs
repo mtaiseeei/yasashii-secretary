@@ -59,6 +59,24 @@ await waitFor(`document.querySelector('h1')?.textContent.includes('現在のGoog
 const result = await evaluate(`({text:document.querySelector('#app').innerText,service:document.querySelector('#app').getAttribute('aria-label')})`);
 await screenshot("google-chat-settings-result.png");
 
+await open(1440, 900);
+await evaluate(`document.querySelector('[data-action="clear"]').click();true`);
+await waitFor(`document.querySelectorAll('.room-list input:checked').length===0`);
+const zeroSpaces = await evaluate(`({text:document.querySelector('#app').innerText,nextDisabled:document.querySelector('[data-action="next"]').disabled,nextText:document.querySelector('[data-action="next"]').textContent})`);
+await evaluate(`document.querySelector('[data-action="next"]').click();true`);
+await waitFor(`document.querySelectorAll('input[name="settings-interval"]').length===5`);
+const zeroAutomaticUi = await evaluate(`({selected:document.querySelector('input[name="settings-interval"]:checked').value,nextDisabled:document.querySelector('[data-action="next"]').disabled,text:document.querySelector('#app').innerText})`);
+const zeroAutomaticApi = await evaluate(`(async()=>{const before=await (await fetch('/api/bootstrap')).json();const response=await fetch('/api/settings',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({selectedSpaceNames:[],interval:'3h',commitPushConsent:true,automaticPushConsent:true})});const body=await response.json();const after=await (await fetch('/api/bootstrap')).json();return {status:response.status,code:body.code,before:before.config,after:after.config};})()`);
+await evaluate(`document.querySelector('input[value="manual"]').click();true`);
+const zeroManualFrequency = await evaluate(`({nextDisabled:document.querySelector('[data-action="next"]').disabled,text:document.querySelector('#app').innerText})`);
+await evaluate(`document.querySelector('[data-action="next"]').click();true`);
+await waitFor(`document.querySelector('#settings-git-consent')!==null`);
+const zeroManualReview = await evaluate(`({text:document.querySelector('#app').innerText,disabled:document.querySelector('[data-action="next"]').disabled,autoConsent:Boolean(document.querySelector('#settings-auto-consent'))})`);
+await evaluate(`document.querySelector('#settings-git-consent').click();document.querySelector('[data-action="next"]').click();true`);
+await waitFor(`document.querySelector('h1')?.textContent.includes('現在のGoogle Chat設定')`);
+const zeroManualResult = await evaluate(`({text:document.querySelector('#app').innerText,service:document.querySelector('#app').getAttribute('aria-label')})`);
+await screenshot("google-chat-settings-zero-manual-result.png");
+
 await open(390, 844, true);
 const mobile = await evaluate(`({overflow:document.documentElement.scrollWidth>innerWidth,actions:getComputedStyle(document.querySelector('.actions')).flexDirection,buttons:[...document.querySelectorAll('button')].map(i=>i.getBoundingClientRect().height),labels:[...document.querySelectorAll('input')].every(i=>i.closest('label')||document.querySelector('label[for="'+i.id+'"]'))})`);
 await screenshot("google-chat-settings-mobile.png");
@@ -68,12 +86,18 @@ await send("Emulation.setPageScaleFactor", { pageScaleFactor: 2 });
 const zoom = await evaluate(`({overflow:document.documentElement.scrollWidth>innerWidth,buttons:[...document.querySelectorAll('button')].every(i=>i.getBoundingClientRect().height>=44),service:document.querySelector('.service-context').textContent})`);
 await screenshot("google-chat-settings-zoom200.png");
 
-const report = { desktop, frequency, manualReview, automaticReview, result, mobile, zoom, browserErrors };
+const report = { desktop, frequency, manualReview, automaticReview, result, zeroSpaces, zeroAutomaticUi, zeroAutomaticApi, zeroManualFrequency, zeroManualReview, zeroManualResult, mobile, zoom, browserErrors };
 const passed = desktop.service === "Google Chatの設定" && desktop.context === "Google Chatの設定" && desktop.selected.length === 2 && desktop.cta.every((item) => item.bg === "rgb(17, 187, 98)" && item.fg === "rgb(0, 0, 0)") && desktop.blue === 0 && desktop.text.includes("取得済み履歴は削除しません")
   && frequency.selected === "3h" && frequency.text.includes("3時間ごと（おすすめ・初期値）")
   && manualReview.disabled && !manualReview.autoConsent && manualReview.ctaCount === 2 && manualReview.text.includes("手動取得時だけ保存")
   && automaticReview.disabled && !automaticReview.gitChecked && !automaticReview.autoChecked && automaticReview.text.includes("差分範囲より古い変更")
-  && result.text.includes("現在の対象") && result.text.includes("現在の間隔") && result.text.includes("自動実行") && result.text.includes("直近の取得") && result.text.includes("既存履歴は削除していません")
+  && result.text.includes("現在の対象") && result.text.includes("現在の間隔") && result.text.includes("自動実行") && result.text.includes("直近の取得") && result.text.includes("既存履歴は削除していません") && !result.text.includes("今後の取得を停止しました")
+  && !zeroSpaces.nextDisabled && zeroSpaces.nextText.includes("停止方法") && zeroSpaces.text.includes("取得済み履歴は残ります")
+  && zeroAutomaticUi.selected === "3h" && zeroAutomaticUi.nextDisabled && zeroAutomaticUi.text.includes("手動のみ")
+  && zeroAutomaticApi.status === 400 && zeroAutomaticApi.code === "space-required" && JSON.stringify(zeroAutomaticApi.before) === JSON.stringify(zeroAutomaticApi.after)
+  && !zeroManualFrequency.nextDisabled && zeroManualFrequency.text.includes("取得済み履歴は削除しません")
+  && zeroManualReview.disabled && !zeroManualReview.autoConsent && zeroManualReview.text.includes("なし（今後の取得を停止）") && zeroManualReview.text.includes("取得済み履歴は削除しません")
+  && zeroManualResult.service === "Google Chatの設定" && zeroManualResult.text.includes("なし（取得を停止）") && zeroManualResult.text.includes("無効（取得停止）") && zeroManualResult.text.includes("既存履歴は削除していません")
   && !mobile.overflow && mobile.actions === "column-reverse" && mobile.buttons.every((height) => height >= 44) && mobile.labels
   && !zoom.overflow && zoom.buttons && zoom.service === "Google Chatの設定" && browserErrors.length === 0;
 writeFileSync(resolve(evidence, "browser-evidence.json"), `${JSON.stringify(report, null, 2)}\n`);

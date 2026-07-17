@@ -48,11 +48,11 @@ export async function applyGoogleChatConfig({ root, selectedSpaces, availableSpa
   const requestedNames = new Set((selectedSpaces || []).map((space) => String(space?.name || "")));
   const selected = normalizedSpaces(selectedSpaces);
   const available = normalizedSpaces(availableSpaces);
-  if (selected.length === 0) throw Object.assign(new Error("通常スペースを1件以上選んでください。"), { code: "space-required" });
+  if (!GOOGLE_CHAT_INTERVALS[interval]) throw Object.assign(new Error("自動取得の間隔を選び直してください。"), { code: "interval-invalid" });
+  if (selected.length === 0 && interval !== "manual") throw Object.assign(new Error("自動取得を使う場合は、通常スペースを1件以上選んでください。取得を停止する場合は「手動のみ」を選んでください。"), { code: "space-required" });
   if (selected.length !== requestedNames.size) throw Object.assign(new Error("通常スペース以外または形式が不正な対象は設定できません。"), { code: "space-not-allowed" });
   const availableNames = new Set(available.map((space) => space.name));
   if (selected.some((space) => !availableNames.has(space.name))) throw Object.assign(new Error("候補にないスペースは設定できません。"), { code: "space-not-allowed" });
-  if (!GOOGLE_CHAT_INTERVALS[interval]) throw Object.assign(new Error("自動取得の間隔を選び直してください。"), { code: "interval-invalid" });
   if (commitPushConsent !== true) throw Object.assign(new Error("設定ファイルと自動取得処理のcommit・pushへの明示同意が必要です。"), { code: "consent-required" });
   const scheduleEnabled = interval !== "manual";
   if (scheduleEnabled && automaticPushConsent !== true) throw Object.assign(new Error("定期取得と自動commit・pushへの明示同意が必要です。"), { code: "consent-required" });
