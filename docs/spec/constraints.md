@@ -141,3 +141,18 @@
 5. MIT表記、Shin-sibainu/cc-companyの単段クレジット、`forkedFrom`、配布識別子は削除・変更しない。元リポジトリからの独立実装化やGit履歴書換えも行わない。
 6. 文言整理を理由に機能、既存の安全境界、Chatwork、プロジェクト管理、ハーネス参照導線、回帰assertを弱めない。
 7. 正本の書き手を越境しない。Plannerはspec・Sprint契約とPlanner文書、Generatorは実装・公開文書・Generator文書、EvaluatorはEvaluator文書、オーケストレーターはstateをそれぞれ扱う。
+
+## 11. 更新の安全境界
+
+1. marketplaceとplugin manifestのversionは同一でなければならず、不一致の配布を機械検査で拒否する。利用者向けCHANGELOGの対象版も同じversionと整合させる。
+2. 更新診断と更新実行を分ける。「最新版にして」の最初の応答では現在版、最新版、変更点、影響、必要操作、カスタマイズ衝突可能性を説明するだけとし、plugin、workspace、Git、設定へ副作用を出さない。
+3. 読み取り専用診断ではplugin更新、workspace書込み、migration、commit、push、reload／restartの実行、設定変更を0件とする。自動更新は案内だけとし、利用者の設定を変更しない。
+4. 実更新はF30の説明後にユーザーが明示了承した場合だけ行う。了承前、拒否、キャンセル、説明不能、影響判定不能では変更しない。
+5. 更新直前の保護はpushを伴わないローカルcommitとする。commitの対象と結果を示し、secretや資格情報らしきファイルを含めない。commitを安全に作れない場合は更新を止める。
+6. 管理対象ファイルが配布時の基準hashから変わっている場合は、ファイルごとに選択を求め、既定を「現状を残す」とする。無応答を上書き同意とみなさず、一括置換を既定にしない。
+7. 最小台帳が保持できるのは管理対象path、配布版、配布時の基準hash、明示的に許可した非機密のテンプレート変数だけ。私的内容になり得る変数値は保存せず、ファイル本文、差分本文、記憶、会話、外部データ、Chatwork本文、API Token、password、secret、資格情報も保存しない。
+8. migrationは対象versionと予定変更をdry-runで示し、明示確認後だけ実行する。同じversionのmigrationを複数回実行しても追加変更が出ない冪等性を必須とし、実行済み状態を安全に判定する。
+9. 台帳無し0.2.0は正常な既存利用者として扱う。現状ファイルを未変更とも全変更とも決めつけず、上書きしない側へ倒したbootstrap判定を行う。
+10. 更新後はversion、管理対象ファイル、主要導線を検証し、失敗を成功と報告しない。失敗時は更新直前commitを基準にrollbackできる手順と影響を示す。
+11. 更新に伴うpushは自動で行わない。private workspace、記憶保護、一般PJ／別repo開発PJ、Chatworkのsecret・同期同意、配布チャネル非依存の境界を変更理由で緩めない。
+12. Google Chat、OAuth、Google Chat同期、Google Chat設定画面はF30/F31の対象外とし、更新導線へ混在させない。

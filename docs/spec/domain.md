@@ -27,6 +27,23 @@
 | Chatwork履歴 | 選択ルームから取得済みのメッセージ | 同じrepoのChatwork履歴領域 |
 | 同期状態 | 最終成功、ルームごとの取得位置、失敗理由 | 同じrepoの状態記録 |
 | やさしいハーネス | 規律を緩めず開発を進める別製品 | 別repo `yasashii-harness` |
+| 配布版 | 利用者が導入・更新判断に使うpluginのversion | marketplaceとplugin manifestの一致値 |
+| CHANGELOG | 版ごとの利用者向け変更説明 | public配布repo |
+| 管理対象ファイル | pluginが配布・生成し、更新時に基準との差を判定するファイル | plugin配布物またはprivate workspace内の対象path |
+| 最小台帳 | 管理対象ファイルの版・基準hash・テンプレート変数だけを持つ更新判断用メタデータ | private workspace内のplugin管理領域 |
+| 復元地点 | 実更新の直前に作るpushなしのローカルcommit | private workspace repo |
+
+## 更新の状態モデル
+
+更新は `diagnosis`（読むだけ）と `apply`（明示確認後の実行）を別状態として扱う。
+
+- `diagnosis` は現在版、最新版、CHANGELOG、管理対象ファイルの基準との差、必要操作を読む。最新版を確認できない場合は `latest-unverified` とし、推測で最新版扱いしない。
+- `apply` は診断結果が揃い、利用者が実更新を明示了承し、安全な復元地点を作れる場合だけ開始する。
+- 管理対象ファイルは `unchanged`、`customized`、`unknown-baseline` に分類する。`customized` と `unknown-baseline` は上書きせず「現状を残す」を既定にする。
+- 最小台帳は管理対象path、導入済みversion、配布時の基準hash、明示的に許可した非機密のテンプレート変数だけを持つ。値が私的内容・資格情報に当たり得る変数は保存せず、更新時に要確認として扱う。
+- 台帳無し0.2.0は `unknown-baseline` を安全側の既定とし、既知の0.2.0基準と一致を証明できたファイルだけ `unchanged` と判定する。
+- migrationは `fromVersion`、`toVersion`、適用済み判定を持ち、dry-runと本実行で同じ対象を示す。再実行時の追加変更は0件でなければならない。
+- rollbackはworkspaceを更新直前commitへ戻す範囲と、pluginを更新前versionへ戻す範囲を区別して説明する。どちらかを自動で復元できない場合は、成功と見せず手動手順を示す。
 
 ## single-repoワークスペース
 
