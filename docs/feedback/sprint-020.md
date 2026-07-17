@@ -382,3 +382,91 @@ synthetic／local implementation issueは0件。
 - 実Google Cloud、実OAuth、実Google Chat API、実Repository Secret、実GitHub Actions、実remote pushは0件。
 - public配布repoの利用者用Google Chat Secret、workflow、config、state、historyは0件。
 - Retry 2のコマンド出力、feedback、既存browser証跡にはOAuth値、認可URL／callback URL、実space名、実本文、実発言者名、実添付名を含めていない。
+
+---
+
+## Retry 3 — 実API live gate 独立評価
+
+**判定:** 不合格
+
+**分類:** `implementation-issue`
+
+**評価対象commit:** `7758fbc`
+
+受入基準10〜12は、明示許可された組織所有test環境と専用private test workspaceで成立した。OAuth接続、通常スペース候補の取得、専用test space 1件の初回取得、3時間設定、2回の実workflow、commit／push／pull、伏せ字検索found、同条件再実行の重複0件を独立に確認した。Actionsログ、public配布repo、Evaluator証跡へのlive値・OAuth値の混入も0件だった。
+
+一方、受入基準13の最後に必要な「test space選択解除」を、配布版と同じwizardで完了できない。選択を0件にすると次へ進むCTAがdisabledになり、内部の `POST /api/settings` も `space-required` で拒否する。実live後始末ではschedule停止とRepository Secret 3件削除までは完了したが、選択は1件のままである。履歴とprivate workspaceは削除していない。
+
+これは外部環境の準備不足ではなく、必要な後始末を製品の正規導線が拒否する実装欠陥である。最終PASSにはせず、0件選択を「今後の取得をすべて停止し、既存履歴は残す」有効な設定として扱えるようGeneratorへ差し戻す。
+
+### スコア
+
+| ID | 基準 | スコア | 閾値 | 判定 | 根拠 |
+|---|---|---:|---:|---|---|
+| C1 | 完成度 | 3/5 | 4 | FAIL | 実接続・Actions・検索は成立したが、必須のlive後始末を正規導線で完了できない |
+| C2 | 構文・整合 | 5/5 | 5 | PASS | manifest、間隔、workflow、private repo、実remoteが整合 |
+| C3 | 機能の実証 | 5/5 | 4 | PASS | 初回取得、2回の実workflow、検索found、冪等性、部分失敗等を実物と回帰で確認 |
+| C4 | 非エンジニア体験 | 4/5 | 4 | PASS | 接続・設定説明は迷いにくいが、全選択解除後に進めない欠陥がある |
+| C5 | 安全・規律 | 4/5 | 5 | FAIL | schedule停止とSecret削除は成立。選択解除を完了できず、live後始末が未完了 |
+| C6 | 無回帰 | 4/5 | 5 | FAIL | offline 314件／online 315件は0 FAILだが、必須の全選択解除を回帰suiteが検出していない |
+| C7 | やさしさ | 5/5 | 4 | PASS | 保存範囲、共同編集者への可視性、Actions、commit・push、現在値を平易に表示 |
+| C8 | wizard体験・デザイン | 5/5 | 4 | PASS | desktop／mobile／200%相当、指定色、黒前景、同意前disabled、browser error 0 |
+| C9 | 配布チャネル非依存 | 5/5 | 5 | PASS | public配布面・online参照導線・維持項目が全回帰で成立 |
+| C10 | 更新の安全性 | 5/5 | 5 | PASS | Sprint 017／018の診断・更新・rollback回帰を維持 |
+| C11 | Google Chat境界 | 4/5 | 5 | FAIL | 実OAuth、read-only、SPACE限定、secret非露出は成立。選択解除だけ未完了 |
+
+### 実API・Actions・Git・検索の独立証跡
+
+- private test workspaceは `PRIVATE`、既定branchは `main`。live取得完了時のlocal HEADとupstreamは `3c06083` で一致した。
+- 実行前はGoogle Chat用Repository Secret名3件が存在した。値は取得していない。
+- workflow run `29612407301` と `29612495601` は、どちらも `workflow_dispatch`、`completed`、`success`。それぞれ今回の設定／取得commitをheadにしていた。
+- private workspaceのlive状態は3時間、schedule有効、自動push同意済み、選択1件。履歴file 1件、伏せ字本文の完全一致出現1件、保存済み検索 `found` 1件、stateは `success`、成功1／失敗0／cursor 1だった。
+- 2つのActionsログを、値を表示しない `docs/evidence/sprint-020/evaluator-live-gate/scan-action-log.mjs` へ直接渡した。実対象resource／表示名／本文／発言者、Google client ID／secret形式、access／refresh token形式、認可URL／callback codeはすべてhit 0。
+- public配布repoのtracked 288件を `scan-public-repo.mjs` で検査し、実live値の完全一致hit 0。root直下の利用者用Google Chat設定／state／history／workflowも0件。
+
+### 配布版wizardの機能・UX証跡
+
+実live画面はactual space名を含むため撮影せず、配布版と同じ `wizard-server.mjs` を非機密fixtureで `http://127.0.0.1:18773/` に起動して実操作した。
+
+- 全画面に「Google Chatの設定」を可視表示し、regionのaccessible nameにも保持。
+- 1h／3h／6h／12h／manualの5値を表示し、3hがchecked。「ChatworkとGoogle Chatは、どちらも3時間ごとがおすすめ・初期値」と説明。
+- primary CTAは背景 `rgb(17, 187, 98)`（`#11BB62`）、前景 `rgb(0, 0, 0)`、高さ48px。
+- 確認画面は対象、間隔、保存内容、同じ非公開repo、共同編集者への可視性、GitHub Actions、commit・push、古い編集・削除の範囲を表示。
+- 2つの同意前は確定CTA disabled、両方同意後だけenabled。結果画面は「現在の対象／現在の間隔／自動実行／直近の取得」を現在値として表示。
+- desktop 1440×900、mobile 390×844、200%相当720×450で横overflow 0、button 44px以上、サービス名維持。browser error 0。
+- 画像: `wizard-confirm-desktop.png`、`wizard-confirm-mobile.png`、`wizard-confirm-zoom200.png`、`wizard-result-desktop.png`（すべて同directoryのsynthetic証跡）。
+
+### 回帰結果
+
+- `bash scripts/sprint-020-regression.sh` → 本体 `45/45`、敵対的 `13/13`、wrapper `16/16`、FAIL 0。
+- `bash scripts/regression-check.sh --offline` → `PASS=314 FAIL=0`。
+- `bash scripts/regression-check.sh --online` → `PASS=315 FAIL=0`。public `yasashii-harness` のremote／manifest検査もPASS。
+
+### live後始末の独立再現
+
+- 実private workspaceは後始末途中のcommit `4ea42a7` でlocal HEADとupstreamが一致。
+- intervalはmanual、scheduleは無効、自動push同意false。Repository Secret名は0件。選択は1件残存。
+- synthetic running wizardで「選択をすべて外す」を押すと「選択中: 0スペース」になるが、「間隔を確認する」はdisabled。
+- 同じserverへ空の `selectedSpaceNames`、manual、commit同意済みで `POST /api/settings` するとHTTP 400、`space-required`。設定は変更されない。
+- 画像: `docs/evidence/sprint-020/evaluator-live-gate/cleanup-empty-selection-blocked.png`。
+- Google OAuth grant／token revokeは、選択解除修正後に受入13全体として再確認する。履歴・private workspaceは削除していない。
+
+### バグ一覧
+
+| # | 重要度 | 内容 | 再現手順／該当箇所 |
+|---:|---|---|---|
+| 1 | Major | 全スペースの選択解除を正規wizardで保存できず、live後始末を完了できない | 設定変更step 1で「選択をすべて外す」→次へdisabled。空配列の `/api/settings` も `config-transaction.mjs` の `space-required` で拒否 |
+
+### Generatorへの修正指示
+
+1. 既存接続の設定変更では、選択0件を有効にする。これは「今後の全space取得を停止し、既存履歴を保持する」設定であり、初回接続の0件拒否とは分ける。
+2. 0件選択時はscheduleを必ず無効にし、選択、config、workflow、commit／pushを1 transactionで整合させる。既存履歴は削除しない。
+3. wizardのstep 1から0件でも次へ進め、確認画面で「対象なし」「自動取得は停止」「既存履歴は保持」を明示する。必要な同意条件をmanual／停止状態に合わせる。
+4. 専用回帰へ、全選択解除→manual／schedule 0→commit／push→再読込後も0件→履歴保持、空配列API受理、初回接続だけ0件拒否、再選択で復帰、を追加する。
+5. 修正後、同じprivate test workspaceで選択0件、schedule停止、Secret 0件、grant／token revoke、履歴／workspace保持を独立Evaluatorが再確認する。
+
+### 秘密・公開境界
+
+- Retry 3のfeedback、Evaluator scripts、synthetic画像には、OAuth値、認可URL／callback、actual space resource／表示名、actual本文、actual発言者、actual添付名を含めていない。
+- 実Actionsログ全文は保存・転記していない。安全なscannerのhit件数だけを記録した。
+- public配布repoの利用者用Google Chat live資産は0件。private履歴とworkspaceは削除していない。
