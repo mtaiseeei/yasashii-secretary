@@ -28,6 +28,8 @@ CURRENT_FILES = {
     "docs/sprints/sprint-020.md": "next sprint contract",
     "docs/progress/sprint-018.md": "current generator handoff",
     "docs/progress/sprint-019.md": "current generator handoff",
+    "docs/progress/sprint-020-patch-001.md": "current generator handoff",
+    "docs/progress/sprint-020-patch-001-copy-inventory.md": "current generator handoff",
 }
 
 TARGET_PREFIXES = {
@@ -36,6 +38,7 @@ TARGET_PREFIXES = {
     "docs/guide/": "public guide",
     "docs/spec/": "current specification",
     "docs/evidence/sprint-016/": "current sprint evidence",
+    "docs/evidence/sprint-020-patch-001/": "current sprint evidence",
     "plugins/yasashii-secretary/": "distributed plugin",
 }
 
@@ -156,11 +159,17 @@ def protected_history_changes(root: Path) -> list[str]:
     changed = [line for line in result.stdout.splitlines() if line]
     protected: list[str] = []
     for path in changed:
-        if path.startswith(("backup/", "docs/evidence/", "docs/feedback/")):
+        if path.startswith(("backup/", "docs/feedback/")):
+            protected.append(path)
+        elif path.startswith("docs/evidence/") and not path.startswith(
+            "docs/evidence/sprint-020-patch-001/"
+        ):
             protected.append(path)
         elif path.startswith("docs/progress/") and path not in {
             "docs/progress/sprint-018.md",
             "docs/progress/sprint-019.md",
+            "docs/progress/sprint-020-patch-001.md",
+            "docs/progress/sprint-020-patch-001-copy-inventory.md",
         }:
             protected.append(path)
         elif path.startswith("docs/sprints/") and path not in {

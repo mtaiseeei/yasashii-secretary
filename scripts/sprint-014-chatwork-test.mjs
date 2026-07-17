@@ -9,6 +9,7 @@ import { promisify } from "node:util";
 import { runInNewContext } from "node:vm";
 import { applyChatworkConfig } from "../plugins/yasashii-secretary/skills/chatwork/scripts/config-transaction.mjs";
 import { INTERVALS } from "../plugins/yasashii-secretary/skills/chatwork/scripts/schedule.mjs";
+import { chatworkInitialResultModel } from "../plugins/yasashii-secretary/skills/chatwork/assets/wizard/result-model.js";
 
 const exec = promisify(execFile);
 const repo = resolve(import.meta.dirname, "..");
@@ -214,7 +215,8 @@ check("room解除は今後の取得だけ停止し既存履歴を保持", exists
 const changedStatus = await (await fetch(`${wizardUrl}api/status`)).json();
 check("設定変更statusは現在のroom・頻度・scheduleを返す", changedStatus.dispatch.operation === "configuration-change" && changedStatus.dispatch.config.selectedRoomIds.join() === "101" && changedStatus.dispatch.config.interval === "manual" && changedStatus.dispatch.config.scheduleEnabled === false);
 const appSource = readFileSync(join(plugin, "skills", "chatwork", "assets", "wizard", "app.js"), "utf8")
-  .replace(/^import \{[^\n]+\} from "\/common\.js";\n/, 'const installWizardShell = () => ({ app: document.querySelector("#app") });\nconst nowCopy = (text) => `<p class="lead">今すること: ${text}</p>`;\nconst renderWizardScreen = (app, { html }) => { app.innerHTML = html; };\nconst safetyList = () => "";\nconst technicalDetails = () => "";\n');
+  .replace(/^import \{[^\n]+\} from "\/common\.js";\n/, 'const installWizardShell = () => ({ app: document.querySelector("#app") });\nconst nowCopy = (text) => `<p class="lead">今すること: ${text}</p>`;\nconst renderWizardScreen = (app, { html }) => { app.innerHTML = html; };\nconst safetyList = () => "";\nconst technicalDetails = () => "";\n')
+  .replace(/^import \{ chatworkInitialResultModel \} from "\/result-model\.js";\n/m, "");
 const appDom = { innerHTML: "", dataset: {}, querySelector: () => ({ onclick: null }) };
 const browserContext = {
   document: { querySelector: (selector) => selector === "#app" ? appDom : null, querySelectorAll: () => [] },
@@ -222,6 +224,7 @@ const browserContext = {
   window: { setTimeout: () => {} },
   console,
   Set,
+  chatworkInitialResultModel,
 };
 runInNewContext(appSource, browserContext);
 runInNewContext('state.rooms = [{ roomId: "101", name: "営業" }, { roomId: "102", name: "開発" }]', browserContext);

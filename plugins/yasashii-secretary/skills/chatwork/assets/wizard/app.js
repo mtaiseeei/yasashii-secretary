@@ -1,4 +1,5 @@
 import { installWizardShell, nowCopy, renderWizardScreen, safetyList, technicalDetails } from "/common.js";
+import { chatworkInitialResultModel } from "/result-model.js";
 
 const { app } = installWizardShell("chatwork");
 const state = {
@@ -230,21 +231,25 @@ async function renderResult() {
     app.querySelector('[data-action="close"]').onclick = renderComplete;
     return;
   }
-  const sync = result.sync;
   const done = ["success", "failed", "fixture"].includes(result.dispatch.status);
-  const results = ["success", "fixture"].includes(result.dispatch.status) ? (sync?.results || []) : [];
-  const zero = sync?.status === "success" && results.reduce((sum, item) => sum + item.fetched, 0) === 0;
   if (!done) {
     show("initial-result-loading", '<p class="eyebrow">STEP 4 / 4</p><h1>Chatworkの最初の取得を進めています。</h1><p class="lead" data-copy-role="status">選んだルームの新しいメッセージを確認しています。</p><p class="notice">取得結果が出るまで、この画面を開いたままお待ちください。</p>', "loading");
     window.setTimeout(renderResult, 2000);
     return;
   }
-  const failed = result.dispatch.status === "failed";
-  show(failed ? "initial-result-failure" : zero ? "initial-result-empty" : "initial-result", `<p class="eyebrow">STEP 4 / 4</p><h1>${failed ? "Chatworkの最初の取得を完了できませんでした。" : "Chatworkの最初の取得が完了しました。"}</h1><p class="lead" data-copy-role="result">${failed ? "接続を確認してから、もう一度取得してください。" : zero ? "まだ保存するメッセージはありません。" : "取得したメッセージを保存しました。"}</p>
-    ${results.length ? `<ul class="result-list">${results.map((item) => `<li><strong>${escape(item.roomName)}</strong> — ${item.status === "success" ? `成功・${item.fetched}件` : `失敗・${escape(item.message || "再実行してください")}`}</li>`).join("")}</ul>` : ""}
+  const model = chatworkInitialResultModel({ sync: result.sync, selectedRoomIds: [...state.selected], dispatchStatus: result.dispatch.status });
+  const failed = model.status === "failed";
+  const partial = model.status === "partial";
+  const zero = model.status === "empty";
+  const screen = failed ? "initial-result-failure" : partial ? "initial-result-partial" : zero ? "initial-result-empty" : "initial-result";
+  const heading = failed ? "選んだChatworkルームを取得できませんでした。" : partial ? "一部のChatworkルームを取得できませんでした。" : "Chatworkの最初の取得が完了しました。";
+  const primary = failed ? "接続を確認してから、もう一度取得してください。" : partial ? "取得できたメッセージは保存しました。失敗したルームは接続を確認してください。" : zero ? "まだ保存するメッセージはありません。" : "取得したメッセージを保存しました。";
+  show(screen, `<p class="eyebrow">STEP 4 / 4</p><h1>${heading}</h1><p class="lead" data-copy-role="result">${primary}</p>
+    <p class="hint" data-copy-role="selected-result-count">選んだルームで保存できたメッセージ: ${model.totalFetched}件</p>
+    ${model.results.length ? `<ul class="result-list">${model.results.map((item) => `<li><strong>${escape(item.roomName)}</strong> — ${item.status === "success" ? `成功・${Number(item.fetched) || 0}件` : `失敗・${escape(item.message || "再実行してください")}`}</li>`).join("")}</ul>` : ""}
     ${zero ? '<p class="empty">次回以降の取得で、新しい内容を保存します。</p>' : ""}
     ${technicalDetails("詳しい説明: 取得結果", `<p>${escape(result.dispatch.message || "詳しい結果はありません。")}</p>`)}
-    <div class="actions" data-copy-role="actions"><button class="button button-primary" data-action="close" aria-label="Chatworkの設定を終了して検索案内を見る">設定を終了する</button></div>`, failed ? "error" : zero ? "empty" : "success");
+    <div class="actions" data-copy-role="actions"><button class="button button-primary" data-action="close" aria-label="Chatworkの設定を終了して検索案内を見る">設定を終了する</button></div>`, failed ? "error" : partial ? "warning" : zero ? "empty" : "success");
   app.querySelector('[data-action="close"]').onclick = renderComplete;
 }
 

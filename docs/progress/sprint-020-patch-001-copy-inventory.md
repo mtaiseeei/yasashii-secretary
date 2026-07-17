@@ -3,11 +3,11 @@
 ## 数え方
 
 - 1行を、利用者が見分けられる1画面または1状態として数える。
-- 共通shellのサービス名、進行表示、外部リンクの「新しいタブで開く」は各行に重複計上せず、全53状態へ共通適用する。
+- 共通shellのサービス名、進行表示、外部リンクの「新しいタブで開く」は各行に重複計上せず、全54状態へ共通適用する。
 - `primary` は見出し・最初の本文・CTA、`technical` は既定で閉じた「詳しい説明／管理者向け」である。
 - accessible nameは、画面領域の `Chatworkの設定`／`Google Chatの設定` と、結果が分かるbutton／linkの `aria-label` を指す。
 
-## 全件inventory（53状態）
+## 全件inventory（54状態）
 
 | サービス | 画面／状態 | copyの役割 | 修正後のprimary copy | 区分 | 必ず残す意味 | technical detail／修正方針 |
 |---|---|---|---|---|---|---|
@@ -30,6 +30,7 @@
 | Chatwork | initial-result-loading | 初回処理中 | 選択ルームを取得中 | primary | 待つ理由 | 技術詳細なし |
 | Chatwork | initial-result | 初回完了 | メッセージを保存した | primary | 結果、次は検索 | 内部取得結果 |
 | Chatwork | initial-result-empty | 初回0件 | まだ保存対象なし、次回以降に保存 | primary | 0件を正常扱い | 内部取得結果 |
+| Chatwork | initial-result-partial | 初回部分失敗 | 成功分を保存、失敗ルームは接続確認 | primary | 選択ルームだけの成功／失敗と件数 | 選択外結果は詳細にも表示しない |
 | Chatwork | initial-result-failure | 初回失敗 | 接続を確認して再取得 | primary | 何が起きたか→次の行動 | 内部取得結果 |
 | Chatwork | complete | 完了 | 設定完了、次は検索 | primary | 結果→次の一手 | 技術詳細なし |
 | Chatwork | cancelled | キャンセル | 変更せず終了 | primary | ルーム・間隔・履歴0変更 | GitHub Actions設定も0変更 |

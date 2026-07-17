@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { createTestOnlyDesktopClientFile } from "./create-sprint-020-patch-001-google-chat-test-client.mjs";
 
 const args = new Map();
 for (let index = 2; index < process.argv.length; index += 2) args.set(process.argv[index], process.argv[index + 1]);
@@ -10,6 +11,8 @@ const chatworkUrl = args.get("--chatwork-url") || "http://127.0.0.1:18784/";
 const googleNewUrl = args.get("--google-new-url") || "http://127.0.0.1:18783/";
 const googleSettingsUrl = args.get("--google-settings-url") || "http://127.0.0.1:18782/";
 const evidence = resolve(args.get("--evidence") || "docs/evidence/sprint-020-patch-001/generator");
+const testClient = createTestOnlyDesktopClientFile();
+process.on("exit", () => rmSync(testClient.directory, { recursive: true, force: true }));
 const delay = (ms) => new Promise((done) => setTimeout(done, ms));
 const pages = await (await fetch(`${cdp}/json/list`)).json();
 const page = pages.find((item) => item.type === "page");
@@ -37,6 +40,14 @@ async function open(url, width = 1440, height = 900, scale = 1) {
 async function screen(expected) { await waitFor(`document.querySelector('#app')?.dataset.screen===${JSON.stringify(expected)}`); return observe(); }
 async function click(selector) { const ok = await evaluate(`(()=>{const el=document.querySelector(${JSON.stringify(selector)});if(!el)return false;el.click();return true})()`); if (!ok) throw new Error(`missing click target: ${selector}`); }
 async function check(selector) { const ok = await evaluate(`(()=>{const el=document.querySelector(${JSON.stringify(selector)});if(!el)return false;el.click();return el.checked})()`); if (!ok) throw new Error(`missing check target: ${selector}`); }
+async function setFileInput(selector, path) {
+  const document = await send("DOM.getDocument", { depth: -1, pierce: true });
+  const target = await send("DOM.querySelector", { nodeId: document.root.nodeId, selector });
+  if (!target.nodeId) throw new Error(`missing file input: ${selector}`);
+  await send("DOM.setFileInputFiles", { nodeId: target.nodeId, files: [path] });
+  const selected = await evaluate(`document.querySelector(${JSON.stringify(selector)})?.files.length===1`);
+  if (!selected) throw new Error(`file chooser did not select exactly one file: ${selector}`);
+}
 async function actionTabSequence() {
   const expected = await evaluate(`(()=>{const items=[...document.querySelectorAll('#app .actions .button')].filter((item)=>!item.disabled&&item.tabIndex>=0);if(items.length<2)return [];items[0].focus();return items.map((item)=>item.classList.contains('button-primary')?'primary':'secondary')})()`);
   if (expected.length < 2) return { expected, actual: expected };
@@ -46,7 +57,7 @@ async function actionTabSequence() {
   return { expected, actual: [expected[0], active] };
 }
 async function observe() {
-  return evaluate(`(()=>{const app=document.querySelector('#app');const primary=[app.querySelector('h1')?.textContent,...[...app.querySelectorAll('[data-copy-role="now"],[data-copy-role="result"],[data-copy-role="status"],[data-copy-role="error"],.actions .button')].map(x=>x.textContent)].join(' ');const buttons=[...app.querySelectorAll('.actions .button')];const cta=buttons.map((x,index)=>{const rect=x.getBoundingClientRect();return {name:x.getAttribute('aria-label')||x.textContent,role:x.classList.contains('button-primary')?'primary':'secondary',domIndex:index,top:Math.round(rect.top),left:Math.round(rect.left),tabIndex:x.tabIndex,disabled:Boolean(x.disabled),bg:getComputedStyle(x).backgroundColor,fg:getComputedStyle(x).color,height:rect.height}});const dom=cta.map(x=>x.role);const visual=[...cta].sort((a,b)=>Math.abs(a.top-b.top)>1?a.top-b.top:a.left-b.left).map(x=>x.role);const tabbable=cta.filter(x=>!x.disabled&&x.tabIndex>=0).map(x=>x.role);return {screen:app.dataset.screen,state:app.dataset.state,service:app.getAttribute('aria-label'),heading:app.querySelector('h1')?.textContent,primary,forbidden:/\\b(?:wizard|workflow|commit|push|Repository Secret|loopback|runtime|scope|token|OAuth client JSON|Sprint[- ]?\\d*)\\b/i.test(primary),details:[...app.querySelectorAll('details')].map(x=>({open:x.open,summary:x.querySelector('summary')?.textContent,text:x.textContent})),safety:[...app.querySelectorAll('[data-copy-role="safety"] strong')].map(x=>x.textContent),cta,ctaOrder:{dom,visual,tabbable,matches:JSON.stringify(dom)===JSON.stringify(visual)},overflow:document.documentElement.scrollWidth>innerWidth,width:innerWidth,actions:app.querySelector('.actions')?getComputedStyle(app.querySelector('.actions')).flexDirection:null}})()`);
+  return evaluate(`(()=>{const app=document.querySelector('#app');const primary=[app.querySelector('h1')?.textContent,...[...app.querySelectorAll('[data-copy-role="now"],[data-copy-role="result"],[data-copy-role="status"],[data-copy-role="error"],.actions .button')].map(x=>x.textContent)].join(' ');const buttons=[...app.querySelectorAll('.actions .button')];const cta=buttons.map((x,index)=>{const rect=x.getBoundingClientRect();return {name:x.getAttribute('aria-label')||x.textContent,role:x.classList.contains('button-primary')?'primary':'secondary',domIndex:index,top:Math.round(rect.top),left:Math.round(rect.left),tabIndex:x.tabIndex,disabled:Boolean(x.disabled),bg:getComputedStyle(x).backgroundColor,fg:getComputedStyle(x).color,height:rect.height}});const dom=cta.map(x=>x.role);const visual=[...cta].sort((a,b)=>Math.abs(a.top-b.top)>1?a.top-b.top:a.left-b.left).map(x=>x.role);const tabbable=cta.filter(x=>!x.disabled&&x.tabIndex>=0).map(x=>x.role);return {screen:app.dataset.screen,state:app.dataset.state,service:app.getAttribute('aria-label'),heading:app.querySelector('h1')?.textContent,primary,forbidden:/\\b(?:wizard|workflow|commit|push|Repository Secret|loopback|runtime|scope|token|OAuth client JSON|Sprint[- ]?\\d*)\\b/i.test(primary),details:[...app.querySelectorAll('details')].map(x=>({open:x.open,summary:x.querySelector('summary')?.textContent,text:x.textContent})),safety:[...app.querySelectorAll('[data-copy-role="safety"] strong')].map(x=>x.textContent),resultRows:[...app.querySelectorAll('.result-list li')].map(x=>x.textContent),selectedResultCount:app.querySelector('[data-copy-role="selected-result-count"]')?.textContent||null,cta,ctaOrder:{dom,visual,tabbable,matches:JSON.stringify(dom)===JSON.stringify(visual)},overflow:document.documentElement.scrollWidth>innerWidth,width:innerWidth,actions:app.querySelector('.actions')?getComputedStyle(app.querySelector('.actions')).flexDirection:null}})()`);
 }
 async function screenshot(name) {
   const size = await evaluate(`({width:Math.max(document.documentElement.scrollWidth,innerWidth),height:Math.max(document.documentElement.scrollHeight,innerHeight)})`);
@@ -56,6 +67,7 @@ async function screenshot(name) {
 
 await send("Page.enable");
 await send("Runtime.enable");
+await send("DOM.enable");
 mkdirSync(evidence, { recursive: true });
 const report = { chatwork: [], google: [], responsive: [], sideEffects: [] };
 
@@ -78,7 +90,8 @@ await check('.room-list input'); await click('[data-action="next"]'); report.cha
 await click('[data-action="back"]'); const chatBack = await screen("chatwork-select-rooms"); if (!(await evaluate(`document.querySelector('.room-list input').checked`))) throw new Error("Chatwork back lost selection");
 await click('[data-action="next"]'); await screen("chatwork-select-interval"); await check('input[value="manual"]'); await click('[data-action="next"]');
 report.chatwork.push(await screen("chatwork-review")); await screenshot("chatwork-review-desktop.png");
-await click('[data-action="next"]'); await waitFor(`document.querySelector('#app')?.dataset.screen.startsWith('chatwork-initial-result')||document.querySelector('#app')?.dataset.screen.startsWith('chatwork-settings-result')`); report.chatwork.push(await observe()); await screenshot("chatwork-result-desktop.png");
+await click('[data-action="next"]'); await waitFor(`document.querySelector('#app')?.dataset.screen.startsWith('chatwork-initial-result')||document.querySelector('#app')?.dataset.screen.startsWith('chatwork-settings-result')`); const chatResult = await observe(); report.chatwork.push(chatResult); await screenshot("chatwork-result-desktop.png");
+if (chatResult.screen.startsWith("chatwork-initial-result") && (chatResult.resultRows.length !== 1 || !chatResult.resultRows[0].includes("営業チーム") || chatResult.resultRows[0].includes("商品開発") || !chatResult.selectedResultCount?.includes("0件"))) throw new Error("Chatwork initial result includes an unselected room or wrong selected count");
 await click('[data-action="close"]'); report.chatwork.push(await screen("chatwork-complete"));
 await open(chatworkUrl); await screen("chatwork-select-rooms"); await click('[data-action="back"]'); report.chatwork.push(await screen("chatwork-cancelled"));
 
@@ -89,22 +102,22 @@ await click('[data-action="back"]'); report.google.push(await screen("google-cha
 await click('[data-action="restart"]'); await screen("google-chat-prepare-cloud");
 await click('[data-action="next"]'); report.google.push(await screen("google-chat-prepare-access"));
 await click('[data-action="next"]'); report.google.push(await screen("google-chat-prepare-file"));
-await evaluate(`fetch('/api/oauth/client',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({clientJson:JSON.stringify({installed:{client_id:'fixture-id',client_secret:'fixture-secret',auth_uri:'https://accounts.google.com/o/oauth2/v2/auth',token_uri:'https://oauth2.googleapis.com/token',redirect_uris:['http://localhost']}})})}).then(r=>r.json())`);
-await send("Page.reload", { ignoreCache: true }); report.google.push(await screen("google-chat-authorize"));
+await setFileInput("#client-json", testClient.path); await click('[data-action="next"]'); report.google.push(await screen("google-chat-authorize"));
 await evaluate(`fetch('/api/oauth/synthetic',{method:'POST',headers:{'content-type':'application/json'},body:'{"mode":"admin-blocked"}'}).then(r=>r.json())`); await send("Page.reload", { ignoreCache: true }); report.google.push(await screen("google-chat-authorize-failure")); await screenshot("google-chat-failure-desktop.png");
 await click('[data-action="next"]'); await screen("google-chat-prepare-cloud");
-await evaluate(`fetch('/api/oauth/client',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({clientJson:JSON.stringify({installed:{client_id:'fixture-id-2',client_secret:'fixture-secret-2',auth_uri:'https://accounts.google.com/o/oauth2/v2/auth',token_uri:'https://oauth2.googleapis.com/token',redirect_uris:['http://localhost']}})})}).then(r=>r.json())`);
-await send("Page.reload", { ignoreCache: true }); await screen("google-chat-authorize");
+await click('[data-action="next"]'); await screen("google-chat-prepare-access"); await click('[data-action="next"]'); await screen("google-chat-prepare-file");
+await setFileInput("#client-json", testClient.path); await click('[data-action="next"]'); await screen("google-chat-authorize");
 await evaluate(`window.__realFetch=window.fetch;window.fetch=(u,o)=>String(u).includes('/api/spaces')?Promise.resolve(new Response(JSON.stringify({error:'synthetic space discovery failure',code:'synthetic-discovery-failed'}),{status:503,headers:{'content-type':'application/json'}})):window.__realFetch(u,o)`);
 await click('[data-action="synthetic"]'); const googleDiscoverFailureBack = await screen("google-chat-discover-failure"); report.google.push(googleDiscoverFailureBack); await screenshot("google-chat-discover-failure-desktop.png");
 if (googleDiscoverFailureBack.state !== "error" || googleDiscoverFailureBack.cta.length !== 2 || !googleDiscoverFailureBack.details.some((item) => item.text.includes("synthetic-discovery-failed"))) throw new Error("Google discover failure state is incomplete");
+await evaluate(`window.fetch=window.__realFetch`);
 const beforeBack = await evaluate(`fetch('/api/bootstrap').then(r=>r.json()).then(x=>({configured:x.configured,oauth:x.oauth.status}))`); report.sideEffects.push({ action: "discover-failure-before-back", ...beforeBack });
 await click('[data-action="back"]'); await screen("google-chat-cancelled");
 const afterBack = await evaluate(`fetch('/api/bootstrap').then(r=>r.json()).then(x=>({configured:x.configured,oauth:x.oauth.status}))`); report.sideEffects.push({ action: "discover-failure-back", ...afterBack });
 if (beforeBack.configured || afterBack.configured || afterBack.oauth !== "cancelled") throw new Error("Google discover failure back changed configuration or skipped cleanup");
 await click('[data-action="restart"]'); await screen("google-chat-prepare-cloud");
-await evaluate(`fetch('/api/oauth/client',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({clientJson:JSON.stringify({installed:{client_id:'fixture-id-3',client_secret:'fixture-secret-3',auth_uri:'https://accounts.google.com/o/oauth2/v2/auth',token_uri:'https://oauth2.googleapis.com/token',redirect_uris:['http://localhost']}})})}).then(r=>r.json())`);
-await send("Page.reload", { ignoreCache: true }); await screen("google-chat-authorize");
+await click('[data-action="next"]'); await screen("google-chat-prepare-access"); await click('[data-action="next"]'); await screen("google-chat-prepare-file");
+await setFileInput("#client-json", testClient.path); await click('[data-action="next"]'); await screen("google-chat-authorize");
 await evaluate(`window.__realFetch=window.fetch;window.fetch=(u,o)=>String(u).includes('/api/spaces')?Promise.resolve(new Response(JSON.stringify({error:'synthetic retry failure',code:'synthetic-retry-failed'}),{status:503,headers:{'content-type':'application/json'}})):window.__realFetch(u,o)`);
 await click('[data-action="synthetic"]'); const googleDiscoverFailureRetry = await screen("google-chat-discover-failure"); googleDiscoverFailureRetry.tabSequence = await actionTabSequence(); report.google.push(googleDiscoverFailureRetry);
 const beforeRetry = await evaluate(`fetch('/api/bootstrap').then(r=>r.json()).then(x=>({configured:x.configured,oauth:x.oauth.status}))`); report.sideEffects.push({ action: "discover-failure-before-retry", ...beforeRetry });
