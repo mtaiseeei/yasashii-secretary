@@ -176,12 +176,18 @@ if [ "$1 $2" = "workflow run" ]; then
   [ -f "$count_file" ] && count=$(cat "$count_file")
   count=$((count + 1))
   printf '%s' "$count" > "$count_file"
+  date -u '+%Y-%m-%dT%H:%M:%SZ' > "$FAKE_GH_ROOT/created-at"
   exit 0
 fi
 if [ "$1 $2" = "run list" ]; then
   count=0
   [ -f "$FAKE_GH_ROOT/dispatch-count" ] && count=$(cat "$FAKE_GH_ROOT/dispatch-count")
-  if [ "$count" -eq 0 ]; then echo '[]'; else printf '[{"databaseId":%s,"status":"queued","conclusion":null}]\n' "$((40 + count))"; fi
+  if [ "$count" -eq 0 ]; then
+    echo '[]'
+  else
+    created_at=$(cat "$FAKE_GH_ROOT/created-at")
+    printf '[{"databaseId":%s,"status":"queued","conclusion":null,"createdAt":"%s"}]\n' "$((40 + count))" "$created_at"
+  fi
   exit 0
 fi
 if [ "$1 $2" = "run watch" ]; then

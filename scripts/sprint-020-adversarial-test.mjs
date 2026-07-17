@@ -42,12 +42,20 @@ async function classifyFixture(body) {
   return null;
 }
 
-function makeSearchFixture({ delayedNewRun }) {
-  const root = temp(`yasashii-gchat-${delayedNewRun ? "delayed" : "stale"}-run-`);
+function makeSearchFixture({ candidateMode }) {
+  const root = temp(`yasashii-gchat-${candidateMode}-run-`);
   mkdirSync(join(root, "bin"), { recursive: true });
   mkdirSync(join(root, "google-chat", "history", "fixture--AAA"), { recursive: true });
   const fakeGit = join(root, "bin", "git");
   const fakeGh = join(root, "bin", "gh");
+  const candidateByMode = {
+    missing: `echo '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"},{"databaseId":8,"status":"queued","conclusion":null}]'`,
+    invalid: `echo '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"},{"databaseId":8,"status":"queued","conclusion":null,"createdAt":"not-a-date"}]'`,
+    before: `echo '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"},{"databaseId":8,"status":"queued","conclusion":null,"createdAt":"2020-01-01T00:00:00.000Z"}]'`,
+    "delayed-valid": `created_at=$(cat "$FAKE_FLOW_ROOT/created-at")
+    printf '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"},{"databaseId":8,"status":"queued","conclusion":null,"createdAt":"%s"}]\\n' "$created_at"`,
+  };
+  const candidateOutput = candidateByMode[candidateMode] || ":";
   writeFileSync(fakeGit, `#!/bin/sh
 if [ "$1" = "pull" ]; then
   count=0
@@ -59,15 +67,19 @@ fi
 exit 0
 `);
   writeFileSync(fakeGh, `#!/bin/sh
-if [ "$1 $2" = "workflow run" ]; then printf '1' > "$FAKE_FLOW_ROOT/dispatched"; exit 0; fi
+if [ "$1 $2" = "workflow run" ]; then
+  printf '1' > "$FAKE_FLOW_ROOT/dispatched"
+  date -u '+%Y-%m-%dT%H:%M:%SZ' > "$FAKE_FLOW_ROOT/created-at"
+  exit 0
+fi
 if [ "$1 $2" = "run list" ]; then
   polls=0
   [ -f "$FAKE_FLOW_ROOT/list-count" ] && polls=$(cat "$FAKE_FLOW_ROOT/list-count")
   polls=$((polls + 1)); printf '%s' "$polls" > "$FAKE_FLOW_ROOT/list-count"
-  if [ "${delayedNewRun ? "yes" : "no"}" = "yes" ] && [ -f "$FAKE_FLOW_ROOT/dispatched" ] && [ "$polls" -ge 4 ]; then
-    echo '[{"databaseId":7,"status":"completed","conclusion":"success"},{"databaseId":8,"status":"queued","conclusion":null}]'
+  if [ "${candidateMode}" != "none" ] && [ -f "$FAKE_FLOW_ROOT/dispatched" ] && [ "$polls" -ge 4 ]; then
+    ${candidateOutput}
   else
-    echo '[{"databaseId":7,"status":"completed","conclusion":"success"}]'
+    echo '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"}]'
   fi
   exit 0
 fi
@@ -132,13 +144,25 @@ try {
   check(unknown === "permission-denied", "未知の403をscope／管理者問題と断定しない", String(unknown));
 
   const searchFlow = resolve("plugins/yasashii-secretary/skills/google-chat/scripts/search-flow.mjs");
-  const stale = makeSearchFixture({ delayedNewRun: false });
+  const stale = makeSearchFixture({ candidateMode: "none" });
   const staleResult = JSON.parse(runOutput(process.execPath, [searchFlow, "--root", stale.root, "--query", "今回runで見つかった語", "--choice", "sync", "--timeout-ms", "500", "--run-discovery-timeout-ms", "300", "--run-poll-ms", "50"], {
     env: { ...process.env, YASASHII_GIT_BIN: stale.fakeGit, YASASHII_GH_BIN: stale.fakeGh, FAKE_FLOW_ROOT: stale.root },
   }));
   check(staleResult.status === "sync-failed" && staleResult.error === "timeout" && !staleResult.events.includes("pull-after-sync") && readFileSync(join(stale.root, "pull-count"), "utf8") === "1", "過去successだけならtimeoutしpull／再検索しない", staleResult.events.join(","));
 
-  const delayed = makeSearchFixture({ delayedNewRun: true });
+  for (const [candidateMode, label] of [
+    ["missing", "createdAt欠落"],
+    ["invalid", "createdAt不正"],
+    ["before", "dispatch前createdAt"],
+  ]) {
+    const rejected = makeSearchFixture({ candidateMode });
+    const rejectedResult = JSON.parse(runOutput(process.execPath, [searchFlow, "--root", rejected.root, "--query", "今回runで見つかった語", "--choice", "sync", "--timeout-ms", "500", "--run-discovery-timeout-ms", "300", "--run-poll-ms", "50"], {
+      env: { ...process.env, YASASHII_GIT_BIN: rejected.fakeGit, YASASHII_GH_BIN: rejected.fakeGh, FAKE_FLOW_ROOT: rejected.root },
+    }));
+    check(rejectedResult.status === "sync-failed" && rejectedResult.error === "timeout" && !rejectedResult.events.includes("success-confirmed") && !rejectedResult.events.includes("pull-after-sync") && readFileSync(join(rejected.root, "pull-count"), "utf8") === "1", `${label}の新規IDを候補外にして後続pull／再検索しない`, rejectedResult.events.join(","));
+  }
+
+  const delayed = makeSearchFixture({ candidateMode: "delayed-valid" });
   const delayedResult = JSON.parse(run(process.execPath, [searchFlow, "--root", delayed.root, "--query", "今回runで見つかった語", "--choice", "sync", "--timeout-ms", "1000", "--run-discovery-timeout-ms", "700", "--run-poll-ms", "50"], {
     env: { ...process.env, YASASHII_GIT_BIN: delayed.fakeGit, YASASHII_GH_BIN: delayed.fakeGh, FAKE_FLOW_ROOT: delayed.root },
   }));

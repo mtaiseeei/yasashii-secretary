@@ -129,3 +129,34 @@
 ### 残課題
 
 - 受入基準10〜13の実API live gateは引き続き未実施。synthetic／localの実装不具合を独立再評価で解消確認した後に限り、ユーザーの個別明示許可とtest資源を確認して進める。
+
+## Retry 2 — workflow run時刻境界のfail-closed修正
+
+**ステータス:** 実装修正完了 - Evaluatorの独立再評価待ち
+
+### 修正内容
+
+- **時刻を確認できるrunだけを採用**: workflow dispatch前に存在しなかった新規run IDでも、`createdAt` が欠落、不正、またはdispatch秒境界より前なら候補外にする。parse可能でdispatch時刻以後と確認できたrunだけをwatchする。
+- **反映遅延は安全にpoll継続**: GitHub側のrun list反映が遅い場合は、過去runや時刻不明runを代用せずpollを続ける。期限内に正しいrunを確認できなければtimeoutとし、成功確認、後続pull、同条件再検索を行わない。
+- **現実的なfixture時刻**: 通常成功fixtureはworkflow dispatch時にUTCの `createdAt` を記録し、run listへ返す。敵対的fixtureには時刻欠落、不正時刻、dispatch前時刻、遅延した有効時刻の4経路を追加した。
+
+### Retry 2 検証結果
+
+- Evaluator時刻境界検査: `node docs/evidence/sprint-020/evaluator-retry1/run-time-boundary-check.mjs` → PASS
+- Sprint 020本体: `node scripts/sprint-020-google-chat-test.mjs` → `SPRINT020_PASS=45 SPRINT020_FAIL=0`
+- Generator敵対的回帰: `node scripts/sprint-020-adversarial-test.mjs` → `SPRINT020_ADVERSARIAL_PASS=13 SPRINT020_ADVERSARIAL_FAIL=0`
+- Sprint 020専用wrapper: `bash scripts/sprint-020-regression.sh` → `SPRINT020_WRAPPER_PASS=16 SPRINT020_WRAPPER_FAIL=0`
+- 全offline回帰: `bash scripts/regression-check.sh --offline` → `PASS=314 FAIL=0`（localhost許可環境）
+- 全online回帰: `bash scripts/regression-check.sh --online` → `PASS=315 FAIL=0`（localhost・通信許可環境）
+- `git diff --check`、Node構文、strict secret形式、public repoの利用者用Google Chat資産0件 → PASS
+- Retry 2はUI assetを変更していない。前回のbrowser証跡を維持し、loopback wizardを含む全offline／online回帰を再実行した。
+
+### 独立再評価で重点確認してほしいこと
+
+1. `createdAt` 欠落、不正、dispatch前時刻の新規run IDをwatchせず、timeout時は初回pull以外の後続pull／再検索が0件であること。
+2. list反映が遅れてもpollを継続し、dispatch時刻以後の有効な `createdAt` を持つrunだけをwatchすること。
+3. 管理path限定commit、既存Git状態保持、403根拠別分類がRetry 1から回帰していないこと。
+
+### 残課題
+
+- 受入基準10〜13の実API live gateは引き続き未実施。synthetic／localの実装問題が0件であることを独立Evaluatorが確認した後、ユーザーの個別明示許可と非機密test資源が揃った場合だけ進める。

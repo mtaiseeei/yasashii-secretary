@@ -73,8 +73,7 @@ async function listWorkflowRuns() {
 }
 
 function wasCreatedAfterDispatch(runItem, dispatchStartedAt) {
-  if (!runItem?.createdAt) return true;
-  const createdAt = Date.parse(runItem.createdAt);
+  const createdAt = Date.parse(runItem?.createdAt || "");
   return Number.isFinite(createdAt) && createdAt >= dispatchStartedAt;
 }
 
