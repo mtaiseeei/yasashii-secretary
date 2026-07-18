@@ -39,7 +39,7 @@
 | sprint-018 | done | [contract](sprint-018.md) | [progress](../progress/sprint-018.md) | [feedback](../feedback/sprint-018.md) |
 | sprint-019 | done | [contract](sprint-019.md) | [progress](../progress/sprint-019.md) | [feedback](../feedback/sprint-019.md) |
 | sprint-020 | done | [contract](sprint-020.md) | [progress](../progress/sprint-020.md) | [feedback](../feedback/sprint-020.md) |
-| sprint-020-patch-001 | awaiting-eval | [contract](sprint-020-patch-001.md) | [progress](../progress/sprint-020-patch-001.md) | [feedback](../feedback/sprint-020-patch-001.md) |
+| sprint-020-patch-001 | done | [contract](sprint-020-patch-001.md) | [progress](../progress/sprint-020-patch-001.md) | [feedback](../feedback/sprint-020-patch-001.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
@@ -87,3 +87,4 @@
 - 2026-07-18: sprint-020-patch-001 Retry 1は初回3不具合の自動回帰を解消したが、独立初見セッションでChatwork完了画面が未選択roomの固定結果も表示する安全説明との矛盾と、Google Chatの合成接続用ファイル選択を完了できず3セッションとも未到達になる評価導線不備を確認。implementation-issueとしてRetry 2へ差し戻す。
 - 2026-07-18: sprint-020-patch-001 Retry 2の最終評価中、ユーザー本人の手動UXレビューを受けて同じRetry 2をactiveへ戻した。Chatworkの自然なアクセス表現、detailsの開閉 affordance、Google Chat本人管理者向け画像ガイドに加え、Chatworkと同じく1回の確定で初回取り込みと自動取得設定を完了する一体型フローを正本化した。手動のみでは初回取り込みを行いscheduleは作らない。Retry Countは中断評価のため増やさない。
 - 2026-07-18: sprint-020-patch-001 Retry 2再開のGeneratorが、Google Chatの初回取り込みと自動取得設定を1回で確定する一体型フロー、手動のみschedule 0件、部分失敗表示、Chatworkのアクセス表現、共通details開閉、本人管理者向けGoogle Cloud画面例を実装。copy 71件、Google Chat 51件、Chatwork 59件、browser 32状態、offline 316件、online 317件が0 FAILのため独立Evaluatorへ引き渡した。
+- 2026-07-18: sprint-020-patch-001 Retry 2最終評価は独立Evaluatorで合格。Rubric 55/55、受入18/18、copy 71件、Google Chat 51件、Chatwork 7件、adversarial 16件、wrapper 7件、browser 32状態、schedule部分失敗browser 1件、offline 316件、online 317件が0 FAIL。ユーザー本人を含む理解テスト3 sessionは両サービス平均5.0/5、重大誤解0。secret・固有識別値0、外部変更0、評価用fixture停止を確認して完了した。
