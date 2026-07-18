@@ -43,6 +43,8 @@ If the host cannot dispatch subagents, run the three roles as strictly separated
 Do not cross these ownership boundaries. If a role finds a problem outside its file, record it in its own handoff instead of editing another role's source of truth.
 Sprint statuses in `state.md` are: `planned`, `active`, `awaiting-eval`, `done`, `deferred`, `superseded`. Never skip or reorder sprints silently; record `deferred`/`superseded` with a reason.
 An older `docs/sprints/current.md` is a legacy pointer: convert it into `docs/sprints/state.md` once, then treat it as read-only reference. If an older `docs/progress.md` exists, treat it as a legacy reference log and do not append new sprint progress there.
+If an existing `state.md` has no `Model Tier`, pass `unknown` to the resolver once, persist only the returned `standard` or `strong` tier with `Rotate: runtime-migration`, and fresh-dispatch Generator. Never persist `unknown`. If only `Rotate` is absent, add `Rotate: none`.
+For a real Generator tier change, record `Rotate: model-escalation` for failure/risk/recommendation routing and `Rotate: model-availability` for an unavailable standard-model fallback. When Generator is not the next role, the resolver returns `modelTier: null`; this must not replace the last dispatched tier in state. A `spec-issue` route also keeps the last dispatched tier and returns to Planner.
 Use zero-padded sprint IDs. Do not create decimal sprint IDs such as `sprint-5.1` or `sprint-5.10`.
 For work between main sprints, use `sprint-NNN-patch-PPP`.
 
@@ -84,6 +86,7 @@ Do not default to fixing things outside the loop. Classify every follow-up reque
 - Score against `docs/spec/rubric.md`; one failed threshold means the sprint fails.
 - A pass requires recorded evidence: executed commands with results, and the concrete URL/DOM/browser interactions checked. Screenshots are mandatory whenever UI, responsiveness, or visual quality is scored. A pass without evidence is invalid.
 - Run the handed-over regression suite as the baseline for the no-regression score, then manually verify the surfaces this sprint touched.
+- Evaluator performs evidence-backed evaluation and self-review; it never implements fixes.
 - Classify failures as `implementation-issue` (back to Generator) or `spec-issue` (back to Planner via the orchestrator).
 - For patch sprints such as `sprint-005-patch-001`, verify the patch behavior, base sprint regression, and absence of next-main-sprint feature leakage. `Type: micro` patches get the lightweight scoring set.
 
@@ -100,4 +103,12 @@ Do not declare completion only because code was written. A sprint is complete on
 
 ## Model Policy
 
-Do not pin this workflow to a host-specific model name in reusable guidance. Inherit the user's current model by default. If the host supports role-specific model choice and the user wants quality over cost, Planner and Evaluator may use the strongest available reasoning model for that host.
+Do not infer or translate model names across hosts. Claude Code inherits the user's current model and effort by default. Codex runtime defaults are Planner `gpt-5.6-sol` / `high`, Generator `gpt-5.6-luna` / `xhigh`, and Evaluator `gpt-5.6-sol` / `high`; they apply only through a confirmed role-level dispatch surface. A dispatch-ready resolver value is not proof of the model that actually launched.
+
+Shared Harness runtime settings live in `.harness/config.toml`; personal leaf overrides live in the git-ignored
+`.harness/config.local.toml`. The default lifecycle is `balanced`. A high-risk Sprint, the second consecutive implementation failure, or an evidence-verified Evaluator recommendation selects the strong tier. A tier change always starts fresh. The same tier may resume only when host metadata proves that resume preserves the routed model and effort; follow-up support alone is insufficient. The third consecutive failure stops for user input; a spec issue returns to Planner without consuming Generator escalation.
+
+If the standard Generator model is unavailable, use the configured strong Sol/high fallback and record `Rotate: model-availability`. Terra is never selected automatically for standard, escalation, or availability fallback. If neither configured Codex model is available, inherit with a warning instead of guessing a model name.
+
+Runtime routing changes Harness dispatch only. Do not install target application packages, add package manifests, or create dependency directories merely to enable routing.
+Never overwrite existing guidance, `.claude/agents/`, `.codex/agents/`, or Harness configuration to apply these settings.

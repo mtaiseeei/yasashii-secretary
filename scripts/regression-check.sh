@@ -1066,6 +1066,65 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+section "27. Harness v0.4.2 runtime移行"
+# ---------------------------------------------------------------------------
+HARNESS_CONFIG="$REPO/.harness/config.toml"
+HARNESS_IGNORE="$REPO/.harness/.gitignore"
+HARNESS_GUIDANCE="$REPO/docs/harness-guidance.md"
+HARNESS_STATE="$REPO/docs/sprints/state.md"
+
+check "共有runtime configと個人override用gitignoreが存在" \
+  "[ -f '$HARNESS_CONFIG' ] && [ -f '$HARNESS_IGNORE' ]"
+
+python3 - "$HARNESS_CONFIG" <<'PY' >/dev/null 2>&1
+import sys
+import tomllib
+
+with open(sys.argv[1], "rb") as f:
+    config = tomllib.load(f)
+
+assert config["version"] == 1
+assert config["lifecycle"] == "balanced"
+assert config["hosts"]["claudeCode"]["roles"]["planner"] == {"model": "inherit", "effort": "inherit"}
+assert config["hosts"]["claudeCode"]["roles"]["generator"] == {"model": "inherit", "effort": "inherit"}
+assert config["hosts"]["claudeCode"]["roles"]["evaluator"] == {"model": "inherit", "effort": "inherit"}
+assert config["hosts"]["codex"]["roles"]["planner"] == {"model": "gpt-5.6-sol", "effort": "high"}
+assert config["hosts"]["codex"]["roles"]["generator"]["model"] == "gpt-5.6-luna"
+assert config["hosts"]["codex"]["roles"]["generator"]["effort"] == "xhigh"
+assert config["hosts"]["codex"]["roles"]["generator"]["escalation"] == {
+    "model": "gpt-5.6-sol",
+    "effort": "high",
+    "after_failures": 2,
+    "on_evaluator_recommendation": True,
+}
+assert config["hosts"]["codex"]["roles"]["evaluator"] == {"model": "gpt-5.6-sol", "effort": "high"}
+PY
+HARNESS_CONFIG_RC=$?
+check "config.tomlが解析でき、Claude継承・Codex role・強化条件が正しい" \
+  "[ $HARNESS_CONFIG_RC -eq 0 ]"
+
+check "個人runtime overrideがTOML/JSONともgit管理外" \
+  "grep -qx 'config.local.toml' '$HARNESS_IGNORE' && grep -qx 'config.local.json' '$HARNESS_IGNORE' && git -C '$REPO' check-ignore --no-index -q .harness/config.local.toml && git -C '$REPO' check-ignore --no-index -q .harness/config.local.json"
+
+check "AGENTSがrouting・state・resume・dispatch証拠の規則を保持" \
+  "grep -q 'Model Tier' '$REPO/AGENTS.md' && grep -q 'Rotate: runtime-migration' '$REPO/AGENTS.md' && grep -q 'Rotate: model-escalation' '$REPO/AGENTS.md' && grep -q 'Rotate: model-availability' '$REPO/AGENTS.md' && grep -q 'modelTier: null' '$REPO/AGENTS.md' && grep -q 'dispatch-ready resolver value is not proof' '$REPO/AGENTS.md' && grep -q 'resume preserves the routed model and effort' '$REPO/AGENTS.md' && grep -q 'Evaluator performs evidence-backed evaluation and self-review; it never implements fixes' '$REPO/AGENTS.md' && grep -q 'Do not install target application packages' '$REPO/AGENTS.md'"
+
+check "AGENTSがClaude継承・Codex既定・Terra自動除外・失敗停止を保持" \
+  "grep -q \"Claude Code inherits the user's current model and effort\" '$REPO/AGENTS.md' && grep -q 'gpt-5.6-luna.*xhigh' '$REPO/AGENTS.md' && grep -q 'Terra is never selected automatically' '$REPO/AGENTS.md' && grep -q 'third consecutive failure stops for user input' '$REPO/AGENTS.md'"
+
+check "既存CLAUDE.mdの製品固有境界・secret・3行報告を維持" \
+  "grep -q 'yasashii-harness' '$REPO/CLAUDE.md' && grep -q '読み取りを含む全面接触禁止' '$REPO/CLAUDE.md' && grep -q 'Repository SecretのAPI Token' '$REPO/CLAUDE.md' && grep -q 'やったこと／結果／次に何が起きるか' '$REPO/CLAUDE.md'"
+
+check "stateが完了履歴を保ちstandard/noneを記録" \
+  "grep -qx -- '- Model Tier: standard' '$HARNESS_STATE' && grep -qx -- '- Rotate: none' '$HARNESS_STATE' && grep -qx -- '- Next Planned: TBD' '$HARNESS_STATE' && ! grep -q 'Model Tier: unknown' '$HARNESS_STATE'"
+
+check "guidanceがv0.4.2 runtime運用とno-overwriteを案内" \
+  "grep -q '.harness/config.local.toml' '$HARNESS_GUIDANCE' && grep -q 'dispatch-ready, not launch-verified' '$HARNESS_GUIDANCE' && grep -q 'Rotate: model-escalation' '$HARNESS_GUIDANCE' && grep -q 'Rotate: model-availability' '$HARNESS_GUIDANCE' && grep -q 'never persist.*unknown' '$HARNESS_GUIDANCE' && grep -q 'Do not overwrite existing guidance' '$HARNESS_GUIDANCE'"
+
+check "製品version 0.6.0とHarness/agents非同梱を維持" \
+  "python3 -c \"import json; assert json.load(open('$MARKET'))['plugins'][0]['version'] == '0.6.0'; assert json.load(open('$PLUGINJSON'))['version'] == '0.6.0'\" && [ ! -d '$PLUGIN/harness' ] && [ ! -d '$PLUGIN/agents' ]"
+
+# ---------------------------------------------------------------------------
 section "結果"
 # ---------------------------------------------------------------------------
 printf 'PASS=%d  FAIL=%d\n' "$PASS" "$FAIL"
