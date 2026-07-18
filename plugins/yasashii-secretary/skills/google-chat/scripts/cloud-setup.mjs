@@ -30,7 +30,7 @@ function isPermissionError(result) {
 }
 
 function isNotFoundError(result) {
-  return /not found|does not exist|NOT_FOUND|404/i.test(resultText(result));
+  return /\b404\b|NOT_FOUND/i.test(resultText(result));
 }
 
 function parseJson(result) {
@@ -168,9 +168,11 @@ function inspectProjectId({ cwd, runner, projectId }) {
     }
     return { status: "project-id-collision", changed: false, projectId, existingProject: { projectId: parsed.value.projectId || projectId, name: parsed.value.name || null } };
   }
+  if (isPermissionError(result)) {
+    return preflightFailure("project-lookup-failed", "project-lookup-permission-needed", "Project IDが使用できるか確認できませんでした。Cloudは変更していません。", { projectId });
+  }
   if (isNotFoundError(result)) return { status: "project-id-available", changed: false, projectId };
-  const code = isPermissionError(result) ? "project-lookup-permission-needed" : "project-lookup-failed";
-  return preflightFailure("project-lookup-failed", code, "Project IDが使用できるか確認できませんでした。Cloudは変更していません。", { projectId });
+  return preflightFailure("project-lookup-failed", "project-lookup-failed", "Project IDが使用できるか確認できませんでした。Cloudは変更していません。", { projectId });
 }
 
 export function inspectGcloud({ cwd = process.cwd(), runner = systemRunner, projectId = "", repoName = "", organization = "" } = {}) {

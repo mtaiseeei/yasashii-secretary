@@ -94,6 +94,49 @@ const project403 = inspectGcloud({ projectId: proposal.projectId, repoName: "hog
 })) });
 check("Project describe 403は存在・権限を推測せず空きIDにしない", project403.status === "project-lookup-failed" && project403.error.code === "project-lookup-permission-needed" && project403.changed === false);
 
+function projectLookupCase(response) {
+  const calls = [];
+  const preflight = inspectGcloud({
+    projectId: proposal.projectId,
+    repoName: "hogehoge",
+    runner: fixtureRunner(readyRoutes({
+      [`gcloud projects describe ${proposal.projectId} --format=json`]: response,
+    }), calls),
+  });
+  const confirmationResult = projectConfirmation({ repo: "/tmp/hogehoge", organization: "123", proposal, preflight });
+  const approvalResult = approveProjectConfirmation({ confirmation: confirmationResult, approved: true });
+  let planResult = null;
+  try {
+    planResult = gcloudPlan({ ...proposal, organization: "123", approval: approvalResult });
+  } catch (error) {
+    planResult = error;
+  }
+  const mutationCalls = calls.filter(({ args }) => /projects create|services enable|config set project|billing/i.test(args.join(" ")));
+  return { preflight, confirmationResult, planResult, mutationCalls };
+}
+
+function checkPermissionDominates(label, response) {
+  const result = projectLookupCase(response);
+  check(label,
+    result.preflight.status === "project-lookup-failed"
+      && result.preflight.error.code === "project-lookup-permission-needed"
+      && result.confirmationResult.status === "preflight-needed"
+      && result.planResult?.code === "plan-incomplete"
+      && result.mutationCalls.length === 0,
+    JSON.stringify({ status: result.preflight.status, code: result.preflight.error?.code, confirmation: result.confirmationResult.status, plan: result.planResult?.code, mutations: result.mutationCalls.length }),
+  );
+}
+
+checkPermissionDominates("403と404の複合応答は権限失敗を優先", { status: 1, stderr: "403 404" });
+checkPermissionDominates("403とdoes not existの複合応答は権限失敗を優先", { status: 1, stderr: "403: project does not exist" });
+checkPermissionDominates("PERMISSION_DENIEDとNOT_FOUNDの複合応答は権限失敗を優先", { status: 1, stderr: "PERMISSION_DENIED: NOT_FOUND" });
+checkPermissionDominates("stdoutとstderrに分かれた大小文字混在の複合応答も権限失敗を優先", { status: 1, stdout: "not_found", stderr: "fOrBiDdEn 403" });
+
+const pure404 = projectLookupCase({ status: 1, stderr: "HTTP 404" });
+check("権限語のない純粋404だけを空きID扱い", pure404.preflight.status === "preflight-ready" && pure404.preflight.project.available === true && pure404.confirmationResult.status === "cloud-project-confirmation-needed" && Array.isArray(pure404.planResult) && pure404.mutationCalls.length === 0);
+const pureNotFound = projectLookupCase({ status: 1, stdout: "not_found" });
+check("権限語のない純粋NOT_FOUNDだけを空きID扱い", pureNotFound.preflight.status === "preflight-ready" && pureNotFound.preflight.project.available === true && pureNotFound.confirmationResult.status === "cloud-project-confirmation-needed" && Array.isArray(pureNotFound.planResult) && pureNotFound.mutationCalls.length === 0);
+
 const collisionPreflight = inspectGcloud({ projectId: proposal.projectId, repoName: "hogehoge", runner: fixtureRunner(readyRoutes({
   [`gcloud projects describe ${proposal.projectId} --format=json`]: { status: 0, stdout: `{"projectId":"${proposal.projectId}","name":"same-name"}` },
   [`gcloud projects describe ${adjustedCollision.projectId} --format=json`]: { status: 1, stderr: "NOT_FOUND 404" },

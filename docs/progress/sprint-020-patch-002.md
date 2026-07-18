@@ -37,6 +37,40 @@ Evaluatorはloopback待受が許可された独立環境で、ラッパー、off
 
 専用テストへ上記7件の負テストを追加し、`SPRINT020_PATCH002_PASS=62 FAIL=0`を確認した。Cloudへの実操作は行っていない。
 
+## Retry 2（2026-07-18）
+
+Evaluatorの独立負テストで見つかった、Project照会の権限エラーと不存在文言が同居した場合のfail-openを修正した。`inspectProjectId()`はstdoutとstderrを合わせて確認し、`permission`、`forbidden`、`denied`、`403`を、大文字小文字を問わず不存在より先に判定する。これらが1つでもあれば、同じ応答に`404`、`NOT_FOUND`、`does not exist`が含まれていてもProject IDを未使用と扱わない。
+
+未使用と判断するのは、権限・403を含まず、明確な`404`または`NOT_FOUND`がある場合だけに絞った。単なる`not found`や`does not exist`という文章だけでは未使用と確定しない。
+
+製品回帰へ次の6件を追加した。
+
+- `403 + 404`
+- `403 + does not exist`
+- `PERMISSION_DENIED + NOT_FOUND`
+- stdoutとstderrへ分かれ、大文字小文字も混在する権限・不存在応答
+- 権限語のない純粋な`404`
+- 権限語のない純粋な`NOT_FOUND`
+
+複合4件はすべて`project-lookup-permission-needed`で停止し、作成内容の確認とplan生成へ進まず、変更系runnerは0件だった。純粋な不存在2件だけが読み取り専用の権限確認を経て`preflight-ready`へ進む。
+
+### Retry 2の検査結果
+
+| コマンド／確認 | 結果 |
+|---|---|
+| `node scripts/sprint-020-patch-002-cloud-setup-test.mjs` | `PASS=68 FAIL=0` |
+| `node docs/evidence/sprint-020-patch-002/evaluator-retry1/independent-cloud-negative-test.mjs` | `PASS=28 FAIL=0`。Retry 1で失敗した複合403もPASS |
+| `bash scripts/sprint-020-patch-002-regression.sh` | 許可環境で`PASS=8 FAIL=0` |
+| `bash scripts/regression-check.sh --offline` | 許可環境で`PASS=316 FAIL=0` |
+| `bash scripts/regression-check.sh --online` | 許可環境で`PASS=317 FAIL=0`、`ONLINE=PASS` |
+| `bash scripts/sprint-016-regression.sh` | `PASS=2 FAIL=0` |
+| `node --check`（Cloud準備module／専用テスト） | PASS |
+| `git diff --check` | PASS |
+
+通常sandbox内では新しい`127.0.0.1`待受が`EPERM`になり、wrapperは7/8、offlineは312/316、onlineは312/317で停止した。onlineの追加1件はsandboxからGitHub APIへ接続できず`ONLINE=UNVERIFIED`になったためである。許可環境で同じ読み取り専用online checkerを再実行すると`REFERENCE_OK`と`ONLINE=PASS`になり、上表の全回帰も0 FAILで完走した。したがって、通常sandbox側の失敗は未push差分や製品回帰ではなく実行環境の制限である。
+
+Retry 2でも実Google Cloud Project作成、API有効化、OAuth、Repository Secret、Billing、pushは0件。UI、README、Chatworkの実装は変更していない。
+
 ## 実装した内容
 
 - Google Chatの正式サポートをGoogle Workspace版に限定した。利用者向けのREADME、Google Chat skill、wizardには、個人向けGoogleアカウント、`External`、Test users、公開審査の案内を出さない。
