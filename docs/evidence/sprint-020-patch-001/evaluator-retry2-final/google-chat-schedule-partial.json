@@ -1,0 +1,17 @@
+{
+  "screen": "google-chat-initial-result-partial",
+  "state": "error",
+  "heading": "最初の取得は保存しましたが、自動取得を設定できませんでした。",
+  "result": "取得したメッセージを保存しました。",
+  "schedule": "自動取得の設定は完了していません。接続先を確認し、設定変更からもう一度お試しください。",
+  "rows": [
+    "営業連絡 — 成功・3件・1日分"
+  ],
+  "primary": [
+    "設定を終了する"
+  ],
+  "detailsClosed": true,
+  "overflow": false,
+  "containsWholeSuccess": false,
+  "containsNextAction": true
+}

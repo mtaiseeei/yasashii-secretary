@@ -246,3 +246,87 @@
 1. Chatwork初回結果を現在選択roomだけへfilterし、選択外固定resultを表示しない負テストを追加する。
 2. Google Chatの初見評価を、秘密なし同梱fixtureのUIだけでSPACE選択→確認まで完走できるようにする。3つのfresh sessionで再試験する。
 3. その後、引渡しbrowser 30状態を独立Evaluatorが再実行できる状態にし、discover失敗の戻る／再試行、mobile／200% CTA順、全スクリーンショットを再取得する。
+
+---
+
+# Retry 2 最終再評価（2026-07-18）
+
+## 判定
+
+- **合格**
+- 分類: **なし**
+- 対象実装commit: `dd5888c`
+- 理由: 受入基準18項目を独立Evaluatorの自動回帰、running UI、responsive画像、部分失敗画面、理解テスト3sessionで確認し、全項目が合格した。Retry 1までの不具合は再現しなかった。
+- external live gate: Sprint 020で完了済みの実Google Chat gateは、本Patchでは再実行していない。今回の評価はlocal synthetic fixtureのみで、実Google／実Chatwork／実OAuth／実Repository Secret／外部書込／外部pushは0件。
+
+## Rubric scores
+
+| ID | Score | 閾値 | 判定 | 根拠 |
+|---|---:|---:|---|---|
+| C1 完成度 | 5/5 | 4 | PASS | 受入18/18、条件付きのschedule部分失敗も機能とrunning UIで確認 |
+| C2 構文・整合 | 5/5 | 5 | PASS | inventory 54、copy 71/0、offline 316/0、online 317/0 |
+| C3 機能の実証 | 5/5 | 4 | PASS | Google初回自動／手動、Chatwork選択room結果、部分失敗を実動作確認 |
+| C4 非エンジニア体験 | 5/5 | 4 | PASS | 1画面1判断、自然な日本語、安全意味、理解テスト両サービス5.0/5 |
+| C5 安全・規律 | 5/5 | 5 | PASS | 同意前副作用0、SPACE／選択room限定、履歴保持、secret 0 |
+| C6 無回帰 | 5/5 | 5 | PASS | wrapper／offline／online／browserを含む全assert成功、既知失敗0 |
+| C7 やさしさ | 5/5 | 4 | PASS | 主説明は目的と次の行動を先に示し、正式名称は必要箇所とdetailsに保持 |
+| C8 wizard体験・デザイン | 5/5 | 4 | PASS | desktop／mobile／200%、CTA色・順序、details、keyboard、focusを実画面確認 |
+| C9 配布チャネル非依存 | 5/5 | 5 | PASS | onlineを含む全回帰で維持 |
+| C10 更新の安全性 | 5/5 | 5 | PASS | Sprint 018回帰を含む全回帰PASS、評価中の外部変更0 |
+| C11 Google Chat境界 | 5/5 | 5 | PASS | 各社所有Internal、read-only、SPACE限定、DM／group DM 0、secret 0を維持 |
+
+**合計: 55/55。全軸が閾値以上のため合格。**
+
+## 受入基準18項目
+
+| # | 判定 | Retry 2最終根拠 |
+|---:|---|---|
+| 1 copy inventory完全性 | PASS | 54状態と実画面を対応づけ、copy検査71/0。未棚卸し0 |
+| 2 今すること | PASS | 主要状態で冒頭の主説明から行動を言い直せ、CTA最大2 |
+| 3 難語除去と詳細退避 | PASS | primary禁止語0。detailsを開かず完走し、開けば正式名称を確認可能 |
+| 4 自然な日本語 | PASS | Chatworkは「この設定画面へアクセスしてください」。不自然な直訳・二重表現0 |
+| 5 画面別情報量 | PASS | 1画面1判断、1段落1要点、重複0を32状態と目視で確認 |
+| 6 安全同意 | PASS | 読む対象、非公開保存、共同編集者可視性、自動取得、履歴保持の5項目。確認前副作用0 |
+| 7 Chatwork固有準備 | PASS | 発行、必要時の管理者承認、安全登録、選択room限定。結果も選択roomだけ |
+| 8 Google Chat固有準備 | PASS | 本人主経路＋管理者副経路、画像5手順、2026年7月表示、SPACE限定、秘密0 |
+| 9 0件・手動のみ・履歴保持 | PASS | 0件を正常表示。手動のみは初回取得あり・schedule 0、履歴保持 |
+| 10 失敗と完了 | PASS | 失敗は原因→次の行動。一体型確定後は終了CTAだけ。部分失敗は完了／未完了／次の行動を分離 |
+| 11 両サービス整合 | PASS | 共通情報順と用語原則を維持し、サービス名と固有準備を混同しない |
+| 12 CTA色・accessibility | PASS | 指定2色＋黒、44px以上、DOM／視覚／Tab順、keyboard、focus、details open状態を確認 |
+| 13 desktop／mobile／200% | PASS | 両サービスの秘密なし画像で欠落・重複・横overflow 0 |
+| 14 browser実操作 | PASS | 準備→接続→選択→間隔→確認→一体型確定→完了、0件、手動、部分失敗、戻る、キャンセル、detailsを操作 |
+| 15 初見理解テスト | PASS | 人間1＋独立AI画面レビュー2。両サービス平均5.0/5、安全上の重大誤解0 |
+| 16 回帰の質 | PASS | 禁止語、必須意味、DOM／状態遷移、壊したfixture、実file inputを検査し、全文一致だけに依存しない |
+| 17 機能漏出なし | PASS | Sprint 013/014/019/020とadversarial回帰PASS。Patch外機能と外部状態の変更0 |
+| 18 全回帰 | PASS | copy 71/0、Chatwork 7/0、Google 51/0、adversarial 16/0、wrapper 7/0、browser 32/0＋部分失敗1/0、offline 316/0、online 317/0 |
+
+## 初見理解テスト（Retry 2最終）
+
+technical detailを開く前に、(1)今すること、(2)primary CTA後、(3)読む対象、(4)保存先と見える人、(5)停止時の履歴、の5問を確認した。
+
+- Session 1 — ユーザー本人、2026-07-18: Chatwork 5/5、Google Chat 5/5、重大誤解0。契約にある確認済み事実をそのまま記録し、推測で再採点していない。
+- Session 2 — 実装担当ではない独立AI画面レビュー: Chatwork 5/5、Google Chat 5/5、重大誤解0。今回のrunning UIと秘密なしDOMを使用。ファイル・外部変更0。
+- Session 3 — 実装担当ではない独立AI画面レビュー: Chatwork 5/5、Google Chat 5/5、重大誤解0。この最終Evaluatorの画像と `browser-evidence.json` だけを使用。古いEvaluator／Generator証跡は不使用。ファイル・外部変更0。
+
+集計はChatwork `15/15 = 5.0/5`、Google Chat `15/15 = 5.0/5`。安全項目3〜5の重大な誤解は0件。
+
+## Retry 1不具合の再確認
+
+1. Chatwork未選択room混入: 選択したroomだけを結果表示。敵対fixture 7/0、browserでも未選択room表示0。
+2. Google Chat初見file input停止: CDPで実file inputへテスト専用ファイルを渡し、製品側検証を通って通常SPACE選択から完了まで到達。
+3. launcher fixture path: 同梱fixtureを読んでSPACE 3件を候補にし、DM／group DMを除外。
+4. space取得失敗: 独立error stateで戻る／再試行を操作。同意前 `configured=false`、戻る後 `oauth=cancelled`。
+5. mobile／200% CTA順: DOM・視覚・Tab順が一致し、横overflow 0。
+
+## 証跡
+
+- [最終Evaluator実行記録](../evidence/sprint-020-patch-001/evaluator-retry2-final/evaluator-run.md)
+- [Browser DOM・操作記録](../evidence/sprint-020-patch-001/evaluator-retry2-final/browser-evidence.json)
+- [schedule部分失敗DOM記録](../evidence/sprint-020-patch-001/evaluator-retry2-final/google-chat-schedule-partial.json)
+- desktop: `chatwork-review-desktop.png`, `chatwork-result-desktop.png`, `google-chat-review-desktop.png`, `google-chat-manual-initial-result.png`, `google-chat-schedule-partial-desktop.png`
+- responsive: `chatwork-mobile.png`, `chatwork-zoom200.png`, `google-chat-mobile.png`, `google-chat-zoom200.png`
+- 失敗・ガイド: `google-chat-failure-desktop.png`, `google-chat-discover-failure-desktop.png`, `google-cloud-guide-desktop.png`
+
+## Bugs / reproduction
+
+- なし。
