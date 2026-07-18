@@ -136,9 +136,21 @@ try {
     ["camel-client-secret.json", () => JSON.stringify({ clientSecret: "alphabeticcredential" })],
     ["oauth-callback-letters.txt", () => "http://127.0.0.1/oauth/callback?state=examplestate&code=alphabeticcredential"],
     ["credential-url-camel.txt", () => "https://example.invalid/callback?clientSecret=alphabeticcredential"],
+    ["shell-client-secret.sh", () => "client_secret=alphabetshellcredential"],
+    ["shell-export-secret.bash", () => "export CLIENT_SECRET=alphabetbashcredential"],
+    ["shell-local-secret.sh", () => "local access_token=alphabetlocalcredential"],
+    ["shell-readonly-secret.sh", () => "readonly refresh_token=alphabetreadonlycredential"],
+    ["shell-declare-secret.bash", () => "declare -gx authorizationCode=alphabetdeclarecredential"],
+    ["shell-typeset-secret.zsh", () => "typeset -gx clientSecret=alphabetzshcredential"],
+    ["shell-double-quoted-secret.sh", () => "CLIENT_SECRET=\"alphabetquotedcredential\""],
+    ["shell-single-quoted-secret.zsh", () => "clientSecret='alphabetsinglequotedcredential'"],
+    ["shell-default-secret.sh", () => "readonly client_secret=${CLIENT_SECRET:-alphabeticfallback}"],
+    ["js-quoted-snake.js", () => "export default {\n  client_secret: \"alphabetjscredential\",\n};\n"],
+    ["js-quoted-camel.mjs", () => "export default {\n  clientSecret: 'alphabetcamelcredential',\n};\n"],
   ];
   const generatedSecrets = [];
   let callbackHistoryProtected = true;
+  let shellHistoryProtected = true;
   for (const [name, makeBody] of secretCases) {
     const target = init(`secret-${name.replace(/[^a-z0-9]/gi, "-")}`);
     const before = baseline(target);
@@ -153,8 +165,13 @@ try {
       const history = git(target, "log", "-p", "--all");
       callbackHistoryProtected = callbackHistoryProtected && !body.match(/SYN_[A-Za-z0-9_-]+/g)?.some((value) => history.includes(value));
     }
+    if (name.startsWith("shell-")) {
+      const history = git(target, "log", "-p", "--all");
+      shellHistoryProtected = shellHistoryProtected && !history.includes(body);
+    }
   }
   check(callbackHistoryProtected, "OAuth callbackのquery／fragmentをGit履歴へ残さない");
+  check(shellHistoryProtected, "shell内の資格情報literalをGit履歴へ残さない");
   const normal = init("normal-document");
   baseline(normal);
   write(normal, "secretary/docs/security.md", [
@@ -171,6 +188,36 @@ try {
   write(safeNames, "secretary/docs/token-handling.txt", "tokenはRepository Secretだけで扱います。値はここに書きません。\n");
   write(safeNames, "secretary/docs/credential-policy.json", JSON.stringify({ policy: "資格情報を文書や履歴へ保存しない" }));
   check(commitOwnedChanges({ root: safeNames, ownedPaths: ["secretary/docs"], message: "安全な資格情報説明" }).status === "committed", "oauth／token／credentialを含む安全なファイル名を誤拒否しない");
+
+  const safeRuntimeReferences = init("safe-runtime-references");
+  baseline(safeRuntimeReferences);
+  write(safeRuntimeReferences, "secretary/runtime/direct.sh", "client_secret=$CLIENT_SECRET\n");
+  write(safeRuntimeReferences, "secretary/runtime/braced.bash", "export CLIENT_SECRET=${OAUTH_CLIENT_SECRET}\n");
+  write(safeRuntimeReferences, "secretary/runtime/local.sh", "local access_token=$OAUTH_ACCESS_TOKEN\n");
+  write(safeRuntimeReferences, "secretary/runtime/readonly.sh", "readonly refresh_token=\"${OAUTH_REFRESH_TOKEN}\"\n");
+  write(safeRuntimeReferences, "secretary/runtime/declare.bash", "declare -gx authorization_code=${OAUTH_AUTHORIZATION_CODE}\n");
+  write(safeRuntimeReferences, "secretary/runtime/quoted.zsh", "typeset -gx clientSecret=\"$RUNTIME_CLIENT_SECRET\" # runtime reference\n");
+  write(safeRuntimeReferences, "secretary/runtime/double-dash.sh", "export -- CHATWORK_API_TOKEN=$RUNTIME_CHATWORK_TOKEN\n");
+  write(safeRuntimeReferences, "secretary/runtime/empty.sh", "CLIENT_SECRET=\nreadonly ACCESS_TOKEN=''\ndeclare REFRESH_TOKEN\n");
+  check(
+    commitOwnedChanges({ root: safeRuntimeReferences, ownedPaths: ["secretary/runtime"], message: "shell runtime参照" }).status === "committed",
+    "shellの明示的なruntime変数参照を誤拒否しない",
+  );
+
+  const safeCodeReferences = init("safe-code-references");
+  baseline(safeCodeReferences);
+  write(safeCodeReferences, "secretary/runtime/oauth.mjs", [
+    "const clientSecret = process.env.OAUTH_CLIENT_SECRET;",
+    "export const oauth = {",
+    "  client_secret: clientSecret,",
+    "  access_token: process.env.OAUTH_ACCESS_TOKEN,",
+    "};",
+    "",
+  ].join("\n"));
+  check(
+    commitOwnedChanges({ root: safeCodeReferences, ownedPaths: ["secretary/runtime"], message: "コードruntime参照" }).status === "committed",
+    "clientSecret／process.envのruntime参照を誤拒否しない",
+  );
 
   const commitFail = init("commit-fail");
   const commitFailHead = baseline(commitFail);

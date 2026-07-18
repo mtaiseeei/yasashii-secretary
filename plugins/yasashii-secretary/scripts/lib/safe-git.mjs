@@ -119,7 +119,7 @@ function isPlaceholderCredentialValue(rawValue) {
   const value = String(rawValue ?? "").trim().replace(/^(["'])([\s\S]*)\1$/, "$2").trim();
   if (!value) return true;
   if (/^(?:sample|example|placeholder|redacted|masked|changeme|replace[-_ ]?me|none|null|undefined|x+|\*+)$/i.test(value)) return true;
-  if (/^(?:<[^>]+>|\$\{[^}]+\}|\{\{[^}]+\}\})$/.test(value)) return true;
+  if (/^(?:<[^>]+>|\$\{\{[^}]+\}\}|\$\{[^}]+\}|\{\{[^}]+\}\})$/.test(value)) return true;
   return false;
 }
 
@@ -149,11 +149,27 @@ function containsCredentialUrl(body) {
 }
 
 function containsCredentialAssignment(path, body) {
-  const codeFile = /\.(?:[cm]?[jt]sx?|py|rb|go|rs|java|kt|swift|php|sh|bash|zsh)$/i.test(path);
-  const assignment = /^\s*["']?([A-Za-z][A-Za-z0-9_.-]*)["']?\s*[:=]\s*(.*?)\s*[,;]?\s*$/gm;
+  const shellFile = /\.(?:sh|bash|zsh)$/i.test(path);
+  const codeFile = /\.(?:[cm]?[jt]sx?|py|rb|go|rs|java|kt|swift|php)$/i.test(path);
+  const shellDeclaration = "(?:(?:export|local|readonly|declare|typeset)(?:[ \\t]+(?:--|[-+][A-Za-z]+))*[ \\t]+)?";
+  const assignment = new RegExp(
+    `^[ \\t]*${shellFile ? shellDeclaration : ""}["']?([A-Za-z][A-Za-z0-9_.-]*)["']?[ \\t]*[:=][ \\t]*(.*?)[ \\t]*[,;]?[ \\t]*$`,
+    "gm",
+  );
   for (const match of body.matchAll(assignment)) {
     if (!STRICT_CREDENTIAL_KEYS.has(canonicalCredentialKey(match[1]))) continue;
     const rawValue = match[2].trim().replace(/[,;]\s*$/, "").trim();
+    if (shellFile) {
+      const withoutComment = rawValue.replace(/\s+#.*$/, "").trim();
+      if (!withoutComment || /^(?:""|'')$/.test(withoutComment)) continue;
+      const doubleQuoted = withoutComment.match(/^"([\s\S]*)"$/);
+      const runtimeReference = doubleQuoted ? doubleQuoted[1] : withoutComment;
+      // shellのbare wordは変数名のように見えても実literalになる。
+      // 値を持たない代入と、明示的な単一のshell変数／位置引数参照だけを許可する。
+      if (/^\$(?:[A-Za-z_][A-Za-z0-9_]*|[1-9][0-9]*)$/.test(runtimeReference)) continue;
+      if (/^\$\{(?:[A-Za-z_][A-Za-z0-9_]*|[1-9][0-9]*)\}$/.test(runtimeReference)) continue;
+      return true;
+    }
     if (isPlaceholderCredentialValue(rawValue)) continue;
     // プログラム中の `client_secret: clientSecret` のような変数参照は値そのものではない。
     // 通常文書・設定では全英字も資格情報になり得るため、文字種や長さでは弱めない。
