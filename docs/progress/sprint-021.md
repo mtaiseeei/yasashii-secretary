@@ -127,9 +127,10 @@ bash scripts/regression-check.sh --online
 | `bash scripts/sprint-019-regression.sh` | `SPRINT019_WRAPPER_PASS=12 FAIL=0`（内部Google Chat `51/51`） |
 | `bash scripts/sprint-020-regression.sh` | `SPRINT020_WRAPPER_PASS=16 FAIL=0`（内部Google Chat `50/50`、敵対fixture `16/16`） |
 | `bash scripts/regression-check.sh --offline` | `PASS=327 FAIL=0` |
+| `bash scripts/regression-check.sh --online` | `PASS=328 FAIL=0`（公開GitHubは読み取り専用。外部書き込み0件） |
 | `node --check`／`bash -n`／`git diff --check` | すべてPASS |
 
-最初のsandbox内関連suiteではlocalhost bindが`EPERM`になったため、localhostを許可した同一suiteを再実行して全件PASSを確認した。これは製品FAILとは分離している。Retry 1ではonline回帰を再実行しておらず、外部書込みは0件である。Gitの動的検証はすべて`/tmp`の一時repoとlocal bare remote、合成値だけを使った。
+最初のsandbox内関連suiteではlocalhost bindが`EPERM`になったため、localhostを許可した同一suiteを再実行して全件PASSを確認した。これは製品FAILとは分離している。online回帰では公開GitHubを読み取り専用で確認し、`ONLINE=PASS`を含む全328件が合格した。外部書き込みは0件である。Gitの動的検証はすべて`/tmp`の一時repoとlocal bare remote、合成値だけを使った。
 
 ### Retry 1 自己評価
 
