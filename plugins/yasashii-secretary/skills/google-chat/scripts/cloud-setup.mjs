@@ -3,6 +3,7 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { basename, resolve } from "node:path";
+import { isDeepStrictEqual } from "node:util";
 import { fileURLToPath } from "node:url";
 
 export const REQUIRED_APIS = Object.freeze(["chat.googleapis.com", "people.googleapis.com"]);
@@ -304,6 +305,15 @@ export function executeApprovedPlan({ plan = [], approval, approved = false, cwd
     && approval.preflight?.projectAvailable === true
     && approval.preflight?.canCreate === true;
   if (!approved || !validApproval) return { status: "confirmation-needed", changed: false, completed: [...completed], next: plan.find((item) => !completed.includes(item.id))?.id || null };
+  const expectedPlan = gcloudPlan({
+    projectId: approval.projectId,
+    displayName: approval.displayName,
+    organization: approval.organization,
+    approval,
+  });
+  if (!isDeepStrictEqual(plan, expectedPlan)) {
+    throw Object.assign(new Error("承認した内容と異なるCloud操作を拒否しました。"), { code: "unsafe-command" });
+  }
   const allowed = new Set(["create-project", "enable-chat-api", "enable-people-api"]);
   const done = new Set(completed);
   for (const item of plan) {

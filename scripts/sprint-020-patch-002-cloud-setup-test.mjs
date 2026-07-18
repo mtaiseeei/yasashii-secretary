@@ -167,6 +167,43 @@ const approved = executeApprovedPlan({ plan, approval, approved: true, runner: f
 check("承認後だけProjectとAPIを順に準備", approved.status === "browser-step-needed" && approved.completed.length === 3 && approved.next === "audience" && approvedCalls.length === 3);
 check("CLI完了後の手動案内はAudienceから始まる", manualStep({ projectId: proposal.projectId, completed: approved.completed }).step === "audience");
 
+function checkUnsafePlan(label, candidate) {
+  let calls = 0;
+  let result = null;
+  try {
+    result = executeApprovedPlan({
+      plan: candidate,
+      approval,
+      approved: true,
+      runner: () => { calls += 1; return { status: 0, stdout: "ok" }; },
+    });
+  } catch (error) {
+    result = error;
+  }
+  check(label, result?.code === "unsafe-command" && calls === 0);
+}
+
+const clonePlan = () => JSON.parse(JSON.stringify(plan));
+const anotherApi = clonePlan();
+anotherApi[1].args[2] = "drive.googleapis.com";
+checkUnsafePlan("承認後でも別APIへの差し替えは実行0件", anotherApi);
+const anotherProject = clonePlan();
+anotherProject[1].args[4] = "another-project";
+checkUnsafePlan("承認後でも別Projectへの差し替えは実行0件", anotherProject);
+const anotherDisplayName = clonePlan();
+anotherDisplayName[0].args[4] = "another-display-name";
+checkUnsafePlan("承認後でも表示名の差し替えは実行0件", anotherDisplayName);
+const extraCommand = clonePlan();
+extraCommand.push({ id: "enable-extra-api", command: "gcloud", args: ["services", "enable", "drive.googleapis.com", "--project", proposal.projectId] });
+checkUnsafePlan("承認後でも余分なcommandは実行0件", extraCommand);
+checkUnsafePlan("承認後でもcommand欠落は実行0件", clonePlan().slice(0, 2));
+const duplicateCommand = clonePlan();
+duplicateCommand.splice(2, 0, JSON.parse(JSON.stringify(duplicateCommand[1])));
+checkUnsafePlan("承認後でもcommand重複は実行0件", duplicateCommand);
+const reorderedCommands = clonePlan();
+[reorderedCommands[0], reorderedCommands[1]] = [reorderedCommands[1], reorderedCommands[0]];
+checkUnsafePlan("承認後でもcommand並べ替えは実行0件", reorderedCommands);
+
 let apiCount = 0;
 const partial = executeApprovedPlan({ plan, approval, approved: true, runner: (command, args) => {
   if (args.includes("services")) apiCount += 1;
