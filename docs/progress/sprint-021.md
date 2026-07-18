@@ -152,3 +152,57 @@ bash scripts/regression-check.sh --online
 - 優先シナリオ: 上記4群の独立fixtureを、`/tmp`のlocal repo／local bare remoteと合成値だけで再実行する。
 - 未解決実装事項: なし。最終合否は独立Evaluatorが判定する。
 - 外部副作用: 0件。実GitHub、実OAuth、実Chatwork、実Google Chat、Repository Secret、Cloud projectは変更していない。
+
+## Retry 2 — shell資格情報literalの敵対評価修正（2026-07-19）
+
+**ステータス:** 実装完了 - 再評価待ち
+
+### 修正内容
+
+- `.sh`／`.bash`／`.zsh`を一般のcode file判定から分離した。shellではbare wordを変数参照とみなさず、資格情報keyへのliteral代入として拒否する。
+- shellで安全なruntime参照として許可する値を、単一の`$VAR`／`${VAR}`（二重引用符付きも含む）へ限定した。single quote、bare literal、quoted literal、command／default expansion等は安全側で拒否する。
+- `export`、`local`、`readonly`、`declare`、`typeset`と、それらのoption／`--`を宣言prefixとして認識する。snake_case／camelCaseの資格情報keyを同じcanonical判定へ通す。
+- assignment検査の空白を水平空白へ限定した。これにより正規表現が改行をまたいで次行を値として取り込まず、空代入・宣言だけの安全なshellを誤拒否しない。
+- GitHub Actionsの`${{ ... }}`は値そのものではなくruntime参照なので、既存Chatwork／Google Chat workflowを誤拒否しないplaceholderとして明示した。
+- JSは従来どおり`process.env`とidentifier参照を許可し、snake_case／camelCase keyのquoted literalを拒否する。OAuth callbackのquery／fragment拒否も維持した。
+
+### 追加した回帰境界
+
+- 拒否: `.sh`／`.bash`／`.zsh`のbare literal、5種のshell宣言、single／double quoted literal、literal fallback付きdefault expansion。
+- 拒否: JSのsnake_case／camelCase quoted literal。
+- 許可: shellの`$VAR`／`${VAR}`、5種のshell宣言、option／`--`、二重引用符、空代入、宣言のみ。
+- 許可: JSの`process.env`／identifier、GitHub Actionsの`${{ ... }}`。
+
+### Retry 2 検査結果
+
+| コマンド | 結果 |
+|---|---|
+| 独立敵対fixture（製品fixture非流用、`/tmp` local repo／bare remote） | `INDEPENDENT_PASS=17 INDEPENDENT_FAIL=0` |
+| `node scripts/sprint-021-git-safety-test.mjs` | `PASS=59 FAIL=0` |
+| `bash scripts/sprint-021-regression.sh` | `SPRINT021_PASS=8 SPRINT021_FAIL=0` |
+| `bash scripts/regression-check.sh --offline` | `PASS=327 FAIL=0` |
+| `bash scripts/regression-check.sh --online` | `PASS=328 FAIL=0`、`ONLINE=PASS` |
+| `node --check`／`git diff --check` | すべてPASS |
+
+master回帰は、共有作業ツリーにPlanner／Evaluator管理の未commit正本変更が存在したため、実装commit `44b75a1`から作った`/tmp`のclean cloneで実行した。共有作業ツリーでの最初のoffline実行は、その正本変更をSprint 016のprotected-record検査が正しく拒否し、sandbox内のlocalhost待受も`EPERM`になった。製品FAILとは分離し、clean clone＋localhost許可でoffline 327件、公開GitHub読み取り専用online 328件を0 FAILで完走した。
+
+### Retry 2 自己評価
+
+| 軸 | 点 | 根拠 |
+|---|---:|---|
+| C1 完成度 | 5 | shell漏れの根本原因を言語別判定で閉じ、宣言・literal・runtime参照境界を回帰化した。 |
+| C2 構文・整合 | 5 | Node構文、差分検査、既存workflow runtime参照がすべて整合した。 |
+| C3 機能の実証 | 5 | 独立fixtureでinspect拒否、commit 0、push 0、local／bare履歴露出0を確認した。 |
+| C4 非エンジニア体験 | 5 | 値を出さない停止メッセージと安全なruntime参照の誤拒否0件を維持した。 |
+| C5 安全・規律 | 5 | bare／quoted／default literalをGit履歴へ入れない。外部書込み0件。 |
+| C6 無回帰 | 5 | clean cloneのoffline 327件、online 328件が0 FAIL。 |
+| C7〜C12 | 5 | UI変更なし。既存配布面、更新安全性、Google Chat境界、0.7.0安全gateを全回帰で維持した。 |
+
+### 再評価への引き渡し
+
+- 実装commit: `44b75a1`（`[sprint-021] shell資格情報literalの検査を強化`）。既存commitはamendしていない。
+- 起動方法／URL: CLI・Git安全境界のため新規画面なし。
+- 専用回帰: `bash scripts/sprint-021-regression.sh`
+- 全回帰: `bash scripts/regression-check.sh --offline`、公開GitHub読み取り専用の`--online`。
+- 優先シナリオ: `.sh`／`.bash`／`.zsh`の3敵対ケースに加え、5宣言、quoted literal、default expansion、`$VAR`／`${VAR}`、JS runtime参照を独立repoで再確認する。
+- 外部副作用: 0件。実GitHub書込み、実OAuth、実Chatwork／Google Chat、Repository Secret、Cloud project、Billingは変更していない。
