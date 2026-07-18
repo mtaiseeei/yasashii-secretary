@@ -35,9 +35,9 @@
 | Chatwork | complete | 完了 | 設定完了、次は検索 | primary | 結果→次の一手 | 技術詳細なし |
 | Chatwork | cancelled | キャンセル | 変更せず終了 | primary | ルーム・間隔・履歴0変更 | GitHub Actions設定も0変更 |
 | Chatwork | bootstrap-failure | 開始失敗 | 現在設定を読めない→開き直す | primary | 利用者の次行動 | root、ローカル起動場所 |
-| Google Chat | prepare-cloud | 管理者準備1 | 会社所有Cloudと必要APIを依頼 | primary | 各社所有Cloud、Chat/People API | 共通外部アプリ・サービスアカウント不使用 |
-| Google Chat | prepare-access | 管理者準備2 | 社内利用者向け接続を依頼 | primary | Internal、Desktop app | OAuth Audience、OAuth Client、Restricted scope |
-| Google Chat | prepare-file | 管理者準備3 | 接続用ファイルをPCから選ぶ | primary | 外部送信なし、画面表示なし | OAuth client JSON、loopback、client secret/ID |
+| Google Chat | prepare-cloud | 本人準備1 | 自分で会社所有Cloudと必要APIを準備 | primary | 各社所有Cloud、Chat/People API、画像ガイド、管理者依頼の副経路 | 共通外部アプリ・サービスアカウント不使用 |
+| Google Chat | prepare-access | 本人準備2 | 社内利用者向け接続を自分で設定 | primary | Internal、Desktop app | OAuth Audience、OAuth Client、Restricted scope |
+| Google Chat | prepare-file | 本人準備3 | 自分で取得した接続用ファイルをPCから選ぶ | primary | 外部送信なし、画面表示なし | OAuth client JSON、loopback、client secret/ID |
 | Google Chat | authorize | 接続許可 | Google画面で読むことを許可 | primary | read-only、投稿・編集・削除なし | OAuth、scope、PKCE、state、loopback、token |
 | Google Chat | authorize-waiting | 接続待ち | 新しい画面で許可を進める | primary | 完了後に自動で次へ | 画面を閉じた場合の復帰 |
 | Google Chat | authorize-popup-failure | 画面起動失敗 | ポップアップを許可して再度開く | primary | 元画面を保持 | 技術詳細なし |
@@ -50,10 +50,10 @@
 | Google Chat | review | 初回保存前確認 | 読む対象・保存先・自動取得を確認 | primary | 安全5要素、読むだけ、明示同意 | API保持範囲、commit・push |
 | Google Chat | initial-sync-loading | 初回処理中 | 選択スペースを取得中 | primary | 最後まで確認する待ち理由 | 技術詳細なし |
 | Google Chat | initial-sync-failure | 初回保存失敗 | 取得／保存問題→接続先確認 | primary | ローカル保存、GitHub保存、秘密消去を区別 | 生エラー、commit/push状態 |
-| Google Chat | initial-result | 初回完了 | 取得内容を保存した | primary | 結果、次は自動取得設定 | token破棄、API範囲 |
-| Google Chat | initial-result-empty | 初回0件 | まだ保存対象なし、次回以降に保存 | primary | 0件を正常扱い | token破棄、保持設定、API範囲 |
-| Google Chat | initial-result-partial | 初回部分失敗 | 成功分保存、失敗分は確認 | primary | 全成功と誤表示しない | space別内部結果 |
-| Google Chat | initial-result-failure | 初回全失敗 | 接続を確認してやり直す | primary | 結果→次の行動 | space別内部結果 |
+| Google Chat | initial-result | 初回＋自動設定完了 | 取得内容を保存し、自動取得も有効化 | primary | 結果、現在の自動取得、終了CTAだけ | token破棄、API範囲 |
+| Google Chat | initial-result-empty | 初回0件＋設定完了 | まだ保存対象なし、次回以降に自動取得 | primary | 0件を正常扱い、schedule有効／手動を区別 | token破棄、保持設定、API範囲 |
+| Google Chat | initial-result-partial | 初回／設定の部分失敗 | 成功分・未完了・次の行動を分ける | primary | 全成功と誤表示しない | space別内部結果、schedule結果 |
+| Google Chat | initial-result-failure | 初回全失敗 | 初回失敗と自動取得設定結果を区別 | primary | 結果→次の行動、終了CTAだけ | space別内部結果、schedule結果 |
 | Google Chat | settings-select-spaces | 設定対象変更 | 今後読む通常スペースだけ選ぶ | primary | 0件停止、履歴非削除 | space ID、再認証 |
 | Google Chat | settings-select-interval | 設定間隔変更 | 取得間隔を選び直す | primary | 3時間推奨、0件は手動のみ | schedule、実行時刻 |
 | Google Chat | settings-review | 変更前確認 | 読む対象・保存先・自動取得を確認 | primary | 安全5要素、同意前0変更 | workflow、commit、push、API差分境界 |

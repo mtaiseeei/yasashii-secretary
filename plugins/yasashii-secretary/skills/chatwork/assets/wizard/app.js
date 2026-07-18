@@ -51,7 +51,7 @@ function renderToken() {
   state.step = 0; progress(0);
   show("prepare-connection", `<p class="eyebrow">接続 1 / 4</p><h1>Chatworkの接続情報を用意します。</h1>
     ${nowCopy("Chatworkの公式ページで、接続に使う情報を発行します。")}
-    <div class="panel"><p class="panel-title">用意できたら、この設定画面へ戻ってください。</p>
+    <div class="panel"><p class="panel-title">用意できたら、この設定画面へアクセスしてください。</p>
       <p class="link-list">${externalLink(officialLinks.token, "Chatworkで接続情報を発行する")}<br>${externalLink(officialLinks.tokenHelp, "発行方法を見る")}</p>
       ${technicalDetails("詳しい説明: 接続情報の正式名称と安全な扱い", `<p>正式名称は <strong>API Token</strong> です。Chatworkを読むための秘密の情報なので、第三者へ見せず、この画面や会話にも貼り付けません。次の画面でGitHubへ直接登録します。${externalLink(officialLinks.tokenHandling, "Chatwork公式のAPI Token取扱いを見る")}</p>`)}
     </div>${actions("接続情報の登録へ進む", "管理者への申請を確認する")}`);
@@ -63,7 +63,7 @@ function renderApplication() {
   state.step = 0; progress(0);
   show("admin-approval", `<p class="eyebrow">接続 1 / 4</p><h1>Chatworkの管理者へ利用を申請します。</h1>
     ${nowCopy("組織でChatworkを使っている場合は、管理者の承認を確認します。")}
-    <div class="panel"><p class="panel-title">実際に使うアカウントで申請し、承認後に戻ってください。</p><p>${externalLink(officialLinks.application, "管理者への利用申請方法を見る")}</p><p class="hint">ここまでの選択は保持します。</p>
+    <div class="panel"><p class="panel-title">実際に使うアカウントで申請し、承認されたらこの設定画面へアクセスしてください。</p><p>${externalLink(officialLinks.application, "管理者への利用申請方法を見る")}</p><p class="hint">ここまでの選択は保持します。</p>
     ${technicalDetails("管理者向け: API利用の条件", "<p>パーソナルプランを除き、Chatwork APIの利用に管理者承認が必要です。承認前はルーム一覧を取得しません。</p>", "admin")}</div>
     ${actions("承認後に接続情報を用意する", "申請せず終了する")}`);
   app.querySelector('[data-action="next"]').onclick = renderToken;

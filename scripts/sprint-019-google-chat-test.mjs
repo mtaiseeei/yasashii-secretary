@@ -91,7 +91,7 @@ check("not foundは保存済み範囲に限定", missing.status === "not-found-l
 
 async function startServer(extraEnv = {}, options = {}) {
   const root = options.root || temp(`wizard-${Date.now()}`);
-  const child = spawn(process.execPath, [join(repo, "plugins", "yasashii-secretary", "skills", "google-chat", "scripts", "wizard-server.mjs"), "--root", root, "--port", "0"], { env: { ...process.env, YASASHII_GOOGLE_CHAT_SYNTHETIC: "1", YASASHII_GOOGLE_CHAT_TEST_PRIVATE: "1", YASASHII_GOOGLE_CHAT_SKIP_GIT: "1", YASASHII_GOOGLE_CHAT_FIXTURE: fixturePath, ...extraEnv } });
+  const child = spawn(process.execPath, [join(repo, "plugins", "yasashii-secretary", "skills", "google-chat", "scripts", "wizard-server.mjs"), "--root", root, "--port", "0"], { env: { ...process.env, YASASHII_GOOGLE_CHAT_SYNTHETIC: "1", YASASHII_GOOGLE_CHAT_TEST_PRIVATE: "1", YASASHII_GOOGLE_CHAT_TEST_SECRETS: "1", YASASHII_GOOGLE_CHAT_SKIP_GIT: "1", YASASHII_GOOGLE_CHAT_FIXTURE: fixturePath, ...extraEnv } });
   let output = ""; child.stdout.on("data", (chunk) => { output += chunk; });
   let errors = ""; child.stderr.on("data", (chunk) => { errors += chunk; });
   for (let attempt = 0; attempt < 80 && !output.match(/http:\/\//); attempt += 1) await new Promise((wait) => setTimeout(wait, 50));
@@ -114,8 +114,18 @@ const discovered = await api(wizard.base, "api/spaces", {});
 check("候補はSPACEだけ・DM/group DM 0件・初期選択0", discovered.json.spaces.length === 3 && discovered.json.excluded === 2 && !JSON.stringify(discovered.json).includes("個別DM") && !JSON.stringify(discovered.json).includes("グループDM"));
 const noConsent = await api(wizard.base, "api/initial-sync", { selectedSpaceNames: ["spaces/space-a"], interval: "3h", saveConsent: true, commitPushConsent: false });
 check("専用確認の同意前は設定・履歴・commit・push 0", noConsent.response.status === 400 && !readFileSync(join(wizard.root, "README.md"), "utf8").includes("google-chat") && !readdirSync(wizard.root).includes("google-chat"));
-const completed = await api(wizard.base, "api/initial-sync", { selectedSpaceNames: ["spaces/space-a", "spaces/space-empty"], interval: "3h", saveConsent: true, commitPushConsent: true });
-check("初回ローカル取得はtoken破棄・workflow dispatch 0", completed.response.ok && completed.json.tokenDiscarded === true && completed.json.workflowDispatches === 0 && readFileSync(join(wizard.root, "google-chat", "config.json"), "utf8").includes('"interval": "3h"'));
+const noAutomaticConsent = await api(wizard.base, "api/initial-sync", { selectedSpaceNames: ["spaces/space-a"], interval: "3h", saveConsent: true, commitPushConsent: true, automaticPushConsent: false });
+check("自動取得の同意前は設定・履歴・commit・push 0", noAutomaticConsent.response.status === 400 && !readdirSync(wizard.root).includes("google-chat"));
+const completed = await api(wizard.base, "api/initial-sync", { selectedSpaceNames: ["spaces/space-a", "spaces/space-empty"], interval: "3h", saveConsent: true, commitPushConsent: true, automaticPushConsent: true });
+const completedConfig = JSON.parse(readFileSync(join(wizard.root, "google-chat", "config.json"), "utf8"));
+check("1回の確定で初回取得と自動取得設定を完了", completed.response.ok && completed.json.tokenDiscarded === true && completed.json.workflowDispatches === 0 && completed.json.schedule.status === "configured" && completedConfig.interval === "3h" && completedConfig.scheduleEnabled === true && completedConfig.automaticPushConsent === true);
+const manualWizard = await startServer();
+await api(manualWizard.base, "api/oauth/synthetic", { mode: "success" });
+await api(manualWizard.base, "api/spaces", {});
+const manualCompleted = await api(manualWizard.base, "api/initial-sync", { selectedSpaceNames: ["spaces/space-empty"], interval: "manual", saveConsent: true, commitPushConsent: true, automaticPushConsent: false });
+const manualConfig = JSON.parse(readFileSync(join(manualWizard.root, "google-chat", "config.json"), "utf8"));
+check("手動のみも初回取得しscheduleを作らない", manualCompleted.response.ok && manualCompleted.json.sync.results.length === 1 && manualCompleted.json.schedule.status === "manual" && manualConfig.scheduleEnabled === false && manualConfig.automaticPushConsent === false && !readFileSync(join(manualWizard.root, ".github", "workflows", "google-chat-sync.yml"), "utf8").includes("  schedule:"));
+manualWizard.child.kill("SIGTERM");
 const cancelled = await api(wizard.base, "api/cancel", {});
 check("OAuth後キャンセルはSecret削除とgrant revoke状態", cancelled.json.cleanup.secretsDeleted === true && cancelled.json.cleanup.grantRevoked === true && cancelled.json.oauth.secretNames.length === 0);
 const persisted = readdirSync(wizard.root, { recursive: true }).filter((name) => typeof name === "string").map((name) => { try { return readFileSync(join(wizard.root, name), "utf8"); } catch { return ""; } }).join("\n");
@@ -164,30 +174,41 @@ async function runGitSync({ name, selectedSpace, data }) {
   const testServer = await startServer({ YASASHII_GOOGLE_CHAT_SKIP_GIT: "0", YASASHII_GOOGLE_CHAT_FIXTURE: dataPath }, { root: workspace.root });
   await api(testServer.base, "api/oauth/synthetic", { mode: "success" });
   await api(testServer.base, "api/spaces", {});
-  const result = await api(testServer.base, "api/initial-sync", { selectedSpaceNames: [selectedSpace], interval: "3h", saveConsent: true, commitPushConsent: true });
+  const result = await api(testServer.base, "api/initial-sync", { selectedSpaceNames: [selectedSpace], interval: "3h", saveConsent: true, commitPushConsent: true, automaticPushConsent: true });
   testServer.child.kill("SIGTERM");
   return { workspace, result };
 }
 
 const zeroGit = await runGitSync({ name: "zero", selectedSpace: "spaces/space-empty", data: fixture });
 const zeroRemoteCommits = Number(execFileSync("git", ["--git-dir", zeroGit.workspace.remote, "rev-list", "--count", "main"], { encoding: "utf8" }).trim());
-check("local bare remoteへ0件でもconfig・stateをcommit・push", zeroGit.result.response.ok && zeroGit.result.json.sync.results[0].messages === 0 && zeroGit.result.json.git.pushed === true && zeroRemoteCommits === 2 && !readdirSync(join(zeroGit.workspace.root, "google-chat")).includes("history"));
+check("local bare remoteへ0件でも初回結果と自動設定をcommit・push", zeroGit.result.response.ok && zeroGit.result.json.sync.results[0].messages === 0 && zeroGit.result.json.git.pushed === true && zeroGit.result.json.schedule.status === "configured" && zeroRemoteCommits === 3 && !readdirSync(join(zeroGit.workspace.root, "google-chat")).includes("history"));
 
 const oneMessageFixture = structuredClone(fixture);
 oneMessageFixture.messagePages["spaces/space-a"] = [[fixture.messagePages["spaces/space-a"][0][0]]];
 const oneGit = await runGitSync({ name: "one", selectedSpace: "spaces/space-a", data: oneMessageFixture });
 const oneRemoteCommits = Number(execFileSync("git", ["--git-dir", oneGit.workspace.remote, "rev-list", "--count", "main"], { encoding: "utf8" }).trim());
-check("local bare remoteへ1件の履歴をcommit・push", oneGit.result.response.ok && oneGit.result.json.sync.results[0].messages === 1 && oneGit.result.json.git.pushed === true && oneRemoteCommits === 2);
+check("local bare remoteへ1件の履歴と自動設定をcommit・push", oneGit.result.response.ok && oneGit.result.json.sync.results[0].messages === 1 && oneGit.result.json.git.pushed === true && oneGit.result.json.schedule.status === "configured" && oneRemoteCommits === 3);
 
 const failedGitWorkspace = localGitWorkspace("push-failure");
 const failedGitServer = await startServer({ YASASHII_GOOGLE_CHAT_SKIP_GIT: "0" }, { root: failedGitWorkspace.root });
 await api(failedGitServer.base, "api/oauth/synthetic", { mode: "success" });
 await api(failedGitServer.base, "api/spaces", {});
 execFileSync("git", ["remote", "set-url", "origin", join(failedGitWorkspace.base, "missing.git")], { cwd: failedGitWorkspace.root });
-const failedGitResult = await api(failedGitServer.base, "api/initial-sync", { selectedSpaceNames: ["spaces/space-a"], interval: "3h", saveConsent: true, commitPushConsent: true });
+const failedGitResult = await api(failedGitServer.base, "api/initial-sync", { selectedSpaceNames: ["spaces/space-a"], interval: "3h", saveConsent: true, commitPushConsent: true, automaticPushConsent: true });
 const failedGitStatus = await api(failedGitServer.base, "api/oauth/status");
 check("Git push失敗でもtoken破棄とローカル生成物を正直に返す", failedGitResult.response.status === 400 && failedGitResult.json.code === "git-save-failed" && failedGitResult.json.savedLocally === true && failedGitResult.json.tokenDiscarded === true && failedGitResult.json.git.committed === true && failedGitResult.json.git.pushed === false && failedGitStatus.json.status === "save-failed");
 failedGitServer.child.kill("SIGTERM");
+
+const partialWorkspace = localGitWorkspace("initial-schedule-partial");
+mkdirSync(join(partialWorkspace.root, ".github", "workflows"), { recursive: true });
+writeFileSync(join(partialWorkspace.root, ".github", "workflows", "google-chat-sync.yml"), "利用者が確認中の既存ファイル\n");
+const partialServer = await startServer({ YASASHII_GOOGLE_CHAT_SKIP_GIT: "0" }, { root: partialWorkspace.root });
+await api(partialServer.base, "api/oauth/synthetic", { mode: "success" });
+await api(partialServer.base, "api/spaces", {});
+const partialResult = await api(partialServer.base, "api/initial-sync", { selectedSpaceNames: ["spaces/space-a"], interval: "3h", saveConsent: true, commitPushConsent: true, automaticPushConsent: true });
+const partialConfig = JSON.parse(readFileSync(join(partialWorkspace.root, "google-chat", "config.json"), "utf8"));
+check("初回保存後に自動設定だけ失敗した場合を全体成功にしない", partialResult.response.status === 207 && partialResult.json.git.pushed === true && partialResult.json.schedule.status === "failed" && partialResult.json.connectionState === "completed-with-schedule-failure" && partialConfig.scheduleEnabled === false && readFileSync(join(partialWorkspace.root, ".github", "workflows", "google-chat-sync.yml"), "utf8") === "利用者が確認中の既存ファイル\n");
+partialServer.child.kill("SIGTERM");
 
 const wizardServerSource = readFileSync(join(repo, "plugins", "yasashii-secretary", "skills", "google-chat", "scripts", "wizard-server.mjs"), "utf8");
 check("Repository Secret値はghのstdinへ渡しハイフン文字を登録しない", wizardServerSource.includes('["secret", "set", name]') && wizardServerSource.includes("child.stdin.end(value)") && !wizardServerSource.includes('["secret", "set", name, "--body", "-"]'));

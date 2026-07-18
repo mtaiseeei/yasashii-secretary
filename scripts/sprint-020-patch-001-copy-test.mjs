@@ -14,6 +14,9 @@ const files = {
   clientHelper: join(repo, "scripts/create-sprint-020-patch-001-google-chat-test-client.mjs"),
   browserCheck: join(repo, "scripts/sprint-020-patch-001-browser-check.mjs"),
   googleFixture: join(repo, "scripts/fixtures/google-chat-wizard/google-chat.json"),
+  googleServer: join(repo, "plugins/yasashii-secretary/skills/google-chat/scripts/wizard-server.mjs"),
+  cloudGuide: join(repo, "plugins/yasashii-secretary/skills/google-chat/assets/wizard/google-cloud-setup-guide.svg"),
+  readme: join(repo, "README.md"),
   inventory: join(repo, "docs/progress/sprint-020-patch-001-copy-inventory.md"),
 };
 
@@ -46,7 +49,7 @@ function plain(value) {
   return value.replace(/<[^>]*>|\$\{[^}]*\}/g, " ").replace(/\s+/g, " ").trim();
 }
 
-export function validateCopyFixture({ chatwork, google, common, style, resultModel, launcher, clientHelper, browserCheck, googleFixture, inventory }) {
+export function validateCopyFixture({ chatwork, google, common, style, resultModel, launcher, clientHelper, browserCheck, googleFixture, googleServer, cloudGuide, readme, inventory }) {
   const errors = [];
   const sources = { chatwork, google };
   for (const [service, screens] of Object.entries(expectedScreens)) {
@@ -81,11 +84,21 @@ export function validateCopyFixture({ chatwork, google, common, style, resultMod
   }
   if ((chatwork.match(/label: "読む対象"/g) || []).length !== 1 || (google.match(/label: "読む対象"/g) || []).length !== 2) errors.push("安全5要素の画面別構造が不正です");
   if (!common.includes('app.setAttribute("aria-label", detail.context)') || !common.includes("app.dataset.screen") || !common.includes("app.dataset.state")) errors.push("service accessible nameまたはDOM状態がありません");
+  if (!common.includes('app.querySelectorAll("details > summary")') || !common.includes('["Enter", " "]') || !common.includes("summary.parentElement.open")) errors.push("native detailsのkeyboard開閉補助がありません");
   if (!combined.includes('data-copy-role="technical"') && !common.includes('data-copy-role="technical"')) errors.push("technical detailsがありません");
   if (!combined.includes("API Token") || !combined.includes("Repository Secret") || !google.includes("OAuth client JSON") || !google.includes("PKCE")) errors.push("管理者向け正式名称が不足しています");
   if (!google.includes('function renderDiscoverFailure(error)') || !google.includes('show("discover-failure"') || !google.includes('data-action="retry"') || !google.includes("catch (error) { renderDiscoverFailure(error); }")) errors.push("Google Chatのspace取得失敗が独立error stateへ遷移しません");
   if (!google.includes("app.querySelector('[data-action=\"back\"]').onclick = cancel") || !google.includes("app.querySelector('[data-action=\"retry\"]').onclick = discoverSpaces")) errors.push("Google Chatのspace取得失敗に戻る／再試行の操作がありません");
   if (/\.actions\s*\{\s*flex-direction:\s*column-reverse\s*;\s*\}/.test(style) || !/\.actions\s*\{\s*flex-direction:\s*column\s*;\s*\}/.test(style)) errors.push("mobileのCTA視覚順がDOM順と一致しません");
+  if (!chatwork.includes("用意できたら、この設定画面へアクセスしてください") || /戻ってください/.test(chatwork)) errors.push("Chatworkの外部準備後が自然なアクセス案内ではありません");
+  if (!style.includes("summary::after") || !style.includes("details[open] summary::after") || !style.includes("summary:focus-visible") || !style.includes("summary::-webkit-details-marker")) errors.push("全detailsのclosed／open表示またはvisible focusが不足しています");
+  if (!google.includes("ご自身で、会社が所有するGoogle Cloudプロジェクト") || !google.includes("別の管理者へ依頼する場合") || !google.includes("/google-cloud-setup-guide.svg") || !google.includes("2026年7月確認")) errors.push("Google Cloud本人管理者の主経路または画像ガイドが不足しています");
+  if (!readme.includes("アカウント情報を省略した画面例") || !readme.includes("この設定で始める") || !readme.includes("初回取得と自動取得の設定をまとめて行います")) errors.push("READMEの画面例または初回一体型説明が不足しています");
+  if (!cloudGuide.includes("画面例（アカウント情報を省略）") || !cloudGuide.includes("Google Auth platform") || !cloudGuide.includes("Desktop app")) errors.push("Google Cloud画面例の中立表示または現行用語が不足しています");
+  if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|client[_ -]?(?:id|secret)\s*[:=]\s*[A-Za-z0-9._-]{8,}|projects?\/[A-Za-z0-9._-]{8,}/i.test(cloudGuide)) errors.push("Google Cloud画面例にアカウントまたは固有識別値が含まれています");
+  if (!google.includes('id="automatic-consent"') || !google.includes('actions("この設定で始める")') || google.includes("自動取得を設定する")) errors.push("Google Chat初回の自動取得同意または一体型CTAが不正です");
+  if (!googleServer.includes('input.automaticPushConsent !== true') || !googleServer.includes("applyGoogleChatConfig") || !googleServer.includes('status: input.interval === "manual" ? "manual" : "configured"')) errors.push("Google Chat初回APIが自動／手動設定を同じ確定処理で保存しません");
+  if (!browserCheck.includes("DOM.setFileInputFiles") || !browserCheck.includes("createTestOnlyDesktopClientFile")) errors.push("Google Chat browser回帰がfile chooserへ合成fileを入力していません");
   if (!chatwork.includes("chatworkInitialResultModel") || !resultModel.includes("selected.has(String(item?.roomId))") || !resultModel.includes("hiddenResultCount") || !resultModel.includes('status: allFailed ? "failed" : partial ? "partial" : zero ? "empty" : "success"')) errors.push("Chatwork完了結果が選択roomだけに絞られていません");
   if (!launcher.includes("YASASHII_GOOGLE_CHAT_FIXTURE: fixture") || !launcher.includes('scripts/fixtures/google-chat-wizard/google-chat.json')) errors.push("Google Chat初回fixture launcherが同梱fixture pathを渡していません");
   if (!launcher.includes('YASASHII_GOOGLE_CHAT_SYNTHETIC: "1"') || !launcher.includes('YASASHII_GOOGLE_CHAT_TEST_PRIVATE: "1"') || !launcher.includes('YASASHII_GOOGLE_CHAT_SKIP_GIT: "1"')) errors.push("Google Chat初回fixture launcherの外部接続防止条件が不足しています");
@@ -123,12 +136,17 @@ const brokenDiscoverFailure = { ...fixture, google: fixture.google.replace("rend
 const brokenMobileOrder = { ...fixture, style: fixture.style.replace("flex-direction: column;", "flex-direction: column-reverse;") };
 const brokenRoomFilter = { ...fixture, resultModel: fixture.resultModel.replace(".filter((item) => selected.has(String(item?.roomId)))", "") };
 const brokenFileChooser = { ...fixture, browserCheck: fixture.browserCheck.replace("DOM.setFileInputFiles", "DOM.describeNode") };
+const brokenAccessCopy = { ...fixture, chatwork: fixture.chatwork.replace("この設定画面へアクセスしてください", "この設定画面へ戻ってください") };
+const brokenDetailsToggle = { ...fixture, style: fixture.style.replace("details[open] summary::after", "details[data-open] summary::after") };
+const brokenUnifiedFlow = { ...fixture, google: fixture.google.replace('actions("この設定で始める")', 'actions("自動取得を設定する")') };
+const brokenGuidePrivacy = { ...fixture, cloudGuide: fixture.cloudGuide.replace("会社で管理する名前", "client_secret: unsafe-value-123") };
 const brokenFixtures = [
   ["安全意味", brokenMeaning], ["画面state", brokenScreen], ["primary禁止語", brokenForbidden],
   ["Google fixture path", brokenGoogleLauncher], ["Google discovery failure", brokenDiscoverFailure], ["mobile CTA order", brokenMobileOrder],
-  ["Chatwork selected room result", brokenRoomFilter], ["Google file chooser", brokenFileChooser],
+  ["Chatwork selected room result", brokenRoomFilter], ["Google file chooser", brokenFileChooser], ["Chatwork access copy", brokenAccessCopy],
+  ["details toggle", brokenDetailsToggle], ["Google unified initial flow", brokenUnifiedFlow], ["Google guide privacy", brokenGuidePrivacy],
 ];
 const missed = brokenFixtures.filter(([, value]) => validateCopyFixture(value).length === 0).map(([name]) => name);
 if (missed.length) throw new Error(`壊したfixtureを検出できません: ${missed.join("、")}`);
 
-process.stdout.write(`SPRINT020_PATCH001_COPY_PASS=${expectedScreens.chatwork.length + expectedScreens.google.length + 13} SPRINT020_PATCH001_COPY_FAIL=0 INVENTORY=${expectedScreens.chatwork.length + expectedScreens.google.length}\n`);
+process.stdout.write(`SPRINT020_PATCH001_COPY_PASS=${expectedScreens.chatwork.length + expectedScreens.google.length + 17} SPRINT020_PATCH001_COPY_FAIL=0 INVENTORY=${expectedScreens.chatwork.length + expectedScreens.google.length}\n`);

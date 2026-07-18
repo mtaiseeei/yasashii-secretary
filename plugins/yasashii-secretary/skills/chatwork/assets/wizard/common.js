@@ -33,6 +33,15 @@ export function renderWizardScreen(app, { id, state = "ready", html }) {
   app.dataset.screen = id;
   app.dataset.state = state;
   app.innerHTML = html;
+  if (typeof app.querySelectorAll === "function") {
+    app.querySelectorAll("details > summary").forEach((summary) => {
+      summary.addEventListener("keydown", (event) => {
+        if (!["Enter", " "].includes(event.key)) return;
+        event.preventDefault();
+        summary.parentElement.open = !summary.parentElement.open;
+      });
+    });
+  }
 }
 
 export function escapeHtml(value) {
@@ -48,7 +57,7 @@ export function nowCopy(text) {
 }
 
 export function technicalDetails(summary, body, kind = "details") {
-  return `<details data-copy-role="technical" data-detail-kind="${escapeHtml(kind)}"><summary>${escapeHtml(summary)}</summary>${body}</details>`;
+  return `<details data-copy-role="technical" data-detail-kind="${escapeHtml(kind)}"><summary>${escapeHtml(summary)}</summary><div class="details-body">${body}</div></details>`;
 }
 
 export function safetyList(items) {

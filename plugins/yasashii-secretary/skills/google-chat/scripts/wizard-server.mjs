@@ -21,6 +21,7 @@ const host = "127.0.0.1";
 const assets = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "chatwork", "assets", "wizard");
 const googleApp = resolve(dirname(fileURLToPath(import.meta.url)), "..", "assets", "wizard", "app.js");
 const googleCleanup = resolve(dirname(fileURLToPath(import.meta.url)), "..", "assets", "wizard", "cleanup.mjs");
+const googleCloudGuide = resolve(dirname(fileURLToPath(import.meta.url)), "..", "assets", "wizard", "google-cloud-setup-guide.svg");
 const synthetic = process.env.YASASHII_GOOGLE_CHAT_SYNTHETIC === "1";
 const normalUiTest = synthetic && process.env.YASASHII_GOOGLE_CHAT_TEST_NORMAL_UI === "1";
 let session = { status: "unconfigured", message: "OAuth client JSONを選んでください。", credentials: null, pkce: null, accessToken: null, refreshToken: null, secretNames: [], cleanup: null };
@@ -136,7 +137,7 @@ function redirectUri() { return `${origin()}/oauth/callback`; }
 function send(response, status, body, type = "application/json; charset=utf-8", extra = {}) {
   response.writeHead(status, {
     "content-type": type, "cache-control": "no-store", "x-content-type-options": "nosniff",
-    "content-security-policy": "default-src 'self'; connect-src 'self'; img-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+    "content-security-policy": "default-src 'self'; connect-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
     ...extra,
   });
   response.end(Buffer.isBuffer(body) || typeof body === "string" ? body : JSON.stringify(body));
@@ -178,7 +179,8 @@ async function commitAndPush(paths) {
   try {
     if (existingPaths.length === 0) throw new Error("保存対象がありません。");
     execFileSync(git, ["add", "--", ...existingPaths], { cwd: root, stdio: "ignore" });
-    execFileSync(git, ["commit", "-m", "Google Chatの選択スペース履歴を初回保存"], { cwd: root, stdio: "ignore" });
+    // 他の作業でstage済みのファイルを、この設定への同意へ混ぜない。
+    execFileSync(git, ["commit", "--only", "-m", "Google Chatの選択スペース履歴を初回保存", "--", ...existingPaths], { cwd: root, stdio: "ignore" });
     result.committed = true;
     execFileSync(git, ["push"], { cwd: root, stdio: "ignore" });
     result.pushed = true;
@@ -262,6 +264,7 @@ const server = createServer(async (request, response) => {
       const input = await bodyJson(request);
       if (input.saveConsent !== true || input.commitPushConsent !== true) return send(response, 400, { error: "保存とGitのcommit・pushへの明示同意が必要です。", code: "consent-required" });
       if (!["1h", "3h", "6h", "12h", "manual"].includes(input.interval)) return send(response, 400, { error: "自動取得の間隔を選び直してください。" });
+      if (input.interval !== "manual" && input.automaticPushConsent !== true) return send(response, 400, { error: "定期取得と自動commit・pushへの明示同意が必要です。", code: "consent-required" });
       const selected = [...new Set((input.selectedSpaceNames || []).map(String))];
       let resultStatus = 200;
       let resultBody;
@@ -273,14 +276,33 @@ const server = createServer(async (request, response) => {
         writeFileSync(configPath, `${JSON.stringify({ version: 2, selectedSpaceNames: selected, selectedSpaces, interval: input.interval, scheduleEnabled: false, automaticPushConsent: false }, null, 2)}\n`, { mode: 0o600 });
         writeFileSync(join(root, "google-chat", "spaces.json"), `${JSON.stringify({ version: 1, capturedAt: new Date().toISOString(), spaces }, null, 2)}\n`, { mode: 0o600 });
         const git = await commitAndPush(["google-chat/config.json", "google-chat/spaces.json", "google-chat/state", "google-chat/history"]);
-        session.status = "completed";
-        session.message = "初回取得とGitのcommit・pushが完了しました。";
-        resultBody = { sync, git, config: readJson(configPath), savedLocally: true, tokenDiscarded: true, connectionState: "completed", workflowDispatches: 0 };
+        let schedule = { status: "not-started", enabled: false, interval: input.interval };
+        let config = readJson(configPath);
+        try {
+          const configured = await applyGoogleChatConfig({
+            root,
+            selectedSpaces,
+            availableSpaces: spaces,
+            interval: input.interval,
+            automaticPushConsent: input.automaticPushConsent,
+            commitPushConsent: input.commitPushConsent,
+          });
+          config = configured.config;
+          schedule = { status: input.interval === "manual" ? "manual" : "configured", enabled: input.interval !== "manual", interval: input.interval, git: configured.status };
+        } catch (scheduleError) {
+          session.status = "completed-with-schedule-failure";
+          session.message = input.interval === "manual" ? "初回取得は保存しましたが、手動取得の設定を完了できませんでした。" : "初回取得は保存しましたが、自動取得の設定を完了できませんでした。";
+          resultStatus = 207;
+          schedule = { status: "failed", enabled: false, interval: input.interval, code: scheduleError.code || "schedule-setup-failed", message: scheduleError.message };
+        }
+        session.status = schedule.status === "failed" ? "completed-with-schedule-failure" : "completed";
+        if (schedule.status !== "failed") session.message = input.interval === "manual" ? "初回取得と手動のみの設定が完了しました。" : "初回取得と自動取得の設定が完了しました。";
+        resultBody = { sync, git, schedule, config, savedLocally: true, tokenDiscarded: true, connectionState: schedule.status === "failed" ? "completed-with-schedule-failure" : "completed", workflowDispatches: 0 };
       } catch (error) {
         session.status = "save-failed";
         session.message = error.message || "初回取得の保存を完了できませんでした。";
         resultStatus = 400;
-        resultBody = { error: session.message, code: error.code || "initial-sync-failed", sync, git: error.git || { status: "not-started", committed: false, pushed: false }, savedLocally: existsSync(join(root, "google-chat")), tokenDiscarded: true, connectionState: "save-failed", workflowDispatches: 0 };
+        resultBody = { error: session.message, code: error.code || "initial-sync-failed", sync, git: error.git || { status: "not-started", committed: false, pushed: false }, schedule: { status: "not-started", enabled: false, interval: input.interval }, savedLocally: existsSync(join(root, "google-chat")), tokenDiscarded: true, connectionState: "save-failed", workflowDispatches: 0 };
       } finally {
         session.accessToken = null;
         session.refreshToken = null;
@@ -309,7 +331,7 @@ const server = createServer(async (request, response) => {
     }
     if (request.method === "POST" && url.pathname === "/api/cancel") { await revokeAndDelete(); return send(response, 200, { oauth: publicOAuthState(session), cleanup: session.cleanup }); }
     if (request.method !== "GET") return send(response, 405, { error: "Method not allowed" });
-    const names = new Map([["/", [join(assets, "index.html"), "text/html; charset=utf-8"]], ["/app.js", [googleApp, "text/javascript; charset=utf-8"]], ["/cleanup.js", [googleCleanup, "text/javascript; charset=utf-8"]], ["/common.js", [join(assets, "common.js"), "text/javascript; charset=utf-8"]], ["/style.css", [join(assets, "style.css"), "text/css; charset=utf-8"]]]);
+    const names = new Map([["/", [join(assets, "index.html"), "text/html; charset=utf-8"]], ["/app.js", [googleApp, "text/javascript; charset=utf-8"]], ["/cleanup.js", [googleCleanup, "text/javascript; charset=utf-8"]], ["/common.js", [join(assets, "common.js"), "text/javascript; charset=utf-8"]], ["/style.css", [join(assets, "style.css"), "text/css; charset=utf-8"]], ["/google-cloud-setup-guide.svg", [googleCloudGuide, "image/svg+xml"]]]);
     const resource = names.get(url.pathname);
     if (!resource || !existsSync(resource[0])) return send(response, 404, "Not found", "text/plain; charset=utf-8");
     return send(response, 200, readFileSync(resource[0]), resource[1]);

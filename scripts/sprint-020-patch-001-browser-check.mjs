@@ -9,6 +9,7 @@ for (let index = 2; index < process.argv.length; index += 2) args.set(process.ar
 const cdp = args.get("--cdp") || "http://127.0.0.1:9231";
 const chatworkUrl = args.get("--chatwork-url") || "http://127.0.0.1:18784/";
 const googleNewUrl = args.get("--google-new-url") || "http://127.0.0.1:18783/";
+const googleManualUrl = args.get("--google-manual-url") || "http://127.0.0.1:18781/";
 const googleSettingsUrl = args.get("--google-settings-url") || "http://127.0.0.1:18782/";
 const evidence = resolve(args.get("--evidence") || "docs/evidence/sprint-020-patch-001/generator");
 const testClient = createTestOnlyDesktopClientFile();
@@ -56,8 +57,27 @@ async function actionTabSequence() {
   const active = await evaluate(`document.activeElement?.classList.contains('button-primary')?'primary':document.activeElement?.classList.contains('button-secondary')?'secondary':'other'`);
   return { expected, actual: [expected[0], active] };
 }
+async function detailsKeyboard(selector) {
+  await evaluate(`document.body.tabIndex=-1;document.body.focus();true`);
+  let focused = false;
+  for (let attempt = 0; attempt < 20 && !focused; attempt += 1) {
+    await send("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+    await send("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+    focused = await evaluate(`document.activeElement===document.querySelector(${JSON.stringify(selector)})?.querySelector('summary')`);
+  }
+  const before = await evaluate(`(()=>{const details=document.querySelector(${JSON.stringify(selector)});const summary=details?.querySelector('summary');if(!summary)return null;const pseudo=getComputedStyle(summary,'::after');return {open:details.open,transform:pseudo.transform,outline:getComputedStyle(summary).outlineStyle,focusVisible:summary.matches(':focus-visible'),focused:document.activeElement===summary}})()`);
+  await send("Input.dispatchKeyEvent", { type: "keyDown", key: " ", code: "Space", windowsVirtualKeyCode: 32, nativeVirtualKeyCode: 32 });
+  await send("Input.dispatchKeyEvent", { type: "keyUp", key: " ", code: "Space", windowsVirtualKeyCode: 32, nativeVirtualKeyCode: 32 });
+  await delay(300);
+  const opened = await evaluate(`(()=>{const details=document.querySelector(${JSON.stringify(selector)});const summary=details?.querySelector('summary');const image=details?.querySelector('img');return {open:details?.open,transform:getComputedStyle(summary,'::after').transform,imageLoaded:!image||image.complete&&image.naturalWidth>0,focused:document.activeElement===summary}})()`);
+  await send("Input.dispatchKeyEvent", { type: "keyDown", key: " ", code: "Space", windowsVirtualKeyCode: 32, nativeVirtualKeyCode: 32 });
+  await send("Input.dispatchKeyEvent", { type: "keyUp", key: " ", code: "Space", windowsVirtualKeyCode: 32, nativeVirtualKeyCode: 32 });
+  await delay(300);
+  const closed = await evaluate(`document.querySelector(${JSON.stringify(selector)})?.open===false`);
+  return { before, opened, closed, passed: Boolean(before?.focused && before.focusVisible && before.outline !== "none" && !before.open && opened.open && opened.focused && opened.imageLoaded && closed) };
+}
 async function observe() {
-  return evaluate(`(()=>{const app=document.querySelector('#app');const primary=[app.querySelector('h1')?.textContent,...[...app.querySelectorAll('[data-copy-role="now"],[data-copy-role="result"],[data-copy-role="status"],[data-copy-role="error"],.actions .button')].map(x=>x.textContent)].join(' ');const buttons=[...app.querySelectorAll('.actions .button')];const cta=buttons.map((x,index)=>{const rect=x.getBoundingClientRect();return {name:x.getAttribute('aria-label')||x.textContent,role:x.classList.contains('button-primary')?'primary':'secondary',domIndex:index,top:Math.round(rect.top),left:Math.round(rect.left),tabIndex:x.tabIndex,disabled:Boolean(x.disabled),bg:getComputedStyle(x).backgroundColor,fg:getComputedStyle(x).color,height:rect.height}});const dom=cta.map(x=>x.role);const visual=[...cta].sort((a,b)=>Math.abs(a.top-b.top)>1?a.top-b.top:a.left-b.left).map(x=>x.role);const tabbable=cta.filter(x=>!x.disabled&&x.tabIndex>=0).map(x=>x.role);return {screen:app.dataset.screen,state:app.dataset.state,service:app.getAttribute('aria-label'),heading:app.querySelector('h1')?.textContent,primary,forbidden:/\\b(?:wizard|workflow|commit|push|Repository Secret|loopback|runtime|scope|token|OAuth client JSON|Sprint[- ]?\\d*)\\b/i.test(primary),details:[...app.querySelectorAll('details')].map(x=>({open:x.open,summary:x.querySelector('summary')?.textContent,text:x.textContent})),safety:[...app.querySelectorAll('[data-copy-role="safety"] strong')].map(x=>x.textContent),resultRows:[...app.querySelectorAll('.result-list li')].map(x=>x.textContent),selectedResultCount:app.querySelector('[data-copy-role="selected-result-count"]')?.textContent||null,cta,ctaOrder:{dom,visual,tabbable,matches:JSON.stringify(dom)===JSON.stringify(visual)},overflow:document.documentElement.scrollWidth>innerWidth,width:innerWidth,actions:app.querySelector('.actions')?getComputedStyle(app.querySelector('.actions')).flexDirection:null}})()`);
+  return evaluate(`(()=>{const app=document.querySelector('#app');const primary=[app.querySelector('h1')?.textContent,...[...app.querySelectorAll('[data-copy-role="now"],[data-copy-role="result"],[data-copy-role="status"],[data-copy-role="error"],.actions .button')].map(x=>x.textContent)].join(' ');const buttons=[...app.querySelectorAll('.actions .button')];const cta=buttons.map((x,index)=>{const rect=x.getBoundingClientRect();return {name:x.getAttribute('aria-label')||x.textContent,role:x.classList.contains('button-primary')?'primary':'secondary',domIndex:index,top:Math.round(rect.top),left:Math.round(rect.left),tabIndex:x.tabIndex,disabled:Boolean(x.disabled),bg:getComputedStyle(x).backgroundColor,fg:getComputedStyle(x).color,height:rect.height}});const dom=cta.map(x=>x.role);const visual=[...cta].sort((a,b)=>Math.abs(a.top-b.top)>1?a.top-b.top:a.left-b.left).map(x=>x.role);const tabbable=cta.filter(x=>!x.disabled&&x.tabIndex>=0).map(x=>x.role);return {screen:app.dataset.screen,state:app.dataset.state,service:app.getAttribute('aria-label'),heading:app.querySelector('h1')?.textContent,primary,forbidden:/\\b(?:wizard|workflow|commit|push|Repository Secret|loopback|runtime|scope|token|OAuth client JSON|Sprint[- ]?\\d*)\\b/i.test(primary),details:[...app.querySelectorAll('details')].map(x=>({open:x.open,summary:x.querySelector('summary')?.textContent,text:x.textContent,indicator:getComputedStyle(x.querySelector('summary'),'::after').borderRightWidth})),safety:[...app.querySelectorAll('[data-copy-role="safety"] strong')].map(x=>x.textContent),resultRows:[...app.querySelectorAll('.result-list li')].map(x=>x.textContent),selectedResultCount:app.querySelector('[data-copy-role="selected-result-count"]')?.textContent||null,scheduleResult:app.querySelector('[data-schedule-result]')?.textContent||null,cta,ctaOrder:{dom,visual,tabbable,matches:JSON.stringify(dom)===JSON.stringify(visual)},overflow:document.documentElement.scrollWidth>innerWidth,width:innerWidth,actions:app.querySelector('.actions')?getComputedStyle(app.querySelector('.actions')).flexDirection:null}})()`);
 }
 async function screenshot(name) {
   const size = await evaluate(`({width:Math.max(document.documentElement.scrollWidth,innerWidth),height:Math.max(document.documentElement.scrollHeight,innerHeight)})`);
@@ -69,11 +89,13 @@ await send("Page.enable");
 await send("Runtime.enable");
 await send("DOM.enable");
 mkdirSync(evidence, { recursive: true });
-const report = { chatwork: [], google: [], responsive: [], sideEffects: [] };
+const report = { chatwork: [], google: [], responsive: [], sideEffects: [], details: [], guideVisual: null, unifiedFlow: [] };
 
 // Chatwork: prepare, admin, back, zero, failure, select, interval, review, manual, complete, cancel.
 await open(chatworkUrl);
 report.chatwork.push(await screen("chatwork-prepare-connection"));
+const chatDetails = await detailsKeyboard('#app details'); report.details.push({ service: "chatwork", ...chatDetails });
+process.stdout.write(`BROWSER_STAGE=chatwork-details passed=${chatDetails.passed}\n`);
 await click('[data-action="back"]'); report.chatwork.push(await screen("chatwork-admin-approval"));
 await click('[data-action="next"]'); await screen("chatwork-prepare-connection");
 await click('[data-action="next"]'); await screen("chatwork-register-connection");
@@ -98,6 +120,9 @@ await open(chatworkUrl); await screen("chatwork-select-rooms"); await click('[da
 // Google Chat onboarding: cancel, three preparations, auth failure, selection, interval, review, zero result, complete.
 await open(googleNewUrl);
 report.google.push(await screen("google-chat-prepare-cloud"));
+const googleDetails = await detailsKeyboard('#app details'); report.details.push({ service: "google-chat", ...googleDetails });
+process.stdout.write(`BROWSER_STAGE=google-details passed=${googleDetails.passed}\n`);
+await evaluate(`document.querySelector('#app details').open=true`); await delay(300); report.guideVisual = await evaluate(`(()=>{const details=document.querySelector('#app details');const summary=details.querySelector('summary');return {open:details.open,transform:getComputedStyle(summary,'::after').transform,imageLoaded:details.querySelector('img')?.naturalWidth>0}})()`); await screenshot("google-cloud-guide-desktop.png"); await evaluate(`document.querySelector('#app details').open=false`);
 await click('[data-action="back"]'); report.google.push(await screen("google-chat-cancelled"));
 await click('[data-action="restart"]'); await screen("google-chat-prepare-cloud");
 await click('[data-action="next"]'); report.google.push(await screen("google-chat-prepare-access"));
@@ -126,9 +151,23 @@ const afterRetry = await evaluate(`fetch('/api/bootstrap').then(r=>r.json()).the
 if (beforeRetry.configured || afterRetry.configured) throw new Error("Google discover retry changed configuration before consent");
 await check('input[value="spaces/space-empty"]'); await click('[data-action="next"]'); report.google.push(await screen("google-chat-select-interval"));
 await click('[data-action="back"]'); await screen("google-chat-select-spaces"); if (!(await evaluate(`document.querySelector('input[value="spaces/space-empty"]').checked`))) throw new Error("Google back lost selection");
-await click('[data-action="next"]'); await screen("google-chat-select-interval"); await check('input[value="manual"]'); await click('[data-action="next"]'); report.google.push(await screen("google-chat-review")); await screenshot("google-chat-review-desktop.png");
-await check('#save-consent'); await check('#git-consent'); await click('[data-action="next"]'); report.google.push(await screen("google-chat-initial-result-empty")); await screenshot("google-chat-empty-desktop.png");
+await click('[data-action="next"]'); await screen("google-chat-select-interval"); await click('[data-action="next"]'); report.google.push(await screen("google-chat-review")); await screenshot("google-chat-review-desktop.png");
+await evaluate(`window.__initialCalls=0;window.__settingsCalls=0;window.__flowFetch=window.fetch;window.fetch=(u,o)=>{if(String(u).includes('/api/initial-sync'))window.__initialCalls+=1;if(String(u).includes('/api/settings'))window.__settingsCalls+=1;return window.__flowFetch(u,o)}`);
+await check('#save-consent'); await check('#git-consent'); await check('#automatic-consent'); await click('[data-action="next"]'); const autoResult = await screen("google-chat-initial-result-empty"); report.google.push(autoResult); await screenshot("google-chat-empty-desktop.png");
+const autoFlow = await evaluate(`fetch('/api/bootstrap').then(r=>r.json()).then(x=>({initialCalls:window.__initialCalls,settingsCalls:window.__settingsCalls,scheduleEnabled:x.config.scheduleEnabled,automaticPushConsent:x.config.automaticPushConsent,interval:x.config.interval,cta:[...document.querySelectorAll('#app .actions .button')].map(x=>x.textContent),text:document.querySelector('#app').innerText}))`); report.unifiedFlow.push({ mode: "automatic", ...autoFlow });
+if (autoFlow.initialCalls !== 1 || autoFlow.settingsCalls !== 0 || !autoFlow.scheduleEnabled || !autoFlow.automaticPushConsent || autoFlow.interval !== "3h" || autoFlow.cta.join() !== "設定を終了する" || !autoFlow.text.includes("自動取得も有効にしました")) throw new Error("Google automatic initial flow is not unified");
+process.stdout.write("BROWSER_STAGE=google-automatic passed=true\n");
 await click('[data-action="close"]'); report.google.push(await screen("google-chat-complete"));
+
+// Google Chat manual onboarding: the same confirmation still runs initial import but creates no schedule.
+await open(googleManualUrl); await screen("google-chat-prepare-cloud"); await click('[data-action="next"]'); await screen("google-chat-prepare-access"); await click('[data-action="next"]'); await screen("google-chat-prepare-file");
+await setFileInput("#client-json", testClient.path); await click('[data-action="next"]'); await screen("google-chat-authorize"); await click('[data-action="synthetic"]'); await screen("google-chat-select-spaces");
+await check('input[value="spaces/space-empty"]'); await click('[data-action="next"]'); await screen("google-chat-select-interval"); await check('input[value="manual"]'); await click('[data-action="next"]'); const manualReview = await screen("google-chat-review"); report.google.push(manualReview);
+if (await evaluate(`document.querySelector('#automatic-consent')!==null`)) throw new Error("manual initial flow requested automatic consent");
+await check('#save-consent'); await check('#git-consent'); await click('[data-action="next"]'); const manualResult = await screen("google-chat-initial-result-empty"); report.google.push(manualResult); await screenshot("google-chat-manual-initial-result.png");
+const manualFlow = await evaluate(`fetch('/api/bootstrap').then(r=>r.json()).then(x=>({scheduleEnabled:x.config.scheduleEnabled,automaticPushConsent:x.config.automaticPushConsent,interval:x.config.interval,cta:[...document.querySelectorAll('#app .actions .button')].map(x=>x.textContent),text:document.querySelector('#app').innerText}))`); report.unifiedFlow.push({ mode: "manual", ...manualFlow });
+if (manualFlow.scheduleEnabled || manualFlow.automaticPushConsent || manualFlow.interval !== "manual" || manualFlow.cta.join() !== "設定を終了する" || !manualFlow.text.includes("手動のみ")) throw new Error("Google manual initial flow is not truthful");
+process.stdout.write("BROWSER_STAGE=google-manual passed=true\n");
 
 // Google Chat settings: selection 0 + manual only + history retention.
 await open(googleSettingsUrl); await screen("google-chat-settings-select-spaces"); await click('[data-action="clear"]'); const zeroSelect = await screen("google-chat-settings-select-spaces"); report.google.push(zeroSelect);
@@ -145,10 +184,13 @@ await open(googleSettingsUrl, 720, 450, 2); await screen("google-chat-settings-s
 const all = [...report.chatwork, ...report.google, ...report.responsive];
 const serviceColor = (item) => item.cta.filter((button) => button.bg !== "rgba(0, 0, 0, 0)").every((button) => item.service === "Chatworkの設定" ? button.bg === "rgb(240, 55, 71)" && button.fg === "rgb(0, 0, 0)" : button.bg === "rgb(17, 187, 98)" && button.fg === "rgb(0, 0, 0)");
 const actionOrder = (item) => item.cta.length < 2 || (item.ctaOrder.matches && (!item.tabSequence || JSON.stringify(item.tabSequence.expected) === JSON.stringify(item.tabSequence.actual)));
-const passed = browserErrors.length === 0 && all.every((item) => !item.forbidden && !item.overflow && item.details.every((detail) => !detail.open) && item.cta.every((button) => button.height >= 44) && serviceColor(item) && actionOrder(item))
+const passed = browserErrors.length === 0 && all.every((item) => !item.forbidden && !item.overflow && item.details.every((detail) => !detail.open && detail.indicator !== "0px") && item.cta.every((button) => button.height >= 44) && serviceColor(item) && actionOrder(item))
   && report.chatwork.some((item) => item.screen === "chatwork-discover-empty") && report.chatwork.some((item) => item.screen === "chatwork-discover-failure") && report.chatwork.some((item) => item.screen === "chatwork-review" && item.safety.length === 5)
   && report.google.some((item) => item.screen === "google-chat-authorize-failure") && report.google.filter((item) => item.screen === "google-chat-discover-failure").length === 2 && report.google.some((item) => item.screen === "google-chat-select-spaces") && report.google.some((item) => item.screen === "google-chat-initial-result-empty") && report.google.some((item) => item.screen === "google-chat-review" && item.safety.length === 5)
   && report.sideEffects.every((item) => item.configured === false)
+  && report.details.length === 2 && report.details.every((item) => item.passed)
+  && report.guideVisual?.open && report.guideVisual.imageLoaded
+  && report.unifiedFlow.some((item) => item.mode === "automatic" && item.scheduleEnabled) && report.unifiedFlow.some((item) => item.mode === "manual" && !item.scheduleEnabled)
   && report.google.some((item) => item.screen === "google-chat-settings-result-stopped");
 report.browserErrors = browserErrors;
 report.passed = passed;

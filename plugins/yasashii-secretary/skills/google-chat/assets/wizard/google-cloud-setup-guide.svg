@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Google Cloudの接続準備 5ステップの画面例</title>
+  <desc id="desc">会社用プロジェクト作成、API有効化、AudienceのInternal設定、Desktop app作成、接続用ファイル取得の順序を示す、アカウント情報を含まない画面例です。</desc>
+  <rect width="1200" height="760" fill="#f7f9fc"/>
+  <rect x="32" y="28" width="1136" height="64" rx="8" fill="#ffffff" stroke="#c9ced6"/>
+  <circle cx="68" cy="60" r="14" fill="#4285f4"/>
+  <text x="94" y="68" font-family="sans-serif" font-size="24" fill="#202124">Google Cloud 設定ガイド</text>
+  <text x="1128" y="67" text-anchor="end" font-family="sans-serif" font-size="17" fill="#5f6368">画面例（アカウント情報を省略）</text>
+
+  <g font-family="sans-serif">
+    <g transform="translate(32 120)">
+      <rect width="548" height="172" rx="8" fill="#ffffff" stroke="#c9ced6"/>
+      <circle cx="42" cy="42" r="22" fill="#e8f0fe"/><text x="42" y="50" text-anchor="middle" font-size="22" fill="#174ea6">1</text>
+      <text x="80" y="48" font-size="22" fill="#202124">会社用プロジェクトを作る</text>
+      <rect x="28" y="78" width="492" height="58" rx="5" fill="#f1f3f4"/>
+      <text x="48" y="103" font-size="15" fill="#5f6368">プロジェクト名</text><text x="48" y="126" font-size="18" fill="#202124">会社で管理する名前</text>
+      <text x="28" y="158" font-size="14" fill="#5f6368">組織で所有・管理するプロジェクトを選びます</text>
+    </g>
+    <g transform="translate(620 120)">
+      <rect width="548" height="172" rx="8" fill="#ffffff" stroke="#c9ced6"/>
+      <circle cx="42" cy="42" r="22" fill="#e6f4ea"/><text x="42" y="50" text-anchor="middle" font-size="22" fill="#137333">2</text>
+      <text x="80" y="48" font-size="22" fill="#202124">必要なAPIを有効にする</text>
+      <rect x="28" y="78" width="232" height="46" rx="5" fill="#f1f3f4"/><text x="48" y="107" font-size="17" fill="#202124">Google Chat API</text>
+      <rect x="284" y="78" width="236" height="46" rx="5" fill="#f1f3f4"/><text x="304" y="107" font-size="17" fill="#202124">Google People API</text>
+      <rect x="408" y="136" width="112" height="28" rx="4" fill="#1a73e8"/><text x="464" y="156" text-anchor="middle" font-size="14" fill="#ffffff">有効にする</text>
+    </g>
+    <g transform="translate(32 320)">
+      <rect width="548" height="172" rx="8" fill="#ffffff" stroke="#c9ced6"/>
+      <circle cx="42" cy="42" r="22" fill="#fef7e0"/><text x="42" y="50" text-anchor="middle" font-size="22" fill="#b06000">3</text>
+      <text x="80" y="48" font-size="22" fill="#202124">社内向けのAudienceにする</text>
+      <text x="28" y="91" font-size="15" fill="#5f6368">Google Auth platform 〉 Audience</text>
+      <rect x="28" y="108" width="492" height="44" rx="5" fill="#f1f3f4"/>
+      <circle cx="54" cy="130" r="9" fill="#1a73e8"/><circle cx="54" cy="130" r="4" fill="#ffffff"/>
+      <text x="76" y="136" font-size="18" fill="#202124">Internal（組織内）</text>
+    </g>
+    <g transform="translate(620 320)">
+      <rect width="548" height="172" rx="8" fill="#ffffff" stroke="#c9ced6"/>
+      <circle cx="42" cy="42" r="22" fill="#f3e8fd"/><text x="42" y="50" text-anchor="middle" font-size="22" fill="#7627bb">4</text>
+      <text x="80" y="48" font-size="22" fill="#202124">PC用の接続設定を作る</text>
+      <text x="28" y="91" font-size="15" fill="#5f6368">Google Auth platform 〉 Clients</text>
+      <rect x="28" y="108" width="492" height="44" rx="5" fill="#f1f3f4"/>
+      <text x="48" y="136" font-size="18" fill="#202124">Application type: Desktop app</text>
+    </g>
+    <g transform="translate(32 520)">
+      <rect width="1136" height="184" rx="8" fill="#ffffff" stroke="#c9ced6"/>
+      <circle cx="42" cy="42" r="22" fill="#fce8e6"/><text x="42" y="50" text-anchor="middle" font-size="22" fill="#c5221f">5</text>
+      <text x="80" y="48" font-size="22" fill="#202124">接続用ファイルをダウンロードする</text>
+      <rect x="28" y="78" width="1080" height="54" rx="5" fill="#f1f3f4"/>
+      <text x="48" y="111" font-size="18" fill="#202124">作成したDesktop appのダウンロード操作を使います</text>
+      <rect x="900" y="143" width="208" height="32" rx="4" fill="#1a73e8"/><text x="1004" y="165" text-anchor="middle" font-size="15" fill="#ffffff">接続用ファイルを取得</text>
+      <text x="28" y="166" font-size="14" fill="#5f6368">ファイルの内容は設定画面や会話へ貼り付けません</text>
+    </g>
+  </g>
+</svg>

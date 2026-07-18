@@ -1,5 +1,67 @@
 # Sprint 020 Patch 001 — Generator handoff
 
+## Retry 2 scope change 再開（2026-07-18）
+
+### 今回そろえた体験
+
+- ChatworkとGoogle Chatを同じ考え方にそろえた。初回取り込みの確定時に、選んだ間隔が「手動のみ」でなければ、自動取得の設定まで同じ1回の操作で完了する。
+- Google Chatの確認画面は、保存への同意、Gitへの保存・共有への同意、自動取得への同意を確認し、主ボタンを `この設定で始める` にした。完了画面の主ボタンは `設定を終了する` の1つだけで、初回直後に間隔を選び直す画面へ戻さない。
+- `手動のみ` を選んだ場合も初回取り込みは実行するが、定期実行のscheduleは作らない。初回保存後に自動取得の設定だけが失敗した場合は全体成功にせず、初回保存済み・自動取得未設定を分けて表示する。
+- Chatworkの案内を `用意できたら、この設定画面へアクセスしてください。` に直した。管理者の承認待ちでも同じ表現にそろえた。
+- 両サービスのすべての「詳しい説明」「管理者向け」へ、開閉方向が分かる矢印、枠、キーボードfocusを付けた。Enter／Spaceで開閉でき、開いた状態では矢印が上向きになる。
+- Google Chatは、利用者本人が管理者としてGoogle Cloudを準備する流れを主導線にした。会社所有のProject、API、Google Auth platformのAudience、Desktop app、接続用ファイルの順で案内し、管理者へ依頼する場合は補助説明に分けた。
+- Google Cloudの画面例として、アカウント名や実Project IDなどを含まない図 `plugins/yasashii-secretary/skills/google-chat/assets/wizard/google-cloud-setup-guide.svg` をwizardとREADMEで共用した。これは実画面のスクリーンショットではなく、2026年7月時点の公式用語に合わせた安全な案内図である。
+
+### 確認結果
+
+| 確認 | 結果 |
+|---|---|
+| `node scripts/sprint-020-patch-001-copy-test.mjs` | `PASS=71 FAIL=0 INVENTORY=54` |
+| `node scripts/sprint-019-google-chat-test.mjs` | `PASS=51 FAIL=0` |
+| Chatwork既存回帰 | `PASS=59 FAIL=0` |
+| `bash scripts/sprint-020-patch-001-regression.sh` | `WRAPPER_PASS=7 WRAPPER_FAIL=0` |
+| `node scripts/sprint-020-adversarial-test.mjs` | `PASS=16 FAIL=0` |
+| browser回帰 | `PASS=32 FAIL=0 SCREENS=32`、`browser-evidence.json` の `passed=true` |
+| `bash scripts/regression-check.sh --offline` | `PASS=316 FAIL=0` |
+| `bash scripts/regression-check.sh --online` | `PASS=317 FAIL=0`、公開先確認も `ONLINE=PASS` |
+| 資格情報形式の厳格scan | 永続ファイルへの実値らしき混入0件 |
+| `git diff --check` | PASS |
+
+browser証跡は `docs/evidence/sprint-020-patch-001/generator-retry2-reopen/` に保存した。実file inputへの接続用ファイル設定、初回取り込みと3時間ごとの自動取得を1回で完了する流れ、手動のみ、部分失敗、Chatwork文言、詳細のキーボード開閉、desktop、mobile、200%相当を確認している。
+
+### 起動と再現
+
+```bash
+# Chatwork
+bash scripts/start-sprint-014-wizard-fixture.sh 18784
+
+# Google Chat: 初回設定（3時間ごとの自動取得）
+node scripts/start-sprint-020-patch-001-google-chat-fixture.mjs 18783
+
+# Google Chat: 初回設定（手動のみの確認用）
+node scripts/start-sprint-020-patch-001-google-chat-fixture.mjs 18781
+
+# Google Chat: 初回設定後の設定変更
+node scripts/start-sprint-020-wizard-fixture.mjs 18782
+```
+
+確認URLは、Chatworkが `http://127.0.0.1:18784/`、Google Chatの通常初回が `http://127.0.0.1:18783/`、手動のみが `http://127.0.0.1:18781/`、設定変更が `http://127.0.0.1:18782/`。
+
+### Evaluatorへの引き渡し
+
+1. Chatworkで「用意できたら、この設定画面へアクセスしてください。」を確認し、すべての詳細欄がクリック、Enter、Spaceで開閉でき、開閉方向が見た目で分かることを確認する。
+2. Google Chatで本人が管理者の主導線を進み、アカウント情報を省略した画面例と、会社所有Projectから接続用ファイルまでの順序を確認する。管理者へ依頼する補助導線も残っていることを見る。
+3. 3時間ごとを選び、`この設定で始める` を1回押す。初回取り込みと自動取得の設定が完了し、結果画面に `設定を終了する` 以外の主導線が出ないことを確認する。
+4. `手動のみ` では初回取り込みを実行しつつscheduleが0件であること、初回保存後の自動設定失敗では部分完了として表示されることを確認する。
+5. 独立Evaluatorが実施済みの初見理解5問は、両サービスとも5/5、重大な誤解0件として引き継ぐ。Generatorは理解度を再採点していない。
+
+### 既知事項
+
+- Google Cloudの案内図は、実アカウントの画面を撮影したスクリーンショットではない。個人情報や接続情報を公開物へ残さず、現在の公式用語と操作順を示すための図である。
+- 実Google Cloud Projectの新規作成、実OAuth、実Google Chat API、実Repository Secretの登録は今回再実行していない。機能とUXはsynthetic fixtureおよび既存の実接続回帰で確認した。
+- OS標準のファイル選択画面そのものの理解テストは自動化していない。browser回帰では実file inputへテスト専用ファイルを設定し、製品側の検証処理を通している。
+- 最終的なSprint合否は独立Evaluatorが判定する。
+
 ## Retry 2（2026-07-18）
 
 ### 修正した内容

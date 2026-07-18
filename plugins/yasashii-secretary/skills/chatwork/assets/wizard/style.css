@@ -29,9 +29,17 @@ h1 { max-width: 720px; margin: 0; color: #171a20; font-size: clamp(28px, 4vw, 40
 .panel-title { margin: 0; color: #171a20; font-weight: 500; line-height: 1.6; }
 .link-list { line-height: 2; }
 .text-link { overflow-wrap: anywhere; }
-details { margin-top: 24px; color: #393c41; line-height: 1.75; }
-summary { min-height: 44px; display: flex; align-items: center; color: #171a20; font-weight: 500; cursor: pointer; }
+details { margin-top: 24px; color: #393c41; line-height: 1.75; border: 1px solid #d0d1d2; border-radius: 4px; background: #ffffff; }
+summary { min-height: 48px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #171a20; font-weight: 500; cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary:hover { background: #f4f4f4; }
+summary::after { content: ""; width: 10px; height: 10px; flex: 0 0 auto; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translate(-2px, -2px); transition: transform .2s ease; }
+details[open] summary::after { transform: rotate(-135deg) translate(-1px, -1px); }
+.details-body { padding: 0 12px 16px; }
 details p { margin: 12px 0 0; }
+.setup-guide-image { width: 100%; height: auto; margin-top: 16px; display: block; border: 1px solid #d0d1d2; border-radius: 4px; background: #ffffff; }
+.setup-guide-steps { margin: 16px 0 0; padding-left: 24px; }
+.setup-guide-steps li + li { margin-top: 8px; }
 .search-label { display: block; margin-bottom: 8px; color: #171a20; font-weight: 500; }
 .search { width: 100%; min-height: 48px; padding: 0 14px; color: #171a20; background: #ffffff; border: 1px solid #d0d1d2; border-radius: 4px; outline: none; transition: border-color .33s, background-color .33s, color .33s; }
 .search:focus { border-color: #171a20; outline: 3px solid #171a20; outline-offset: 3px; }
@@ -86,6 +94,7 @@ details p { margin: 12px 0 0; }
   .button { width: 100%; min-height: 48px; }
   .summary-row { grid-template-columns: 1fr; gap: 8px; }
   .safety-list li { grid-template-columns: 1fr; gap: 8px; }
+  summary { align-items: flex-start; }
 }
 
 @media (max-width: 360px) {
