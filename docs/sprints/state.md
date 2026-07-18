@@ -40,7 +40,7 @@
 | sprint-019 | done | [contract](sprint-019.md) | [progress](../progress/sprint-019.md) | [feedback](../feedback/sprint-019.md) |
 | sprint-020 | done | [contract](sprint-020.md) | [progress](../progress/sprint-020.md) | [feedback](../feedback/sprint-020.md) |
 | sprint-020-patch-001 | done | [contract](sprint-020-patch-001.md) | [progress](../progress/sprint-020-patch-001.md) | [feedback](../feedback/sprint-020-patch-001.md) |
-| sprint-020-patch-002 | active | [contract](sprint-020-patch-002.md) | [progress](../progress/sprint-020-patch-002.md) | [feedback](../feedback/sprint-020-patch-002.md) |
+| sprint-020-patch-002 | awaiting-eval | [contract](sprint-020-patch-002.md) | [progress](../progress/sprint-020-patch-002.md) | [feedback](../feedback/sprint-020-patch-002.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
@@ -94,3 +94,4 @@
 - 2026-07-18: sprint-020-patch-002初回評価はimplementation-issueで不合格。専用8/8、offline 316/316、online 317/317、browser 31/31は0 FAILだったが、同名ProjectとProject作成権限の事前確認がなく、組織一覧の権限エラーも `cli-ready` と誤分類するため、作成前preflightをGeneratorへ差し戻した（Retry 1）。
 - 2026-07-18: sprint-020-patch-002 Retry 1で認証・組織・Project ID・作成権限の読み取り専用preflight、衝突後の候補再確認と再承認、Policy Troubleshooter不明時の安全停止を実装。承認後の正規3コマンド差し替えも厳密一致で拒否し、専用62件、copy 69件、Sprint 020 50件、敵対条件16件、Chatwork 7件が0 FAILのため独立再評価へ引き渡した。
 - 2026-07-18: sprint-020-patch-002 Retry 1再評価はimplementation-issueで不合格。wrapper 8/8、offline 316/316、online 317/317、Sprint 016 2/2は0 FAILだったが、Project確認の複合エラー文に403と `does not exist` が共存すると権限エラーより404判定を優先し、未使用IDとして `preflight-ready` へ進む1件を独立負テストで検出。判定優先順位の修正をRetry 2へ差し戻した。
+- 2026-07-18: sprint-020-patch-002 Retry 2で権限・403判定を404／NOT_FOUNDより優先し、stdout／stderr分散を含む複合エラーを安全停止へ修正。専用68件、前Evaluator独立負テスト28件、wrapper 8/8、offline 316/316、online 317/317、Sprint 016 2/2が0 FAILで、実Cloud等の外部変更0件のまま独立最終評価へ引き渡した。
