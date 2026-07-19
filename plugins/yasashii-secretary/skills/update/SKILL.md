@@ -80,8 +80,13 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/update-apply.mjs" resume --workspace . --plu
 node "${CLAUDE_PLUGIN_ROOT}/scripts/update-apply.mjs" rollback --workspace .
 ```
 
-workspaceは`git reset --hard`を使わず、保護commitから管理対象だけを復元します。pluginの旧版を公式経路で
-自動復元できない場合は、成功と見せず未復元項目と手動確認手順を示します。全経路でpushとremote変更は禁止です。
+pluginも同時に復元する場合は、現在読み込まれているplugin rootを明示します。
+
+```text
+node "${CLAUDE_PLUGIN_ROOT}/scripts/update-apply.mjs" rollback --workspace . --plugin-root "${CLAUDE_PLUGIN_ROOT}"
+```
+
+workspaceは`git reset --hard`を使わず、更新が書いた後から利用者が変更していない管理対象だけを復元します。pluginは更新前の退避物を同じscopeの対象に戻し、versionと主要skillを検証します。自動復元できない場合は、成功と見せず旧版、scope、実行可能な退避先、起動・確認手順を示します。全経路でpushとremote変更は禁止です。
 
 ## 自動更新について
 

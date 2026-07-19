@@ -1111,7 +1111,18 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-section "31. Harness v0.4.2 runtime移行"
+section "31. 0.7.0更新配布と両面rollback（sprint-025）"
+# ---------------------------------------------------------------------------
+SPRINT025_REGRESSION="$REPO/scripts/sprint-025-regression.sh"
+check "sprint-025回帰が存在し実行可能" "[ -x '$SPRINT025_REGRESSION' ]"
+if bash "$SPRINT025_REGRESSION"; then
+  ok "sprint-025 version・validator・0.6.0 migration・plugin／workspace rollbackが全て成功"
+else
+  ng "sprint-025回帰に失敗"
+fi
+
+# ---------------------------------------------------------------------------
+section "32. Harness v0.4.2 runtime移行"
 # ---------------------------------------------------------------------------
 HARNESS_CONFIG="$REPO/.harness/config.toml"
 HARNESS_IGNORE="$REPO/.harness/.gitignore"
@@ -1166,8 +1177,8 @@ check "stateが完了履歴と有効なruntime状態を保持" \
 check "guidanceがv0.4.2 runtime運用とno-overwriteを案内" \
   "grep -q '.harness/config.local.toml' '$HARNESS_GUIDANCE' && grep -q 'dispatch-ready, not launch-verified' '$HARNESS_GUIDANCE' && grep -q 'Rotate: model-escalation' '$HARNESS_GUIDANCE' && grep -q 'Rotate: model-availability' '$HARNESS_GUIDANCE' && grep -q 'never persist.*unknown' '$HARNESS_GUIDANCE' && grep -q 'Do not overwrite existing guidance' '$HARNESS_GUIDANCE'"
 
-check "製品version 0.6.0とHarness/agents非同梱を維持" \
-  "python3 -c \"import json; assert json.load(open('$MARKET'))['plugins'][0]['version'] == '0.6.0'; assert json.load(open('$PLUGINJSON'))['version'] == '0.6.0'\" && [ ! -d '$PLUGIN/harness' ] && [ ! -d '$PLUGIN/agents' ]"
+check "製品version 0.7.0とHarness/agents非同梱を維持" \
+  "python3 -c \"import json; assert json.load(open('$MARKET'))['plugins'][0]['version'] == '0.7.0'; assert json.load(open('$PLUGINJSON'))['version'] == '0.7.0'\" && [ ! -d '$PLUGIN/harness' ] && [ ! -d '$PLUGIN/agents' ]"
 
 # ---------------------------------------------------------------------------
 section "結果"

@@ -159,8 +159,9 @@ Google People APIの `contacts.readonly` では、連絡先にない同僚名を
 
 ### 更新を確認する
 
-「更新ある？」と話しかけると、現在版・最新版・主な変更・設定やファイルへの影響を確認できます。
-この診断はplugin、workspace、Git、Claude Code設定を変更しません。実際のplugin更新やworkspace移行は、現在の版では行いません。
+公開版は`0.7.0`です。「更新ある？」と話しかけると、現在版・最新版・主な変更・設定やファイルへの影響を確認できます。
+この診断はplugin、workspace、Git、Claude Code設定を変更しません。診断後の別の確認で明示了承した場合だけ、pushしない保護commit、plugin更新、dry-run、workspace migration、検証へ進みます。
+失敗時はworkspaceとpluginを別々に復元し、片方しか戻っていない状態を完了と表示しません。
 変更内容の正本は [CHANGELOG](plugins/yasashii-secretary/CHANGELOG.md) です。
 
 2026年7月時点では、第三者marketplaceの自動更新は既定で無効です。使う場合は利用者自身が

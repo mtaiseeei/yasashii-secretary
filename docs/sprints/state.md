@@ -2,11 +2,11 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-025
+- Current ID: sprint-026
 - Retry Count: 0
 - Model Tier: strong
 - Rotate: none
-- Next Planned: sprint-026
+- Next Planned: sprint-027
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
      ユーザー確認で単段クレジットに正本改訂、回帰assert強化のうえ合格）。
@@ -47,7 +47,7 @@
 | sprint-022 | done | [contract](sprint-022.md) | [progress](../progress/sprint-022.md) | [feedback](../feedback/sprint-022.md) |
 | sprint-023 | done | [contract](sprint-023.md) | [progress](../progress/sprint-023.md) | [feedback](../feedback/sprint-023.md) |
 | sprint-024 | done | [contract](sprint-024.md) | [progress](../progress/sprint-024.md) | [feedback](../feedback/sprint-024.md) |
-| sprint-025 | planned | [contract](sprint-025.md) | - | - |
+| sprint-025 | done | [contract](sprint-025.md) | [progress](../progress/sprint-025.md) | [feedback](../feedback/sprint-025.md) |
 | sprint-026 | planned | [contract](sprint-026.md) | - | - |
 | sprint-027 | planned | [contract](sprint-027.md) | - | - |
 | sprint-028 | planned | [contract](sprint-028.md) | - | - |
@@ -135,3 +135,6 @@
 - 2026-07-18: sprint-021 Generatorが一時indexによる所有path限定commit、stage後のsecret再検査、候補差替え拒否、push失敗時の既存index保護を初回publish／Chatwork／Google Chat／memory commitへ実装。専用31件、wrapper 8件、全offline 327件、全online 328件が0 FAIL、実外部サービス変更0件のため独立Evaluatorへ引き渡した。
 - 2026-07-18: sprint-021 Retry 1でcredential key正規化、OAuth callback code検査、安全文書の誤拒否解消、memory所有path限定、upstreamなし初回pushの履歴基点確認を実装。独立fixture相当を製品suiteへ取り込み、専用45件、wrapper 8件、全offline 327件と関連suiteが0 FAILのためfresh独立Evaluatorへ再引き渡した。
 - 2026-07-19: sprint-024はAgentic Harness 0.4.4 Sol/high fresh EvaluatorでPASS（59/60）。専用43/43、wrapper 15/15、独立fixture 25/25、master offline 334/334・online 335/335が0 FAIL。履歴marker、冪等差分、Actions run相関、未確認／失敗時の安全停止を確認し、外部書込み・保護対象接触・残存processは0件。親metadataで実起動modelもSol/highと確認し、sprint-024をdone、Current IDをsprint-025へ更新。
+- 2026-07-19: sprint-025は公開version、既存利用者更新、plugin／workspace rollbackを扱うhigh risk Sprint。Agentic Harness 0.4.4 resolverはstrong tierのSol/high fresh Generatorを選択し、Rotateはnoneを維持して開始する。
+- 2026-07-19: sprint-025のSol/high fresh Generatorが0.7.0整合、0.6.0→0.7.0 migration、plugin／workspace別rollback、後続commit保護、partial-restoration表示、validator強化を実装。専用25/25、関連Sprint 017・018・021〜024、安全隔離master offline 336/336が0 FAIL。検証中に一時worktreeがtracked監査記録をcheckout対象にする操作逸脱があり即中断・削除し、個別内容読取・外部送信・実repo stage／commit／pushは0件。製品判定と分離記録し、fresh独立Evaluatorへ引き渡す。
+- 2026-07-19: sprint-025はSol/high fresh EvaluatorでPASS（59/60、受入12/12）。専用25/25、独立fixture 25/25、evidence全除外の隔離repoでmaster offline 336/336・online 337/337が0 FAIL。実外部書込み・Secret・workflow・remote push・禁止対象接触・残存fixture／processは0件。Generatorの一時worktree操作逸脱は製品判定と分離記録し、sprint-025をdone、Current IDをsprint-026へ更新。

@@ -2,6 +2,8 @@
 
 import { createHash } from "node:crypto";
 import {
+  chmodSync,
+  copyFileSync,
   existsSync,
   lstatSync,
   mkdirSync,
@@ -155,6 +157,120 @@ function safePluginRoot(value) {
   } catch {
     fail("pluginのversionを安全に確認できないため、更新を進めません。", EXIT_REFUSED);
   }
+}
+
+function inspectPluginTree(value, expectedVersion = null) {
+  const root = realpathSync(resolve(value));
+  if (!lstatSync(root).isDirectory() || lstatSync(root).isSymbolicLink()) throw new Error("plugin-root");
+  const manifest = JSON.parse(readFileSync(join(root, ".claude-plugin", "plugin.json"), "utf8"));
+  if (manifest.name !== "yasashii-secretary" || !SEMVER.test(String(manifest.version ?? ""))) throw new Error("plugin-manifest");
+  if (expectedVersion && manifest.version !== expectedVersion) throw new Error("plugin-version");
+  const requiredSkills = ["secretary", "update"];
+  if (requiredSkills.some((name) => !existsSync(join(root, "skills", name, "SKILL.md")))) throw new Error("plugin-skills");
+  const entries = [];
+  const walk = (directory, prefix = "") => {
+    for (const entry of readdirSync(directory, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name))) {
+      const absolute = join(directory, entry.name);
+      const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+      if (entry.isSymbolicLink()) throw new Error("plugin-symlink");
+      if (entry.isDirectory()) {
+        walk(absolute, rel);
+      } else if (entry.isFile()) {
+        const bytes = readFileSync(absolute);
+        entries.push({ rel, mode: lstatSync(absolute).mode & 0o777, hash: sha256Buffer(bytes) });
+      } else {
+        throw new Error("plugin-special-file");
+      }
+    }
+  };
+  walk(root);
+  return {
+    root,
+    version: manifest.version,
+    fileCount: entries.length,
+    treeHash: sha256Buffer(JSON.stringify(entries)),
+    requiredSkills,
+  };
+}
+
+function copyPluginTree(source, destination) {
+  mkdirSync(destination, { recursive: false });
+  const walk = (from, to) => {
+    for (const entry of readdirSync(from, { withFileTypes: true })) {
+      const sourcePath = join(from, entry.name);
+      const targetPath = join(to, entry.name);
+      if (entry.isSymbolicLink()) throw new Error("plugin-symlink");
+      if (entry.isDirectory()) {
+        mkdirSync(targetPath, { recursive: false });
+        walk(sourcePath, targetPath);
+      } else if (entry.isFile()) {
+        copyFileSync(sourcePath, targetPath);
+        chmodSync(targetPath, lstatSync(sourcePath).mode & 0o777);
+      } else {
+        throw new Error("plugin-special-file");
+      }
+    }
+  };
+  walk(source, destination);
+}
+
+function backupPlugin(pluginRoot, gitDir, scope) {
+  const source = inspectPluginTree(pluginRoot);
+  const sessionDirectory = join(gitDir, SESSION_DIRECTORY);
+  if (existsSync(sessionDirectory) && (lstatSync(sessionDirectory).isSymbolicLink() || !lstatSync(sessionDirectory).isDirectory())) {
+    fail("plugin復元用の保護領域を安全に作れないため、更新を開始しません。", EXIT_REFUSED);
+  }
+  mkdirSync(sessionDirectory, { recursive: true });
+  const backupRoot = join(sessionDirectory, "plugin-backup");
+  if (existsSync(backupRoot)) {
+    if (lstatSync(backupRoot).isSymbolicLink() || !lstatSync(backupRoot).isDirectory()) {
+      fail("plugin復元用の保護領域が安全でないため、更新を開始しません。", EXIT_REFUSED);
+    }
+    rmSync(backupRoot, { recursive: true, force: false });
+  }
+  try {
+    copyPluginTree(source.root, backupRoot);
+    const copied = inspectPluginTree(backupRoot, source.version);
+    if (copied.treeHash !== source.treeHash || copied.fileCount !== source.fileCount) throw new Error("plugin-backup-mismatch");
+    return { directory: "plugin-backup", version: source.version, scope, treeHash: source.treeHash, fileCount: source.fileCount, requiredSkills: source.requiredSkills };
+  } catch {
+    if (existsSync(backupRoot) && !lstatSync(backupRoot).isSymbolicLink()) rmSync(backupRoot, { recursive: true, force: true });
+    fail("plugin更新前版を安全に退避できないため、更新を開始しません。", EXIT_REFUSED);
+  }
+}
+
+function ensurePluginBackup(session, gitDir, currentPluginRoot) {
+  const backupRoot = join(gitDir, SESSION_DIRECTORY, "plugin-backup");
+  try {
+    if (session.pluginBackup?.directory === "plugin-backup") {
+      const existing = inspectPluginTree(backupRoot, session.fromVersion);
+      if (existing.treeHash !== session.pluginBackup.treeHash || existing.fileCount !== session.pluginBackup.fileCount) throw new Error("backup-mismatch");
+      return false;
+    }
+  } catch {
+    fail("更新前pluginの退避物を検証できません。workspace migrationは開始していません。", EXIT_REFUSED);
+  }
+
+  let current;
+  try { current = inspectPluginTree(currentPluginRoot, session.toVersion); }
+  catch { fail("更新後pluginを検証できないため、workspace migrationは開始していません。", EXIT_REFUSED); }
+  const parent = dirname(current.root);
+  const candidates = [];
+  for (const entry of readdirSync(parent, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.isSymbolicLink()) continue;
+    const candidate = join(parent, entry.name);
+    if (candidate === current.root) continue;
+    try {
+      const inspected = inspectPluginTree(candidate, session.fromVersion);
+      candidates.push(inspected.root);
+    } catch {}
+  }
+  if (candidates.length !== 1) {
+    fail(`更新前plugin ${session.fromVersion}を一意に確認できないため、workspace migrationは開始していません。`, EXIT_REFUSED);
+  }
+  session.pluginBackup = backupPlugin(candidates[0], gitDir, session.scope);
+  session.pluginBackup.recoveredAfterReload = true;
+  return true;
 }
 
 function safeManagedFile(workspace, rel, { allowMissing = false } = {}) {
@@ -313,6 +429,12 @@ function output(args, value) {
     plan ? `plan hash: ${plan.planHash}` : null,
     value.nextAction ? `次の操作: ${value.nextAction}` : null,
     value.protectionCommit ? `保護commit: ${value.protectionCommit}` : null,
+    value.status ? `復元状態: ${value.status}` : null,
+    value.pluginVersion ? `plugin version: ${value.pluginVersion}` : null,
+    value.pluginScope ? `plugin scope: ${value.pluginScope}` : null,
+    value.fallback?.pluginRoot ? `実行可能な旧版: ${value.fallback.pluginRoot}` : null,
+    value.fallback?.command ? `旧版の起動: ${value.fallback.command}` : null,
+    value.fallback?.verify ? `旧版の確認: ${value.fallback.verify}` : null,
     value.unresolved?.length ? `未復元項目: ${value.unresolved.join(" / ")}` : null,
   ].filter(Boolean);
   process.stdout.write(`${lines.join("\n")}\n`);
@@ -400,6 +522,7 @@ function start(args, scriptDir) {
   const scope = args.values.get("--scope") ?? "user";
   if (!ALLOWED_SCOPES.has(scope)) fail("pluginのscopeが不明なため更新を停止しました。", EXIT_REFUSED);
   const protection = protectionCommit(workspace, currentPlugin.version, diagnosis.latestVersion);
+  const pluginBackup = backupPlugin(currentPlugin.root, gitDir, scope);
   const session = {
     schemaVersion: 1,
     phase: "protection-created",
@@ -409,8 +532,9 @@ function start(args, scriptDir) {
     scope,
     managed: managed.map(({ path, status, currentHash }) => ({ path, status, currentHash })),
     selections,
+    pluginBackup,
     plugin: { updated: false, requiresReload: false },
-    migration: { changedPaths: [], ledgerChanged: false },
+    migration: { changedPaths: [], appliedHashes: {}, ledgerChanged: false, ledgerHash: null },
   };
   const statePath = sessionPath(gitDir);
   atomicJson(statePath, session);
@@ -525,6 +649,8 @@ function resume(args) {
   }
   const plugin = safePluginRoot(args.values.get("--plugin-root") ?? resolve(dirname(fileURLToPath(import.meta.url)), ".."));
   if (plugin.version !== session.toVersion) fail("reload後のplugin versionが予定版と一致しません。migrationは行っていません。", EXIT_REFUSED);
+  if (ensurePluginBackup(session, gitDir, plugin.root)) atomicJson(statePath, session);
+  session.migration = { changedPaths: [], appliedHashes: {}, ledgerChanged: false, ledgerHash: null, ...(session.migration ?? {}) };
   const plan = session.phase === "migration-partial" && session.plan
     ? session.plan
     : buildPlan(workspace, session, plugin.root);
@@ -557,6 +683,7 @@ function resume(args) {
     const asset = readFileSync(operation.assetPath, "utf8").trimEnd();
     writeFileAtomicSafe(workspace, target, `${body.trimEnd()}\n\n${asset}\n`, { encoding: "utf8" });
     session.migration.changedPaths = [...new Set([...session.migration.changedPaths, item.path])];
+    session.migration.appliedHashes = { ...(session.migration.appliedHashes ?? {}), [item.path]: sha256File(target) };
     session.phase = "migration-partial";
     atomicJson(statePath, session);
     applied += 1;
@@ -566,8 +693,9 @@ function resume(args) {
       return;
     }
   }
-  updateLedger(workspace, session, plan);
-  session.migration.ledgerChanged = true;
+  const ledgerResult = updateLedger(workspace, session, plan);
+  session.migration.ledgerChanged = ledgerResult.changed;
+  session.migration.ledgerHash = ledgerResult.hash;
   const verification = verifyUpdate(workspace, plugin.root, session, plan, args);
   if (!verification.ok) {
     session.phase = "verification-failed";
@@ -604,20 +732,31 @@ function updateLedger(workspace, session, plan) {
     if (index >= 0) records[index] = record;
     else records.push(record);
   }
-  if (records.length === 0) return;
+  for (const managed of session.managed) {
+    if (!["clean", "unchanged"].includes(managed.status)) continue;
+    const index = records.findIndex((record) => record.path === managed.path);
+    if (index < 0) continue;
+    const target = safeManagedFile(workspace, managed.path);
+    if (records[index].baselineHash !== sha256File(target)) continue;
+    records[index] = { ...records[index], installedVersion: session.toVersion };
+  }
+  if (records.length === 0) return { changed: false, hash: null };
   const directory = dirname(ledger.path);
   if (existsSync(directory) && lstatSync(directory).isSymbolicLink()) fail("台帳の保存先がsymlinkのため停止しました。", EXIT_FAILED);
-  writeFileAtomicSafe(workspace, ledger.path, `${JSON.stringify(records.sort((left, right) => left.path.localeCompare(right.path)), null, 2)}\n`, { encoding: "utf8" });
+  const content = `${JSON.stringify(records.sort((left, right) => left.path.localeCompare(right.path)), null, 2)}\n`;
+  const before = existsSync(ledger.path) ? readFileSync(ledger.path, "utf8") : null;
+  if (before !== content) writeFileAtomicSafe(workspace, ledger.path, content, { encoding: "utf8" });
+  return { changed: before !== content, hash: sha256Buffer(content) };
 }
 
 function verifyUpdate(workspace, pluginRoot, session, plan, args) {
   const ledger = readLedger(workspace);
-  const expectedLedgerPaths = plan.items
+  const expectedLedgerPaths = [...new Set([...plan.items
     .filter((item) => {
       const managed = session.managed.find((candidate) => candidate.path === item.path);
       return item.action === "change" || item.action === "already-applied" || managed?.status === "unchanged" || managed?.status === "clean";
     })
-    .map((item) => item.path);
+    .map((item) => item.path), ...session.managed.filter((item) => ["clean", "unchanged"].includes(item.status)).map((item) => item.path)])];
   const ledgerValid = expectedLedgerPaths.every((path) => {
     if (!Array.isArray(ledger.records)) return false;
     const record = ledger.records.find((candidate) => candidate?.path === path);
@@ -661,25 +800,148 @@ function restoreFromCommit(workspace, commit, rel) {
   }
 }
 
+function pluginFallback(backup, scope, version) {
+  return {
+    version,
+    scope,
+    pluginRoot: backup,
+    command: `claude --plugin-dir "${backup}"`,
+    verify: `.claude-plugin/plugin.json=${version} / skills/secretary/SKILL.md / skills/update/SKILL.md`,
+  };
+}
+
+function restorePlugin(workspace, gitDir, session, requestedRoot) {
+  const backupInfo = session.pluginBackup;
+  const backupRoot = join(gitDir, SESSION_DIRECTORY, "plugin-backup");
+  try {
+    if (!backupInfo || backupInfo.directory !== "plugin-backup" || backupInfo.version !== session.fromVersion || backupInfo.scope !== session.scope) throw new Error("backup-state");
+    const backup = inspectPluginTree(backupRoot, session.fromVersion);
+    if (backup.treeHash !== backupInfo.treeHash || backup.fileCount !== backupInfo.fileCount) throw new Error("backup-integrity");
+    const fallback = pluginFallback(backup.root, session.scope, session.fromVersion);
+    if (!requestedRoot) return { restored: false, verified: false, fallback, reason: "plugin復元先が指定されていません。" };
+
+    const candidate = resolve(requestedRoot);
+    const relToWorkspace = relative(workspace, candidate);
+    if (!relToWorkspace || (relToWorkspace !== ".." && !relToWorkspace.startsWith(`..${sep}`))) {
+      return { restored: false, verified: false, fallback, reason: "workspace内のpathをplugin復元先にしないでください。" };
+    }
+    const current = inspectPluginTree(candidate);
+    if (current.version === session.fromVersion && current.treeHash === backup.treeHash) {
+      return { restored: true, verified: true, version: current.version, scope: session.scope, requiredSkills: current.requiredSkills, fallback };
+    }
+    if (current.version !== session.toVersion) {
+      return { restored: false, verified: false, fallback, reason: `復元先のplugin versionが予定した${session.toVersion}ではありません。` };
+    }
+    const parent = realpathSync(dirname(current.root));
+    if (lstatSync(parent).isSymbolicLink()) throw new Error("plugin-parent-symlink");
+    const staging = join(parent, `.yasashii-secretary-rollback-stage-${process.pid}`);
+    const quarantine = join(parent, `.yasashii-secretary-rollback-new-${process.pid}`);
+    if (existsSync(staging) || existsSync(quarantine)) throw new Error("plugin-rollback-collision");
+    let targetMoved = false;
+    try {
+      copyPluginTree(backup.root, staging);
+      const staged = inspectPluginTree(staging, session.fromVersion);
+      if (staged.treeHash !== backup.treeHash) throw new Error("plugin-staging-mismatch");
+      renameSync(current.root, quarantine);
+      targetMoved = true;
+      renameSync(staging, current.root);
+      const restored = inspectPluginTree(current.root, session.fromVersion);
+      if (restored.treeHash !== backup.treeHash) throw new Error("plugin-restore-mismatch");
+      rmSync(quarantine, { recursive: true, force: false });
+      return { restored: true, verified: true, version: restored.version, scope: session.scope, requiredSkills: restored.requiredSkills, fallback };
+    } catch (error) {
+      if (existsSync(staging) && !lstatSync(staging).isSymbolicLink()) rmSync(staging, { recursive: true, force: true });
+      if (targetMoved && existsSync(quarantine)) {
+        if (existsSync(current.root)) {
+          if (lstatSync(current.root).isSymbolicLink()) throw error;
+          rmSync(current.root, { recursive: true, force: true });
+        }
+        renameSync(quarantine, current.root);
+      }
+      throw error;
+    }
+  } catch {
+    let fallback = null;
+    try {
+      const backup = inspectPluginTree(backupRoot, session.fromVersion);
+      fallback = pluginFallback(backup.root, session.scope, session.fromVersion);
+    } catch {}
+    return { restored: false, verified: false, fallback, reason: "pluginを自動復元できませんでした。" };
+  }
+}
+
+function hashFromCommit(workspace, commit, rel) {
+  const existsAtCommit = git(workspace, ["cat-file", "-e", `${commit}:${rel}`]);
+  if (existsAtCommit.status !== 0) return null;
+  const content = git(workspace, ["show", `${commit}:${rel}`]);
+  return content.status === 0 ? sha256Buffer(content.stdout) : undefined;
+}
+
+function currentPathHash(workspace, rel) {
+  let target;
+  try { target = rel === LEDGER_PATH ? safeWritePath(workspace, rel) : safeManagedFile(workspace, rel, { allowMissing: true }); }
+  catch { return undefined; }
+  if (!existsSync(target)) return null;
+  if (lstatSync(target).isSymbolicLink() || !lstatSync(target).isFile()) return undefined;
+  return sha256File(target);
+}
+
 function rollback(args) {
   const { workspace, gitDir } = safeWorkspace(args.values.get("--workspace"));
   const statePath = sessionPath(gitDir);
   const session = readSession(statePath);
   const head = git(workspace, ["rev-parse", "HEAD"]);
-  if (head.status !== 0 || head.stdout.trim() !== session.protectionCommit) fail("保護commit後に別のcommitがあります。自動で上書きせず、手動確認へ切り替えます。", EXIT_REFUSED);
-  for (const path of session.migration?.changedPaths ?? []) restoreFromCommit(workspace, session.protectionCommit, path);
-  if (session.migration?.ledgerChanged || existsSync(resolve(workspace, LEDGER_PATH))) restoreFromCommit(workspace, session.protectionCommit, LEDGER_PATH);
-  session.phase = "rolled-back";
+  const unresolved = [];
+  let workspaceRestored = Boolean(session.workspaceRestored);
+  if (!workspaceRestored) {
+    if (head.status !== 0 || head.stdout.trim() !== session.protectionCommit) {
+      unresolved.push("保護commit後に別のcommitがあるため、workspaceを上書きしていません。");
+    } else {
+      const targets = [...new Set([...(session.migration?.changedPaths ?? []), ...(session.migration?.ledgerChanged ? [LEDGER_PATH] : [])])];
+      let safe = true;
+      for (const path of targets) {
+        const currentHash = currentPathHash(workspace, path);
+        const protectedHash = hashFromCommit(workspace, session.protectionCommit, path);
+        const expectedAppliedHash = path === LEDGER_PATH ? session.migration?.ledgerHash : session.migration?.appliedHashes?.[path];
+        if (currentHash === protectedHash) continue;
+        if (currentHash === undefined || !expectedAppliedHash || currentHash !== expectedAppliedHash) {
+          safe = false;
+          unresolved.push(`${path} は更新後に利用者変更がある可能性があるため、上書きしていません。`);
+        }
+      }
+      if (safe) {
+        for (const path of targets) {
+          if (currentPathHash(workspace, path) !== hashFromCommit(workspace, session.protectionCommit, path)) restoreFromCommit(workspace, session.protectionCommit, path);
+        }
+        workspaceRestored = targets.every((path) => currentPathHash(workspace, path) === hashFromCommit(workspace, session.protectionCommit, path));
+        if (!workspaceRestored) unresolved.push("workspaceの管理対象を保護commitと一致させられませんでした。");
+      }
+    }
+  }
+  const pluginResult = restorePlugin(workspace, gitDir, session, args.values.get("--plugin-root"));
+  if (!pluginResult.restored) unresolved.push(pluginResult.reason);
+  session.workspaceRestored = workspaceRestored;
+  session.pluginRestored = pluginResult.restored;
+  session.phase = workspaceRestored && pluginResult.restored ? "rolled-back" : "rollback-partial";
   atomicJson(statePath, session);
   output(args, {
-    title: "workspaceを復元しました",
-    message: "管理対象だけを保護commitの状態へ戻しました。git reset --hard、push、remote変更は行っていません。pluginは自動で旧版へ戻していません。",
+    title: workspaceRestored && pluginResult.restored ? "workspaceとpluginを復元しました" : "復元はまだ完了していません",
+    status: workspaceRestored && pluginResult.restored ? "rolled-back" : "partial-restoration",
+    message: workspaceRestored && pluginResult.restored
+      ? "workspaceの管理対象とpluginを更新前へ戻し、plugin versionと主要skillを確認しました。"
+      : "workspaceとpluginの片方または両方に未復元項目があります。完了として扱っていません。",
     protectionCommit: session.protectionCommit,
-    workspaceRestored: true,
-    pluginRestored: false,
-    unresolved: ["Claude Codeの /plugin → Installed でyasashii-secretaryの状態を確認し、旧版が必要なら保守者へ連絡してください。旧cacheは一時的であり自動復元の正本にしません。"],
+    workspaceRestored,
+    pluginRestored: pluginResult.restored,
+    pluginVersion: pluginResult.version ?? session.fromVersion,
+    pluginScope: session.scope,
+    pluginVerified: pluginResult.verified,
+    requiredSkills: pluginResult.requiredSkills ?? session.pluginBackup?.requiredSkills ?? [],
+    fallback: pluginResult.fallback,
+    unresolved,
     pushCount: 0,
   });
+  if (!workspaceRestored || !pluginResult.restored) process.exitCode = EXIT_FAILED;
 }
 
 const args = parseArgs(process.argv.slice(2));
