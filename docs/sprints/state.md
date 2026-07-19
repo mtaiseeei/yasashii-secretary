@@ -2,11 +2,11 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-026
+- Current ID: sprint-027
 - Retry Count: 0
 - Model Tier: strong
-- Rotate: none
-- Next Planned: sprint-027
+- Rotate: model-escalation
+- Next Planned: sprint-028
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
      ユーザー確認で単段クレジットに正本改訂、回帰assert強化のうえ合格）。
@@ -48,7 +48,7 @@
 | sprint-023 | done | [contract](sprint-023.md) | [progress](../progress/sprint-023.md) | [feedback](../feedback/sprint-023.md) |
 | sprint-024 | done | [contract](sprint-024.md) | [progress](../progress/sprint-024.md) | [feedback](../feedback/sprint-024.md) |
 | sprint-025 | done | [contract](sprint-025.md) | [progress](../progress/sprint-025.md) | [feedback](../feedback/sprint-025.md) |
-| sprint-026 | planned | [contract](sprint-026.md) | - | - |
+| sprint-026 | done | [contract](sprint-026.md) | [progress](../progress/sprint-026.md) | [feedback](../feedback/sprint-026.md) |
 | sprint-027 | planned | [contract](sprint-027.md) | - | - |
 | sprint-028 | planned | [contract](sprint-028.md) | - | - |
 
@@ -138,3 +138,10 @@
 - 2026-07-19: sprint-025は公開version、既存利用者更新、plugin／workspace rollbackを扱うhigh risk Sprint。Agentic Harness 0.4.4 resolverはstrong tierのSol/high fresh Generatorを選択し、Rotateはnoneを維持して開始する。
 - 2026-07-19: sprint-025のSol/high fresh Generatorが0.7.0整合、0.6.0→0.7.0 migration、plugin／workspace別rollback、後続commit保護、partial-restoration表示、validator強化を実装。専用25/25、関連Sprint 017・018・021〜024、安全隔離master offline 336/336が0 FAIL。検証中に一時worktreeがtracked監査記録をcheckout対象にする操作逸脱があり即中断・削除し、個別内容読取・外部送信・実repo stage／commit／pushは0件。製品判定と分離記録し、fresh独立Evaluatorへ引き渡す。
 - 2026-07-19: sprint-025はSol/high fresh EvaluatorでPASS（59/60、受入12/12）。専用25/25、独立fixture 25/25、evidence全除外の隔離repoでmaster offline 336/336・online 337/337が0 FAIL。実外部書込み・Secret・workflow・remote push・禁止対象接触・残存fixture／processは0件。Generatorの一時worktree操作逸脱は製品判定と分離記録し、sprint-025をdone、Current IDをsprint-026へ更新。
+- 2026-07-19: sprint-026は標準リスク。Agentic Harness 0.4.4 resolverがstrongからstandardへのtier変更を選択し、Model Tierをstandard、Rotateをmodel-escalationとしてLuna/xHigh fresh Generatorを開始する。
+- 2026-07-19: sprint-026のLuna/xHigh fresh Generatorがcheckout／archive分離、suite順序・開始終了・assert集約、FAIL／signal／timeout／必須未実行の非ゼロ化、archive metadata検査を実装。専用12/12、wrapper 3/3、`.git`なしarchive fixtureがPASS。調査時に広い`rg`で禁止evidence配下のパス名列挙が1件発生したが、内容読取・変更・stage・外部送信0件で、以後の再発0。製品判定と分離記録し、fresh独立Evaluatorへ引き渡す。
+- 2026-07-19: sprint-026初回評価はimplementation-issueでFAIL（50/60）。archiveの不正homepageを正式validatorは拒否する一方、master archive gateがvalidatorを実行せず75/75 PASSとする偽PASSと、`SPRINT..._PASS`形式のassert summary誤集計を独立再現。Retry Countを1、Model Tier standard、Rotate noneとし、Luna/xHigh fresh Generatorへ限定差し戻す。
+- 2026-07-19: sprint-026 Retry 1のLuna/xHigh fresh Generatorがarchive／master gateから正式validatorを実行して失敗を非ゼロ反映し、prefix付きassert summary集計を修正。homepage／repository破損負例を追加し、専用16/16、wrapper 3/3、validator直実行がPASS。禁止対象接触・外部操作0件でfresh独立Evaluatorへ再引き渡す。
+- 2026-07-19: sprint-026 Retry 1再評価はimplementation-issueでFAIL（53/60）。validator偽PASSと単一prefix集計は修正済みだが、子suite内の複数内部summaryと最終正本summaryを全加算し、raw 335/1をmaster JSON 2969/1へ二重計上するF3を独立再現。Retry Count 2の閾値によりModel Tierをstrong、Rotateをmodel-escalationとし、Sol/high fresh GeneratorへF3だけを差し戻す。
+- 2026-07-19: sprint-026 Retry 2のSol/high fresh Generatorが最終bare正本summaryを優先し、ない場合のみ最後のprefix summaryを採用、途中FAILを保持するようF3を限定修正。raw 335/1維持を含む専用21/21、wrapper 3/3、validator、構文がPASS。禁止対象接触・外部操作0件でfresh独立Evaluatorへ再引き渡す。
+- 2026-07-19: sprint-026 Retry 2はSol/high fresh EvaluatorでPASS（57/60）。専用21/21、wrapper 3/3、独立parser 11/11、archive matrix 6/6、checkout offline 411/411・online 412/412、archive 76/76・checks 9/9が0 FAIL。F1〜F3修正とraw／JSON集計一致を確認し、禁止対象接触・外部書込み・残存fixture／process 0件。sprint-026をdone、Retry Countを0、Current IDをsprint-027へ更新。
