@@ -3,7 +3,8 @@
 import { createHash } from "node:crypto";
 import { existsSync, lstatSync, readdirSync, readFileSync, realpathSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { fetchWithTimeout } from "./lib/external-ops.mjs";
 
 const PLUGIN_NAME = "yasashii-secretary";
 const LEDGER_PATH = ".yasashii-secretary/update-ledger.json";
@@ -121,7 +122,7 @@ function currentVersion(pluginRoot) {
   }
 }
 
-async function latestRelease(args) {
+export async function latestRelease(args, { fetchImpl = fetch } = {}) {
   let manifest;
   let changelog;
   let source;
@@ -140,11 +141,17 @@ async function latestRelease(args) {
     return { version: null, reason: "ネットワーク確認を行わない指定のため、最新版は未確認です。" };
   } else {
     try {
+      const timeoutMs = Number(process.env.YASASHII_HTTP_TIMEOUT_MS || 8_000);
+      const marketplaceUrl = process.env.YASASHII_MARKETPLACE_URL || DEFAULT_MARKETPLACE_URL;
+      const changelogUrl = process.env.YASASHII_CHANGELOG_URL || DEFAULT_CHANGELOG_URL;
       const [manifestResponse, changelogResponse] = await Promise.all([
-        fetch(DEFAULT_MARKETPLACE_URL, { signal: AbortSignal.timeout(8000) }),
-        fetch(DEFAULT_CHANGELOG_URL, { signal: AbortSignal.timeout(8000) }),
+        fetchWithTimeout(marketplaceUrl, {}, { timeoutMs, label: "公開marketplace情報", fetchImpl }),
+        fetchWithTimeout(changelogUrl, {}, { timeoutMs, label: "公開CHANGELOG", fetchImpl }),
       ]);
-      if (!manifestResponse.ok || !changelogResponse.ok) throw new Error("distribution fetch failed");
+      if (!manifestResponse.ok || !changelogResponse.ok) {
+        await Promise.allSettled([manifestResponse.text(), changelogResponse.text()]);
+        throw new Error("distribution fetch failed");
+      }
       manifest = await manifestResponse.json();
       changelog = await changelogResponse.text();
       source = "public配布repo";
@@ -337,4 +344,4 @@ async function main() {
   process.stdout.write(args.flags.has("--json") ? `${JSON.stringify(result, null, 2)}\n` : `${renderText(result)}\n`);
 }
 
-await main();
+if (import.meta.url === pathToFileURL(process.argv[1] || "").href) await main();

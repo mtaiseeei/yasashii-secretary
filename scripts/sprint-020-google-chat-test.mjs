@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { execFileSync, spawnSync } from "node:child_process";
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -13,6 +13,7 @@ import { GOOGLE_CHAT_INTERVALS, googleChatScheduleFor, renderGoogleChatWorkflow 
 let passed = 0;
 let failed = 0;
 const temporary = [];
+const testTmp = realpathSync(tmpdir());
 
 function check(condition, label) {
   if (condition) { passed += 1; process.stdout.write(`  PASS ${label}\n`); }
@@ -20,7 +21,7 @@ function check(condition, label) {
 }
 
 function temp(prefix) {
-  const path = mkdtempSync(join(tmpdir(), prefix));
+  const path = mkdtempSync(join(testTmp, prefix));
   temporary.push(path);
   return path;
 }

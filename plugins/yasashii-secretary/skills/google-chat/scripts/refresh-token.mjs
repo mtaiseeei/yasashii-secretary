@@ -1,10 +1,12 @@
-export async function exchangeRefreshToken({ clientId, clientSecret, refreshToken, fetchImpl = fetch }) {
+import { fetchWithTimeout } from "./runtime-safety.mjs";
+
+export async function exchangeRefreshToken({ clientId, clientSecret, refreshToken, fetchImpl = fetch, timeoutMs = Number(process.env.YASASHII_HTTP_TIMEOUT_MS || 15_000) }) {
   if (!clientId || !clientSecret || !refreshToken) {
     throw Object.assign(new Error("Google Chat用のRepository Secretを確認できません。"), { code: "secret-missing" });
   }
   let response;
   try {
-    response = await fetchImpl("https://oauth2.googleapis.com/token", {
+    response = await fetchWithTimeout("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "content-type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
@@ -13,11 +15,14 @@ export async function exchangeRefreshToken({ clientId, clientSecret, refreshToke
         client_secret: clientSecret,
         refresh_token: refreshToken,
       }),
-    });
-  } catch {
+    }, { timeoutMs, label: "Google OAuth", fetchImpl });
+  } catch (error) {
+    if (error?.code === "timeout") throw error;
     throw Object.assign(new Error("Google OAuthへ接続できません。ネットワークを確認してください。"), { code: "network" });
   }
-  const result = await response.json().catch(() => ({}));
+  let result = {};
+  try { result = await response.json(); }
+  catch (error) { if (error?.code === "timeout") throw error; }
   if (!response.ok || !result.access_token) {
     const source = `${result.error || ""} ${result.error_description || ""}`.toLowerCase();
     if (/invalid_grant|revoked|expired/.test(source)) throw Object.assign(new Error("Google認証の同意が取り消されたか、refresh tokenが失効しています。再認証してください。"), { code: "reauthorization-needed" });

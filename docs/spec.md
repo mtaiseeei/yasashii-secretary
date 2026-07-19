@@ -114,7 +114,7 @@ sprint-007 は製品方針転換で白紙化され、旧計画と実装は `back
 18. Chatwork／Google Chat wizardの主導線は「今すること」1文、1画面1判断、1段落1要点に絞る。内部用語は判断に必要な正式名称を除いて主説明から外し、安全同意の意味は短く分けて必ず残す。
 19. 詳細は開閉可能と見た目・支援技術の両方で分かるようにする。Google ChatのCloud準備はskill会話が担当し、`gcloud`で可能な工程と、本人が直接リンクから操作する工程を分ける。local wizardは接続用JSONの選択から開始し、スペース・間隔・保存内容を1回確認して初回取り込みと自動取得設定を同じ確定操作で完了し、完了画面は終了だけをprimaryにする。
 20. 配布、設定、記憶、更新のcommitは各操作が所有する変更だけを対象にし、既存stageや隣接領域を混ぜない。commit／push前のsecret検査は、製品管理対象と初回publish inventoryにあるGoogle OAuth client JSON、private key、known token field、通常のliteral assignment等の合理的な誤混入を拒否する。`${{ secrets.NAME }}` 等の正規参照と通常文書は許可し、意図的難読化の完全検出を保証しない。
-21. 書込みはsymlink解決後も許可root内、symlink削除は参照先ではなくlink自体だけを対象にする。外部CLI・HTTPは有限時間で終了し、timeoutを成功として扱わない。
+21. 書込みの許可rootは、現在確認済みのworking rootごとに定める。秘書workspaceから外部repoへ向くsymlink越しの書込みは拒否する一方、確認済みの開発repoをそのrepo自身のworking rootとして開いた通常の開発ではrepo内へ書き込める。symlink削除は参照先ではなくlink自体だけを対象にし、外部CLI・HTTPは有限時間で終了してtimeoutを成功として扱わない。
 22. loopback wizardは同一session・同一originの正当な操作だけを受け付け、OAuth callbackは一度だけ処理する。Google Chat本文が内部Markdown markerに似ていても履歴の欠落・改変を起こさない。
 23. 公開版は `0.7.0`。既存 `0.6.0`から利用者データとカスタマイズを守って更新でき、失敗時はworkspaceだけでなくpluginも更新前版へ戻せる、または実行可能な復元手順を示す。
 24. 配布可否はmaster回帰、Git archive相当の `.git` なし環境、専用private test workspaceのChatwork／Google Chat live gate、Secret・schedule・OAuthの後始末がすべて合格した場合だけ `ready` とする。

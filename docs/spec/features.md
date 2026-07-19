@@ -240,6 +240,7 @@
 ### F37 symlink境界と有限時間の外部処理
 
 - Node／shellの書込み・作成・移動は、既存・未作成の最終要素を含む全ancestorを実体として確認し、許可root外を指すsymlinkがあれば副作用前に拒否する。
+- 秘書workspaceから別repoへ向くsymlink越しの書込みは拒否する。一方、ユーザーが別repo開発PJとして確認し、そのrepo自身をworking rootとして開いた開発作業では、そのrepo内の正常な書込みを妨げない。
 - 許可root内にあるsymlink自体を削除する操作は、参照先のファイル／ディレクトリを辿らずlinkだけを削除する。通常ファイル、通常ディレクトリ、symlinkを区別し、削除前の対象提示と明示確認を維持する。
 - secret、memory、project、成果物、更新、チャット設定の全書込み導線で同じ境界を守り、拒否時に外部・内部のどちらにも部分生成を残さない。
 - `git`、`gh`、`claude`、`gcloud`等の外部CLIと外部HTTPは、操作の種類に応じた有限時間で完了またはtimeoutする。timeoutは成功や空結果に読み替えず、後続commit・push・削除を進めない。

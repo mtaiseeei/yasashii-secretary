@@ -1,31 +1,27 @@
 #!/usr/bin/env node
 
-import { execFile } from "node:child_process";
-import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { promisify } from "node:util";
 import { commitOwnedChanges, pushOwnedCommit, restoreOwnedCommit } from "../../../scripts/lib/safe-git.mjs";
+import { removeSafe, workingRoot, writeFileAtomicSafe } from "../../../scripts/lib/safe-fs.mjs";
+import { runExternal } from "../../../scripts/lib/external-ops.mjs";
 import { GOOGLE_CHAT_SECRET_NAMES } from "./oauth-session.mjs";
 import { GOOGLE_CHAT_INTERVALS, renderGoogleChatWorkflow } from "./schedule.mjs";
 
-const exec = promisify(execFile);
 const moduleRoot = dirname(fileURLToPath(import.meta.url));
-const runtimeFiles = ["client.mjs", "history.mjs", "refresh-token.mjs", "continuous-sync.mjs"];
+const runtimeFiles = ["client.mjs", "history.mjs", "refresh-token.mjs", "continuous-sync.mjs", "runtime-safety.mjs"];
 
 function readOptional(path) {
   try { return readFileSync(path, "utf8"); } catch { return null; }
 }
 
-function writeAtomic(path, content) {
-  mkdirSync(dirname(path), { recursive: true });
-  const temporary = `${path}.tmp-${process.pid}`;
-  writeFileSync(temporary, content, { mode: 0o600 });
-  renameSync(temporary, path);
+function writeAtomic(root, path, content) {
+  writeFileAtomicSafe(root, path, content, { mode: 0o600 });
 }
 
-async function run(binary, argv, root, timeout = 30_000) {
-  return exec(binary, argv, { cwd: root, timeout, maxBuffer: 2 * 1024 * 1024 });
+async function run(binary, argv, root, timeout = Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000)) {
+  return runExternal(binary, argv, { cwd: root, timeoutMs: timeout, maxBuffer: 2 * 1024 * 1024, label: binary });
 }
 
 function classify(error) {
@@ -45,7 +41,7 @@ function normalizedSpaces(spaces) {
 }
 
 export async function applyGoogleChatConfig({ root, selectedSpaces, availableSpaces = selectedSpaces, interval, automaticPushConsent, commitPushConsent }) {
-  root = resolve(root);
+  root = workingRoot(root);
   const requestedNames = new Set((selectedSpaces || []).map((space) => String(space?.name || "")));
   const selected = normalizedSpaces(selectedSpaces);
   const available = normalizedSpaces(availableSpaces);
@@ -104,10 +100,10 @@ export async function applyGoogleChatConfig({ root, selectedSpaces, availableSpa
       scheduleEnabled,
       automaticPushConsent: scheduleEnabled && automaticPushConsent === true,
     };
-    writeAtomic(entries[0][0], `${JSON.stringify(config, null, 2)}\n`);
-    writeAtomic(entries[1][0], `${JSON.stringify({ version: 1, capturedAt: new Date().toISOString(), spaces: available }, null, 2)}\n`);
-    writeAtomic(entries[2][0], renderGoogleChatWorkflow(interval, scheduleEnabled));
-    for (const name of runtimeFiles) writeAtomic(join(root, "google-chat", "scripts", name), readFileSync(join(moduleRoot, name), "utf8"));
+    writeAtomic(root, entries[0][0], `${JSON.stringify(config, null, 2)}\n`);
+    writeAtomic(root, entries[1][0], `${JSON.stringify({ version: 1, capturedAt: new Date().toISOString(), spaces: available }, null, 2)}\n`);
+    writeAtomic(root, entries[2][0], renderGoogleChatWorkflow(interval, scheduleEnabled));
+    for (const name of runtimeFiles) writeAtomic(root, join(root, "google-chat", "scripts", name), readFileSync(join(moduleRoot, name), "utf8"));
     if (process.env.YASASHII_GOOGLE_CHAT_SKIP_GIT === "1") return { status: "saved", config, workflow: { schedule: scheduleEnabled, interval } };
     const managedPaths = entries.map(([, relative]) => relative);
     const committed = commitOwnedChanges({ root, ownedPaths: managedPaths, message: "Google Chatのスペースと自動取得の間隔を変更" });
@@ -120,10 +116,10 @@ export async function applyGoogleChatConfig({ root, selectedSpaces, availableSpa
       try { restoreOwnedCommit({ root, oldHead, newHead, ownedPaths: entries.map(([, relative]) => relative) }); } catch { /* snapshot復元を続ける */ }
     }
     for (const [path, content] of snapshots) {
-      if (content === null) rmSync(path, { force: true });
-      else writeAtomic(path, content);
+      if (content === null) removeSafe(root, path);
+      else writeAtomic(root, path, content);
     }
-    if (["dirty-config", "secret-detected", "inspection-failed", "candidate-changed", "commit-scope", "git-conflict", "push-base-changed", "push-failed"].includes(error.code)) throw error;
+    if (["dirty-config", "secret-detected", "inspection-failed", "candidate-changed", "commit-scope", "git-conflict", "push-base-changed", "push-failed", "filesystem-boundary", "symlink-boundary", "working-root-unsafe", "target-changed", "timeout"].includes(error.code)) throw error;
     const detail = classify(error);
     throw Object.assign(new Error(detail.message), { code: detail.code });
   }

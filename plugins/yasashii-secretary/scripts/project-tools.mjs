@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
-import { existsSync, lstatSync, realpathSync, readFileSync, writeFileSync, mkdirSync, rmSync, renameSync, cpSync, readdirSync } from "node:fs";
-import { basename, dirname, join, relative, resolve, sep } from "node:path";
-import { spawnSync } from "node:child_process";
+import { existsSync, lstatSync, readFileSync, writeFileSync, mkdirSync, rmSync, renameSync, cpSync, readdirSync } from "node:fs";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { runExternalSync } from "./lib/external-ops.mjs";
+import { safeWritePath, workingRoot } from "./lib/safe-fs.mjs";
 
 class ProjectError extends Error {
   constructor(message, code = 3) {
@@ -70,36 +71,17 @@ function validateName(value) {
   return name;
 }
 
-function isInside(base, target) {
-  const rel = relative(base, target);
-  return rel !== "" && rel !== ".." && !rel.startsWith(`..${sep}`);
-}
-
 function secretaryRoot(value) {
-  const path = resolve(value ?? "");
-  if (!existsSync(path)) refuse(`秘書ディレクトリが見つかりません: ${value}`);
-  if (lstatSync(path).isSymbolicLink()) refuse(`秘書ディレクトリが symlink です。安全のため操作できません: ${value}`);
-  if (!lstatSync(path).isDirectory()) refuse(`秘書ディレクトリではありません: ${value}`);
-  return realpathSync(path);
+  try { return workingRoot(value); }
+  catch { refuse(`秘書ディレクトリが通常のdirectoryではないため、安全に操作できません: ${value}`); }
 }
 
 function safePath(root, rel) {
   if (!rel || rel === "." || rel === ".." || rel.startsWith("/") || rel.split(/[\\/]/).some((part) => !part || part === "." || part === "..")) {
     refuse(`秘書ディレクトリ（secretary/）の外は操作できません: ${rel}`);
   }
-  const parts = rel.split(/[\\/]/);
-  let cursor = root;
-  for (const part of parts) {
-    cursor = join(cursor, part);
-    if (existsSync(cursor) || (() => { try { lstatSync(cursor); return true; } catch { return false; } })()) {
-      const resolved = realpathSync(cursor);
-      if (!isInside(root, resolved)) refuse(`symlink経由で秘書ディレクトリの外は操作できません: ${rel}`);
-      cursor = resolved;
-    }
-  }
-  const result = resolve(cursor);
-  if (!isInside(root, result)) refuse(`秘書ディレクトリ（secretary/）の外は操作できません: ${rel}`);
-  return result;
+  try { return safeWritePath(root, rel); }
+  catch { refuse(`symlink経由で秘書ディレクトリの外は操作できません: ${rel}`); }
 }
 
 function projectPath(root, name) {
@@ -188,7 +170,17 @@ function writeMarkdown(path, value) {
 }
 
 function runJournal(root, type, message) {
-  const result = spawnSync("bash", [memoryTools, "journal-add", root, type, message], { encoding: "utf8" });
+  let result;
+  try {
+    result = runExternalSync("bash", [memoryTools, "journal-add", root, type, message], {
+      encoding: "utf8",
+      timeoutMs: Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000),
+      label: "journal記録",
+      allowFailure: true,
+    });
+  } catch (error) {
+    refuse(error?.code === "timeout" ? "journalの記録が時間切れになりました。後続処理は行っていません。" : "journalの記録を安全に完了できませんでした。");
+  }
   if (result.status !== 0) refuse((result.stderr || result.stdout || "journalの記録に失敗しました。").trim());
 }
 
@@ -490,7 +482,17 @@ function cmdTodo(argv) {
   const due = options.get("--due") ?? "";
   if (due && !/^\d{4}-\d{2}-\d{2}$/.test(due)) usage("--due は YYYY-MM-DD 形式で指定してください。");
   const linked = `${todo} [PJ: ${name} / projects/${name}/PROJECT.md]`;
-  const result = spawnSync("bash", [workspaceTools, "todo-add", root, linked, source, due], { encoding: "utf8" });
+  let result;
+  try {
+    result = runExternalSync("bash", [workspaceTools, "todo-add", root, linked, source, due], {
+      encoding: "utf8",
+      timeoutMs: Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000),
+      label: "TODO追加",
+      allowFailure: true,
+    });
+  } catch (error) {
+    throw new ProjectError(error?.code === "timeout" ? "TODO追加が時間切れになりました。後続処理は行っていません。" : "TODO追加を安全に完了できませんでした。", 3);
+  }
   if (result.status !== 0) throw new ProjectError((result.stderr || result.stdout).trim(), result.status === 2 ? 2 : 3);
   console.log(`PJ参照つきTODOを正本へ追加しました: inbox/todo.md`);
 }

@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
-import { execFileSync, spawn } from "node:child_process";
 import { createServer } from "node:http";
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { commitOwnedChanges, pushOwnedCommit } from "../../../scripts/lib/safe-git.mjs";
+import { workingRoot, writeFileAtomicSafe } from "../../../scripts/lib/safe-fs.mjs";
+import { fetchWithTimeout, runExternal, runExternalSync } from "../../../scripts/lib/external-ops.mjs";
 import { createGoogleChatClient } from "./client.mjs";
 import { applyGoogleChatConfig } from "./config-transaction.mjs";
 import { initialGoogleChatSync } from "./sync.mjs";
@@ -16,7 +17,7 @@ import {
 
 const args = new Map();
 for (let i = 2; i < process.argv.length; i += 2) args.set(process.argv[i], process.argv[i + 1]);
-const root = resolve(args.get("--root") || process.cwd());
+const root = workingRoot(args.get("--root") || process.cwd());
 const port = Number(args.get("--port") || 8766);
 const host = "127.0.0.1";
 const assets = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "chatwork", "assets", "wizard");
@@ -50,7 +51,7 @@ function oauthStatusOnce() {
 
 function repository() {
   let remote;
-  try { remote = execFileSync(process.env.YASASHII_GIT_BIN || "git", ["remote", "get-url", "origin"], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(); }
+  try { remote = runExternalSync(process.env.YASASHII_GIT_BIN || "git", ["remote", "get-url", "origin"], { cwd: root, encoding: "utf8", timeoutMs: Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000), label: "git remote確認" }).stdout.trim(); }
   catch { return null; }
   const matched = remote.replace(/\.git$/i, "").match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)$/i)
     || remote.replace(/\.git$/i, "").match(/^git@github\.com:([^/]+)\/([^/]+)$/i);
@@ -61,8 +62,9 @@ function repository() {
 function verifyPrivateRepo() {
   if (synthetic && process.env.YASASHII_GOOGLE_CHAT_TEST_PRIVATE === "1") return;
   try {
-    const gitRoot = execFileSync(process.env.YASASHII_GIT_BIN || "git", ["rev-parse", "--show-toplevel"], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
-    const detail = JSON.parse(execFileSync(process.env.YASASHII_GH_BIN || "gh", ["repo", "view", "--json", "visibility"], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }));
+    const timeout = Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000);
+    const gitRoot = runExternalSync(process.env.YASASHII_GIT_BIN || "git", ["rev-parse", "--show-toplevel"], { cwd: root, encoding: "utf8", timeoutMs: timeout, label: "git root確認" }).stdout.trim();
+    const detail = JSON.parse(runExternalSync(process.env.YASASHII_GH_BIN || "gh", ["repo", "view", "--json", "visibility"], { cwd: root, encoding: "utf8", timeoutMs: timeout, label: "GitHub repo確認" }).stdout);
     if (resolve(gitRoot) !== root || String(detail.visibility).toUpperCase() !== "PRIVATE" || !repository()) throw new Error("private-required");
   } catch {
     process.stderr.write("private GitHub repoを確認できないためGoogle Chat設定wizardを起動しません。\n");
@@ -71,11 +73,14 @@ function verifyPrivateRepo() {
 }
 
 function runSecret(name, value) {
-  return new Promise((resolveRun, reject) => {
-    const child = spawn(process.env.YASASHII_GH_BIN || "gh", ["secret", "set", name], { cwd: root, stdio: ["pipe", "ignore", "ignore"] });
-    child.once("error", reject);
-    child.once("close", (code) => code === 0 ? resolveRun() : reject(Object.assign(new Error("Repository Secretへ登録できませんでした。"), { code: "secret-registration-failed" })));
-    child.stdin.end(value);
+  return runExternal(process.env.YASASHII_GH_BIN || "gh", ["secret", "set", name], {
+    cwd: root,
+    input: value,
+    timeoutMs: Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000),
+    label: "Repository Secret登録",
+  }).catch((error) => {
+    if (error?.code === "timeout") throw error;
+    throw Object.assign(new Error("Repository Secretへ登録できませんでした。"), { code: "secret-registration-failed" });
   });
 }
 
@@ -83,7 +88,7 @@ function deleteRepositorySecrets(names = GOOGLE_CHAT_SECRET_NAMES) {
   if (synthetic) return process.env.YASASHII_GOOGLE_CHAT_SECRET_DELETE_FAILURE !== "1";
   let deleted = true;
   for (const name of names) {
-    try { execFileSync(process.env.YASASHII_GH_BIN || "gh", ["secret", "delete", name], { cwd: root, stdio: "ignore" }); }
+    try { runExternalSync(process.env.YASASHII_GH_BIN || "gh", ["secret", "delete", name], { cwd: root, timeoutMs: Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000), label: "Repository Secret削除" }); }
     catch { deleted = false; }
   }
   return deleted;
@@ -114,7 +119,7 @@ async function revokeAndDelete() {
   if (!synthetic) {
     const token = session.accessToken || session.refreshToken;
     if (token) {
-      const result = await fetch(`https://oauth2.googleapis.com/revoke?token=${encodeURIComponent(token)}`, { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" } }).catch(() => null);
+      const result = await fetchWithTimeout(`https://oauth2.googleapis.com/revoke?token=${encodeURIComponent(token)}`, { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" } }, { timeoutMs: Number(process.env.YASASHII_HTTP_TIMEOUT_MS || 15_000), label: "Google OAuth取消", headersOnly: true }).catch(() => null);
       grantRevoked = Boolean(result?.ok);
     }
   }
@@ -236,7 +241,7 @@ const server = createServer(async (request, response) => {
         return send(response, 200, "<!doctype html><html lang=\"ja\"><meta charset=\"utf-8\"><title>認証完了</title><h1>Google認証が完了しました。</h1><p>元のGoogle Chat設定画面が自動的に次へ進みます。この認証タブは閉じて大丈夫です。</p><p>元の画面が進まない場合は、設定タブへ戻って接続状態を確認してください。</p>", "text/html; charset=utf-8");
       } catch (error) {
         const clientId = session.credentials?.clientId || null;
-        if (!synthetic && session.accessToken) await fetch(`https://oauth2.googleapis.com/revoke?token=${encodeURIComponent(session.accessToken)}`, { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" } }).catch(() => null);
+        if (!synthetic && session.accessToken) await fetchWithTimeout(`https://oauth2.googleapis.com/revoke?token=${encodeURIComponent(session.accessToken)}`, { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" } }, { timeoutMs: Number(process.env.YASASHII_HTTP_TIMEOUT_MS || 15_000), label: "Google OAuth取消", headersOnly: true }).catch(() => null);
         deleteRepositorySecrets(session.secretNames);
         session.status = "failed"; session.errorCode = error.code || "oauth-failed"; session.message = error.message; session.adminChecklist = ["admin-blocked", "audience-mismatch", "scope-insufficient"].includes(error.code) && clientId ? { clientId, scopes: GOOGLE_CHAT_SCOPES } : null; session.credentials = null; session.pkce = null; session.accessToken = null; session.refreshToken = null;
         return send(response, 400, "<!doctype html><html lang=\"ja\"><meta charset=\"utf-8\"><title>認証失敗</title><h1>Google認証を完了できませんでした。</h1><p>元のGoogle Chat設定画面に理由と次の操作を表示しています。この認証タブを閉じて設定タブへ戻ってください。</p>", "text/html; charset=utf-8");
@@ -271,9 +276,8 @@ const server = createServer(async (request, response) => {
         sync = await initialGoogleChatSync({ root, selectedSpaceNames: selected, spaces, client: currentClient() });
         const configPath = join(root, "google-chat", "config.json");
         const selectedSpaces = spaces.filter((space) => selected.includes(space.name));
-        mkdirSync(dirname(configPath), { recursive: true });
-        writeFileSync(configPath, `${JSON.stringify({ version: 2, selectedSpaceNames: selected, selectedSpaces, interval: input.interval, scheduleEnabled: false, automaticPushConsent: false }, null, 2)}\n`, { mode: 0o600 });
-        writeFileSync(join(root, "google-chat", "spaces.json"), `${JSON.stringify({ version: 1, capturedAt: new Date().toISOString(), spaces }, null, 2)}\n`, { mode: 0o600 });
+        writeFileAtomicSafe(root, configPath, `${JSON.stringify({ version: 2, selectedSpaceNames: selected, selectedSpaces, interval: input.interval, scheduleEnabled: false, automaticPushConsent: false }, null, 2)}\n`, { mode: 0o600 });
+        writeFileAtomicSafe(root, join(root, "google-chat", "spaces.json"), `${JSON.stringify({ version: 1, capturedAt: new Date().toISOString(), spaces }, null, 2)}\n`, { mode: 0o600 });
         const git = await commitAndPush(["google-chat/config.json", "google-chat/spaces.json", "google-chat/state", "google-chat/history"]);
         let schedule = { status: "not-started", enabled: false, interval: input.interval };
         let config = readJson(configPath);

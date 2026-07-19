@@ -226,9 +226,9 @@ Gitを使う各操作は、次の集合を混ぜずに扱う。
 
 ### filesystem対象
 
-- **write target**: 最終要素が未作成でも、最深の既存ancestorから許可rootまでを実体として評価する。外向きsymlinkがあれば作成前に拒否する。
+- **write target**: 現在ユーザーが確認して開いているworking root内の対象。最終要素が未作成でも、最深の既存ancestorから許可rootまでを実体として評価し、外向きsymlinkがあれば作成前に拒否する。
 - **delete target**: 通常ファイル／通常ディレクトリ／symlinkを区別する。symlinkはlink objectが許可root内であることを確認し、参照先を辿らずlinkだけを削除する。
-- **external target**: symlink参照先、別repo、許可root外の実体。読取りを含め明示された範囲を超えて変更しない。
+- **external target**: 現在のworking rootから見たsymlink参照先と許可root外の実体。別repoは秘書workspaceから扱う間はexternal targetだが、別repo開発PJとして確認され、そのrepo自身をworking rootとして開いた開発作業ではrepo内がwrite targetになる。読取りを含め明示された範囲を超えて変更しない。
 
 ### OAuth session状態
 

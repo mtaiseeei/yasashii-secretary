@@ -13,8 +13,9 @@ import {
   writeFileSync,
 } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { removeSafe, safeWritePath, workingRoot, writeFileAtomicSafe } from "./lib/safe-fs.mjs";
+import { runExternalSync } from "./lib/external-ops.mjs";
 
 const EXIT_USAGE = 2;
 const EXIT_REFUSED = 3;
@@ -103,14 +104,20 @@ function atomicJson(path, value) {
 }
 
 function run(binary, args, options = {}) {
-  return spawnSync(binary, args, {
-    cwd: options.cwd,
-    encoding: "utf8",
-    shell: false,
-    input: options.input,
-    env: options.env ?? process.env,
-    maxBuffer: 8 * 1024 * 1024,
-  });
+  try {
+    return runExternalSync(binary, args, {
+      cwd: options.cwd,
+      encoding: "utf8",
+      input: options.input,
+      env: options.env ?? process.env,
+      maxBuffer: 8 * 1024 * 1024,
+      timeoutMs: Number(options.timeout || process.env.YASASHII_CLI_TIMEOUT_MS || 30_000),
+      label: basename(binary),
+      allowFailure: true,
+    });
+  } catch (error) {
+    return { stdout: String(error.stdout || ""), stderr: String(error.stderr || error.message || ""), status: error.code === "timeout" ? 124 : 125, signal: error.signal || null, code: error.code };
+  }
 }
 
 function git(workspace, args, options = {}) {
@@ -119,10 +126,13 @@ function git(workspace, args, options = {}) {
 
 function safeWorkspace(value) {
   const candidate = resolve(value ?? ".");
-  if (!existsSync(candidate) || !lstatSync(candidate).isDirectory() || lstatSync(candidate).isSymbolicLink()) {
+  let workspace;
+  try {
+    // realpathで参照先をworkspaceとして採用する前に、入力pathの全componentを確認する。
+    workspace = workingRoot(candidate);
+  } catch {
     fail("workspaceを安全に読み取れないため、更新を開始しません。", EXIT_REFUSED);
   }
-  const workspace = realpathSync(candidate);
   const top = git(workspace, ["rev-parse", "--show-toplevel"]);
   if (top.status !== 0 || resolve(top.stdout.trim()) !== workspace) {
     fail("workspace rootのGitリポジトリで実行してください。更新は開始していません。", EXIT_REFUSED);
@@ -151,7 +161,9 @@ function safeManagedFile(workspace, rel, { allowMissing = false } = {}) {
   if (!ALLOWED_MANAGED_PATHS.has(rel) || rel.startsWith("/") || rel.split(/[\\/]/).some((part) => !part || part === "." || part === "..")) {
     fail("許可されていない管理対象が含まれるため、更新を止めました。", EXIT_REFUSED);
   }
-  const target = resolve(workspace, rel);
+  let target;
+  try { target = safeWritePath(workspace, rel); }
+  catch { fail("symlink経由またはworkspace外への変更を拒否しました。", EXIT_REFUSED); }
   const relToRoot = relative(workspace, target);
   if (!relToRoot || relToRoot === ".." || relToRoot.startsWith(`..${sep}`)) fail("workspace外への変更を拒否しました。", EXIT_REFUSED);
   let cursor = workspace;
@@ -543,7 +555,7 @@ function resume(args) {
     if (sha256Buffer(body) !== item.beforeHash) fail("dry-run後に対象ファイルが変わったため、本実行せず停止しました。", EXIT_REFUSED);
     if (SECRET_PATTERN.test(body)) fail("資格情報らしき内容を検出したため、migrationを止めました。", EXIT_REFUSED);
     const asset = readFileSync(operation.assetPath, "utf8").trimEnd();
-    writeFileSync(target, `${body.trimEnd()}\n\n${asset}\n`, "utf8");
+    writeFileAtomicSafe(workspace, target, `${body.trimEnd()}\n\n${asset}\n`, { encoding: "utf8" });
     session.migration.changedPaths = [...new Set([...session.migration.changedPaths, item.path])];
     session.phase = "migration-partial";
     atomicJson(statePath, session);
@@ -595,7 +607,7 @@ function updateLedger(workspace, session, plan) {
   if (records.length === 0) return;
   const directory = dirname(ledger.path);
   if (existsSync(directory) && lstatSync(directory).isSymbolicLink()) fail("台帳の保存先がsymlinkのため停止しました。", EXIT_FAILED);
-  atomicJson(ledger.path, records.sort((left, right) => left.path.localeCompare(right.path)));
+  writeFileAtomicSafe(workspace, ledger.path, `${JSON.stringify(records.sort((left, right) => left.path.localeCompare(right.path)), null, 2)}\n`, { encoding: "utf8" });
 }
 
 function verifyUpdate(workspace, pluginRoot, session, plan, args) {
@@ -635,16 +647,17 @@ function verifyUpdate(workspace, pluginRoot, session, plan, args) {
 }
 
 function restoreFromCommit(workspace, commit, rel) {
-  const target = rel === LEDGER_PATH ? resolve(workspace, rel) : safeManagedFile(workspace, rel, { allowMissing: true });
+  let target;
+  try { target = rel === LEDGER_PATH ? safeWritePath(workspace, rel) : safeManagedFile(workspace, rel, { allowMissing: true }); }
+  catch { fail("復元対象のsymlink境界を確認できないため停止しました。", EXIT_FAILED); }
   const existsAtCommit = git(workspace, ["cat-file", "-e", `${commit}:${rel}`]);
   if (existsAtCommit.status === 0) {
     const content = git(workspace, ["show", `${commit}:${rel}`]);
     if (content.status !== 0) fail("保護commitからworkspaceを復元できませんでした。", EXIT_FAILED);
-    mkdirSync(dirname(target), { recursive: true });
-    writeFileSync(target, content.stdout, "utf8");
+    writeFileAtomicSafe(workspace, target, content.stdout, { encoding: "utf8" });
   } else if (existsSync(target)) {
     if (lstatSync(target).isSymbolicLink() || !lstatSync(target).isFile()) fail("安全に削除できない復元対象があります。", EXIT_FAILED);
-    rmSync(target);
+    removeSafe(workspace, target);
   }
 }
 

@@ -1,18 +1,19 @@
 #!/usr/bin/env node
 
 import { execFileSync } from "node:child_process";
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { createGoogleChatClient } from "../plugins/yasashii-secretary/skills/google-chat/scripts/client.mjs";
 import { applyGoogleChatConfig } from "../plugins/yasashii-secretary/skills/google-chat/scripts/config-transaction.mjs";
 
 const roots = [];
+const testTmp = realpathSync(tmpdir());
 let passed = 0;
 let failed = 0;
 
 function temp(prefix) {
-  const root = mkdtempSync(join(tmpdir(), prefix));
+  const root = mkdtempSync(join(testTmp, prefix));
   roots.push(root);
   return root;
 }

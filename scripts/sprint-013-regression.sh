@@ -2,7 +2,8 @@
 set -uo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 PLUGIN="$REPO/plugins/yasashii-secretary"
-WORK="$(mktemp -d "${TMPDIR:-/tmp}/yasashii-s013-regression.XXXXXX")"
+WORK_PARENT="$(cd "${TMPDIR:-/tmp}" && pwd -P)"
+WORK="$(mktemp -d "$WORK_PARENT/yasashii-s013-regression.XXXXXX")"
 PASS=0; FAIL=0
 trap 'rm -rf "$WORK"' EXIT
 check(){ local label="$1"; shift; if "$@"; then printf 'PASS %s\n' "$label"; PASS=$((PASS+1)); else printf 'FAIL %s\n' "$label"; FAIL=$((FAIL+1)); fi; }

@@ -4,15 +4,12 @@ import { createHash } from "node:crypto";
 import {
   existsSync,
   lstatSync,
-  mkdirSync,
   readFileSync,
   realpathSync,
-  renameSync,
-  rmSync,
-  writeFileSync,
 } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { safeWritePath, workingRoot, writeFileAtomicSafe } from "./lib/safe-fs.mjs";
 
 const EXIT_USAGE = 2;
 const EXIT_REFUSED = 3;
@@ -70,12 +67,8 @@ function isManagedPath(value) {
 }
 
 function safeWorkspaceRoot(value) {
-  const candidate = resolve(value);
-  if (!existsSync(candidate) || !lstatSync(candidate).isDirectory()) {
-    fail(`workspaceが見つかりません: ${value}`, EXIT_REFUSED);
-  }
-  if (lstatSync(candidate).isSymbolicLink()) fail("workspaceがsymlinkのため台帳を作成しません。", EXIT_REFUSED);
-  return realpathSync(candidate);
+  try { return workingRoot(value); }
+  catch { fail(`workspaceを安全に確認できません: ${value}`, EXIT_REFUSED); }
 }
 
 function safeFile(root, rel) {
@@ -151,7 +144,7 @@ function initialize(args) {
     fail("initには --workspace、--plugin-root、1件以上の --managed-path が必要です。");
   }
   const workspace = safeWorkspaceRoot(workspaceValue);
-  const ledger = resolve(workspace, LEDGER_PATH);
+  const ledger = safeWritePath(workspace, LEDGER_PATH);
   if (existsSync(ledger)) fail("既存の最小台帳は上書きしません。", EXIT_REFUSED);
   const ledgerDirectory = dirname(ledger);
   if (existsSync(ledgerDirectory) && (lstatSync(ledgerDirectory).isSymbolicLink() || !lstatSync(ledgerDirectory).isDirectory())) {
@@ -173,15 +166,9 @@ function initialize(args) {
     templateVariables,
   }));
 
-  mkdirSync(ledgerDirectory, { recursive: true });
-  const temporary = `${ledger}.tmp-${process.pid}`;
   try {
-    writeFileSync(temporary, `${JSON.stringify(records, null, 2)}\n`, { encoding: "utf8", flag: "wx" });
-    renameSync(temporary, ledger);
+    writeFileAtomicSafe(workspace, ledger, `${JSON.stringify(records, null, 2)}\n`, { encoding: "utf8" });
   } catch {
-    if (existsSync(temporary)) {
-      try { rmSync(temporary); } catch { /* 次回の上書きを避ける一時名であり、利用者の本文は含まない */ }
-    }
     fail("最小台帳を安全に作成できませんでした。既存workspaceの診断では作り直しません。", EXIT_REFUSED);
   }
   process.stdout.write(`新規導入の最小台帳を作成しました: ${LEDGER_PATH}（管理対象${records.length}件）\n`);

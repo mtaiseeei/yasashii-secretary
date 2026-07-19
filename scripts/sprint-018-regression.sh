@@ -129,7 +129,7 @@ def cli(command, workspace, current=None, env=None, extra=None):
     return run(args, cwd=workspace, env=fixture_env)
 
 with tempfile.TemporaryDirectory(prefix="sprint018-") as temp:
-    root = Path(temp)
+    root = Path(temp).resolve()
     log = root / "claude.log"
     mock = root / "claude-fixture"
     mock.write_text("""#!/usr/bin/env python3
@@ -326,7 +326,7 @@ raise SystemExit(0)
     check("検証失敗後もworkspace rollback", rolled.returncode == 0 and snapshot(verify_fail) == before_files)
 
     source = apply_cli.read_text()
-    check("任意shell文字列と破壊的resetを使わない", "shell: false" in source and 'git(workspace, ["reset"' not in source and 'git(workspace, ["push"' not in source)
+    check("任意shell文字列と破壊的resetを使わない", ("shell: false" in source or "runExternalSync" in source) and "shell: true" not in source and 'git(workspace, ["reset"' not in source and 'git(workspace, ["push"' not in source)
     check("push/remote変更の実行経路0", not any(line.startswith("push") or " remote " in f" {line} " for line in log.read_text().splitlines()))
     new_plugin_files = [apply_cli, plugin / "skills/update/SKILL.md"] + list((plugin / "migrations").rglob("*"))
     leaked = [path for path in new_plugin_files if path.is_file() and "Google" + " Chat" in path.read_text()]

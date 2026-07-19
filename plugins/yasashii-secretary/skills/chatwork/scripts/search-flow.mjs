@@ -1,11 +1,9 @@
 #!/usr/bin/env node
 
-import { execFile } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { promisify } from "node:util";
+import { runExternal } from "../../../scripts/lib/external-ops.mjs";
 
-const exec = promisify(execFile);
 const args = new Map();
 for (let i = 2; i < process.argv.length; i += 2) {
   if (!process.argv[i]?.startsWith("--") || process.argv[i + 1] === undefined) {
@@ -41,7 +39,7 @@ function classify(error) {
 }
 
 async function run(binary, argv, runTimeout = 60_000) {
-  return exec(binary, argv, { cwd: root, timeout: runTimeout, maxBuffer: 2 * 1024 * 1024 });
+  return runExternal(binary, argv, { cwd: root, timeoutMs: runTimeout, maxBuffer: 2 * 1024 * 1024, label: binary });
 }
 
 async function pull(stage) {

@@ -9,7 +9,9 @@
 #
 # 提供関数:
 #   _realpath <path>          実解決先の物理絶対パスを返す（symlink 完全解決）
+#   _safe_working_root <base> baseまでの入力pathにsymlink componentがないか確認する
 #   _safe_path <base> <rel>   base 配下に rel の実解決先が収まる安全な絶対パスを返す
+#   _safe_delete_path <base> <rel> 最終symlinkを辿らず、link objectの安全な絶対パスを返す
 #     rel は base（＝秘書ディレクトリ）からの相対パス（例: memory/preferences.md / docs/.../x.md / inbox/todo.md）。
 #     返り値: 0=安全（実解決パスを出力） / 1=範囲外・不正 rel / 2=base が実在しない / 4=base 自身が symlink（基点 symlink）
 #
@@ -34,6 +36,47 @@ _realpath() {
   printf '%s/%s' "$d" "$b"
 }
 
+# macOSのOS標準alias。mktemp等が /var を返す一方、実体は /private/var にある。
+# 任意のsymlinkは許可せず、root直下のこの既知の対応だけを通す。
+_platform_root_alias() {
+  local path="$1" target
+  target="$(readlink "$path" 2>/dev/null)" || return 1
+  case "$path:$target" in
+    /var:private/var|/var:/private/var|/tmp:private/tmp|/tmp:/private/tmp) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# baseをpwd -P等で参照先へ解決する前に、入力pathの各componentを検査する。
+# 最終要素だけでなく、例えば /safe/link/nested の link も先に拒否する。
+# 相対pathの場合は論理cwd（pwd -L）からのcomponentも同じように確認する。
+_safe_working_root() {
+  local requested="$1" candidate cursor part
+  local -a components
+  case "$requested" in
+    /*) candidate="$requested" ;;
+    *) candidate="$(pwd -L 2>/dev/null)/$requested" || return 2 ;;
+  esac
+  cursor="/"
+  IFS='/' read -r -a components <<< "$candidate"
+  for part in "${components[@]}"; do
+    case "$part" in
+      ""|.) continue ;;
+      ..)
+        cursor="$(dirname "$cursor")" || return 2
+        ;;
+      *)
+        if [ "$cursor" = "/" ]; then cursor="/$part"; else cursor="$cursor/$part"; fi
+        if [ -L "$cursor" ]; then
+          _platform_root_alias "$cursor" || return 4
+        fi
+        ;;
+    esac
+  done
+  [ -d "$candidate" ] || return 2
+  return 0
+}
+
 # base（秘書ディレクトリ）配下に rel の実解決先が収まる安全な絶対パスを標準出力に返す。
 _safe_path() {
   base="$1"; rel="$2"
@@ -46,7 +89,8 @@ _safe_path() {
     */../*) return 1 ;;
   esac
   case "$(basename "$rel")" in .|..) return 1 ;; esac
-  # 3) 基点（base）自身が symlink なら拒否（H1: 基点 symlink 抜けを塞ぐ）
+  # 3) baseを物理path化する前に、baseまでの途中componentを含めてsymlinkを拒否する。
+  _safe_working_root "$base" || return $?
   [ -L "$base" ] && return 4
   [ -d "$base" ] || return 2
   baseabs="$(cd "$base" 2>/dev/null && pwd -P)" || return 2
@@ -70,4 +114,28 @@ _safe_path() {
   esac
   printf '%s' "$real"
   return 0
+}
+
+# 削除専用。途中ancestorは通常どおり実体境界を確認するが、最終要素がsymlinkなら
+# 参照先を辿らずlink object自体を返す。呼び出し側は通常file／directory／symlinkを
+# 区別し、symlinkには再帰削除を使わない。
+_safe_delete_path() {
+  base="$1"; rel="$2"
+  case "$rel" in ""|.|..) return 1 ;; esac
+  case "/$rel/" in */../*) return 1 ;; esac
+  case "$(basename "$rel")" in .|..) return 1 ;; esac
+  _safe_working_root "$base" || return $?
+  [ -L "$base" ] && return 4
+  [ -d "$base" ] || return 2
+  baseabs="$(cd "$base" 2>/dev/null && pwd -P)" || return 2
+  parentrel="$(dirname "$rel")"
+  if [ "$parentrel" = "." ]; then
+    parent="$baseabs"
+  else
+    parent="$(_safe_path "$base" "$parentrel")" || return $?
+  fi
+  [ -d "$parent" ] || return 1
+  target="$parent/$(basename "$rel")"
+  case "$target/" in "$baseabs"/*) : ;; *) return 1 ;; esac
+  printf '%s' "$target"
 }

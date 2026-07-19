@@ -1,3 +1,5 @@
+import { fetchWithTimeout } from "./runtime-safety.mjs";
+
 const CHAT_API = "https://chat.googleapis.com/v1";
 const PEOPLE_API = "https://people.googleapis.com/v1";
 
@@ -25,13 +27,18 @@ function classifyApiFailure(response, detail = "") {
   return Object.assign(new Error("Google Chat APIから取得できませんでした。"), { code: "api-failed" });
 }
 
-export function createGoogleChatClient({ accessToken, fetchImpl = fetch, chatBase = CHAT_API, peopleBase = PEOPLE_API }) {
+export function createGoogleChatClient({ accessToken, fetchImpl = fetch, chatBase = CHAT_API, peopleBase = PEOPLE_API, timeoutMs = Number(process.env.YASASHII_HTTP_TIMEOUT_MS || 15_000) }) {
   const request = async (url) => {
     let response;
-    try { response = await fetchImpl(url, { headers: { authorization: `Bearer ${accessToken}` } }); }
-    catch { throw Object.assign(new Error("Google Chat APIへ接続できません。ネットワークを確認してください。"), { code: "network" }); }
+    try { response = await fetchWithTimeout(url, { headers: { authorization: `Bearer ${accessToken}` } }, { timeoutMs, label: "Google Chat API", fetchImpl }); }
+    catch (error) {
+      if (error?.code === "timeout") throw error;
+      throw Object.assign(new Error("Google Chat APIへ接続できません。ネットワークを確認してください。"), { code: "network" });
+    }
     if (!response.ok) {
-      const detail = await response.text().catch(() => "");
+      let detail = "";
+      try { detail = await response.text(); }
+      catch (error) { if (error?.code === "timeout") throw error; }
       throw classifyApiFailure(response, detail);
     }
     return response.json();

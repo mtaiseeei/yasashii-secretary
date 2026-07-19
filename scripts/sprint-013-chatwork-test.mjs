@@ -2,7 +2,7 @@
 
 import { execFile } from "node:child_process";
 import { createServer } from "node:http";
-import { cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
@@ -13,7 +13,7 @@ const template = join(repo, "plugins", "yasashii-secretary", "workspace-template
 const syncScript = join(template, "chatwork", "scripts", "chatwork-sync.mjs");
 const searchScript = join(repo, "plugins", "yasashii-secretary", "skills", "chatwork", "scripts", "search.mjs");
 const wizardScript = join(repo, "plugins", "yasashii-secretary", "skills", "chatwork", "scripts", "wizard-server.mjs");
-const work = mkdtempSync(join(tmpdir(), "yasashii-s013-"));
+const work = mkdtempSync(join(realpathSync(tmpdir()), "yasashii-s013-"));
 const tokenMarker = ["runtime", "chatwork", String(process.pid), String(Date.now())].join("-");
 let failures = 0;
 

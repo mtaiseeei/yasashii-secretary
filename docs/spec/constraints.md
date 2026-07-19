@@ -227,7 +227,7 @@
    - commit前scannerはこの通常フローを代替する安全境界ではなく、合理的な誤混入を止めるdefense-in-depthである。万能secret detectorまたは任意言語の完全parserと表示しない。
    - `${{ secrets.NAME }}`、定義済みの環境変数参照等の製品が生成する正規のruntime参照は許可する。通常文書と合理的な非機密metadataを、文字列がtoken風であるという理由だけで拒否しない。
    - 利用者がローカル／private repoの任意のJS／TS／shell／JSONを意図的に特殊構文・難読化・computed／escaped key・偽placeholderへ改変してscannerを回避するケースの完全検出は非ゴールとする。この非ゴールは、製品管理対象と通常フローの非露出保証を緩めない。
-5. 書込み・作成・移動は、既存／未作成を問わず対象までの実体境界を副作用前に確認し、許可root外を指すsymlinkを拒否する。symlink自体の削除は参照先へ追従せずlinkだけを対象にし、参照先本体を削除・変更しない。
+5. 書込み・作成・移動の許可境界は、現在ユーザーが確認して開いているworking rootごとに定める。既存／未作成を問わず対象までの実体境界を副作用前に確認し、秘書workspaceから外部repoを指すsymlink越しの書込みを拒否する。別repo開発PJを確認後、そのrepo自身をworking rootとして開いた場合はrepo内の正常な書込みを許可する。symlink自体の削除は参照先へ追従せずlinkだけを対象にし、参照先本体を削除・変更しない。
 6. `git`、`gh`、`claude`、`gcloud`等の外部CLIと外部HTTPは、有限のtimeoutと明確な失敗状態を持つ。timeout後にcommit、push、pull、検索、削除、成功表示へ進まず、子process・待機sessionを残さない。
 7. loopback wizardは `127.0.0.1`／localhostのloopback以外へbindしない。状態変更requestは同じsessionの正しいorigin、正しいContent-Type、推測困難なsession確認値を必須とし、cross-origin、確認値なし／不一致、JSON以外の送信を副作用0件で拒否する。状態変更をGETで行わない。
 8. OAuth callbackは1つの認証sessionで一度だけ処理する。再送、同時再入、完了後の再アクセスでtoken交換、Repository Secret登録、初回取得を重複させない。callbackとsession確認値をURL、ログ、DOM、証跡へ残さない。

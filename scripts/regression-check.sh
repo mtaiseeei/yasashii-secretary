@@ -445,10 +445,11 @@ ln -s "$WORK/outside/real.txt" "$DEST/memory/evil_link.md"
 printf 'HACKED\n' | bash "$TOOLS" guarded-write "$DEST" "evil_link.md" >/dev/null 2>&1
 check "symlink（最終要素）越えの書き込みは拒否（exit 3）" "[ $? -eq 3 ]"
 check "symlink 越え後も外部の実ファイルが不変" "[ \"\$(cat '$WORK/outside/real.txt')\" = 'EXTERNAL-ORIGINAL' ]"
-# (e) 最終要素 symlink への削除も拒否（外部の実体を消さない）
+# (e) 最終要素 symlink はリンクだけ削除する（外部の実体を消さない）
 bash "$TOOLS" delete "$DEST" "evil_link.md" --confirm >/dev/null 2>&1
-check "symlink（最終要素）越えの削除は拒否（exit 3）" "[ $? -eq 3 ]"
-check "symlink 越え削除後も外部の実ファイルが残る" "[ -f '$WORK/outside/real.txt' ]"
+check "symlink（最終要素）の確認つき削除は成功する" "[ $? -eq 0 ]"
+check "symlink（最終要素）の削除はリンクだけを除去する" "[ ! -L '$DEST/memory/evil_link.md' ]"
+check "symlink 削除後も外部の実ファイルが残る" "[ -f '$WORK/outside/real.txt' ]"
 # (f) 中間ディレクトリが外向き symlink → 書き込みが外へ届かない
 ln -s "$WORK/outside" "$DEST/memory/evil_dir"
 printf 'HACKED\n' | bash "$TOOLS" guarded-write "$DEST" "evil_dir/real.txt" >/dev/null 2>&1
@@ -1077,7 +1078,18 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-section "28. Harness v0.4.2 runtime移行"
+section "28. symlink境界と有限時間の外部処理（sprint-022）"
+# ---------------------------------------------------------------------------
+SPRINT022_REGRESSION="$REPO/scripts/sprint-022-regression.sh"
+check "sprint-022回帰が存在し実行可能" "[ -x '$SPRINT022_REGRESSION' ]"
+if bash "$SPRINT022_REGRESSION"; then
+  ok "sprint-022 symlink境界・安全な削除・CLI／HTTP timeoutが全て成功"
+else
+  ng "sprint-022回帰に失敗"
+fi
+
+# ---------------------------------------------------------------------------
+section "29. Harness v0.4.2 runtime移行"
 # ---------------------------------------------------------------------------
 HARNESS_CONFIG="$REPO/.harness/config.toml"
 HARNESS_IGNORE="$REPO/.harness/.gitignore"

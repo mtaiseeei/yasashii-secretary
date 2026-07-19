@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { basename, resolve } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import { fileURLToPath } from "node:url";
+import { runExternalSync } from "../../../scripts/lib/external-ops.mjs";
 
 export const REQUIRED_APIS = Object.freeze(["chat.googleapis.com", "people.googleapis.com"]);
 export const MANUAL_STEPS = Object.freeze([
@@ -43,9 +43,16 @@ function parseJson(result) {
 
 export function systemRunner(command, args, options = {}) {
   try {
-    return { stdout: execFileSync(command, args, { cwd: options.cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }), stderr: "", status: 0 };
+    return runExternalSync(command, args, {
+      cwd: options.cwd,
+      encoding: "utf8",
+      timeoutMs: Number(options.timeout || process.env.YASASHII_CLI_TIMEOUT_MS || 30_000),
+      label: command,
+      allowFailure: true,
+    });
   } catch (error) {
-    return { stdout: String(error.stdout || ""), stderr: String(error.stderr || ""), status: Number(error.status || 1) };
+    const timedOut = error?.code === "timeout";
+    return { stdout: String(error.stdout || ""), stderr: timedOut ? "timeout" : String(error.stderr || ""), status: timedOut ? 124 : Number(error.status || 1) };
   }
 }
 

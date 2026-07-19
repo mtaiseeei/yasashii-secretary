@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 
-import { execFileSync } from "node:child_process";
 import {
   cpSync,
   existsSync,
-  mkdirSync,
+  lstatSync,
   readdirSync,
   realpathSync,
 } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { commitOwnedChanges, inspectWorkingCandidates, pushOwnedCommit } from "./lib/safe-git.mjs";
+import { runExternalSync } from "./lib/external-ops.mjs";
+import { ensureSafeDirectory, safeWritePath, workingRoot } from "./lib/safe-fs.mjs";
 
 const EXIT_USAGE = 2;
 const EXIT_CONFIRM = 3;
@@ -37,16 +38,20 @@ function parseArgs(argv) {
 
 function run(binary, args, cwd, options = {}) {
   try {
-    return execFileSync(binary, args, {
+    return runExternalSync(binary, args, {
       cwd,
       encoding: "utf8",
-      stdio: options.quiet ? ["ignore", "pipe", "pipe"] : ["ignore", "pipe", "pipe"],
       env: { ...process.env, ...(options.env || {}) },
-    }).trim();
+      timeoutMs: Number(options.timeout || process.env.YASASHII_CLI_TIMEOUT_MS || 30_000),
+      label: basename(binary),
+    }).stdout.trim();
   } catch (error) {
-    if (options.allowFailure) return null;
+    const timedOut = error?.code === "timeout";
+    if (options.allowFailure && !timedOut && error?.code !== "max-buffer") return null;
     const detail = String(error.stderr || "").trim();
-    fail(options.message || detail || `${basename(binary)} の実行に失敗しました。`, options.code || 1);
+    fail(timedOut
+      ? `${basename(binary)} の処理が時間切れになりました。後続処理は行っていません。`
+      : options.message || detail || `${basename(binary)} の実行に失敗しました。`, options.code || 1);
   }
 }
 
@@ -54,6 +59,7 @@ function collectTemplateEntries(source, current = "") {
   const absolute = join(source, current);
   const entries = [];
   for (const item of readdirSync(absolute, { withFileTypes: true })) {
+    if (item.isSymbolicLink()) fail(`templateにsymlinkがあるため準備を止めました: ${join(current, item.name)}`, EXIT_CONFIRM);
     const child = join(current, item.name);
     entries.push({ relativePath: child, directory: item.isDirectory() });
     if (item.isDirectory()) entries.push(...collectTemplateEntries(source, child));
@@ -63,8 +69,10 @@ function collectTemplateEntries(source, current = "") {
 
 function prepareWorkspace(root, templates) {
   const source = realpathSync(templates);
-  const destination = realpathSync(root);
+  const destination = workingRoot(root);
   const entries = collectTemplateEntries(source);
+  // すべての書込み先を先に確認する。1件でも境界外ならdirectoryを部分生成しない。
+  const targets = new Map(entries.map((entry) => [entry.relativePath, safeWritePath(destination, entry.relativePath)]));
   const conflicts = entries
     .filter(({ relativePath }) => existsSync(join(destination, relativePath)))
     .map(({ relativePath }) => relativePath);
@@ -72,10 +80,12 @@ function prepareWorkspace(root, templates) {
     fail(`既存ファイルと重なるため変更しません: ${conflicts.slice(0, 5).join(", ")}`, EXIT_CONFIRM);
   }
   for (const entry of entries.filter((item) => item.directory)) {
-    mkdirSync(join(destination, entry.relativePath), { recursive: true });
+    ensureSafeDirectory(destination, targets.get(entry.relativePath));
   }
   for (const entry of entries.filter((item) => !item.directory)) {
-    cpSync(join(source, entry.relativePath), join(destination, entry.relativePath), {
+    const sourcePath = join(source, entry.relativePath);
+    if (!lstatSync(sourcePath).isFile()) fail(`templateの通常fileではないため準備を止めました: ${entry.relativePath}`, EXIT_CONFIRM);
+    cpSync(sourcePath, targets.get(entry.relativePath), {
       errorOnExist: true,
       force: false,
     });
@@ -108,7 +118,7 @@ function verifyExistingRemote(root, ghBinary) {
 function publishWorkspace(args) {
   const rootValue = args.values.get("--root");
   if (!rootValue) fail("--root を指定してください。");
-  const root = realpathSync(rootValue);
+  const root = workingRoot(rootValue);
   if (args.values.get("--visibility") && args.values.get("--visibility") !== "private") {
     fail("public repoは選べません。--visibility private を指定してください。", EXIT_CONFIRM);
   }

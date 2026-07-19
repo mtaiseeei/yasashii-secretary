@@ -1,5 +1,6 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { safeWritePath, workingRoot, writeFileAtomicSafe } from "./runtime-safety.mjs";
 
 function partsInTokyo(value) {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -77,7 +78,7 @@ function existingBlocks(source) {
 }
 
 export function writeSpaceHistory({ root, space, messages }) {
-  const rootPath = resolve(root);
+  const rootPath = workingRoot(root);
   const byDate = new Map();
   for (const message of messages) {
     const date = tokyoDate(message.createTime);
@@ -87,14 +88,13 @@ export function writeSpaceHistory({ root, space, messages }) {
   const files = [];
   for (const [date, dayMessages] of byDate) {
     const directory = join(rootPath, "google-chat", "history", `${safeSegment(space.displayName)}--${safeSegment(space.name.split("/").pop())}`);
-    const path = join(directory, `${date}.md`);
+    const path = safeWritePath(rootPath, join(directory, `${date}.md`));
     let previous = "";
     try { previous = readFileSync(path, "utf8"); } catch { /* 新規 */ }
     const blocks = existingBlocks(previous);
     for (const message of dayMessages) blocks.set(message.name, { created: message.createTime, body: messageBlock(message) });
     const content = [...blocks.values()].sort((a, b) => a.created.localeCompare(b.created)).map((item) => item.body).join("\n\n---\n\n");
-    mkdirSync(dirname(path), { recursive: true });
-    writeFileSync(path, `# ${space.displayName} - ${date}\n\n- source: Google Chat\n- space: \`${space.name}\`\n- timezone: Asia/Tokyo\n\n${content}\n`, { mode: 0o600 });
+    writeFileAtomicSafe(rootPath, path, `# ${space.displayName} - ${date}\n\n- source: Google Chat\n- space: \`${space.name}\`\n- timezone: Asia/Tokyo\n\n${content}\n`, { mode: 0o600 });
     files.push(path);
   }
   return files;

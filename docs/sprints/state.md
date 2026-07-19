@@ -2,11 +2,11 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-022
+- Current ID: sprint-023
 - Retry Count: 0
 - Model Tier: strong
 - Rotate: none
-- Next Planned: sprint-023
+- Next Planned: sprint-024
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
      ユーザー確認で単段クレジットに正本改訂、回帰assert強化のうえ合格）。
@@ -44,7 +44,7 @@
 | sprint-020-patch-001 | done | [contract](sprint-020-patch-001.md) | [progress](../progress/sprint-020-patch-001.md) | [feedback](../feedback/sprint-020-patch-001.md) |
 | sprint-020-patch-002 | done | [contract](sprint-020-patch-002.md) | [progress](../progress/sprint-020-patch-002.md) | [feedback](../feedback/sprint-020-patch-002.md) |
 | sprint-021 | done | [contract](sprint-021.md) | [progress](../progress/sprint-021.md) | [feedback](../feedback/sprint-021.md) |
-| sprint-022 | planned | [contract](sprint-022.md) | - | - |
+| sprint-022 | done | [contract](sprint-022.md) | [progress](../progress/sprint-022.md) | [feedback](../feedback/sprint-022.md) |
 | sprint-023 | planned | [contract](sprint-023.md) | - | - |
 | sprint-024 | planned | [contract](sprint-024.md) | - | - |
 | sprint-025 | planned | [contract](sprint-025.md) | - | - |
@@ -122,5 +122,12 @@
 - 2026-07-19: fresh Plannerがsecret安全性の保証境界を7つの正本へ反映。通常wizardのmemory→Repository Secret直接登録、通常フロー非露出、製品管理対象／初回publish inventoryの合理的な誤混入拒否、正規runtime参照／通常文書／合理的metadataの誤拒否0件を合格条件とした。意図的な特殊構文・難読化・computed／escaped key・偽placeholderの完全検出は非ゴール。新仕様の実装サイクルとしてRetry Countを0へ戻し、high risk／strong tierを維持してfresh Generatorへ引き渡す。
 - 2026-07-19: Generatorがscannerの過剰なmetadata定型文解析・文字種／長さheuristicと非ゴール敵対回帰を整理し、実装・test合計追加行を307行から155行へ縮小。専用71/71、wrapper 8/8、関連suite、隔離clone offline 327/327・online 328/328が0 FAIL。PlannerがChatworkは本人のGitHub Secret画面直接入力、Google Chatはwizard memory→gh stdin直接登録へ仕様を再整合し、fresh Generatorが現コード一致・追加変更不要を確認。未commit差分のままfresh Evaluatorへ引き渡す。
 - 2026-07-19: sprint-021は改訂保証境界でfresh独立Evaluator合格。受入12/12、Rubric 59/60、独立16/16、専用71/71、wrapper 8/8、関連suite全0 FAIL、master offline 327/327・online 328/328。通常フローsecret露出0、外部書込み0、評価資産残存0。sprint-021をdone、Retry Countを0、Current IDをsprint-022、Next Plannedをsprint-023へ進める。Model Tier strongは次Generatorのresolver判断まで保持する。
+- 2026-07-19: sprint-022 Plannerが外部repo境界を明確化。秘書workspace内のsymlink越し書込みは拒否する一方、ユーザー確認済みの開発repoをそのrepo自身のworking rootとして開いた通常開発は許可する。high risk／strong tierを維持し、fresh Generatorへ引き渡す。
+- 2026-07-19: sprint-022 Generatorがsymlink境界、link-only削除、CLI／HTTP timeout、process cleanupを実装。専用37/37、wrapper 8/8、隔離cloneのoffline 330/330・online 331/331が0 FAILのため、fresh独立Evaluatorへ引き渡す。
+- 2026-07-19: sprint-022初回評価はimplementation-issueで不合格。提供suite 37/37・wrapper 8/8は合格したが、独立fixtureでworking root入力の途中ancestorが外向きsymlinkの場合に外部書込みが成立し、AC1・AC10、C5・C12を未達。Retry Countを1とし、high risk／strong tierを維持したfresh Generatorへ差し戻す。
+- 2026-07-19: sprint-022 Retry 1 Generatorが途中component symlink、process tree cleanup、maxBuffer、HTTP body timeout、caller abort、production callsiteのtimeout処理を修正。専用63/63、wrapper 8/8、隔離clone offline 330/330・online 331/331が0 FAILのため、fresh独立Evaluatorへ再引き渡す。
+- 2026-07-19: sprint-022 Retry 1のSol/high fresh Evaluatorはimplementation-issueで不合格。Node共通guardは改善したが、Shell `path-guard.sh`の途中symlink rootで外部書込み／確認済み削除が進み、`update-apply.mjs`も途中symlink先の外部Git repoをworkspaceとして受理した。Retry Countを2とし、high risk／strong tierを維持したfresh Generatorへ限定差し戻し。
+- 2026-07-19: sprint-022 Retry 2のSol/high fresh GeneratorがShellと更新入口の途中symlink root検査を限定修正。専用69/69、wrapper 8/8、Sprint 018 41/41、隔離clone offline 330/330・online 331/331が0 FAIL。commit・push・実外部service書込み0件でfresh独立Evaluatorへ引き渡す。
+- 2026-07-19: sprint-022 Retry 2はSol/high fresh Evaluatorで製品判定PASS。専用69/69、wrapper 8/8、独立fixture 30/30、Sprint 018 41/41が0 FAIL。Shell書込み／確認済み削除とupdate-applyは途中symlink rootを副作用0で拒否し、外部sentinel・Git状態・session・link不変を確認。評価操作で禁止evidence配下のファイル名列挙が1件発生したが、内容読取・変更0件で製品合否と分離記録。sprint-022をdone、Current IDをsprint-023、Retry Countを0へ更新。
 - 2026-07-18: sprint-021 Generatorが一時indexによる所有path限定commit、stage後のsecret再検査、候補差替え拒否、push失敗時の既存index保護を初回publish／Chatwork／Google Chat／memory commitへ実装。専用31件、wrapper 8件、全offline 327件、全online 328件が0 FAIL、実外部サービス変更0件のため独立Evaluatorへ引き渡した。
 - 2026-07-18: sprint-021 Retry 1でcredential key正規化、OAuth callback code検査、安全文書の誤拒否解消、memory所有path限定、upstreamなし初回pushの履歴基点確認を実装。独立fixture相当を製品suiteへ取り込み、専用45件、wrapper 8件、全offline 327件と関連suiteが0 FAILのためfresh独立Evaluatorへ再引き渡した。

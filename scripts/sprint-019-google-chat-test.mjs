@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { execFileSync, spawn } from "node:child_process";
-import { mkdtempSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,14 +11,15 @@ import { searchGoogleChat } from "../plugins/yasashii-secretary/skills/google-ch
 import { cleanupDescription } from "../plugins/yasashii-secretary/skills/google-chat/assets/wizard/cleanup.mjs";
 
 const repo = resolve(fileURLToPath(new URL("..", import.meta.url)));
+const testTmp = realpathSync(tmpdir());
 const fixturePath = join(repo, "scripts", "fixtures", "google-chat-wizard", "google-chat.json");
 const fixture = JSON.parse(readFileSync(fixturePath, "utf8"));
 let passed = 0;
 let failed = 0;
 function check(name, condition) { if (condition) { passed += 1; process.stdout.write(`  PASS ${name}\n`); } else { failed += 1; process.stdout.write(`  FAIL ${name}\n`); } }
-function temp(name) { const root = mkdtempSync(join(tmpdir(), `yasashii-s019-${name}-`)); execFileSync("git", ["init", "-q", "-b", "main"], { cwd: root }); writeFileSync(join(root, "README.md"), "fixture\n"); execFileSync("git", ["add", "README.md"], { cwd: root }); execFileSync("git", ["-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid", "commit", "-qm", "fixture"], { cwd: root }); execFileSync("git", ["remote", "add", "origin", `https://github.com/fixture/${name}.git`], { cwd: root }); return root; }
+function temp(name) { const root = mkdtempSync(join(testTmp, `yasashii-s019-${name}-`)); execFileSync("git", ["init", "-q", "-b", "main"], { cwd: root }); writeFileSync(join(root, "README.md"), "fixture\n"); execFileSync("git", ["add", "README.md"], { cwd: root }); execFileSync("git", ["-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid", "commit", "-qm", "fixture"], { cwd: root }); execFileSync("git", ["remote", "add", "origin", `https://github.com/fixture/${name}.git`], { cwd: root }); return root; }
 function localGitWorkspace(name) {
-  const base = mkdtempSync(join(tmpdir(), `yasashii-s019-git-${name}-`));
+  const base = mkdtempSync(join(testTmp, `yasashii-s019-git-${name}-`));
   const remote = join(base, "remote.git");
   const root = join(base, "workspace");
   mkdirSync(root);
@@ -150,7 +151,7 @@ for (const cleanupCase of [
   cleanupServer.child.kill("SIGTERM");
 }
 
-const zeroFixturePath = join(mkdtempSync(join(tmpdir(), "yasashii-s019-zero-space-")), "zero.json");
+const zeroFixturePath = join(mkdtempSync(join(testTmp, "yasashii-s019-zero-space-")), "zero.json");
 writeFileSync(zeroFixturePath, `${JSON.stringify({ spaces: fixture.spaces.filter((space) => space.spaceType !== "SPACE"), messagePages: {}, people: {} }, null, 2)}\n`);
 const zeroSpaceServer = await startServer({ YASASHII_GOOGLE_CHAT_FIXTURE: zeroFixturePath, YASASHII_GOOGLE_CHAT_GRANT_REVOKE_FAILURE: "1" });
 await api(zeroSpaceServer.base, "api/oauth/synthetic", { mode: "success" });
@@ -168,7 +169,7 @@ normalUiServer.child.kill("SIGTERM");
 
 async function runGitSync({ name, selectedSpace, data }) {
   const workspace = localGitWorkspace(name);
-  const dataRoot = mkdtempSync(join(tmpdir(), `yasashii-s019-fixture-${name}-`));
+  const dataRoot = mkdtempSync(join(testTmp, `yasashii-s019-fixture-${name}-`));
   const dataPath = join(dataRoot, "fixture.json");
   writeFileSync(dataPath, `${JSON.stringify(data, null, 2)}\n`);
   const testServer = await startServer({ YASASHII_GOOGLE_CHAT_SKIP_GIT: "0", YASASHII_GOOGLE_CHAT_FIXTURE: dataPath }, { root: workspace.root });
@@ -211,7 +212,7 @@ check("初回保存後に自動設定だけ失敗した場合を全体成功に�
 partialServer.child.kill("SIGTERM");
 
 const wizardServerSource = readFileSync(join(repo, "plugins", "yasashii-secretary", "skills", "google-chat", "scripts", "wizard-server.mjs"), "utf8");
-check("Repository Secret値はghのstdinへ渡しハイフン文字を登録しない", wizardServerSource.includes('["secret", "set", name]') && wizardServerSource.includes("child.stdin.end(value)") && !wizardServerSource.includes('["secret", "set", name, "--body", "-"]'));
+check("Repository Secret値はghのstdinへ渡しハイフン文字を登録しない", wizardServerSource.includes('["secret", "set", name]') && (wizardServerSource.includes("child.stdin.end(value)") || (wizardServerSource.includes("runExternal") && wizardServerSource.includes("input: value"))) && !wizardServerSource.includes('["secret", "set", name, "--body", "-"]'));
 
 const common = readFileSync(join(repo, "plugins", "yasashii-secretary", "skills", "chatwork", "assets", "wizard", "common.js"), "utf8");
 const css = readFileSync(join(repo, "plugins", "yasashii-secretary", "skills", "chatwork", "assets", "wizard", "style.css"), "utf8");

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { runExternalSync } from "../../../scripts/lib/external-ops.mjs";
 
 function files(root) {
   if (!existsSync(root)) return [];
@@ -13,8 +13,16 @@ function files(root) {
 export function searchGoogleChat({ root, query, space = "", sender = "", from = "", to = "", skipPull = false }) {
   root = resolve(root);
   if (!skipPull) {
-    try { execFileSync(process.env.YASASHII_GIT_BIN || "git", ["pull", "--ff-only"], { cwd: root, stdio: "ignore" }); }
-    catch { return { status: "pull-failed", message: "最新のGit状態を取り込めませんでした。保存済み履歴は変更していません。" }; }
+    try {
+      runExternalSync(process.env.YASASHII_GIT_BIN || "git", ["pull", "--ff-only"], {
+        cwd: root,
+        timeoutMs: Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000),
+        label: "git pull",
+      });
+    } catch (error) {
+      if (error?.code === "timeout") return { status: "sync-failed", code: "timeout", message: "Gitの取り込みが時間切れになりました。保存済み履歴は変更していません。" };
+      return { status: "pull-failed", message: "最新のGit状態を取り込めませんでした。保存済み履歴は変更していません。" };
+    }
   }
   const matches = [];
   for (const path of files(join(root, "google-chat", "history"))) {

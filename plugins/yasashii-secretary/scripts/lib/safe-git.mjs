@@ -1,7 +1,7 @@
-import { execFileSync } from "node:child_process";
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, posix, relative, resolve, sep } from "node:path";
+import { runExternalSync } from "./external-ops.mjs";
 
 const MAX_INSPECTABLE_BYTES = 5 * 1024 * 1024;
 
@@ -15,16 +15,20 @@ export class GitSafetyError extends Error {
 
 function git(root, args, { env = {}, allowFailure = false, encoding = "utf8" } = {}) {
   try {
-    return execFileSync(process.env.YASASHII_GIT_BIN || "git", args, {
+    return runExternalSync(process.env.YASASHII_GIT_BIN || "git", args, {
       cwd: root,
       encoding,
-      stdio: ["ignore", "pipe", "pipe"],
       env: { ...process.env, ...env },
       maxBuffer: 16 * 1024 * 1024,
-    });
+      timeoutMs: Number(process.env.YASASHII_GIT_TIMEOUT_MS || 30_000),
+      label: "Git",
+    }).stdout;
   } catch (error) {
-    if (allowFailure) return null;
-    const wrapped = new GitSafetyError("git-failed", "Gitの安全なcommit処理に失敗しました。");
+    const timeout = error?.code === "timeout";
+    if (allowFailure && !timeout && error?.code !== "max-buffer") return null;
+    const wrapped = new GitSafetyError(timeout ? "timeout" : "git-failed", timeout
+      ? "Gitの処理が時間切れになりました。commit・push等の後続処理は行っていません。"
+      : "Gitの安全なcommit処理に失敗しました。");
     wrapped.cause = error;
     throw wrapped;
   }

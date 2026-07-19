@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { execFileSync, spawnSync } from "node:child_process";
-import { chmodSync, cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,7 +10,7 @@ import { applyGoogleChatConfig } from "../plugins/yasashii-secretary/skills/goog
 import { commitOwnedChanges, inspectWorkingCandidates, pushOwnedCommit, stagedSnapshot } from "../plugins/yasashii-secretary/scripts/lib/safe-git.mjs";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const work = mkdtempSync(join(tmpdir(), "yasashii-sprint-021-"));
+const work = mkdtempSync(join(realpathSync(tmpdir()), "yasashii-sprint-021-"));
 let pass = 0;
 let fail = 0;
 const emitted = [];
