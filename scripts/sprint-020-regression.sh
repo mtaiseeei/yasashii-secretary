@@ -31,7 +31,7 @@ else
   FAIL=$((FAIL+1)); printf '  FAIL Google Chat独立評価3件の敵対的回帰\n'
 fi
 
-if find "$REPO" -path '*/.github/workflows/google-chat-sync.yml' -o -path '*/google-chat/config.json' -o -path '*/google-chat/state/sync.json' -o -path '*/google-chat/history/*.md' | grep -q .; then
+if [ -e "$REPO/.github/workflows/google-chat-sync.yml" ] || [ -e "$REPO/google-chat" ]; then
   FAIL=$((FAIL+1)); printf '  FAIL public配布repoの利用者用Google Chat資産0\n'
 else
   PASS=$((PASS+1)); printf '  PASS public配布repoの利用者用Google Chat資産0\n'

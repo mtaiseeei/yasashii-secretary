@@ -11,7 +11,10 @@ export function cleanupDescription(cleanup, { networkFailure = false } = {}) {
     technical: "Repository Secretを削除し、Google OAuth grant／tokenを取り消しました。",
   };
   const missing = [];
-  if (!cleanup.secretsDeleted) missing.push("GitHubリポジトリの Settings → Secrets and variables → Actions");
-  if (!cleanup.grantRevoked) missing.push("Googleのアプリ権限ページ");
-  return { kind: "manual", text: "接続情報の一部を自動で消せませんでした。管理者に確認を依頼してください。", technical: `${missing.join(" と ")}を手動で確認してください。` };
+  if (!cleanup.secretsDeleted) {
+    const names = (cleanup.remainingSecretNames || []).join("、") || "Google Chat用Repository Secret";
+    missing.push(`GitHubのRepository Secret（${names}）`);
+  }
+  if (!cleanup.grantRevoked) missing.push("GoogleのOAuth grant／token");
+  return { kind: "manual", retryable: cleanup.retryable === true, text: "接続情報の一部を自動で消せませんでした。後始末をもう一度お試しください。", technical: `${missing.join(" と ")}が残っています。再試行しても完了しない場合は、上記の残っている対象だけを手動で削除してください。` };
 }

@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
+import { fetchWithTimeout } from "../../../scripts/lib/external-ops.mjs";
 
 export const GOOGLE_CHAT_SCOPES = Object.freeze([
   "https://www.googleapis.com/auth/chat.spaces.readonly",
@@ -84,8 +85,8 @@ export function validateCallback({ expectedState, expectedOrigin, requestUrl }) 
   return code;
 }
 
-export async function exchangeAuthorizationCode({ tokenUri, clientId, clientSecret, redirectUri, code, verifier, fetchImpl = fetch }) {
-  const response = await fetchImpl(tokenUri, {
+export async function exchangeAuthorizationCode({ tokenUri, clientId, clientSecret, redirectUri, code, verifier, fetchImpl = fetch, timeoutMs = Number(process.env.YASASHII_HTTP_TIMEOUT_MS || 15_000) }) {
+  const response = await fetchWithTimeout(tokenUri, {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -96,8 +97,10 @@ export async function exchangeAuthorizationCode({ tokenUri, clientId, clientSecr
       code,
       code_verifier: verifier,
     }),
-  });
-  const tokens = await response.json().catch(() => ({}));
+  }, { timeoutMs, label: "Google OAuth", fetchImpl });
+  let tokens = {};
+  try { tokens = await response.json(); }
+  catch (error) { if (error?.code === "timeout") throw error; }
   if (!response.ok) {
     const source = `${tokens.error || ""} ${tokens.error_description || ""}`.toLowerCase();
     if (source.includes("admin_policy_enforced") || source.includes("access_blocked")) {
@@ -121,11 +124,22 @@ export async function exchangeAuthorizationCode({ tokenUri, clientId, clientSecr
 }
 
 export function publicOAuthState(session) {
-  return {
+  const result = {
     status: session.status,
     code: session.errorCode || null,
     message: session.message || "",
     scopes: GOOGLE_CHAT_SCOPES,
     secretNames: session.status === "connected" ? GOOGLE_CHAT_SECRET_NAMES : [],
   };
+  if (session.cleanup) result.cleanup = {
+    hadConnection: session.cleanup.hadConnection === true,
+    secretsDeleted: session.cleanup.secretsDeleted === true,
+    grantRevoked: session.cleanup.grantRevoked === true,
+    remainingSecretNames: [...(session.cleanup.remainingSecretNames || [])],
+    oauthGrantRemaining: session.cleanup.oauthGrantRemaining === true,
+    manualCheckRequired: session.cleanup.manualCheckRequired === true,
+    retryable: session.cleanup.retryable === true,
+  };
+  if (session.managerChecklist) result.managerChecklist = { scopes: [...(session.managerChecklist.scopes || [])] };
+  return result;
 }

@@ -1,27 +1,23 @@
 #!/usr/bin/env node
 
-import { execFile } from "node:child_process";
-import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { promisify } from "node:util";
+import { commitOwnedChanges, pushOwnedCommit, restoreOwnedCommit } from "../../../scripts/lib/safe-git.mjs";
+import { removeSafe, workingRoot, writeFileAtomicSafe } from "../../../scripts/lib/safe-fs.mjs";
+import { runExternal } from "../../../scripts/lib/external-ops.mjs";
 import { INTERVALS, renderWorkflow } from "./schedule.mjs";
 
-const exec = promisify(execFile);
-
-function writeAtomic(path, content) {
-  mkdirSync(dirname(path), { recursive: true });
-  const temporary = `${path}.tmp-${process.pid}`;
-  writeFileSync(temporary, content, { mode: 0o600 });
-  renameSync(temporary, path);
+function writeAtomic(root, path, content) {
+  writeFileAtomicSafe(root, path, content, { mode: 0o600 });
 }
 
 function readOptional(path) {
   try { return readFileSync(path, "utf8"); } catch { return null; }
 }
 
-async function run(binary, args, root, timeout = 30_000) {
-  return exec(binary, args, { cwd: root, timeout, maxBuffer: 1024 * 1024 });
+async function run(binary, args, root, timeout = Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000)) {
+  return runExternal(binary, args, { cwd: root, timeoutMs: timeout, maxBuffer: 1024 * 1024, label: binary });
 }
 
 function classify(error) {
@@ -32,7 +28,7 @@ function classify(error) {
 }
 
 export async function applyChatworkConfig({ root, selectedRoomIds, interval, automaticPushConsent }) {
-  root = resolve(root);
+  root = workingRoot(root);
   const selected = [...new Set((selectedRoomIds || []).map(String))];
   if (selected.length === 0) throw Object.assign(new Error("ルームを1つ以上選んでください。"), { code: "room-required" });
   if (selected.some((id) => !/^\d+$/.test(id))) throw Object.assign(new Error("ルームIDの形式が不正です。"), { code: "room-invalid" });
@@ -81,26 +77,23 @@ export async function applyChatworkConfig({ root, selectedRoomIds, interval, aut
       scheduleEnabled,
       automaticPushConsent: scheduleEnabled && automaticPushConsent === true,
     };
-    writeAtomic(configPath, `${JSON.stringify(config, null, 2)}\n`);
-    writeAtomic(workflowPath, renderWorkflow(interval, scheduleEnabled));
+    writeAtomic(root, configPath, `${JSON.stringify(config, null, 2)}\n`);
+    writeAtomic(root, workflowPath, renderWorkflow(interval, scheduleEnabled));
     if (process.env.YASASHII_CHATWORK_SKIP_GIT === "1") return { status: "saved", config };
-    await run(git, ["add", "--", ...relativePaths], root);
-    await run(git, ["commit", "-m", "Chatworkのルームと自動取得の間隔を変更"], root);
-    newHead = (await run(git, ["rev-parse", "HEAD"], root)).stdout.trim();
-    await run(git, ["push"], root, 60_000);
+    const committed = commitOwnedChanges({ root, ownedPaths: relativePaths, message: "Chatworkのルームと自動取得の間隔を変更" });
+    if (committed.status !== "committed") throw Object.assign(new Error("Chatwork設定にcommitする変更がありません。"), { code: "no-change" });
+    newHead = committed.newHead;
+    pushOwnedCommit({ root, oldHead: committed.oldHead, newHead });
     return { status: "pushed", config, commit: newHead };
   } catch (error) {
     if (newHead && oldHead) {
-      try { await run(git, ["update-ref", "HEAD", oldHead, newHead], root); } catch { /* 次のrestoreで整合を試す */ }
+      try { restoreOwnedCommit({ root, oldHead, newHead, ownedPaths: relativePaths }); } catch { /* snapshot復元を続ける */ }
     }
     for (const [path, content] of snapshots) {
-      if (content === null) rmSync(path, { force: true });
-      else writeAtomic(path, content);
+      if (content === null) removeSafe(root, path);
+      else writeAtomic(root, path, content);
     }
-    if (oldHead && process.env.YASASHII_CHATWORK_SKIP_GIT !== "1") {
-      try { await run(git, ["restore", "--source", oldHead, "--staged", "--worktree", "--", ...relativePaths], root); } catch { /* 元内容は上で復元済み */ }
-    }
-    if (error.code === "dirty-config") throw error;
+    if (["dirty-config", "secret-detected", "inspection-failed", "candidate-changed", "commit-scope", "git-conflict", "push-base-changed", "push-failed", "filesystem-boundary", "symlink-boundary", "working-root-unsafe", "target-changed", "timeout"].includes(error.code)) throw error;
     const detail = classify(error);
     throw Object.assign(new Error(detail.message), { code: detail.code });
   }

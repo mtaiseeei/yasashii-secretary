@@ -299,12 +299,41 @@ Chatworkと同じ共通wizard骨格を使い、全画面の可視見出しとacc
 - plugin更新後にreload／restartが必要なら、理由と再開方法を示す。再開後はversion、migration、主要導線を検証してから成功を報告する。
 - 失敗時はpluginとworkspaceのどちらが変わったかを分け、直前commitと更新前versionを使うrollback手順を示す。pushは別操作として確認なしに行わない。
 
+## 0.7.0 配布前の操作体験
+
+### wizardのsessionとfocus
+
+- loopback wizardは、URLを知っているだけの別originから設定を変えられない。session確認値の入力を利用者へ求めず、正当な画面操作に自動的に付与する。
+- cross-origin、session不一致、Content-Type不一致は「設定画面を開き直してください」のように、何が起きたかと次の操作を示す。内部のsession値、OAuth state、callback URLは表示しない。
+- 画面遷移、非同期成功、失敗、キャンセル、再試行後は、新しい画面の見出しまたは主領域へfocusを移す。スクリーンリーダーには現在の画面名と結果が伝わり、keyboard利用者はTabを最初から巡回し直さなくてよい。
+- 検索欄への入力、checkbox／radioの選択、details開閉等、同じ画面内の再描画では現在の操作focusを保つ。毎回先頭へ戻して入力を妨げない。
+
+### 操作領域
+
+- primary／secondary button、外部link、detailsのsummary、checkbox／radioと対応labelは、desktop／mobile／200%で44px相当以上の操作領域を持つ。
+- 文字やアイコンだけを大きく見せてhit areaが小さい状態にしない。隣接操作の領域を重ねず、誤操作しにくい間隔を保つ。
+- keyboard focus、pointer、touchの全経路で同じ操作を完了できる。hoverだけで利用可能な操作を作らない。
+
+### 0.7.0更新とrollbackの説明
+
+- 更新前に「現在版0.6.0→最新版0.7.0」「workspaceの保護地点」「pluginの更新前版」「pushしないこと」を一画面で確認できる。
+- rollbackでは「workspaceを戻す」「pluginを0.6.0へ戻す」「両方を確認する」を順に示す。pluginを自動復元できない場合も、旧版、scope、実行する操作、確認結果までを具体的に案内し、問い合わせだけを次の一手にしない。
+- 一部だけ戻った場合は完了と表示せず、未復元対象を主表示に残す。
+
+### 配布前gateの表示
+
+- 配布・保守者向け結果は、`自動回帰`、`Git archive相当`、`Chatwork live`、`Google Chat live`、`後始末`を別項目で表示する。
+- 各項目は `未実施／実行中／合格／不合格／後始末が必要` を区別し、片方のチャットや過去runを全体合格に見せない。
+- 証跡表示はSecret名、伏せ字対象、run状態、件数、commit hash、検索状態に限り、token、OAuth URL、本文、発言者名を出さない。
+
 ## 非機能要件
 
 - macOS / Windowsで、ファイル構造と案内が破綻しない。
 - Chatwork／Google Chat wizardは主要desktop browserで動き、外部interfaceへbindしない。OAuth callbackもloopback以外へ公開しない。
+- Chatwork／Google Chat wizardの状態変更は同一session・同一origin・正しいContent-Typeだけを受け付け、OAuth callbackは同一sessionで一度だけ処理する。
 - `CC_SECRETARY_NOW` により日付依存の体験を固定して検証できる。
 - 中断後は `_resume.md`、翌日への申し送りはjournal `next` で役割を混ぜずに再開できる。
 - 破壊的操作、設定変更、記憶追加の確認規約を守る。
 - プロジェクト候補確認、一般PJ作成、フル昇格、別repo開発PJ接続は、確認前の副作用を0件にする。
 - すべてのユーザー向け出力は日本語。コマンド名・ファイル名・エラー名は原形を保つ。
+- 外部CLI・HTTPの待機は有限時間で終了し、timeout時は現在状態と再試行／中止の選択肢を示す。

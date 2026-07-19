@@ -320,20 +320,28 @@ case "$cmd" in
   delete)
     sec="${1:-}"; rel="${2:-}"; flag="${3:-}"
     [ -n "$sec" ] && [ -n "$rel" ] || die_usage "secretary と memory 相対パスを指定"
-    # 削除対象が secretary/ 配下（memory/ 内）に収まることを rm 実行前に確認（基点 symlink・トラバーサル拒否）
-    tgt="$(_safe_path "$sec" "memory/$rel")" || _guard_reject "$?" "memory/$rel"
-    [ -e "$tgt" ] || die_usage "見つかりません: memory/$rel"
+    # 途中ancestorは実体境界を確認し、最終symlinkは参照先を辿らずlink objectだけを対象にする。
+    tgt="$(_safe_delete_path "$sec" "memory/$rel")" || _guard_reject "$?" "memory/$rel"
+    [ -e "$tgt" ] || [ -L "$tgt" ] || die_usage "見つかりません: memory/$rel"
     if [ "$flag" != "--confirm" ]; then
       # 削除前警告（実行しない）
       echo "確認: これから消そうとしているのは次の記憶です。" >&2
       echo "  $rel" >&2
-      if [ -f "$tgt" ]; then
+      if [ -L "$tgt" ]; then
+        echo "  種類: symlink（参照先は削除しません）" >&2
+      elif [ -f "$tgt" ]; then
         echo "  中身の先頭: $(head -n 3 "$tgt" | tr '\n' ' ' | cut -c1-60)…" >&2
       fi
       echo "本当に消してよければ、確認のうえ --confirm を付けて実行します（消すと元に戻せません）。" >&2
       refuse "未確認のため削除しませんでした。"
     fi
-    rm -rf "$tgt"
+    if [ -L "$tgt" ]; then
+      rm -f -- "$tgt"
+    elif [ -d "$tgt" ]; then
+      rm -rf -- "$tgt"
+    else
+      rm -f -- "$tgt"
+    fi
     _reindex "$sec"
     echo "削除し、目次を更新しました: $rel"
     ;;
@@ -382,22 +390,33 @@ case "$cmd" in
     [ -n "$sec" ] || die_usage "secretary を指定"
     [ -n "${msg// /}" ] || die_usage "コミットメッセージ（日本語）を指定"
     [ -L "$sec" ] && refuse "秘書ディレクトリが symlink です。安全のため操作できません。"
-    git -C "$sec" rev-parse --is-inside-work-tree >/dev/null 2>&1 || die_usage "git 管理下ではありません: $sec"
-    # H3: 秘密情報を黙って履歴化しない。commit 前に秘密情報を検査し、見つかれば拒否する。
-    secret_content="$(grep -rlEi '(password|api[_-]?key|secret|token|client[_-]?secret)[[:space:]]*[:=][[:space:]]*[A-Za-z0-9_./+=-]{6,}' "$sec" --exclude-dir=.git 2>/dev/null || true)"
-    secret_files="$(find "$sec" -path "$sec/.git" -prune -o -type f \( -name '*.pem' -o -name '*.key' -o -name 'id_rsa' -o -name '.env' -o -iname '*credential*' -o -iname '*secret*' -o -iname '*token*' \) -print 2>/dev/null || true)"
-    if [ -n "${secret_content}${secret_files}" ]; then
-      echo "秘密情報らしきファイルが見つかりました。安全のためコミットしません:" >&2
-      printf '%s\n%s\n' "$secret_content" "$secret_files" | sed '/^$/d' | sed "s#^${sec}/#  #" | sort -u >&2
-      echo "トークン・パスワード・鍵ファイルは記録に含めない運用です。該当を取り除いてから、もう一度お試しください。" >&2
-      exit 3
-    fi
-    git -C "$sec" add -A
-    if git -C "$sec" diff --cached --quiet; then
+    safe_external="$_HERE/../../../scripts/safe-external.mjs"
+    git_bin="${YASASHII_GIT_BIN:-git}"
+    cli_timeout="${YASASHII_CLI_TIMEOUT_MS:-30000}"
+    node "$safe_external" --cwd "$sec" --label "Git" --timeout-ms "$cli_timeout" -- "$git_bin" rev-parse --is-inside-work-tree >/dev/null 2>&1 || die_usage "git 管理下ではありません: $sec"
+    repo_root="$(node "$safe_external" --cwd "$sec" --label "Git" --timeout-ms "$cli_timeout" -- "$git_bin" rev-parse --show-toplevel 2>/dev/null)" || die_usage "Git repo rootを確認できません: $sec"
+    sec_real="$(cd "$sec" && pwd -P)" || refuse "秘書ディレクトリを確認できません。"
+    repo_real="$(cd "$repo_root" && pwd -P)" || refuse "Git repo rootを確認できません。"
+    safe_commit="$_HERE/../../../scripts/safe-git-commit.mjs"
+    commit_args=(--root "$repo_real" --message "$msg")
+    case "$sec_real" in
+      "$repo_real")
+        # 旧形式のsecretary単体repoでも、memory操作が所有する領域だけを対象にする。
+        [ -e "$repo_real/memory" ] || die_usage "memoryフォルダが見つかりません: $sec"
+        commit_args+=(--path "memory")
+        ;;
+      "$repo_real"/*)
+        sec_rel="${sec_real#"$repo_real"/}"
+        [ -e "$repo_real/$sec_rel/memory" ] || die_usage "memoryフォルダが見つかりません: $sec"
+        commit_args+=(--path "$sec_rel/memory")
+        ;;
+      *) refuse "秘書ディレクトリがworkspace repoの内側にないためcommitしません。" ;;
+    esac
+    result="$(node "$safe_commit" "${commit_args[@]}")" || exit $?
+    if printf '%s' "$result" | grep -q '"status":"unchanged"'; then
       echo "変更がないためコミットしませんでした。"
       exit 0
     fi
-    git -C "$sec" commit -q -m "$msg"
     # push は決してしない（この関数は push もリモート追加も行わない）
     echo "作業の区切りを記録しました（ローカルのみ・インターネットには送っていません）。"
     ;;

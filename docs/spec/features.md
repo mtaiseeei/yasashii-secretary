@@ -1,6 +1,6 @@
 # Features
 
-機能IDと、ユーザーから見える振る舞いの正本。F01〜F16 は受け入れ済みの既存機能、F17〜F22 は 2026-07-15 方針転換、F23〜F27 は 2026-07-16 のsingle-repo Git-first + Chatwork方針、F28 は 2026-07-17 の一般プロジェクト管理方針、F29 は配布チャネルから独立した製品説明、F30〜F31 は更新の説明と実行を分ける安全な更新体験、F32〜F35 は各社所有Google Cloudプロジェクトを使うGoogle Chat同期である。
+機能IDと、ユーザーから見える振る舞いの正本。F01〜F16 は受け入れ済みの既存機能、F17〜F22 は 2026-07-15 方針転換、F23〜F27 は 2026-07-16 のsingle-repo Git-first + Chatwork方針、F28 は 2026-07-17 の一般プロジェクト管理方針、F29 は配布チャネルから独立した製品説明、F30〜F31 は更新の説明と実行を分ける安全な更新体験、F32〜F35 は各社所有Google Cloudプロジェクトを使うGoogle Chat同期、F36〜F43 は `0.7.0` 配布前監査の全指摘を閉じるrelease hardeningである。
 
 ## 既存機能（F01〜F16）
 
@@ -223,6 +223,71 @@
 - 再検索でも見つからない場合は、未選択スペース、組織の保持設定、APIが返さない履歴、キーワード差、編集・削除、認証・workflow失敗を区別する。
 - キャンセル、失敗、timeout、再認証待ちではrepo内容を壊さず、何が起きたかと次の選択肢を示す。
 
+## 0.7.0 配布前ハードニング（F36〜F43）
+
+### F36 secret検査とGit変更範囲の分離
+
+- Google ChatのOAuth実値はlocal wizard sessionのmemoryから `gh` のstdin経由で現在のprivate repoのRepository Secretへ直接登録し、利用者のコピー／貼り付けを求めない。
+- Chatwork API Tokenはwizardが自動取得・受領・登録しない。F24の既存導線どおり、利用者本人がChatwork公式画面で取得し、GitHubのRepository Secret画面へ `CHATWORK_API_TOKEN` として直接入力する。Tokenをwizard、AI会話、repo本文、ログ、製品側DOMへ入力・貼り付けさせない。
+- 両サービスともRepository Secretを正本とし、通常フローのrepo、Git差分・履歴、ログ、製品側DOM、会話へ実値を残さない。
+- 製品が生成・管理するworkflow／config／historyと初回publishは、commit候補の全inventoryを検査する。Google OAuth client JSON、client secret、refresh token、API Token、private key／秘密鍵、credential URL、known token field、通常のliteral assignment等の合理的な誤混入が1件でもあればcommit・push前に停止する。ファイル名だけ、特定の1サービスだけの検査で合格にしない。
+- `${{ secrets.NAME }}` 等の製品が生成する正規のruntime参照、通常文書、合理的な非機密metadataは許可し、誤拒否で通常利用を止めない。
+- commit前scannerは合理的な誤混入を止めるdefense-in-depthであり、万能secret detectorではない。利用者が任意のJS／TS／shell／JSONを意図的に特殊構文・難読化・computed／escaped key・偽placeholderへ改変したケースの完全検出は保証しない。
+- 初回publish、Chatwork設定、Google Chat設定、記憶の節目commit、更新は、それぞれが所有するpathだけをcommit対象にする。操作開始前からstageされていた変更、隣接する一般PJ、別サービス、repo rootの無関係ファイルを混ぜない。
+- 操作前のworking treeとindexの状態を保ち、自分の変更だけをcommitした後も既存stageを同じ内容・stage状態で残す。commit不能、競合、push失敗では対象変更だけを安全に戻し、第三者の変更をunstage・上書き・削除しない。
+- pushはその操作が作成し検証したcommitだけを対象にし、secret検査後に候補範囲が変わった場合は再検査する。
+
+### F37 symlink境界と有限時間の外部処理
+
+- Node／shellの書込み・作成・移動は、既存・未作成の最終要素を含む全ancestorを実体として確認し、許可root外を指すsymlinkがあれば副作用前に拒否する。
+- 秘書workspaceから別repoへ向くsymlink越しの書込みは拒否する。一方、ユーザーが別repo開発PJとして確認し、そのrepo自身をworking rootとして開いた開発作業では、そのrepo内の正常な書込みを妨げない。
+- 許可root内にあるsymlink自体を削除する操作は、参照先のファイル／ディレクトリを辿らずlinkだけを削除する。通常ファイル、通常ディレクトリ、symlinkを区別し、削除前の対象提示と明示確認を維持する。
+- secret、memory、project、成果物、更新、チャット設定の全書込み導線で同じ境界を守り、拒否時に外部・内部のどちらにも部分生成を残さない。
+- `git`、`gh`、`claude`、`gcloud`等の外部CLIと外部HTTPは、操作の種類に応じた有限時間で完了またはtimeoutする。timeoutは成功や空結果に読み替えず、後続commit・push・削除を進めない。
+
+### F38 OAuth callbackとloopback wizardのsession保護
+
+- OAuth callbackは1つの認証sessionで一度だけ受理し、同じcode／stateの再送、同時再入、完了後の再アクセスでtoken交換、Secret登録、履歴取得を重複しない。
+- callback処理中、成功済み、失敗済み、後始末待ちを区別する。OAuth grant／token取消やRepository Secret削除に失敗した場合は成功と表示せず、残っている対象と次の操作を示す。
+- Chatwork／Google Chatのloopback wizardはloopback interfaceだけへbindし、状態変更requestは同じsessionの正しいorigin、正しいContent-Type、推測困難なsession確認値を満たす場合だけ受け付ける。cross-origin、確認値なし／不一致、JSON以外の送信は副作用0件で拒否する。
+- GETは状態参照と静的配信だけにし、状態変更を起こさない。認証・session情報はログ、URL、DOM、評価証跡へ残さない。
+
+### F39 履歴markerとActions runの因果整合
+
+- Google Chat本文、発言者名、添付メタデータに履歴内部marker、Markdown見出し、HTML comment、区切り線と同じ文字列が含まれても、既存blockの境界として解釈せず本文として保持する。
+- 1件の悪意ある／偶発的な本文で、同日既存投稿、後続投稿、thread、添付メタデータが欠落・結合・上書きされない。再取得でもmessage resource name単位の冪等性を保つ。
+- Chatwork／Google Chatのworkflow dispatch後は、今回のdispatchより前のrun、別workflow／別branchのrun、作成時刻が欠落・不正なrunを候補にしない。今回開始したrunとの対応を確認できない場合はtimeoutまたは未確認として停止する。
+- 成功確認前のpull・検索・成功表示、失敗runを避けて別の古い成功runを採用する動作を0件にする。
+
+### F40 0.6.0から0.7.0への安全更新と完全復元
+
+- marketplace、plugin manifest、CHANGELOG、更新診断、最小台帳、migrationの最新版を `0.7.0`へ揃え、`0.6.0`利用者へ対象者、変わること、設定・ファイルへの影響、必要な操作、互換性上の注意を示す。
+- `0.6.0`からの更新は診断→明示確認→pushなし保護地点→dry-run→更新→検証の順を守る。カスタマイズ、記憶、一般PJ、チャット履歴・設定、secretを無確認で置換しない。
+- migrationは冪等で、同じ `0.6.0` workspaceへ再実行しても追加変更0件。途中失敗、reload前後、検証失敗を区別し、成功前に `0.7.0`適用済みと記録しない。
+- rollbackはworkspaceとpluginの両方を更新前状態へ戻す。pluginの自動復元が環境上不可能な場合も、正確な旧版、対象scope、確認方法を含むその場で実行可能な手順を示し、「保守者へ連絡」だけで終わらせない。
+
+### F41 配布validatorとportableなmaster回帰
+
+- Claude plugin／marketplaceの配布validatorは、必須author情報と `forkedFrom`を検査対象にし、欠落・不正・不一致を失敗にする。独自validatorだけが通りClaude側の配布条件を満たさない状態を合格にしない。
+- master offline suiteは受入済み機能の正本とし、少なくともSprint 015のプロジェクト境界とSprint 020 Patch 002のGoogle Cloud準備を実行する。子suiteの存在確認だけ、実行漏れ、失敗の握りつぶしを認めない。
+- master suiteはGit checkoutと、`.git`がないGit archive相当の配布物の両方で実行できる。Git履歴を検査する項目は、checkoutで必須の検査とarchiveで利用可能な配布物検査を区別して結果を示す。
+- release integrity、manifest、CHANGELOG、migration、配布チャネル非依存、MIT・単段クレジット、`forkedFrom`、authorを1つの配布前結果として確認できる。
+
+### F42 wizard accessibilityと公開説明の整合
+
+- Chatwork／Google Chat wizardは画面遷移、非同期成功、失敗、キャンセル後に、新しい画面の見出しまたは主領域へfocusを移し、現在地をkeyboard／支援技術で把握できる。入力中の再描画では入力focusを不必要に奪わない。
+- button、link、summary、checkbox／radioの主要操作領域はdesktop／mobile／200%で44px相当以上とし、見た目だけでなく実際のhit areaを確保する。
+- `.mcp.json`、onboarding、README、公開ガイドは、Microsoft／Notion対応、Google公式コネクタ、Chatwork／Google Chat同期、更新、`0.7.0`の現行機能と一致する。古い「後続対応予定」、古い版、古い導線を現行説明に残さない。
+- READMEの主導線は短く保ち、技術者向けの配布検査、live gate、復元情報は後半または公開ガイドへ分ける。文書整理で安全同意や正式名称を削らない。
+
+### F43 正式な0.7.0 release gate
+
+- release candidateはF36〜F42の専用回帰とmaster offline／online suiteが0 FAIL、Git archive相当の配布検査がPASSになるまでlive gateへ進まない。
+- live gateはユーザーが許可した1つの専用private test workspaceで、ChatworkのToken、Google Chatの組織所有Internal OAuth、両サービスのRepository Secret、選択した非機密room／spaceだけを使う。
+- ChatworkとGoogle Chatの接続、対象選択、初回取得、3時間schedule相当のActions、commit、push、pull後search found、同条件再実行の重複0件を、同じrelease candidateで確認する。片方だけ、過去run、合成fixtureをlive合格に数えない。
+- 証跡はprivate状態、版、Secret名、伏せ字対象、run ID／時刻／状態、件数、commit hash、push／pull、検索状態、重複0件だけとし、資格情報、OAuth URL、本文、発言者名を残さない。
+- 評価後は両サービスのschedule停止、全チャットSecret削除、room／space選択解除、Google OAuth grant／token取消を確認する。後始末が1つでも未完了なら `cleanup-required`で不合格とし、取得履歴やworkspaceの削除は別の明示確認なしに行わない。
+
 ## Gテーマと機能の対応
 
 | テーマ | 主な機能 |
@@ -236,3 +301,4 @@
 | G7 | F01 F02 F04 F10 F16 F29 |
 | G8 | F01 F02 F07 F10 F16 F20 F30 F31 |
 | G9 | F03 F07 F10 F16 F23 F32 F33 F34 F35 |
+| G10 | F01 F02 F04 F05 F07 F10 F16 F23 F24 F30 F31 F32 F33 F34 F35 F36 F37 F38 F39 F40 F41 F42 F43 |

@@ -49,7 +49,7 @@ result = run([sys.executable, str(integrity), "--root", str(repo)])
 check("現行manifestとCHANGELOGが一致", result.returncode == 0)
 
 with tempfile.TemporaryDirectory(prefix="sprint017-release-") as temp:
-    root = Path(temp)
+    root = Path(temp).resolve()
     (root / ".claude-plugin").mkdir(parents=True)
     (root / "plugins/yasashii-secretary/.claude-plugin").mkdir(parents=True)
     shutil.copy(repo / ".claude-plugin/marketplace.json", root / ".claude-plugin/marketplace.json")
@@ -74,7 +74,7 @@ with tempfile.TemporaryDirectory(prefix="sprint017-release-") as temp:
 
 print("== minimal ledger and diagnosis ==")
 with tempfile.TemporaryDirectory(prefix="sprint017-workspace-") as temp:
-    base = Path(temp)
+    base = Path(temp).resolve()
     workspace = base / "workspace"
     fake_plugin = base / "plugin"
     latest_manifest = base / "latest.json"

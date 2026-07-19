@@ -18,6 +18,7 @@ export function renderWorkflow(interval, enabled) {
   const schedule = cron ? ["  schedule:", `    - cron: '${cron}'`] : [];
   return [
     "name: Chatwork sync",
+    "run-name: Chatwork sync [${{ inputs.correlation_id || github.event_name }}]",
     "",
     "on:",
     ...schedule,
@@ -32,6 +33,10 @@ export function renderWorkflow(interval, enabled) {
     "          - discover",
     "          - initial",
     "          - sync",
+    "      correlation_id:",
+    "        description: 今回の開始操作とrunを対応づける識別子",
+    "        required: false",
+    "        type: string",
     "",
     "permissions:",
     "  contents: write",

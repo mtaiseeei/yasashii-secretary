@@ -1,18 +1,19 @@
 #!/usr/bin/env node
 
-import { execFile, execFileSync } from "node:child_process";
 import { createServer } from "node:http";
-import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { promisify } from "node:util";
 import { applyChatworkConfig } from "./config-transaction.mjs";
+import { dispatchCorrelatedWorkflow, watchCorrelatedWorkflow } from "../../../scripts/lib/actions-run.mjs";
+import { workingRoot, writeFileAtomicSafe } from "../../../scripts/lib/safe-fs.mjs";
+import { runExternal, runExternalSync } from "../../../scripts/lib/external-ops.mjs";
+import { createWizardSessionGuard } from "../../../scripts/lib/wizard-session.mjs";
 
-const exec = promisify(execFile);
 const INTERVALS = new Set(["30m", "1h", "3h", "6h", "12h", "manual"]);
 const args = new Map();
 for (let i = 2; i < process.argv.length; i += 2) args.set(process.argv[i], process.argv[i + 1]);
-const root = resolve(args.get("--root") || process.cwd());
+const root = workingRoot(args.get("--root") || process.cwd());
 const port = Number(args.get("--port") || 8765);
 const host = "127.0.0.1";
 const assets = resolve(dirname(fileURLToPath(import.meta.url)), "..", "assets", "wizard");
@@ -20,15 +21,24 @@ let dispatch = { status: "idle", operation: null, config: null, message: "" };
 let discovery = { status: "idle", message: "" };
 let discoveryConfirmed = false;
 
+function origin() {
+  const address = server.address();
+  return `http://${host}:${address.port}`;
+}
+
+const sessionGuard = createWizardSessionGuard({ origin, cookieName: "yasashii_chatwork_session" });
+const mutationPaths = new Set(["/api/discover", "/api/confirm"]);
+
 function githubRepository() {
   const git = process.env.YASASHII_GIT_BIN || "git";
   let remote;
   try {
-    remote = execFileSync(git, ["remote", "get-url", "origin"], {
+    remote = runExternalSync(git, ["remote", "get-url", "origin"], {
       cwd: root,
       encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-    }).trim();
+      timeoutMs: Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000),
+      label: "git remote確認",
+    }).stdout.trim();
   } catch {
     return null;
   }
@@ -52,9 +62,10 @@ function verifyPrivateRepo() {
   const git = process.env.YASASHII_GIT_BIN || "git";
   const gh = process.env.YASASHII_GH_BIN || "gh";
   try {
-    const gitRoot = execFileSync(git, ["rev-parse", "--show-toplevel"], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    const timeoutMs = Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000);
+    const gitRoot = runExternalSync(git, ["rev-parse", "--show-toplevel"], { cwd: root, encoding: "utf8", timeoutMs, label: "git root確認" }).stdout.trim();
     if (resolve(gitRoot) !== root) throw new Error("not-root");
-    const remote = JSON.parse(execFileSync(gh, ["repo", "view", "--json", "visibility"], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }));
+    const remote = JSON.parse(runExternalSync(gh, ["repo", "view", "--json", "visibility"], { cwd: root, encoding: "utf8", timeoutMs, label: "GitHub repo確認" }).stdout);
     if (String(remote.visibility).toUpperCase() !== "PRIVATE") throw new Error("not-private");
   } catch {
     process.stderr.write("private GitHub repoを確認できないためwizardを起動しません。repo rootとremoteを確認してください。\n");
@@ -67,9 +78,7 @@ function readJson(path, fallback) {
 }
 
 function writeJson(path, value) {
-  const temporary = `${path}.tmp-${process.pid}`;
-  writeFileSync(temporary, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 });
-  renameSync(temporary, path);
+  writeFileAtomicSafe(root, path, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 });
 }
 
 function send(response, status, body, type = "application/json; charset=utf-8") {
@@ -78,6 +87,7 @@ function send(response, status, body, type = "application/json; charset=utf-8") 
     "cache-control": "no-store",
     "x-content-type-options": "nosniff",
     "content-security-policy": "default-src 'self'; connect-src 'self'; img-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+    "set-cookie": sessionGuard.cookieHeader(),
   });
   if (Buffer.isBuffer(body) || typeof body === "string") {
     response.end(body);
@@ -96,7 +106,8 @@ async function bodyJson(request) {
     body += chunk;
     if (body.length > 64 * 1024) throw new Error("too-large");
   }
-  return JSON.parse(body || "{}");
+  try { return JSON.parse(body || "{}"); }
+  catch { throw Object.assign(new Error("設定内容のJSONを読み取れませんでした。"), { code: "invalid-json" }); }
 }
 
 async function runSync(mode, config) {
@@ -115,28 +126,38 @@ async function runSync(mode, config) {
     message: operation === "initial" ? "初回取得の自動取得処理（GitHub Actions）を開始しています。" : "設定変更後の自動取得処理（GitHub Actions）を開始しています。",
   };
   try {
-    await exec(gh, ["workflow", "run", "chatwork-sync.yml", "-f", `mode=${mode}`], { cwd: root, timeout: 30_000 });
-    dispatch = { status: "waiting", operation, config, message: "自動取得処理（GitHub Actions）の完了を待っています。" };
-    await new Promise((resolveWait) => setTimeout(resolveWait, 2500));
-    const listed = await exec(gh, ["run", "list", "--workflow", "chatwork-sync.yml", "--limit", "1", "--json", "databaseId"], { cwd: root, timeout: 30_000 });
-    const runs = JSON.parse(listed.stdout || "[]");
-    if (!runs[0]?.databaseId) throw new Error("run-not-found");
-    await exec(gh, ["run", "watch", String(runs[0].databaseId), "--exit-status"], { cwd: root, timeout: 5 * 60_000 });
-    await exec(process.env.YASASHII_GIT_BIN || "git", ["pull", "--ff-only"], { cwd: root, timeout: 60_000 });
+    const run = await dispatchCorrelatedWorkflow({
+      root,
+      workflowFile: "chatwork-sync.yml",
+      workflowName: "Chatwork sync",
+      inputs: { mode },
+      gh,
+      discoveryTimeoutMs: Number(process.env.YASASHII_RUN_DISCOVERY_TIMEOUT_MS || 5_000),
+      pollIntervalMs: Number(process.env.YASASHII_RUN_POLL_MS || 250),
+    });
+    const runSummary = { id: run.runId, workflow: run.workflowFile, branch: run.branch, createdAt: run.createdAt };
+    dispatch = { status: "waiting", operation, config, run: runSummary, message: "今回開始した自動取得処理（GitHub Actions）の完了を待っています。" };
+    await watchCorrelatedWorkflow({ root, run, gh, timeoutMs: 5 * 60_000 });
+    await runExternal(process.env.YASASHII_GIT_BIN || "git", ["pull", "--ff-only"], { cwd: root, timeoutMs: 60_000, label: "git pull" });
     dispatch = {
       status: "success",
       operation,
       config,
+      run: runSummary,
       message: operation === "initial" ? "初回取得が完了し、リポジトリへ反映しました。" : "設定変更後の同期が完了し、リポジトリへ反映しました。",
     };
-  } catch {
+  } catch (error) {
+    const unconfirmed = ["run-correlation-unconfirmed", "branch-unconfirmed", "run-list-invalid"].includes(error?.code);
     dispatch = {
       status: "failed",
       operation,
       config,
-      message: operation === "initial"
-        ? "初回取得を完了できませんでした。自動取得処理（GitHub Actions）の結果を確認して再実行してください。"
-        : "設定は変更しましたが、同期を完了できませんでした。自動取得処理（GitHub Actions）の結果を確認して再実行してください。",
+      run: error?.correlatedRun ? { id: error.correlatedRun.runId, workflow: error.correlatedRun.workflowFile, branch: error.correlatedRun.branch, createdAt: error.correlatedRun.createdAt } : null,
+      message: unconfirmed
+        ? "今回開始した自動取得処理（GitHub Actions）を確認できませんでした。古い成功結果は使わず停止しました。Actions画面で今回の実行を確認してから再実行してください。"
+        : operation === "initial"
+          ? "今回の初回取得が失敗しました。古い成功結果へ切り替えず停止しました。Actions画面で今回の実行を確認してから再実行してください。"
+          : "設定は変更しましたが、今回の同期が失敗しました。古い成功結果へ切り替えず停止しました。Actions画面で今回の実行を確認してから再実行してください。",
     };
   }
 }
@@ -152,26 +173,42 @@ async function discoverRooms() {
   }
   const gh = process.env.YASASHII_GH_BIN || "gh";
   try {
-    await exec(gh, ["workflow", "run", "chatwork-sync.yml", "-f", "mode=discover"], { cwd: root, timeout: 30_000 });
-    await new Promise((resolveWait) => setTimeout(resolveWait, 2500));
-    const listed = await exec(gh, ["run", "list", "--workflow", "chatwork-sync.yml", "--limit", "1", "--json", "databaseId"], { cwd: root, timeout: 30_000 });
-    const runs = JSON.parse(listed.stdout || "[]");
-    if (!runs[0]?.databaseId) throw new Error("run-not-found");
-    await exec(gh, ["run", "watch", String(runs[0].databaseId), "--exit-status"], { cwd: root, timeout: 5 * 60_000 });
-    await exec(process.env.YASASHII_GIT_BIN || "git", ["pull", "--ff-only"], { cwd: root, timeout: 60_000 });
+    const run = await dispatchCorrelatedWorkflow({
+      root,
+      workflowFile: "chatwork-sync.yml",
+      workflowName: "Chatwork sync",
+      inputs: { mode: "discover" },
+      gh,
+      discoveryTimeoutMs: Number(process.env.YASASHII_RUN_DISCOVERY_TIMEOUT_MS || 5_000),
+      pollIntervalMs: Number(process.env.YASASHII_RUN_POLL_MS || 250),
+    });
+    discovery = { status: "running", run: { id: run.runId, workflow: run.workflowFile, branch: run.branch, createdAt: run.createdAt }, message: "今回開始した自動取得処理（GitHub Actions）で参加中のルーム一覧を取得しています。" };
+    await watchCorrelatedWorkflow({ root, run, gh, timeoutMs: 5 * 60_000 });
+    await runExternal(process.env.YASASHII_GIT_BIN || "git", ["pull", "--ff-only"], { cwd: root, timeoutMs: 60_000, label: "git pull" });
     const rooms = readJson(join(root, "chatwork", "rooms.json"), { status: "not-discovered", rooms: [] });
     if (rooms.status !== "ready") throw new Error("rooms-not-ready");
-    discovery = { status: "success", message: "ルーム一覧を取得しました。" };
+    discovery = { status: "success", run: { id: run.runId, workflow: run.workflowFile, branch: run.branch, createdAt: run.createdAt }, message: "ルーム一覧を取得しました。" };
     discoveryConfirmed = true;
     return rooms;
-  } catch {
-    discovery = { status: "failed", message: "ルーム一覧を取得できませんでした。GitHub Actionsの結果とAPI Tokenの登録を確認してください。" };
-    throw Object.assign(new Error(discovery.message), { code: "discovery-failed" });
+  } catch (error) {
+    const unconfirmed = ["run-correlation-unconfirmed", "branch-unconfirmed", "run-list-invalid"].includes(error?.code);
+    discovery = {
+      status: "failed",
+      run: error?.correlatedRun ? { id: error.correlatedRun.runId, workflow: error.correlatedRun.workflowFile, branch: error.correlatedRun.branch, createdAt: error.correlatedRun.createdAt } : null,
+      message: unconfirmed
+        ? "今回開始したルーム一覧取得を確認できませんでした。古い成功結果は使わず停止しました。Actions画面で今回の実行を確認してから再実行してください。"
+        : "今回のルーム一覧取得が失敗しました。古い成功結果へ切り替えず停止しました。Actions画面の今回runとAPI Tokenの登録を確認してください。",
+    };
+    throw Object.assign(new Error(discovery.message), { code: unconfirmed ? "run-unconfirmed" : "discovery-failed" });
   }
 }
 
 const server = createServer(async (request, response) => {
-  const url = new URL(request.url || "/", `http://${host}`);
+  const url = new URL(request.url || "/", origin());
+  if (mutationPaths.has(url.pathname)) {
+    const rejected = sessionGuard.validateMutation(request);
+    if (rejected) return send(response, rejected.status, { error: rejected.message, code: rejected.code });
+  }
   if (request.method === "GET" && url.pathname === "/api/bootstrap") {
     const rooms = readJson(join(root, "chatwork", "rooms.json"), { status: "not-discovered", rooms: [] });
     const config = readJson(join(root, "chatwork", "config.json"), { selectedRoomIds: [], interval: "3h", scheduleEnabled: false });
@@ -179,10 +216,11 @@ const server = createServer(async (request, response) => {
   }
   if (request.method === "POST" && url.pathname === "/api/discover") {
     try {
+      await bodyJson(request);
       const rooms = await discoverRooms();
       return send(response, 200, { rooms, discovery });
     } catch (error) {
-      return send(response, error.code === "discovery-running" ? 409 : 502, { error: error.message, code: error.code || "discovery-failed", discovery });
+      return send(response, error.code === "invalid-json" ? 400 : error.code === "discovery-running" ? 409 : 502, { error: error.message, code: error.code || "discovery-failed", discovery });
     }
   }
   if (request.method === "GET" && url.pathname === "/api/status") {

@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
-import { execFile } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { promisify } from "node:util";
+import { dispatchCorrelatedWorkflow, watchCorrelatedWorkflow } from "../../../scripts/lib/actions-run.mjs";
+import { runExternal } from "../../../scripts/lib/external-ops.mjs";
 
-const exec = promisify(execFile);
 const args = new Map();
 for (let i = 2; i < process.argv.length; i += 2) {
   if (!process.argv[i]?.startsWith("--") || process.argv[i + 1] === undefined) {
@@ -19,6 +18,8 @@ const root = resolve(args.get("--root") || process.cwd());
 const query = (args.get("--query") || "").trim();
 const choice = args.get("--choice") || "ask";
 const timeout = Number(args.get("--timeout-ms") || 5 * 60_000);
+const runDiscoveryTimeout = Math.max(250, Math.min(timeout, Number(args.get("--run-discovery-timeout-ms") || 5_000)));
+const runPollInterval = Math.max(50, Number(args.get("--run-poll-ms") || 250));
 const git = process.env.YASASHII_GIT_BIN || "git";
 const gh = process.env.YASASHII_GH_BIN || "gh";
 const searchScript = resolve(dirname(fileURLToPath(import.meta.url)), "search.mjs");
@@ -30,7 +31,8 @@ function output(value) {
 
 function classify(error) {
   const text = `${error?.stdout || ""}\n${error?.stderr || ""}`.toLowerCase();
-  if (error?.killed || error?.code === "ETIMEDOUT" || /timed out|timeout/.test(text)) return { code: "timeout", message: "自動取得処理（GitHub Actions）の完了待ちが時間切れになりました。状態を確認してから再実行してください。" };
+  if (["run-correlation-unconfirmed", "branch-unconfirmed", "run-list-invalid"].includes(error?.code)) return { code: "run-unconfirmed", message: "今回開始した自動取得処理（GitHub Actions）を確認できませんでした。古い成功結果は使わず停止しました。Actions画面で今回の実行を確認してから再実行してください。" };
+  if (error?.killed || error?.code === "ETIMEDOUT" || /timed out|timeout/.test(text)) return { code: "timeout", message: "今回開始した自動取得処理（GitHub Actions）の完了待ちが時間切れになりました。Actions画面で今回の実行を確認してから再実行してください。" };
   if (/resource not accessible|permission|forbidden|403/.test(text)) return { code: "github-permission", message: "GitHub Actionsを実行する権限を確認できません。repoのActions権限を確認してください。" };
   if (/non-fast-forward|not possible to fast-forward|divergent|conflict/.test(text)) return { code: "git-conflict", message: "remoteとlocalの変更が競合したため停止しました。前回の履歴はそのまま検索できます。" };
   if (/失敗種別:\s*auth|api token/.test(text)) return { code: "auth", message: "Chatworkの認証に失敗しました。GitHub上の安全な保管場所（Repository Secret）を確認してください。前回の履歴はそのまま検索できます。" };
@@ -41,7 +43,7 @@ function classify(error) {
 }
 
 async function run(binary, argv, runTimeout = 60_000) {
-  return exec(binary, argv, { cwd: root, timeout: runTimeout, maxBuffer: 2 * 1024 * 1024 });
+  return runExternal(binary, argv, { cwd: root, timeoutMs: runTimeout, maxBuffer: 2 * 1024 * 1024, label: binary });
 }
 
 async function pull(stage) {
@@ -92,17 +94,23 @@ try {
   if (choice !== "sync") throw Object.assign(new Error("選択肢を確認できません。"), { code: "choice-invalid" });
 
   events.push("dispatch");
-  await run(gh, ["workflow", "run", "chatwork-sync.yml", "-f", "mode=sync"]);
+  const dispatchedRun = await dispatchCorrelatedWorkflow({
+    root,
+    workflowFile: "chatwork-sync.yml",
+    workflowName: "Chatwork sync",
+    inputs: { mode: "sync" },
+    gh,
+    git,
+    discoveryTimeoutMs: runDiscoveryTimeout,
+    pollIntervalMs: runPollInterval,
+  });
   events.push("wait");
-  const listed = await run(gh, ["run", "list", "--workflow", "chatwork-sync.yml", "--event", "workflow_dispatch", "--limit", "1", "--json", "databaseId,status,conclusion"]);
-  const runs = JSON.parse(listed.stdout || "[]");
-  if (!runs[0]?.databaseId) throw new Error("workflow run not found");
   try {
-    await run(gh, ["run", "watch", String(runs[0].databaseId), "--exit-status"], timeout);
+    await watchCorrelatedWorkflow({ root, run: dispatchedRun, gh, timeoutMs: timeout });
   } catch (watchError) {
     if (!watchError.killed && watchError.code !== "ETIMEDOUT") {
       try {
-        const logs = await run(gh, ["run", "view", String(runs[0].databaseId), "--log-failed"]);
+        const logs = await run(gh, ["run", "view", String(dispatchedRun.runId), "--log-failed"]);
         watchError.stderr = `${watchError.stderr || ""}\n${logs.stdout || ""}\n${logs.stderr || ""}`;
       } catch { /* 権限や通信失敗は元errorで分類する */ }
     }

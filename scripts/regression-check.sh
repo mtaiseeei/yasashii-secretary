@@ -445,10 +445,11 @@ ln -s "$WORK/outside/real.txt" "$DEST/memory/evil_link.md"
 printf 'HACKED\n' | bash "$TOOLS" guarded-write "$DEST" "evil_link.md" >/dev/null 2>&1
 check "symlink（最終要素）越えの書き込みは拒否（exit 3）" "[ $? -eq 3 ]"
 check "symlink 越え後も外部の実ファイルが不変" "[ \"\$(cat '$WORK/outside/real.txt')\" = 'EXTERNAL-ORIGINAL' ]"
-# (e) 最終要素 symlink への削除も拒否（外部の実体を消さない）
+# (e) 最終要素 symlink はリンクだけ削除する（外部の実体を消さない）
 bash "$TOOLS" delete "$DEST" "evil_link.md" --confirm >/dev/null 2>&1
-check "symlink（最終要素）越えの削除は拒否（exit 3）" "[ $? -eq 3 ]"
-check "symlink 越え削除後も外部の実ファイルが残る" "[ -f '$WORK/outside/real.txt' ]"
+check "symlink（最終要素）の確認つき削除は成功する" "[ $? -eq 0 ]"
+check "symlink（最終要素）の削除はリンクだけを除去する" "[ ! -L '$DEST/memory/evil_link.md' ]"
+check "symlink 削除後も外部の実ファイルが残る" "[ -f '$WORK/outside/real.txt' ]"
 # (f) 中間ディレクトリが外向き symlink → 書き込みが外へ届かない
 ln -s "$WORK/outside" "$DEST/memory/evil_dir"
 printf 'HACKED\n' | bash "$TOOLS" guarded-write "$DEST" "evil_dir/real.txt" >/dev/null 2>&1
@@ -657,12 +658,12 @@ check "H1: secretary 自体が symlink でも拒否（exit 3）" "[ $? -eq 3 ]"
 
 # --- H3: 秘密情報が黙って履歴化されない（commit が拒否し、履歴に入らない）---
 H3S="$WORK/h3/secretary"; mkdir -p "$WORK/h3"; mk_sec "$H3S"
-printf 'api_key = ABCDEF123456\n' > "$H3S/inbox/creds.txt"
+printf 'api_key = ABCDEF123456\n' > "$H3S/memory/creds.txt"
 bash "$TOOLS" commit "$H3S" "テストコミット" >/dev/null 2>&1
 check "H3: 秘密情報を含むと commit が拒否（exit≠0）" "[ $? -ne 0 ]"
 check "H3: 秘密ファイルが履歴に入っていない" "! git -C '$H3S' log --all --name-only --pretty=format: 2>/dev/null | grep -q 'creds.txt'"
-rm -f "$H3S/inbox/creds.txt"
-printf 'メモ\n' > "$H3S/inbox/note.md"
+rm -f "$H3S/memory/creds.txt"
+printf 'メモ\n' > "$H3S/memory/note.md"
 bash "$TOOLS" commit "$H3S" "正常な記憶を記録" >/dev/null 2>&1
 check "H3: 秘密が無ければ通常コミットは成功" "[ $? -eq 0 ] && git -C '$H3S' log -1 --name-only --pretty=format: | grep -q 'note.md'"
 
@@ -697,9 +698,9 @@ check "M4: workspace-tools.sh に実行権限" "[ -x '$WT' ]"
 check "M6: 秘書向け SKILL/rules に docs/spec 参照が無い" "! grep -rq 'docs/spec' '$PLUGIN/skills' '$PLUGIN/rules'"
 check "M6: 秘書向け SKILL/rules に docs/sprints 参照が無い" "! grep -rq 'docs/sprints' '$PLUGIN/skills' '$PLUGIN/rules'"
 
-# --- M8: .mcp.json が未実装の setup-microsoft に言及しない ---
+# --- M8: .mcp.json の公式connector／専用wizard説明が現行仕様と一致する ---
 check "M8: .mcp.json に setup-microsoft の言及が無い" "! grep -q 'setup-microsoft' '$PLUGIN/.mcp.json'"
-check "M8: .mcp.json が『今は Google のみ』を明記" "grep -q 'Google のみ' '$PLUGIN/.mcp.json'"
+check "M8: .mcp.json が公式connectorとChatwork／Google Chatを説明" "grep -q 'Microsoft 365' '$PLUGIN/.mcp.json' && grep -q 'Notion' '$PLUGIN/.mcp.json' && grep -q 'Chatwork' '$PLUGIN/.mcp.json' && grep -q 'Google Chat' '$PLUGIN/.mcp.json' && ! grep -qE '今のところ Google のみ|Google のみ|後続で対応予定' '$PLUGIN/.mcp.json'"
 
 # --- H2: 再セットアップの保護（バックアップ提案＋明示確認・無確認上書き禁止）---
 check "H2: ルーターに再セットアップ保護フローがある" "grep -q '作り直し（再セットアップ）の保護' '$SECRETARY_SKILL' && grep -q 'バックアップ' '$SECRETARY_SKILL'"
@@ -1064,6 +1065,120 @@ if bash "$SPRINT020_PATCH001_REGRESSION"; then
 else
   ng "sprint-020-patch-001回帰に失敗"
 fi
+
+# ---------------------------------------------------------------------------
+section "27. secret検査とGit所有変更の分離（sprint-021）"
+# ---------------------------------------------------------------------------
+SPRINT021_REGRESSION="$REPO/scripts/sprint-021-regression.sh"
+check "sprint-021回帰が存在し実行可能" "[ -x '$SPRINT021_REGRESSION' ]"
+if bash "$SPRINT021_REGRESSION"; then
+  ok "sprint-021 secret検査・所有path commit・失敗保護が全て成功"
+else
+  ng "sprint-021回帰に失敗"
+fi
+
+# ---------------------------------------------------------------------------
+section "28. symlink境界と有限時間の外部処理（sprint-022）"
+# ---------------------------------------------------------------------------
+SPRINT022_REGRESSION="$REPO/scripts/sprint-022-regression.sh"
+check "sprint-022回帰が存在し実行可能" "[ -x '$SPRINT022_REGRESSION' ]"
+if bash "$SPRINT022_REGRESSION"; then
+  ok "sprint-022 symlink境界・安全な削除・CLI／HTTP timeoutが全て成功"
+else
+  ng "sprint-022回帰に失敗"
+fi
+
+# ---------------------------------------------------------------------------
+section "29. OAuth callbackとloopback session保護（sprint-023）"
+# ---------------------------------------------------------------------------
+SPRINT023_REGRESSION="$REPO/scripts/sprint-023-regression.sh"
+check "sprint-023回帰が存在し実行可能" "[ -x '$SPRINT023_REGRESSION' ]"
+if bash "$SPRINT023_REGRESSION"; then
+  ok "sprint-023 Origin・session・Content-Type・OAuth一度限り・cleanupが全て成功"
+else
+  ng "sprint-023回帰に失敗"
+fi
+
+# ---------------------------------------------------------------------------
+section "30. 履歴境界とActions実行因果性（sprint-024）"
+# ---------------------------------------------------------------------------
+SPRINT024_REGRESSION="$REPO/scripts/sprint-024-regression.sh"
+check "sprint-024回帰が存在し実行可能" "[ -x '$SPRINT024_REGRESSION' ]"
+if bash "$SPRINT024_REGRESSION"; then
+  ok "sprint-024 履歴境界・再取得安定性・Actions run相関が全て成功"
+else
+  ng "sprint-024回帰に失敗"
+fi
+
+# ---------------------------------------------------------------------------
+section "31. 0.7.0更新配布と両面rollback（sprint-025）"
+# ---------------------------------------------------------------------------
+SPRINT025_REGRESSION="$REPO/scripts/sprint-025-regression.sh"
+check "sprint-025回帰が存在し実行可能" "[ -x '$SPRINT025_REGRESSION' ]"
+if bash "$SPRINT025_REGRESSION"; then
+  ok "sprint-025 version・validator・0.6.0 migration・plugin／workspace rollbackが全て成功"
+else
+  ng "sprint-025回帰に失敗"
+fi
+
+# ---------------------------------------------------------------------------
+section "32. Harness v0.4.2 runtime移行"
+# ---------------------------------------------------------------------------
+HARNESS_CONFIG="$REPO/.harness/config.toml"
+HARNESS_IGNORE="$REPO/.harness/.gitignore"
+HARNESS_GUIDANCE="$REPO/docs/harness-guidance.md"
+HARNESS_STATE="$REPO/docs/sprints/state.md"
+
+check "共有runtime configと個人override用gitignoreが存在" \
+  "[ -f '$HARNESS_CONFIG' ] && [ -f '$HARNESS_IGNORE' ]"
+
+python3 - "$HARNESS_CONFIG" <<'PY' >/dev/null 2>&1
+import sys
+import tomllib
+
+with open(sys.argv[1], "rb") as f:
+    config = tomllib.load(f)
+
+assert config["version"] == 1
+assert config["lifecycle"] == "balanced"
+assert config["hosts"]["claudeCode"]["roles"]["planner"] == {"model": "inherit", "effort": "inherit"}
+assert config["hosts"]["claudeCode"]["roles"]["generator"] == {"model": "inherit", "effort": "inherit"}
+assert config["hosts"]["claudeCode"]["roles"]["evaluator"] == {"model": "inherit", "effort": "inherit"}
+assert config["hosts"]["codex"]["roles"]["planner"] == {"model": "gpt-5.6-sol", "effort": "high"}
+assert config["hosts"]["codex"]["roles"]["generator"]["model"] == "gpt-5.6-luna"
+assert config["hosts"]["codex"]["roles"]["generator"]["effort"] == "xhigh"
+assert config["hosts"]["codex"]["roles"]["generator"]["escalation"] == {
+    "model": "gpt-5.6-sol",
+    "effort": "high",
+    "after_failures": 2,
+    "on_evaluator_recommendation": True,
+}
+assert config["hosts"]["codex"]["roles"]["evaluator"] == {"model": "gpt-5.6-sol", "effort": "high"}
+PY
+HARNESS_CONFIG_RC=$?
+check "config.tomlが解析でき、Claude継承・Codex role・強化条件が正しい" \
+  "[ $HARNESS_CONFIG_RC -eq 0 ]"
+
+check "個人runtime overrideがTOML/JSONともgit管理外" \
+  "grep -qx 'config.local.toml' '$HARNESS_IGNORE' && grep -qx 'config.local.json' '$HARNESS_IGNORE' && git -C '$REPO' check-ignore --no-index -q .harness/config.local.toml && git -C '$REPO' check-ignore --no-index -q .harness/config.local.json"
+
+check "AGENTSがrouting・state・resume・dispatch証拠の規則を保持" \
+  "grep -q 'Model Tier' '$REPO/AGENTS.md' && grep -q 'Rotate: runtime-migration' '$REPO/AGENTS.md' && grep -q 'Rotate: model-escalation' '$REPO/AGENTS.md' && grep -q 'Rotate: model-availability' '$REPO/AGENTS.md' && grep -q 'modelTier: null' '$REPO/AGENTS.md' && grep -q 'dispatch-ready resolver value is not proof' '$REPO/AGENTS.md' && grep -q 'resume preserves the routed model and effort' '$REPO/AGENTS.md' && grep -q 'Evaluator performs evidence-backed evaluation and self-review; it never implements fixes' '$REPO/AGENTS.md' && grep -q 'Do not install target application packages' '$REPO/AGENTS.md'"
+
+check "AGENTSがClaude継承・Codex既定・Terra自動除外・失敗停止を保持" \
+  "grep -q \"Claude Code inherits the user's current model and effort\" '$REPO/AGENTS.md' && grep -q 'gpt-5.6-luna.*xhigh' '$REPO/AGENTS.md' && grep -q 'Terra is never selected automatically' '$REPO/AGENTS.md' && grep -q 'third consecutive failure stops for user input' '$REPO/AGENTS.md'"
+
+check "既存CLAUDE.mdの製品固有境界・secret・3行報告を維持" \
+  "grep -q 'yasashii-harness' '$REPO/CLAUDE.md' && grep -q '読み取りを含む全面接触禁止' '$REPO/CLAUDE.md' && grep -q 'Repository SecretのAPI Token' '$REPO/CLAUDE.md' && grep -q 'やったこと／結果／次に何が起きるか' '$REPO/CLAUDE.md'"
+
+check "stateが完了履歴と有効なruntime状態を保持" \
+  "grep -q '^| sprint-020-patch-002 | done |' '$HARNESS_STATE' && grep -qE '^- Model Tier: (standard|strong)$' '$HARNESS_STATE' && grep -qE '^- Rotate: (none|runtime-migration|model-escalation|model-availability)$' '$HARNESS_STATE' && grep -qE '^- Current ID: sprint-[0-9]{3}(-patch-[0-9]{3})?$' '$HARNESS_STATE' && ! grep -q 'Model Tier: unknown' '$HARNESS_STATE'"
+
+check "guidanceがv0.4.2 runtime運用とno-overwriteを案内" \
+  "grep -q '.harness/config.local.toml' '$HARNESS_GUIDANCE' && grep -q 'dispatch-ready, not launch-verified' '$HARNESS_GUIDANCE' && grep -q 'Rotate: model-escalation' '$HARNESS_GUIDANCE' && grep -q 'Rotate: model-availability' '$HARNESS_GUIDANCE' && grep -q 'never persist.*unknown' '$HARNESS_GUIDANCE' && grep -q 'Do not overwrite existing guidance' '$HARNESS_GUIDANCE'"
+
+check "製品version 0.7.0とHarness/agents非同梱を維持" \
+  "python3 -c \"import json; assert json.load(open('$MARKET'))['plugins'][0]['version'] == '0.7.0'; assert json.load(open('$PLUGINJSON'))['version'] == '0.7.0'\" && [ ! -d '$PLUGIN/harness' ] && [ ! -d '$PLUGIN/agents' ]"
 
 # ---------------------------------------------------------------------------
 section "結果"

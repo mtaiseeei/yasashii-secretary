@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 import { spawn } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createTestOnlyDesktopClientFile } from "./create-sprint-020-patch-001-google-chat-test-client.mjs";
 
-const root = mkdtempSync(join(tmpdir(), "yasashii-google-chat-new-"));
+const root = realpathSync(mkdtempSync(join(tmpdir(), "yasashii-google-chat-new-")));
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const server = resolve(repo, "plugins/yasashii-secretary/skills/google-chat/scripts/wizard-server.mjs");
 const fixture = resolve(repo, "scripts/fixtures/google-chat-wizard/google-chat.json");

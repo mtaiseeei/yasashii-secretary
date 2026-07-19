@@ -1,18 +1,19 @@
 #!/usr/bin/env node
 
 import { execFileSync } from "node:child_process";
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { createGoogleChatClient } from "../plugins/yasashii-secretary/skills/google-chat/scripts/client.mjs";
 import { applyGoogleChatConfig } from "../plugins/yasashii-secretary/skills/google-chat/scripts/config-transaction.mjs";
 
 const roots = [];
+const testTmp = realpathSync(tmpdir());
 let passed = 0;
 let failed = 0;
 
 function temp(prefix) {
-  const root = mkdtempSync(join(tmpdir(), prefix));
+  const root = mkdtempSync(join(testTmp, prefix));
   roots.push(root);
   return root;
 }
@@ -49,11 +50,11 @@ function makeSearchFixture({ candidateMode }) {
   const fakeGit = join(root, "bin", "git");
   const fakeGh = join(root, "bin", "gh");
   const candidateByMode = {
-    missing: `echo '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"},{"databaseId":8,"status":"queued","conclusion":null}]'`,
-    invalid: `echo '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"},{"databaseId":8,"status":"queued","conclusion":null,"createdAt":"not-a-date"}]'`,
-    before: `echo '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"},{"databaseId":8,"status":"queued","conclusion":null,"createdAt":"2020-01-01T00:00:00.000Z"}]'`,
+    missing: `printf '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"},{"databaseId":8,"status":"queued","conclusion":null,"headBranch":"main","workflowName":"Google Chat sync","displayTitle":"Google Chat sync [%s]"}]\\n' "$correlation_id"`,
+    invalid: `printf '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"},{"databaseId":8,"status":"queued","conclusion":null,"createdAt":"not-a-date","headBranch":"main","workflowName":"Google Chat sync","displayTitle":"Google Chat sync [%s]"}]\\n' "$correlation_id"`,
+    before: `printf '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"},{"databaseId":8,"status":"queued","conclusion":null,"createdAt":"2020-01-01T00:00:00.000Z","headBranch":"main","workflowName":"Google Chat sync","displayTitle":"Google Chat sync [%s]"}]\\n' "$correlation_id"`,
     "delayed-valid": `created_at=$(cat "$FAKE_FLOW_ROOT/created-at")
-    printf '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"},{"databaseId":8,"status":"queued","conclusion":null,"createdAt":"%s"}]\\n' "$created_at"`,
+    printf '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"},{"databaseId":8,"status":"queued","conclusion":null,"createdAt":"%s","headBranch":"main","workflowName":"Google Chat sync","displayTitle":"Google Chat sync [%s]"}]\\n' "$created_at" "$correlation_id"`,
   };
   const candidateOutput = candidateByMode[candidateMode] || ":";
   writeFileSync(fakeGit, `#!/bin/sh
@@ -64,12 +65,14 @@ if [ "$1" = "pull" ]; then
   printf '%s' "$count" > "$FAKE_FLOW_ROOT/pull-count"
   if [ "$count" -ge 2 ]; then printf '# fixture\n\n今回runで見つかった語\n' > "$FAKE_FLOW_ROOT/google-chat/history/fixture--AAA/2026-07-17.md"; fi
 fi
+if [ "$1 $2" = "branch --show-current" ]; then echo main; fi
 exit 0
 `);
   writeFileSync(fakeGh, `#!/bin/sh
 if [ "$1 $2" = "workflow run" ]; then
   printf '1' > "$FAKE_FLOW_ROOT/dispatched"
   date -u '+%Y-%m-%dT%H:%M:%SZ' > "$FAKE_FLOW_ROOT/created-at"
+  for arg in "$@"; do case "$arg" in correlation_id=*) printf '%s' "\${arg#correlation_id=}" > "$FAKE_FLOW_ROOT/correlation-id" ;; esac; done
   exit 0
 fi
 if [ "$1 $2" = "run list" ]; then
@@ -77,6 +80,7 @@ if [ "$1 $2" = "run list" ]; then
   [ -f "$FAKE_FLOW_ROOT/list-count" ] && polls=$(cat "$FAKE_FLOW_ROOT/list-count")
   polls=$((polls + 1)); printf '%s' "$polls" > "$FAKE_FLOW_ROOT/list-count"
   if [ "${candidateMode}" != "none" ] && [ -f "$FAKE_FLOW_ROOT/dispatched" ] && [ "$polls" -ge 4 ]; then
+    correlation_id=$(cat "$FAKE_FLOW_ROOT/correlation-id")
     ${candidateOutput}
   else
     echo '[{"databaseId":7,"status":"completed","conclusion":"success","createdAt":"2020-01-01T00:00:00.000Z"}]'
@@ -172,7 +176,7 @@ try {
   const staleResult = JSON.parse(runOutput(process.execPath, [searchFlow, "--root", stale.root, "--query", "今回runで見つかった語", "--choice", "sync", "--timeout-ms", "500", "--run-discovery-timeout-ms", "300", "--run-poll-ms", "50"], {
     env: { ...process.env, YASASHII_GIT_BIN: stale.fakeGit, YASASHII_GH_BIN: stale.fakeGh, FAKE_FLOW_ROOT: stale.root },
   }));
-  check(staleResult.status === "sync-failed" && staleResult.error === "timeout" && !staleResult.events.includes("pull-after-sync") && readFileSync(join(stale.root, "pull-count"), "utf8") === "1", "過去successだけならtimeoutしpull／再検索しない", staleResult.events.join(","));
+  check(staleResult.status === "sync-failed" && staleResult.error === "run-unconfirmed" && !staleResult.events.includes("pull-after-sync") && readFileSync(join(stale.root, "pull-count"), "utf8") === "1", "過去successだけなら未確認停止しpull／再検索しない", staleResult.events.join(","));
 
   for (const [candidateMode, label] of [
     ["missing", "createdAt欠落"],
@@ -183,7 +187,7 @@ try {
     const rejectedResult = JSON.parse(runOutput(process.execPath, [searchFlow, "--root", rejected.root, "--query", "今回runで見つかった語", "--choice", "sync", "--timeout-ms", "500", "--run-discovery-timeout-ms", "300", "--run-poll-ms", "50"], {
       env: { ...process.env, YASASHII_GIT_BIN: rejected.fakeGit, YASASHII_GH_BIN: rejected.fakeGh, FAKE_FLOW_ROOT: rejected.root },
     }));
-    check(rejectedResult.status === "sync-failed" && rejectedResult.error === "timeout" && !rejectedResult.events.includes("success-confirmed") && !rejectedResult.events.includes("pull-after-sync") && readFileSync(join(rejected.root, "pull-count"), "utf8") === "1", `${label}の新規IDを候補外にして後続pull／再検索しない`, rejectedResult.events.join(","));
+    check(rejectedResult.status === "sync-failed" && rejectedResult.error === "run-unconfirmed" && !rejectedResult.events.includes("success-confirmed") && !rejectedResult.events.includes("pull-after-sync") && readFileSync(join(rejected.root, "pull-count"), "utf8") === "1", `${label}の新規IDを候補外にして後続pull／再検索しない`, rejectedResult.events.join(","));
   }
 
   const delayed = makeSearchFixture({ candidateMode: "delayed-valid" });

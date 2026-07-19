@@ -1,21 +1,19 @@
 #!/usr/bin/env node
 
-import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { createGoogleChatClient } from "./client.mjs";
 import { normalizeMessage, writeSpaceHistory } from "./history.mjs";
 import { exchangeRefreshToken } from "./refresh-token.mjs";
+import { workingRoot, writeFileAtomicSafe } from "./runtime-safety.mjs";
 
 function readJson(path, fallback = null) {
   try { return JSON.parse(readFileSync(path, "utf8")); } catch { return fallback; }
 }
 
-function writeJsonAtomic(path, value) {
-  mkdirSync(dirname(path), { recursive: true });
-  const temporary = `${path}.tmp-${process.pid}`;
-  writeFileSync(temporary, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 });
-  renameSync(temporary, path);
+function writeJsonAtomic(root, path, value) {
+  writeFileAtomicSafe(root, path, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 });
 }
 
 function overlapStart(value) {
@@ -34,7 +32,7 @@ export async function continuousGoogleChatSync({
   client: providedClient = null,
   now = env.CC_SECRETARY_NOW || new Date().toISOString(),
 } = {}) {
-  root = resolve(root || process.cwd());
+  root = workingRoot(root || process.cwd());
   const configPath = join(root, "google-chat", "config.json");
   const statePath = join(root, "google-chat", "state", "sync.json");
   const config = readJson(configPath);
@@ -89,7 +87,7 @@ export async function continuousGoogleChatSync({
       cursors,
       results,
     };
-    writeJsonAtomic(statePath, state);
+    writeJsonAtomic(root, statePath, state);
     if (status !== "success") {
       const kinds = [...new Set(results.filter((item) => item.status === "failed").map((item) => item.code))];
       throw Object.assign(new Error(`一部または全部のスペースを取得できませんでした。失敗種別: ${kinds.join(",")}。成功したスペースの履歴と取得位置は保持しました。`), { code: status === "partial" ? "partial-space" : (kinds[0] || "sync-failed"), state });
@@ -101,7 +99,7 @@ export async function continuousGoogleChatSync({
 }
 
 async function main() {
-  const root = resolve(process.argv[2] || process.cwd());
+  const root = workingRoot(process.argv[2] || process.cwd());
   try {
     const state = await continuousGoogleChatSync({ root, trigger: process.env.GOOGLE_CHAT_TRIGGER || "manual" });
     const fetched = state.results.reduce((sum, item) => sum + item.fetched, 0);
@@ -111,7 +109,7 @@ async function main() {
     if (!error.state) {
       const previous = readJson(statePath, { version: 2, cursors: {}, results: [], lastSuccessAt: null });
       const reauth = ["reauthorization-needed", "reauth-required", "scope-insufficient"].includes(error.code);
-      writeJsonAtomic(statePath, { ...previous, version: 2, status: reauth ? "reauthorization-needed" : "failed", attemptedAt: process.env.CC_SECRETARY_NOW || new Date().toISOString(), error: error.code || "sync-failed", message: error.message });
+      writeJsonAtomic(root, statePath, { ...previous, version: 2, status: reauth ? "reauthorization-needed" : "failed", attemptedAt: process.env.CC_SECRETARY_NOW || new Date().toISOString(), error: error.code || "sync-failed", message: error.message });
     }
     process.stderr.write(`GOOGLE_CHAT_ERROR=${error.code || "sync-failed"}\n${error.message}\n`);
     process.exitCode = 4;

@@ -30,9 +30,17 @@ export function installWizardShell(service) {
 }
 
 export function renderWizardScreen(app, { id, state = "ready", html }) {
+  const previousScreen = app.dataset?.screen;
+  const previousFocus = captureFocus(app);
   app.dataset.screen = id;
   app.dataset.state = state;
   app.innerHTML = html;
+  const heading = app.querySelector?.("h1");
+  if (heading) {
+    if (!heading.id) heading.id = "wizard-screen-heading";
+    heading.tabIndex = -1;
+    app.setAttribute?.("aria-labelledby", heading.id);
+  }
   if (typeof app.querySelectorAll === "function") {
     app.querySelectorAll("details > summary").forEach((summary) => {
       summary.addEventListener("keydown", (event) => {
@@ -42,6 +50,49 @@ export function renderWizardScreen(app, { id, state = "ready", html }) {
       });
     });
   }
+  restoreFocus(app, previousFocus, previousScreen === id);
+}
+
+function captureFocus(app) {
+  if (typeof document === "undefined" || !app?.contains || !app.contains(document.activeElement)) return null;
+  const element = document.activeElement;
+  const field = element.matches?.("input, textarea, select") === true;
+  return {
+    key: element.dataset?.focusKey || null,
+    id: element.id || null,
+    name: element.getAttribute?.("name") || null,
+    type: element.getAttribute?.("type") || null,
+    value: field ? element.value : null,
+    selectionStart: field && typeof element.selectionStart === "number" ? element.selectionStart : null,
+    selectionEnd: field && typeof element.selectionEnd === "number" ? element.selectionEnd : null,
+    selectionDirection: field ? element.selectionDirection : null,
+    checked: field && typeof element.checked === "boolean" ? element.checked : null,
+  };
+}
+
+function restoreFocus(app, previousFocus, sameScreen) {
+  if (!previousFocus || typeof app.querySelector !== "function") {
+    app.querySelector?.("h1")?.focus?.();
+    return;
+  }
+  const escaped = (value) => typeof CSS !== "undefined" && CSS.escape ? CSS.escape(value) : String(value).replace(/[^a-zA-Z0-9_-]/g, "\\$&");
+  let target = null;
+  if (previousFocus.key) target = app.querySelector(`[data-focus-key="${escaped(previousFocus.key)}"]`);
+  if (!target && previousFocus.id) target = app.querySelector(`#${escaped(previousFocus.id)}`);
+  if (!target && previousFocus.name) target = app.querySelector(`[name="${escaped(previousFocus.name)}"]`);
+  if (!target && previousFocus.type && previousFocus.value != null) {
+    target = [...(app.querySelectorAll?.(`input[type="${escaped(previousFocus.type)}"]`) || [])]
+      .find((candidate) => candidate.value === previousFocus.value) || null;
+  }
+  if (sameScreen && target) {
+    target.focus?.({ preventScroll: true });
+    if (previousFocus.selectionStart != null && typeof target.setSelectionRange === "function") {
+      const max = String(target.value || "").length;
+      target.setSelectionRange(Math.min(previousFocus.selectionStart, max), Math.min(previousFocus.selectionEnd ?? previousFocus.selectionStart, max), previousFocus.selectionDirection || "none");
+    }
+    return;
+  }
+  app.querySelector("h1")?.focus?.({ preventScroll: true });
 }
 
 export function escapeHtml(value) {

@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
-import { execFile } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { promisify } from "node:util";
+import { dispatchCorrelatedWorkflow, watchCorrelatedWorkflow } from "../../../scripts/lib/actions-run.mjs";
+import { runExternal } from "../../../scripts/lib/external-ops.mjs";
 
-const exec = promisify(execFile);
 const args = new Map();
 for (let index = 2; index < process.argv.length; index += 2) {
   if (!process.argv[index]?.startsWith("--") || process.argv[index + 1] === undefined) {
@@ -32,7 +31,8 @@ function output(value) {
 
 function classify(error) {
   const source = `${error?.stdout || ""}\n${error?.stderr || ""}`.toLowerCase();
-  if (error?.killed || error?.code === "ETIMEDOUT" || error?.code === "run-discovery-timeout" || /timed out|timeout/.test(source)) return { status: "sync-failed", code: "timeout", message: "自動取得処理（GitHub Actions）の完了待ちが時間切れになりました。状態を確認してから再実行してください。" };
+  if (["run-correlation-unconfirmed", "branch-unconfirmed", "run-list-invalid"].includes(error?.code)) return { status: "sync-failed", code: "run-unconfirmed", message: "今回開始した自動取得処理（GitHub Actions）を確認できませんでした。古い成功結果は使わず停止しました。Actions画面で今回の実行を確認してから再実行してください。" };
+  if (error?.killed || error?.code === "ETIMEDOUT" || /timed out|timeout/.test(source)) return { status: "sync-failed", code: "timeout", message: "今回開始した自動取得処理（GitHub Actions）の完了待ちが時間切れになりました。Actions画面で今回の実行を確認してから再実行してください。" };
   if (/google_chat_error=(?:reauthorization-needed|reauth-required)/.test(source)) return { status: "reauthorization-needed", code: "token-invalid", message: "Google認証の同意が取り消されたか、refresh tokenが失効しています。既存履歴を残したまま再認証してください。" };
   if (/google_chat_error=scope-insufficient/.test(source)) return { status: "reauthorization-needed", code: "scope-insufficient", message: "必要なread-only scopeが不足しています。既存履歴を残したまま再認証してください。" };
   if (/google_chat_error=(?:admin-blocked|admin-or-scope-blocked)/.test(source)) return { status: "admin-action-needed", code: "admin-blocked", message: "Google Workspace管理者のAPI access controlsを確認してください。取得の再試行は行いません。" };
@@ -47,7 +47,7 @@ function classify(error) {
 }
 
 async function run(binary, argv, runTimeout = 60_000) {
-  return exec(binary, argv, { cwd: root, timeout: runTimeout, maxBuffer: 2 * 1024 * 1024 });
+  return runExternal(binary, argv, { cwd: root, timeoutMs: runTimeout, maxBuffer: 2 * 1024 * 1024, label: binary });
 }
 
 async function pull(stage) {
@@ -60,38 +60,6 @@ async function search(stage) {
   const argv = [searchScript, "--root", root, "--query", query, "--skip-pull", "yes"];
   for (const name of ["--space", "--sender", "--from", "--to"]) if (args.has(name)) argv.push(name, args.get(name));
   return JSON.parse((await run(process.execPath, argv)).stdout);
-}
-
-function wait(milliseconds) {
-  return new Promise((resolveWait) => setTimeout(resolveWait, milliseconds));
-}
-
-async function listWorkflowRuns() {
-  const listed = await run(gh, ["run", "list", "--workflow", "google-chat-sync.yml", "--event", "workflow_dispatch", "--limit", "50", "--json", "databaseId,status,conclusion,createdAt"]);
-  const parsed = JSON.parse(listed.stdout || "[]");
-  return Array.isArray(parsed) ? parsed : [];
-}
-
-function wasCreatedAfterDispatch(runItem, dispatchStartedAt) {
-  const createdAt = Date.parse(runItem?.createdAt || "");
-  return Number.isFinite(createdAt) && createdAt >= dispatchStartedAt;
-}
-
-async function waitForDispatchedRun(baselineIds, dispatchStartedAt) {
-  const deadline = Date.now() + runDiscoveryTimeout;
-  do {
-    const candidates = (await listWorkflowRuns()).filter((runItem) => runItem?.databaseId && !baselineIds.has(String(runItem.databaseId)) && wasCreatedAfterDispatch(runItem, dispatchStartedAt));
-    candidates.sort((left, right) => {
-      const leftTime = Date.parse(left.createdAt || "") || 0;
-      const rightTime = Date.parse(right.createdAt || "") || 0;
-      return leftTime - rightTime || Number(left.databaseId) - Number(right.databaseId);
-    });
-    if (candidates[0]) return candidates[0];
-    const remaining = deadline - Date.now();
-    if (remaining <= 0) break;
-    await wait(Math.min(runPollInterval, remaining));
-  } while (Date.now() <= deadline);
-  throw Object.assign(new Error("workflow dispatch後に今回の実行を確認できませんでした。"), { code: "run-discovery-timeout" });
 }
 
 if (!query) {
@@ -125,19 +93,23 @@ try {
   }
   if (choice !== "sync") throw Object.assign(new Error("選択肢を確認できません。"), { code: "choice-invalid" });
 
-  const baselineIds = new Set((await listWorkflowRuns()).map((runItem) => String(runItem?.databaseId || "")).filter(Boolean));
-  // GitHubのcreatedAtは秒精度で返るため、同じ秒の今回runを除外しないよう秒境界を使う。
-  const dispatchStartedAt = Math.floor(Date.now() / 1000) * 1000;
   events.push("dispatch");
-  await run(gh, ["workflow", "run", "google-chat-sync.yml"]);
+  const dispatchedRun = await dispatchCorrelatedWorkflow({
+    root,
+    workflowFile: "google-chat-sync.yml",
+    workflowName: "Google Chat sync",
+    gh,
+    git,
+    discoveryTimeoutMs: runDiscoveryTimeout,
+    pollIntervalMs: runPollInterval,
+  });
   events.push("wait");
-  const dispatchedRun = await waitForDispatchedRun(baselineIds, dispatchStartedAt);
   try {
-    await run(gh, ["run", "watch", String(dispatchedRun.databaseId), "--exit-status"], timeout);
+    await watchCorrelatedWorkflow({ root, run: dispatchedRun, gh, timeoutMs: timeout });
   } catch (watchError) {
     if (!watchError.killed && watchError.code !== "ETIMEDOUT") {
       try {
-        const logs = await run(gh, ["run", "view", String(dispatchedRun.databaseId), "--log-failed"]);
+        const logs = await run(gh, ["run", "view", String(dispatchedRun.runId), "--log-failed"]);
         watchError.stderr = `${watchError.stderr || ""}\n${logs.stdout || ""}\n${logs.stderr || ""}`;
       } catch { /* 元の失敗を分類する */ }
     }
@@ -154,7 +126,5 @@ try {
     const detail = classify(error);
     output({ status: detail.status, error: detail.code, message: detail.message });
   }
-  // dispatch直後のrun反映待ちは、今回runを確認できなかったという業務結果をJSONで返す。
-  // 過去runは採用せず、呼び出し側がstatusを見て再試行可否を案内できるようにする。
-  if (error.code !== "run-discovery-timeout") process.exitCode = 4;
+  process.exitCode = 4;
 }

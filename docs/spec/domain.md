@@ -200,6 +200,65 @@ token値、OAuth client値、不要な対象名、チャット本文、業務固
 - workflow、取得履歴、test workspaceを残す必要がある場合は、目的・保持期間・閲覧者をユーザーへ示す。
 - repoや履歴の削除・archiveは別の破壊的操作として、対象と影響を示した後の明示確認でだけ行う。
 
+## 0.7.0 release candidate
+
+### Git変更集合
+
+Gitを使う各操作は、次の集合を混ぜずに扱う。
+
+- **既存変更集合**: 操作開始前からworking treeまたはindexにある利用者の変更。内容・stage状態とも操作対象外。
+- **所有変更集合**: 初回publish、Chatwork設定、Google Chat設定、記憶commit、更新等、その操作が作成または変更したpath。
+- **commit候補集合**: 所有変更集合のうち、secret検査と整合検査に合格し、今回commitすると利用者へ示したpath。
+- **push対象**: commit候補集合だけから作られ、検証済みの今回commit。既存branchの別commitを黙って含めない。
+
+検査後にcommit候補集合が変わった場合は、以前の検査結果を流用せず再検査する。失敗時のrollbackは所有変更集合だけへ作用し、
+既存変更集合をunstage、復元、削除しない。初回publishでも「repo全体だからすべて所有」と推定せず、配布対象として意図したinventoryを確定する。
+
+### secret値と補助scannerの責任境界
+
+- **secret実値と正本**: OAuth client secret、認可コード、access／refresh token、Chatwork API Token等。継続取得の正本は、現在のprivate repoのRepository Secretである。
+- **Google Chat登録導線**: OAuth実値はlocal wizard sessionのmemoryから `gh` のstdin経由でRepository Secretへ直接登録し、利用者のコピー／貼り付けを求めない。
+- **Chatwork登録導線**: wizardはAPI Tokenを自動取得・受領・登録しない。F24の既存導線どおり、利用者本人がChatwork公式画面で取得し、GitHubのRepository Secret画面へ直接入力する。Tokenをwizard、AI会話、repo本文、ログ、製品側DOMへ入力・貼り付けさせない。
+- **通常フローの非露出**: 両サービスとも、実値をrepo・Git履歴・ログ・製品側DOM・会話へ残さない。
+- **強制検査対象**: 製品が生成・管理するworkflow／config／historyと、初回publish時に確定したcommit候補inventory。OAuth client JSON、private key、known token field、通常のliteral assignment等、通常利用で合理的に起こり得る誤混入をcommit前に拒否する。
+- **安全な参照**: `${{ secrets.NAME }}` 等の、実値を持たず実行時にRepository Secretを参照する正規参照。通常文書と合理的な非機密metadataも含め、補助scannerが誤拒否しない。
+- **補助scanner**: 通常フローの設計に追加するdefense-in-depth。任意のユーザー作成コードを理解する万能parserではなく、意図的な特殊構文・難読化・computed／escaped key・偽placeholderの完全検出は保証対象外とする。この非ゴールはサービス別のRepository Secret登録導線と強制検査対象の0露出を緩めない。
+
+### filesystem対象
+
+- **write target**: 現在ユーザーが確認して開いているworking root内の対象。最終要素が未作成でも、最深の既存ancestorから許可rootまでを実体として評価し、外向きsymlinkがあれば作成前に拒否する。
+- **delete target**: 通常ファイル／通常ディレクトリ／symlinkを区別する。symlinkはlink objectが許可root内であることを確認し、参照先を辿らずlinkだけを削除する。
+- **external target**: 現在のworking rootから見たsymlink参照先と許可root外の実体。別repoは秘書workspaceから扱う間はexternal targetだが、別repo開発PJとして確認され、そのrepo自身をworking rootとして開いた開発作業ではrepo内がwrite targetになる。読取りを含め明示された範囲を超えて変更しない。
+
+### OAuth session状態
+
+- `client-ready`: 接続用JSONをメモリ上で検証済み。まだOAuth画面、Secret、履歴への副作用はない。
+- `authorization-pending`: 一意のstate／PKCE／session確認値を持ち、callbackを1回だけ受け付けられる。
+- `callback-processing`: 最初の正当なcallbackを処理中。並行・再送callbackは副作用なしで拒否する。
+- `connected`: token交換と必要Secret登録が一度だけ完了し、後続の対象選択へ進める。
+- `failed`: token交換または登録に失敗。厳格secretを破棄し、残存物を示す。
+- `cleanup-required`: Secret、schedule、対象選択、OAuth grant／tokenのいずれかが残り、自動後始末を完了できていない。
+- `closed`: 後始末不要または後始末完了。callback再入で状態を戻さない。
+
+### release readiness状態
+
+- `blocked`: F36〜F42、master suite、version整合、Git archive相当のいずれかが未合格。live gateを開始しない。
+- `offline-passed`: 自動回帰、online参照検査、archive検査、`0.7.0`整合が合格し、同一release candidateを固定できた。
+- `live-running`: 専用private test workspaceで両チャットのlive gateを実施中。片方の完了を全体合格にしない。
+- `cleanup-required`: live動作は完了したが、schedule、Secret、選択、Google OAuthの後始末が未完了。
+- `ready`: 同一release candidateで両チャットのActions、commit、push、pull後検索、冪等再実行と後始末がすべて合格した。
+
+`ready`は過去runや過去commitから引き継がない。候補commitが変わった場合、影響するoffline gateとlive gateを再評価する。
+
+### 0.6.0から0.7.0の更新状態
+
+- `diagnosis`: 現在版 `0.6.0`、最新版 `0.7.0`、変更点、影響、復元方法を読み取り専用で示す。
+- `protected`: workspaceのpushなし保護地点と、更新前plugin版／scope／取得元を復元情報として確認済み。
+- `applying`: 明示確認済みのplugin更新とmigrationを実行中。`0.7.0`適用済みとはまだ記録しない。
+- `verified`: plugin版、管理対象、migration、主要導線を検証済み。ここで初めて更新成功とする。
+- `rollback-required`: pluginまたはworkspaceの一方でも検証不合格。両方の変更範囲と復元方法を示す。
+- `rolled-back`: workspaceとpluginの両方が更新前状態であることを確認済み。片方だけの復元はこの状態にしない。
+
 ## 三層記憶
 
 | 層 | 型 | 記録経路 | 記録前確認 |

@@ -214,3 +214,32 @@
 12. 初回取り込みとschedule設定の結果が分かれ得る場合は、完了した処理と未完了の処理、次にすることを別々に表示し、全体を成功と誤認させない。既存の確認前0変更、安全なtransaction／rollback、secret非露出の境界を緩めない。後日の通常の設定変更導線は維持する。
 13. Cloud準備の会話とlocal wizardを分ける。skill会話はJSON取得までを担当し、JSON取得を確認してからwizardを起動する。wizardはJSON選択→OAuth許可→通常スペース選択へ進み、Cloud project作成・API有効化・Audience・OAuth Client作成の画像や重複説明を表示しない。
 14. OAuth許可はJSON確認後の明示ボタンで別タブに開く。元wizardの状態確認、ポップアップ拒否、タブ閉鎖、同意拒否、再試行、許可後の自動SPACE選択というSprint 019の合格動作を維持する。OAuth画面をJSON選択だけで勝手に開かない。
+
+## 14. 0.7.0 配布前安全境界
+
+1. 公開版は `0.7.0` とし、marketplace、plugin manifest、CHANGELOG、更新診断、最小台帳、migration、公開ガイドの版を一致させる。`0.6.0`のまま監査対応を大幅追加して配布しない。
+2. 初回publish、チャット設定、記憶commit、更新等のGit操作は、その操作が所有するpathだけをstage・commitする。操作開始前からstage済みの変更、別サービス、一般PJ、repo rootの無関係ファイルをcommitへ混ぜず、既存indexを勝手にunstage・上書き・削除しない。
+3. 初回publishのように複数領域を初期化する場合も、commit候補のinventoryを明示的に確定してから全候補をsecret検査する。製品が生成・管理するworkflow／config／historyと初回publish inventoryでは、Google OAuth client JSON、client secret、認可コード、access／refresh token、Chatwork API Token、private key／秘密鍵、credential URL、known token field、通常のliteral assignment等の合理的な誤混入が1件でもあればcommit・push前に停止する。検査後に候補が変われば再検査する。
+4. OAuth／Chatwork資格情報の正本は、現在のprivate repoのRepository Secretとする。サービスごとの登録境界を混同しない。
+   - Google Chatの厳格secretはlocal wizard sessionのmemory内だけで受け渡し、`gh` のstdin経由でRepository Secretへ直接登録する。登録失敗時も値をコピー／貼り付けさせず安全に停止する。
+   - Chatwork API Tokenはwizardが自動取得・受領・登録しない。F24の既存導線どおり、利用者本人がChatwork公式画面で取得し、GitHubのRepository Secret画面へ `CHATWORK_API_TOKEN` として直接入力する。Tokenをwizard、AI会話、repo本文、ログ、journal、fixture出力、スクリーンショット、評価証跡、製品側DOMへ入力・貼り付けさせない。
+   - 両サービスとも、通常フローのrepo本文、Git差分・履歴、ログ、journal、fixture出力、スクリーンショット、評価証跡、再読込後も残る製品側DOM、会話に実値を出さない。
+   - commit前scannerはこの通常フローを代替する安全境界ではなく、合理的な誤混入を止めるdefense-in-depthである。万能secret detectorまたは任意言語の完全parserと表示しない。
+   - `${{ secrets.NAME }}`、定義済みの環境変数参照等の製品が生成する正規のruntime参照は許可する。通常文書と合理的な非機密metadataを、文字列がtoken風であるという理由だけで拒否しない。
+   - 利用者がローカル／private repoの任意のJS／TS／shell／JSONを意図的に特殊構文・難読化・computed／escaped key・偽placeholderへ改変してscannerを回避するケースの完全検出は非ゴールとする。この非ゴールは、製品管理対象と通常フローの非露出保証を緩めない。
+5. 書込み・作成・移動の許可境界は、現在ユーザーが確認して開いているworking rootごとに定める。既存／未作成を問わず対象までの実体境界を副作用前に確認し、秘書workspaceから外部repoを指すsymlink越しの書込みを拒否する。別repo開発PJを確認後、そのrepo自身をworking rootとして開いた場合はrepo内の正常な書込みを許可する。symlink自体の削除は参照先へ追従せずlinkだけを対象にし、参照先本体を削除・変更しない。
+6. `git`、`gh`、`claude`、`gcloud`等の外部CLIと外部HTTPは、有限のtimeoutと明確な失敗状態を持つ。timeout後にcommit、push、pull、検索、削除、成功表示へ進まず、子process・待機sessionを残さない。
+7. loopback wizardは `127.0.0.1`／localhostのloopback以外へbindしない。状態変更requestは同じsessionの正しいorigin、正しいContent-Type、推測困難なsession確認値を必須とし、cross-origin、確認値なし／不一致、JSON以外の送信を副作用0件で拒否する。状態変更をGETで行わない。
+8. OAuth callbackは1つの認証sessionで一度だけ処理する。再送、同時再入、完了後の再アクセスでtoken交換、Repository Secret登録、初回取得を重複させない。callbackとsession確認値をURL、ログ、DOM、証跡へ残さない。
+9. OAuth grant／token取消、Repository Secret削除、schedule停止、対象選択解除の失敗を無視しない。1件でも未完了なら `cleanup-required` とし、成功または配布可能と表示しない。
+10. Google Chat本文・表示名・添付メタデータは非信頼入力として扱う。内部Markdown marker、HTML comment、見出し、区切り線と同じ文字列が含まれても保存構造として解釈せず、既存・後続の履歴を欠落・結合・上書きしない。
+11. GitHub Actionsの結果は今回のdispatchと因果関係を確認できるrunだけを採用する。dispatch前、別workflow／branch、作成時刻欠落・不正、識別不能なrunを成功候補にせず、対応runを確認できなければtimeoutまたは未確認として停止する。
+12. `0.6.0`から `0.7.0`への更新は、診断、明示確認、pushなし保護地点、dry-run、更新、検証、rollbackを一続きで持つ。migrationは冪等、カスタマイズ・記憶・PJ・チャット・secretは既定で保持する。
+13. rollbackはworkspaceとpluginを別の対象として扱い、両方を更新前状態へ戻す。pluginを自動復元できない環境では、旧版 `0.6.0`、対象scope、実行手順、復元確認をその場で実施できる形で示し、単なる問い合わせ案内で終わらせない。
+14. Claude plugin／marketplace validatorは必須author情報、MIT、単段クレジット、`forkedFrom`、name／source／version整合を検査し、欠落・不正・不一致を拒否する。
+15. master offline suiteは受入済みの必要suiteを実行し、少なくともSprint 015とSprint 020 Patch 002を含む。存在確認だけ、子suite未実行、失敗の握りつぶしを禁止する。
+16. 配布検査はGit checkoutと `.git`がないGit archive相当の両方で成立する。Git履歴が必要な検査はcheckout専用と明示し、archiveで実行可能なmanifest、参照、配布ファイル、secret、version検査を `.git`不在だけで失敗させない。
+17. wizardの画面遷移・非同期結果後は新しい見出しまたは主領域へfocusを移す。入力中の再描画では利用者のfocusを奪わず、主要なbutton、link、summary、checkbox／radioは44px相当以上の操作領域を持つ。
+18. `.mcp.json`、onboarding、README、公開ガイドは `0.7.0`の現行機能と一致させる。古い「後続対応予定」、古いversion、既に置き換えた導線を現行説明へ残さない。
+19. `0.7.0`の配布合格には、F36〜F42の回帰、master offline／online、Git archive相当の検査、専用private test workspaceのChatwork／Google Chat live gateがすべて必要である。片方のサービス、合成fixture、過去run、過去版の成功で代替しない。
+20. live gate完了後は両チャットschedule、全Repository Secret、room／space選択、Google OAuth grant／tokenが残っていないことを確認する。後始末未完了は不合格。履歴またはtest workspaceの削除は別の明示確認を必要とする。

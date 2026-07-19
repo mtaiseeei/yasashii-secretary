@@ -2,7 +2,7 @@
 
 import { execFile } from "node:child_process";
 import { createServer } from "node:http";
-import { cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
@@ -13,7 +13,7 @@ const template = join(repo, "plugins", "yasashii-secretary", "workspace-template
 const syncScript = join(template, "chatwork", "scripts", "chatwork-sync.mjs");
 const searchScript = join(repo, "plugins", "yasashii-secretary", "skills", "chatwork", "scripts", "search.mjs");
 const wizardScript = join(repo, "plugins", "yasashii-secretary", "skills", "chatwork", "scripts", "wizard-server.mjs");
-const work = mkdtempSync(join(tmpdir(), "yasashii-s013-"));
+const work = mkdtempSync(join(realpathSync(tmpdir()), "yasashii-s013-"));
 const tokenMarker = ["runtime", "chatwork", String(process.pid), String(Date.now())].join("-");
 let failures = 0;
 
@@ -109,6 +109,8 @@ const url = output.match(/http:\/\/127\.0\.0\.1:\d+\//)?.[0];
 check("wizardはloopbackだけで起動", Boolean(url));
 const htmlResponse = await fetch(url);
 const wizardHtml = await htmlResponse.text();
+const wizardCookie = htmlResponse.headers.get("set-cookie")?.split(";", 1)[0];
+const mutationHeaders = { "content-type": "application/json", origin: new URL(url).origin, cookie: wizardCookie };
 const cssResponse = await fetch(`${url}style.css`);
 const wizardCss = await cssResponse.text();
 const jsResponse = await fetch(`${url}app.js`);
@@ -144,11 +146,11 @@ check("wizard DOMにTokenが無い", !wizardHtml.includes(tokenMarker));
 const before = readFileSync(join(wizardRoot, "chatwork", "config.json"), "utf8");
 await fetch(`${url}api/bootstrap`);
 check("閲覧・キャンセル相当は設定副作用0", readFileSync(join(wizardRoot, "chatwork", "config.json"), "utf8") === before);
-const invalid = await fetch(`${url}api/confirm`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ selectedRoomIds: ["999"], interval: "1h" }) });
+const invalid = await fetch(`${url}api/confirm`, { method: "POST", headers: mutationHeaders, body: JSON.stringify({ selectedRoomIds: ["999"], interval: "1h" }) });
 check("未発見roomを確定できない", invalid.status === 400 && readFileSync(join(wizardRoot, "chatwork", "config.json"), "utf8") === before);
-const discovered = await fetch(`${url}api/discover`, { method: "POST" });
+const discovered = await fetch(`${url}api/discover`, { method: "POST", headers: mutationHeaders, body: "{}" });
 check("Token登録確認後だけroom一覧を取得", discovered.status === 200 && (await discovered.json()).rooms.status === "ready");
-const confirmed = await fetch(`${url}api/confirm`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ selectedRoomIds: ["101"], interval: "3h", automaticPushConsent: true }) });
+const confirmed = await fetch(`${url}api/confirm`, { method: "POST", headers: mutationHeaders, body: JSON.stringify({ selectedRoomIds: ["101"], interval: "3h", automaticPushConsent: true }) });
 const confirmedConfig = json(join(wizardRoot, "chatwork", "config.json"));
 check("確定後だけroomと頻度を保存", confirmed.status === 202 && confirmedConfig.selectedRoomIds.join() === "101" && confirmedConfig.interval === "3h");
 check("明示同意後だけscheduleを有効化", confirmedConfig.scheduleEnabled === true && confirmedConfig.automaticPushConsent === true);

@@ -129,7 +129,7 @@ def cli(command, workspace, current=None, env=None, extra=None):
     return run(args, cwd=workspace, env=fixture_env)
 
 with tempfile.TemporaryDirectory(prefix="sprint018-") as temp:
-    root = Path(temp)
+    root = Path(temp).resolve()
     log = root / "claude.log"
     mock = root / "claude-fixture"
     mock.write_text("""#!/usr/bin/env python3
@@ -208,8 +208,8 @@ raise SystemExit(0)
     check("同じmigration再実行は追加変更0", again.returncode == 0 and parse(again).get("migrationCount") == 0 and hashlib.sha256((approved / "secretary/AGENTS.md").read_bytes()).hexdigest() == first_hash)
     rollback = cli("rollback", approved)
     rollback_data = parse(rollback)
-    check("workspaceは管理対象だけ保護commitへ復元", rollback.returncode == 0 and rollback_data.get("workspaceRestored") is True and snapshot(approved) == initial_files)
-    check("plugin未復元を隠さず手動手順を示す", rollback_data.get("pluginRestored") is False and rollback_data.get("unresolved"))
+    check("workspaceは管理対象だけ保護commitへ復元", rollback.returncode != 0 and rollback_data.get("workspaceRestored") is True and snapshot(approved) == initial_files)
+    check("plugin未復元を隠さずpartial表示と実行可能な旧版手順を示す", rollback_data.get("status") == "partial-restoration" and rollback_data.get("pluginRestored") is False and rollback_data.get("fallback", {}).get("command") and rollback_data.get("unresolved"))
 
     print("== customized, secret, dirty, commit/plugin failure ==")
     clean_ledger = make_workspace(root, "clean-ledger", old_agents)
@@ -323,10 +323,10 @@ raise SystemExit(0)
     failed_verify = cli("resume", verify_fail, extra=["--apply", "--plan-hash", plan_hash, "--test-post-verify-fail", "yes"])
     check("更新後検証1件失敗で成功報告しない", failed_verify.returncode != 0 and parse(failed_verify).get("title") == "更新後の検証に失敗しました")
     rolled = cli("rollback", verify_fail)
-    check("検証失敗後もworkspace rollback", rolled.returncode == 0 and snapshot(verify_fail) == before_files)
+    check("検証失敗後もworkspace rollbackし、plugin未復元はpartial", rolled.returncode != 0 and parse(rolled).get("workspaceRestored") is True and parse(rolled).get("status") == "partial-restoration" and snapshot(verify_fail) == before_files)
 
     source = apply_cli.read_text()
-    check("任意shell文字列と破壊的resetを使わない", "shell: false" in source and 'git(workspace, ["reset"' not in source and 'git(workspace, ["push"' not in source)
+    check("任意shell文字列と破壊的resetを使わない", ("shell: false" in source or "runExternalSync" in source) and "shell: true" not in source and 'git(workspace, ["reset"' not in source and 'git(workspace, ["push"' not in source)
     check("push/remote変更の実行経路0", not any(line.startswith("push") or " remote " in f" {line} " for line in log.read_text().splitlines()))
     new_plugin_files = [apply_cli, plugin / "skills/update/SKILL.md"] + list((plugin / "migrations").rglob("*"))
     leaked = [path for path in new_plugin_files if path.is_file() and "Google" + " Chat" in path.read_text()]

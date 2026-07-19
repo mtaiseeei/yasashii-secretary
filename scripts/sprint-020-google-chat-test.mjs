@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { execFileSync, spawnSync } from "node:child_process";
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -13,6 +13,7 @@ import { GOOGLE_CHAT_INTERVALS, googleChatScheduleFor, renderGoogleChatWorkflow 
 let passed = 0;
 let failed = 0;
 const temporary = [];
+const testTmp = realpathSync(tmpdir());
 
 function check(condition, label) {
   if (condition) { passed += 1; process.stdout.write(`  PASS ${label}\n`); }
@@ -20,7 +21,7 @@ function check(condition, label) {
 }
 
 function temp(prefix) {
-  const path = mkdtempSync(join(tmpdir(), prefix));
+  const path = mkdtempSync(join(testTmp, prefix));
   temporary.push(path);
   return path;
 }
@@ -171,7 +172,7 @@ try {
   check(second.status === "success" && secondHistory.includes("編集後") && secondHistory.includes("削除済みメッセージ") && secondHistory.includes("新規本文"), "取得範囲内の新規・編集・削除をmessage resource単位で統合");
   const oldHistory = readFileSync(join(syncRoot, "google-chat", "history", "営業--AAA", "2026-07-15.md"), "utf8");
   check(oldHistory.includes("古い本文"), "差分範囲外の古い編集・削除は既存履歴を消さない");
-  check((secondHistory.match(/google-chat-message:/g) || []).length === 3, "同日再実行で重複・既存投稿消失0件");
+  check((secondHistory.match(/^<!-- google-chat-message:/gm) || []).length === 3, "同日再実行で重複・既存投稿消失0件");
 
   const beforeB = second.cursors["spaces/BBB"];
   let partialError;
@@ -214,7 +215,7 @@ try {
   mkdirSync(join(flowRoot, "google-chat", "history", "営業--AAA"), { recursive: true });
   const fakeGit = join(flowRoot, "bin", "git");
   const fakeGh = join(flowRoot, "bin", "gh");
-  writeFileSync(fakeGit, "#!/bin/sh\nexit 0\n");
+  writeFileSync(fakeGit, "#!/bin/sh\nif [ \"$1 $2\" = \"branch --show-current\" ]; then echo main; fi\nexit 0\n");
   writeFileSync(fakeGh, `#!/bin/sh
 if [ "$1 $2" = "workflow run" ]; then
   count_file="$FAKE_GH_ROOT/dispatch-count"
@@ -223,6 +224,7 @@ if [ "$1 $2" = "workflow run" ]; then
   count=$((count + 1))
   printf '%s' "$count" > "$count_file"
   date -u '+%Y-%m-%dT%H:%M:%SZ' > "$FAKE_GH_ROOT/created-at"
+  for arg in "$@"; do case "$arg" in correlation_id=*) printf '%s' "\${arg#correlation_id=}" > "$FAKE_GH_ROOT/correlation-id" ;; esac; done
   exit 0
 fi
 if [ "$1 $2" = "run list" ]; then
@@ -232,7 +234,8 @@ if [ "$1 $2" = "run list" ]; then
     echo '[]'
   else
     created_at=$(cat "$FAKE_GH_ROOT/created-at")
-    printf '[{"databaseId":%s,"status":"queued","conclusion":null,"createdAt":"%s"}]\n' "$((40 + count))" "$created_at"
+    correlation_id=$(cat "$FAKE_GH_ROOT/correlation-id")
+    printf '[{"databaseId":%s,"status":"queued","conclusion":null,"createdAt":"%s","headBranch":"main","workflowName":"Google Chat sync","displayTitle":"Google Chat sync [%s]"}]\n' "$((40 + count))" "$created_at" "$correlation_id"
   fi
   exit 0
 fi

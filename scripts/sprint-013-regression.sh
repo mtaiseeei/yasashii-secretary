@@ -2,7 +2,8 @@
 set -uo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 PLUGIN="$REPO/plugins/yasashii-secretary"
-WORK="$(mktemp -d "${TMPDIR:-/tmp}/yasashii-s013-regression.XXXXXX")"
+WORK_PARENT="$(cd "${TMPDIR:-/tmp}" && pwd -P)"
+WORK="$(mktemp -d "$WORK_PARENT/yasashii-s013-regression.XXXXXX")"
 PASS=0; FAIL=0
 trap 'rm -rf "$WORK"' EXIT
 check(){ local label="$1"; shift; if "$@"; then printf 'PASS %s\n' "$label"; PASS=$((PASS+1)); else printf 'FAIL %s\n' "$label"; FAIL=$((FAIL+1)); fi; }
@@ -65,9 +66,9 @@ node "$PUBLISH" prepare --root "$SUCCESS" --templates "$TEMPLATES" >/dev/null
 FAKE_REMOTE="$WORK/success.git" YASASHII_GH_BIN="$FAKE_GH" GIT_AUTHOR_NAME=regression GIT_AUTHOR_EMAIL=regression@example.invalid GIT_COMMITTER_NAME=regression GIT_COMMITTER_EMAIL=regression@example.invalid node "$PUBLISH" publish --root "$SUCCESS" --repo all-in-one --visibility private --confirm > "$WORK/publish.json"
 check_eval "private repo初期commit・初回pushが成功" "[ \"\$(node -p \"JSON.parse(require('fs').readFileSync('$WORK/publish.json')).visibility\")\" = PRIVATE ] && git -C '$SUCCESS' rev-parse --abbrev-ref '@{u}' >/dev/null 2>&1"
 check_eval "secretary・project・Chatworkが同じrepo root" "[ -d '$SUCCESS/secretary' ] && [ -d '$SUCCESS/project' ] && [ -d '$SUCCESS/chatwork' ] && [ -f '$SUCCESS/.github/workflows/chatwork-sync.yml' ] && [ ! -e '$SUCCESS/secretary/.git' ]"
-check_eval "初回commitはworkspace全体を含む" "git -C '$SUCCESS' ls-tree -r --name-only HEAD | grep -q '^secretary/' && git -C '$SUCCESS' ls-tree -r --name-only HEAD | grep -q '^project/' && git -C '$SUCCESS' ls-tree -r --name-only HEAD | grep -q '^chatwork/'"
+check_eval "初回commitは明示inventoryだけを含む" "git -C '$SUCCESS' ls-tree -r --name-only HEAD | grep -q '^secretary/' && git -C '$SUCCESS' ls-tree -r --name-only HEAD | grep -q '^chatwork/' && ! git -C '$SUCCESS' ls-tree -r --name-only HEAD | grep -q '^project/'"
 
-SECRET="$WORK/secret"; make_workspace "$SECRET"; TOKEN_MARKER="runtime-chatwork-${RANDOM}-$$"; printf 'CHATWORK_API_TOKEN=%s\n' "$TOKEN_MARKER" > "$SECRET/.env"
+SECRET="$WORK/secret"; make_workspace "$SECRET"; TOKEN_MARKER="runtime-chatwork-${RANDOM}-$$"; printf 'CHATWORK_API_TOKEN=%s\n' "$TOKEN_MARKER" > "$SECRET/secretary/.env"
 FAKE_REMOTE="$WORK/secret.git" YASASHII_GH_BIN="$FAKE_GH" GIT_AUTHOR_NAME=regression GIT_AUTHOR_EMAIL=regression@example.invalid GIT_COMMITTER_NAME=regression GIT_COMMITTER_EMAIL=regression@example.invalid node "$PUBLISH" publish --root "$SECRET" --repo secret --visibility private --confirm >/dev/null 2>&1; SECRET_RC=$?
 check_eval "資格情報候補を検出するとcommit・pushしない" "[ '$SECRET_RC' -eq 3 ] && [ ! -e '$SECRET/.git' ] && [ ! -e '$WORK/secret.git' ]"
 check "Chatwork API・search・wizard挙動回帰" node "$REPO/scripts/sprint-013-chatwork-test.mjs"
@@ -79,7 +80,7 @@ check_eval "wizardはgradient・shadow・画像・Tesla商標を使わない" "!
 check_eval "mobile 1 column・CTAはDOM順で縦積み・reduced motion" "grep -q 'max-width: 767px' '$CSS' && grep -q 'grid-template-columns: 1fr' '$CSS' && grep -q 'flex-direction: column;' '$CSS' && ! grep -q 'flex-direction: column-reverse' '$CSS' && grep -q 'prefers-reduced-motion' '$CSS'"
 check_eval "Token入力欄・token値surfaceが無い" "! grep -RqiE 'type=\"password\"|name=\"token\"|CHATWORK_API_TOKEN=' '$HTML' '$CSS' '$JS' '$CHATWORK/SKILL.md'"
 check_eval "6頻度・既定3時間・run数を挙動データで定義" "node -e \"const s=require('fs').readFileSync(process.argv[1],'utf8'); for(const v of ['30m','1h','3h','6h','12h','manual','1440','720','240','120','60']) if(!s.includes(v)) process.exit(1)\" '$JS' && grep -q 'interval: \"3h\"' '$JS'"
-check_eval "wizardはprivate repoを検証し確定後だけ設定commit・push" "grep -q 'verifyPrivateRepo' '$CHATWORK/scripts/wizard-server.mjs' && grep -q 'applyChatworkConfig' '$CHATWORK/scripts/wizard-server.mjs' && grep -q '\[\"push\"\]' '$CHATWORK/scripts/config-transaction.mjs'"
+check_eval "wizardはprivate repoを検証し確定後だけ設定commit・push" "grep -q 'verifyPrivateRepo' '$CHATWORK/scripts/wizard-server.mjs' && grep -q 'applyChatworkConfig' '$CHATWORK/scripts/wizard-server.mjs' && grep -q 'commitOwnedChanges' '$CHATWORK/scripts/config-transaction.mjs' && grep -q 'pushOwnedCommit' '$CHATWORK/scripts/config-transaction.mjs'"
 
 cp "$TEMPLATES/.github/workflows/chatwork-sync.yml" "$WORK/workflow-invalid.yml"
 apply_patch <<PATCH

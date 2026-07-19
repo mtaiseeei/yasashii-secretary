@@ -1,4 +1,4 @@
 {
-  "_NOTE": "yasashii-secretary は外部データを『公式リモートコネクタ優先・都度参照』で扱う方針のため、このファイルは意図的に最小です。Gmail / Googleカレンダー / Googleドライブ は、ローカルにMCPサーバーを立てず、Claude 側の設定画面（コネクタ）からOAuthで接続します。接続の案内は今のところ Google のみ（setup-google スキル）で、Microsoft / Notion は後続で対応予定です。ローカルの同期コピーやキャッシュ層は作りません。",
+  "_NOTE": "yasashii-secretary は外部データを『公式リモートコネクタ優先・都度参照』で扱うため、このファイルにローカルMCPサーバーは追加しません。Gmail / Googleカレンダー / Googleドライブ、Microsoft 365（Outlook / 予定表 / OneDrive / Teams）、NotionはClaudeの設定画面（公式コネクタ）から接続します。ChatworkとGoogle Chatは、このプラグインの専用wizardで選択範囲だけを非公開workspaceへ保存します。利用者のデータ・Secret・同期workflowはこのpublic配布repoへ置きません。",
   "mcpServers": {}
 }

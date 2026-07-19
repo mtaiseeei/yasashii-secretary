@@ -1,5 +1,31 @@
 # 変更履歴
 
+## [0.7.0] - 2026-07-19
+
+### 対象者
+
+- `0.6.0`を利用中の方と、Chatwork／Google Chatを含む安全性改善をまとめて受け取りたい方。
+
+### 変わること
+
+- secretのcommit防止、symlink境界、外部処理timeout、OAuth callbackの一回性、Google Chat履歴marker、GitHub Actions runの取り違えを配布前に検査します。
+- `0.6.0`からの更新で、workspaceとpluginを別々に検証・復元し、片方だけ戻った状態を完了と表示しません。
+
+### 設定・ファイルへの影響
+
+- migrationは管理対象のversion台帳だけを`0.7.0`へ進め、記憶、一般プロジェクト、Chatwork／Google Chatの履歴・設定、Repository Secretを置き換えません。
+- カスタマイズ済み、または配布時の基準を確認できないファイルは「現状を残す」が既定です。
+
+### 必要な操作
+
+- 「最新版にして」と依頼し、読み取り専用の診断で`0.6.0 → 0.7.0`の影響と戻し方を確認してから実更新を明示了承します。
+- plugin更新後は`/reload-plugins`を実行し、dry-runの追加・変更・維持対象を確認してからmigrationを適用します。
+
+### 互換性上の注意
+
+- 更新にはcleanなGit workspaceと、pushしない保護commitが必要です。force push、rebase、filter-repoは行いません。
+- pluginを自動復元できない環境では、実行可能な`0.6.0`の退避先、対象scope、起動・確認手順を表示し、未復元のまま完了としません。
+
 ## [0.6.0] - 2026-07-17
 
 ### 対象者

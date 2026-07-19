@@ -1,4 +1,5 @@
 name: Chatwork sync
+run-name: Chatwork sync [${{ inputs.correlation_id || github.event_name }}]
 
 on:
   # 3時間ごと（おすすめ・初期値）を有効にする例: cron: '17 */3 * * *'
@@ -14,6 +15,10 @@ on:
           - discover
           - initial
           - sync
+      correlation_id:
+        description: 今回の開始操作とrunを対応づける識別子
+        required: false
+        type: string
 
 permissions:
   contents: write

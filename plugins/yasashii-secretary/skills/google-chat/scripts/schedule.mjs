@@ -17,10 +17,16 @@ export function renderGoogleChatWorkflow(interval, enabled) {
   const schedule = cron ? ["  schedule:", `    - cron: '${cron}'`] : [];
   return [
     "name: Google Chat sync",
+    "run-name: Google Chat sync [${{ inputs.correlation_id || github.event_name }}]",
     "",
     "on:",
     ...schedule,
     "  workflow_dispatch:",
+    "    inputs:",
+    "      correlation_id:",
+    "        description: 今回の開始操作とrunを対応づける識別子",
+    "        required: false",
+    "        type: string",
     "",
     "permissions:",
     "  contents: write",

@@ -1,5 +1,6 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { safeWritePath, workingRoot, writeFileAtomicSafe } from "./runtime-safety.mjs";
 
 function partsInTokyo(value) {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -28,6 +29,12 @@ function senderFallback(message) {
   return `Google Chatユーザー ${suffix}`;
 }
 
+function normalizedTimestamp(value, field) {
+  const date = new Date(value);
+  if (!value || !Number.isFinite(date.getTime())) throw new Error(`${field}を確認できません。`);
+  return date.toISOString();
+}
+
 export function normalizeMessage(message, displayName) {
   const name = String(message.name || "");
   if (!/^spaces\/[^/]+\/messages\/[^/]+$/.test(name)) throw new Error("message resource nameを確認できません。");
@@ -38,10 +45,14 @@ export function normalizeMessage(message, displayName) {
     reference: item.attachmentDataRef?.resourceName || item.driveDataRef?.driveFileId || "参照先なし",
   }));
   const deleted = Boolean(message.deletionMetadata);
+  const createTime = normalizedTimestamp(message.createTime || message.lastUpdateTime || new Date(0).toISOString(), "message createTime");
+  const updateTime = message.lastUpdateTime || message.createTime
+    ? normalizedTimestamp(message.lastUpdateTime || message.createTime, "message updateTime")
+    : null;
   return {
     name,
-    createTime: message.createTime || message.lastUpdateTime || new Date(0).toISOString(),
-    updateTime: message.lastUpdateTime || message.createTime || null,
+    createTime,
+    updateTime,
     sender: displayName || senderFallback(message),
     thread: message.thread?.name || null,
     text: deleted ? "" : String(message.text || message.formattedText || ""),
@@ -51,33 +62,72 @@ export function normalizeMessage(message, displayName) {
   };
 }
 
+function quoted(value, fallback = "（なし）") {
+  const source = String(value || fallback).replace(/\r\n?/g, "\n");
+  return source.split("\n").map((line) => `> ${line}`).join("\n");
+}
+
 function messageBlock(message) {
   const encoded = Buffer.from(message.name).toString("base64url");
   const lines = [
-    `<!-- google-chat-message:${encoded} created:${message.createTime} -->`,
-    `## [${tokyoTime(message.createTime)}] ${message.sender}`,
+    `<!-- google-chat-message:${encoded} created:${message.createTime} format:v2 -->`,
+    `## [${tokyoTime(message.createTime)}] Google Chatメッセージ`,
     "",
-    message.deleted ? `削除済みメッセージ（${message.deletionType || "削除情報あり"}）` : (message.text || "（本文なし）"),
+    "### 発言者",
+    quoted(message.sender, "Google Chatユーザー"),
+    "",
+    "### 本文",
+    message.deleted ? quoted("削除済みメッセージ") : quoted(message.text, "（本文なし）"),
   ];
-  if (message.thread) lines.push("", `- スレッド: \`${message.thread}\``);
-  for (const attachment of message.attachments) {
-    lines.push("", `- 添付メタデータ: ${attachment.name} / ${attachment.type} / ${attachment.source} / ${attachment.reference}`);
+  if (message.deleted) lines.push("", "### 削除メタデータ", quoted(message.deletionType, "削除情報あり"));
+  if (message.thread) lines.push("", "### スレッド", quoted(message.thread));
+  for (const [index, attachment] of message.attachments.entries()) {
+    lines.push(
+      "",
+      `### 添付メタデータ ${index + 1}`,
+      "#### 名前", quoted(attachment.name, "名称なし"),
+      "#### 種類", quoted(attachment.type, "種類不明"),
+      "#### 取得元", quoted(attachment.source, "Google Chat"),
+      "#### 参照先", quoted(attachment.reference, "参照先なし"),
+    );
   }
-  lines.push("", "<!-- /google-chat-message -->");
+  lines.push("", `<!-- /google-chat-message:${encoded} -->`);
   return lines.join("\n");
 }
 
 function existingBlocks(source) {
   const blocks = new Map();
-  const pattern = /<!-- google-chat-message:([A-Za-z0-9_-]+) created:([^ ]+) -->[\s\S]*?<!-- \/google-chat-message -->/g;
-  for (const match of source.matchAll(pattern)) {
-    try { blocks.set(Buffer.from(match[1], "base64url").toString(), { created: match[2], body: match[0] }); } catch { /* 壊れたmarkerは無視 */ }
+  const v2Start = /^<!-- google-chat-message:([A-Za-z0-9_-]+) created:([^ \r\n]+) format:v2 -->$/gm;
+  for (const match of source.matchAll(v2Start)) {
+    const end = `<!-- /google-chat-message:${match[1]} -->`;
+    const endAt = source.indexOf(`\n${end}`, match.index + match[0].length);
+    if (endAt < 0) continue;
+    try {
+      const name = Buffer.from(match[1], "base64url").toString();
+      if (!/^spaces\/[^/]+\/messages\/[^/]+$/.test(name)) continue;
+      blocks.set(name, { created: match[2], body: source.slice(match.index, endAt + 1 + end.length) });
+    } catch { /* 壊れたmarkerは無視 */ }
+  }
+
+  // v1履歴は次のmessage開始までを1区間とし、最後の終了markerを正規の境界として移行する。
+  const legacyStarts = [...source.matchAll(/^<!-- google-chat-message:([A-Za-z0-9_-]+) created:([^ \r\n]+) -->$/gm)];
+  for (const [index, match] of legacyStarts.entries()) {
+    const segmentEnd = legacyStarts[index + 1]?.index ?? source.length;
+    const segment = source.slice(match.index, segmentEnd);
+    const endMarker = "<!-- /google-chat-message -->";
+    const endAt = segment.lastIndexOf(endMarker);
+    if (endAt < 0) continue;
+    try {
+      const name = Buffer.from(match[1], "base64url").toString();
+      if (!/^spaces\/[^/]+\/messages\/[^/]+$/.test(name) || blocks.has(name)) continue;
+      blocks.set(name, { created: match[2], body: segment.slice(0, endAt + endMarker.length) });
+    } catch { /* 壊れたmarkerは無視 */ }
   }
   return blocks;
 }
 
 export function writeSpaceHistory({ root, space, messages }) {
-  const rootPath = resolve(root);
+  const rootPath = workingRoot(root);
   const byDate = new Map();
   for (const message of messages) {
     const date = tokyoDate(message.createTime);
@@ -87,14 +137,13 @@ export function writeSpaceHistory({ root, space, messages }) {
   const files = [];
   for (const [date, dayMessages] of byDate) {
     const directory = join(rootPath, "google-chat", "history", `${safeSegment(space.displayName)}--${safeSegment(space.name.split("/").pop())}`);
-    const path = join(directory, `${date}.md`);
+    const path = safeWritePath(rootPath, join(directory, `${date}.md`));
     let previous = "";
     try { previous = readFileSync(path, "utf8"); } catch { /* 新規 */ }
     const blocks = existingBlocks(previous);
     for (const message of dayMessages) blocks.set(message.name, { created: message.createTime, body: messageBlock(message) });
-    const content = [...blocks.values()].sort((a, b) => a.created.localeCompare(b.created)).map((item) => item.body).join("\n\n---\n\n");
-    mkdirSync(dirname(path), { recursive: true });
-    writeFileSync(path, `# ${space.displayName} - ${date}\n\n- source: Google Chat\n- space: \`${space.name}\`\n- timezone: Asia/Tokyo\n\n${content}\n`, { mode: 0o600 });
+    const content = [...blocks.entries()].sort((left, right) => left[1].created.localeCompare(right[1].created) || left[0].localeCompare(right[0])).map(([, item]) => item.body).join("\n\n---\n\n");
+    writeFileAtomicSafe(rootPath, path, `# ${space.displayName} - ${date}\n\n- source: Google Chat\n- space: \`${space.name}\`\n- timezone: Asia/Tokyo\n\n${content}\n`, { mode: 0o600 });
     files.push(path);
   }
   return files;
