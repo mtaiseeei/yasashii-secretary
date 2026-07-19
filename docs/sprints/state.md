@@ -2,11 +2,11 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-027
+- Current ID: sprint-028
 - Retry Count: 0
 - Model Tier: strong
-- Rotate: model-escalation
-- Next Planned: sprint-028
+- Rotate: none
+- Next Planned: TBD
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
      ユーザー確認で単段クレジットに正本改訂、回帰assert強化のうえ合格）。
@@ -49,7 +49,7 @@
 | sprint-024 | done | [contract](sprint-024.md) | [progress](../progress/sprint-024.md) | [feedback](../feedback/sprint-024.md) |
 | sprint-025 | done | [contract](sprint-025.md) | [progress](../progress/sprint-025.md) | [feedback](../feedback/sprint-025.md) |
 | sprint-026 | done | [contract](sprint-026.md) | [progress](../progress/sprint-026.md) | [feedback](../feedback/sprint-026.md) |
-| sprint-027 | planned | [contract](sprint-027.md) | - | - |
+| sprint-027 | done | [contract](sprint-027.md) | [progress](../progress/sprint-027.md) | [feedback](../feedback/sprint-027.md) |
 | sprint-028 | planned | [contract](sprint-028.md) | - | - |
 
 ## Deferred / Superseded
@@ -145,3 +145,10 @@
 - 2026-07-19: sprint-026 Retry 1再評価はimplementation-issueでFAIL（53/60）。validator偽PASSと単一prefix集計は修正済みだが、子suite内の複数内部summaryと最終正本summaryを全加算し、raw 335/1をmaster JSON 2969/1へ二重計上するF3を独立再現。Retry Count 2の閾値によりModel Tierをstrong、Rotateをmodel-escalationとし、Sol/high fresh GeneratorへF3だけを差し戻す。
 - 2026-07-19: sprint-026 Retry 2のSol/high fresh Generatorが最終bare正本summaryを優先し、ない場合のみ最後のprefix summaryを採用、途中FAILを保持するようF3を限定修正。raw 335/1維持を含む専用21/21、wrapper 3/3、validator、構文がPASS。禁止対象接触・外部操作0件でfresh独立Evaluatorへ再引き渡す。
 - 2026-07-19: sprint-026 Retry 2はSol/high fresh EvaluatorでPASS（57/60）。専用21/21、wrapper 3/3、独立parser 11/11、archive matrix 6/6、checkout offline 411/411・online 412/412、archive 76/76・checks 9/9が0 FAIL。F1〜F3修正とraw／JSON集計一致を確認し、禁止対象接触・外部書込み・残存fixture／process 0件。sprint-026をdone、Retry Countを0、Current IDをsprint-027へ更新。
+- 2026-07-19: sprint-027は標準リスク。Agentic Harness 0.4.4 resolverがstrongからstandardへのtier変更を選択し、Model Tierをstandard、Rotateをmodel-escalationとしてLuna/xHigh fresh Generatorを開始する。既存の未stage `LICENSE`差分はSprint 027対象外として保持する。
+- 2026-07-19: sprint-027のLuna/xHigh fresh Generatorがwizard共通focus／caret／aria、44px操作領域、overflow防止、両wizard focus-key、`.mcp.json`／onboarding／README／guide整合、copy／browser回帰を実装。copy 66/66、wrapper 4/4、構文・diff checkがPASS。実browser測定はfresh Evaluatorへ引き渡し、禁止対象接触・外部操作0件、既存`LICENSE`差分不変。
+- 2026-07-19: sprint-027初回評価はimplementation-issueでFAIL（54/60）。UI本体は独立DOM 15観測・3 viewport、focus／caret／44px／overflow／accessible nameがPASSしたが、提供browser checkのRuntime SyntaxError、閉じたdetails内不可視linkの測定、master旧M8の現行`.mcp.json`と逆向きassertを検出。Retry Countを1、standard tier、Rotate noneとし、Luna/xHigh fresh Generatorへ3点を限定差し戻す。
+- 2026-07-19: sprint-027 Retry 1のLuna/xHigh fresh Generatorがbrowser DOM式のmodule分離、不可視／無効要素のhit-area除外、M8の現行connector／両チャット仕様への更新を限定実装。expression 6/6、copy 66/66、wrapper 5/5がPASS。禁止対象接触・外部操作0件、既存`LICENSE`差分不変でfresh独立Evaluatorへ再引き渡す。
+- 2026-07-19: sprint-027 Retry 1再評価はimplementation-issueでFAIL（54/60）。初回3指摘とUI本体は合格したが、Google synthetic開始用の別Runtime式line 94に欠落`}`があり実ChromeでSyntaxError停止。独立補正版は12/12・caret 6/6・screenshot 6枚目視PASS。Retry Count 2の閾値によりstrong／Rotate model-escalationへ切替え、Sol/high fresh Generatorへline 94だけを差し戻す。
+- 2026-07-19: sprint-027 Retry 2のfresh Generatorが`scripts/sprint-027-browser-check.mjs:94`の欠落`}`だけを限定修正。構文、expression 6/6、copy 66/66、wrapper 5/5が0 FAIL。role別model／effort適用面とlaunch metadataは未確認のため実起動modelは`unverified`。既存`LICENSE`差分と`docs/evidence`には触れず、fresh独立Evaluatorへ引き渡す。
+- 2026-07-19: sprint-027 Retry 2はfresh独立EvaluatorでPASS（59/60、受入1〜10）。正式browser 12/12、screenshot 6枚目視、専用5/5・copy 66/66・expression 6/6・M8 2/2、禁止領域を持たないallowlist隔離repoでmaster offline 416/416・online 417/417が0 FAIL。最初の隔離試行で禁止領域の追跡path名を1回列挙した操作逸脱は内容読取・実体化・変更・stage・外部送信0件として製品合否と分離記録。sprint-027をdone、Retry Countを0、Current IDをsprint-028へ更新する。

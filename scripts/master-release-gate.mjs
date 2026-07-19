@@ -57,6 +57,7 @@ function defaultInventory(root, mode) {
       { id: "sprint-022-git-diff", excluded: true, reason: "archive has no Git checkout; diff assertion is checkout-only", archive: false },
       { id: "sprint-023-git-diff", excluded: true, reason: "archive has no Git checkout; diff assertion is checkout-only", archive: false },
       { id: "sprint-024-git-diff", excluded: true, reason: "archive has no Git checkout; diff assertion is checkout-only", archive: false },
+      { id: "sprint-027-focus-copy", command: "bash", args: [script("sprint-027-regression.sh")], archive: true },
     ];
   }
   // The existing regression-check is the long-lived master suite.  The two
@@ -66,6 +67,7 @@ function defaultInventory(root, mode) {
   return [
     { id: "sprint-015-projects", command: "bash", args: [script("sprint-015-regression.sh")], archive: false },
     { id: "sprint-020-patch-002-cloud", command: "bash", args: [script("sprint-020-patch-002-regression.sh")], archive: false },
+    { id: "sprint-027-focus-copy", command: "bash", args: [script("sprint-027-regression.sh")], archive: false },
     { id: "master-regression-check", command: "bash", args: [script("regression-check.sh"), modeArg], archive: false },
   ];
 }

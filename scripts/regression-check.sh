@@ -698,9 +698,9 @@ check "M4: workspace-tools.sh に実行権限" "[ -x '$WT' ]"
 check "M6: 秘書向け SKILL/rules に docs/spec 参照が無い" "! grep -rq 'docs/spec' '$PLUGIN/skills' '$PLUGIN/rules'"
 check "M6: 秘書向け SKILL/rules に docs/sprints 参照が無い" "! grep -rq 'docs/sprints' '$PLUGIN/skills' '$PLUGIN/rules'"
 
-# --- M8: .mcp.json が未実装の setup-microsoft に言及しない ---
+# --- M8: .mcp.json の公式connector／専用wizard説明が現行仕様と一致する ---
 check "M8: .mcp.json に setup-microsoft の言及が無い" "! grep -q 'setup-microsoft' '$PLUGIN/.mcp.json'"
-check "M8: .mcp.json が『今は Google のみ』を明記" "grep -q 'Google のみ' '$PLUGIN/.mcp.json'"
+check "M8: .mcp.json が公式connectorとChatwork／Google Chatを説明" "grep -q 'Microsoft 365' '$PLUGIN/.mcp.json' && grep -q 'Notion' '$PLUGIN/.mcp.json' && grep -q 'Chatwork' '$PLUGIN/.mcp.json' && grep -q 'Google Chat' '$PLUGIN/.mcp.json' && ! grep -qE '今のところ Google のみ|Google のみ|後続で対応予定' '$PLUGIN/.mcp.json'"
 
 # --- H2: 再セットアップの保護（バックアップ提案＋明示確認・無確認上書き禁止）---
 check "H2: ルーターに再セットアップ保護フローがある" "grep -q '作り直し（再セットアップ）の保護' '$SECRETARY_SKILL' && grep -q 'バックアップ' '$SECRETARY_SKILL'"
