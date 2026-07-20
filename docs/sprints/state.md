@@ -2,11 +2,11 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-033
-- Retry Count: 0
+- Current ID: sprint-032-patch-002
+- Retry Count: 1
 - Model Tier: standard
 - Rotate: none
-- Next Planned: sprint-034
+- Next Planned: sprint-033
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
      ユーザー確認で単段クレジットに正本改訂、回帰assert強化のうえ合格）。
@@ -56,7 +56,7 @@
 | sprint-031 | done | [contract](sprint-031.md) | [progress](../progress/sprint-031.md) | [feedback](../feedback/sprint-031.md) |
 | sprint-032 | done | [contract](sprint-032.md) | [progress](../progress/sprint-032.md) | [feedback](../feedback/sprint-032.md) |
 | sprint-032-patch-001 | done | [contract](sprint-032-patch-001.md) | [progress](../progress/sprint-032-patch-001.md) | [feedback](../feedback/sprint-032-patch-001.md) |
-| sprint-032-patch-002 | done | [contract](sprint-032-patch-002.md) | [progress](../progress/sprint-032-patch-002.md) | [feedback](../feedback/sprint-032-patch-002.md) |
+| sprint-032-patch-002 | active | [contract](sprint-032-patch-002.md) | [progress](../progress/sprint-032-patch-002.md) | [feedback](../feedback/sprint-032-patch-002.md) |
 | sprint-033 | planned | [contract](sprint-033.md) | - | - |
 | sprint-034 | planned | [contract](sprint-034.md) | - | - |
 | sprint-035 | planned | [contract](sprint-035.md) | - | - |
@@ -193,3 +193,4 @@
 - 2026-07-20: ユーザーが既存Draft PR #2（base `codex/sprint-032-patch-001-baseline`、head `fable/conversation-markdown-review`、開始HEAD `6605b98`）の完成をHarnessへ依頼し、通常Patch `sprint-032-patch-002` を新設。fresh Plannerが契約（Risk: high、実会話runner安全化、完了報告誤合格修正、wizard進捗、GitHub用語補足、serializer正本、room表記、4環境対応のホスト非依存境界）とspec正本・sprint-033／034契約を更新。resolverはhost=claudeCodeで全role model/effort=inherit、generator tier=standard（host-default、rotateReason=null）、lifecycle=fresh独立作業単位を返したため、Model Tierをstrong→standardへ更新しRotate: noneのままfresh Generatorをdispatchする。Current IDをsprint-032-patch-002（active）、Retry Count 0、Next Plannedをsprint-033とする。sprint-033はplannedのまま未着手。
 - 2026-07-21: sprint-032-patch-002 fresh Generatorが契約8領域を実装。実会話runnerをenv allowlist（PATH、HOME、SHELL、TERM、LANG、LC_ALL、LC_CTYPE＋workspace内TMPDIR）・Bashなし最小ツール・workspace内locked fixture・try/finally cleanup・前後外部変更0件検査・サニタイズ証跡へ安全化し、完了報告判定をvalidateScenario統一とfixed必須で誤合格を解消。wizard進捗をChatwork「設定 N/4」系列とGoogle Chat接続1〜3/3再採番で後戻り0にし、GitHub用語補足、serializer shim宣言と参照解決、room→ルーム、4ホスト別集計lib（1ホストPASS非昇格negative付き）を追加。専用24/24、readability 28/28、patch-001回帰7/7、master offline 456/456、archive 116/116が0 FAIL。実会話smokeは資格情報非透過契約下で子セッション未認証のためFAIL=0／UNVERIFIED=5として正直に記録。awaiting-evalへ更新し、fresh独立Evaluatorへ引き渡す。
 - 2026-07-21: sprint-032-patch-002はfresh独立EvaluatorでPASS（機能完全性5/5、動作安定性4/5、エラーハンドリング4/5、回帰なし5/5、ゼロ許容C2・C5・C12・C13・C14全合格）。専用24/24、wrapper 7/7、readability 28/28、patch-001回帰7/7、sprint-013/027/029/030回帰、SCHEMA_OK surfaces=20、master offline 456/456、archive 116/116、negative 17/17が0 FAIL。両wizardをheadless CDPでdesktop/390px/200%全導線walkし進捗後戻り0・欠番0・console error 0、screenshot 11枚をPatch専用docs/evidence/sprint-032-patch-002/へ保存。実会話runnerはcredential非透過・Bash不許可・外部変更0・cleanup保証を独立確認し、子セッション未認証によるUNVERIFIED=5は安全条件を弱めない正しい挙動と判定。実会話の会話品質は4ホストすべてunverifiedとしてSprint 033の実環境検証へ残す。sprint-032-patch-002をdone、Retry Count 0、Current IDをsprint-033、Next Plannedをsprint-034へ進める。sprint-033はplannedのままGeneratorをdispatchせず停止し、Draft PR #2の更新のみ行う。
+- 2026-07-21: ユーザーレビューがsprint-032-patch-002のPASSへ2件の差し戻しを提示。P1（implementation-issue）: smoke runnerは子のcwd/TMPDIRを一時workspaceへ向けるだけで、実HOME透過・Write/Edit許可・acceptEditsの組合せでは絶対path/../によるworkspace外書込みとHOME内資格情報読取を技術的に防いでおらず、外部変更検査もplugin+sentinelに限られ契約96行の保証に届かない。P2（spec-issue成分）: 実会話出力が回帰へ組み込まれておらず（wrapperはnode --checkのみ、live 5 scenarioは全UNVERIFIED）、元指摘「実plugin sessionの会話出力の回帰確認」を解消済みとしてPASS扱いにしたのは早い。doneを取り消しactiveへ戻し、Retry Countを1へ記録。P2のgate構造はPlannerが契約を改訂（live conversation gateの分離と未完了の明示、外部変更0件主張の検査範囲限定、合成HOME・plugin read-only・path-scoped permission・canary拒否実証・隔離未実証時のWrite/Editシナリオ自動実行禁止）し、その後fresh Generatorが修正、fresh独立Evaluatorが再評価する。過去logは書き換えず本entryで訂正する。
