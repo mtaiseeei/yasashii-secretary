@@ -11,7 +11,7 @@ API Tokenは有効期限がなくChatwork機能へフルアクセスできるた
 
 最初に `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
 `secretary/memory/preferences.md` を読む。通常報告の項目数、prefix、Markdown構造をここで再定義せず、すべての
-tool実行後に同ruleの「最終応答serializer」を1回だけ適用する。
+tool実行後に同rule入口から解決される「最終応答serializer」を1回だけ適用する。
 
 ## 状態を先に示す
 

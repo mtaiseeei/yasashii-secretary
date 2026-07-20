@@ -13,7 +13,7 @@ Gmail・Googleカレンダー・Googleドライブを秘書が参照できるよ
 
 `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
 `secretary/memory/preferences.md` を読む。案内内容と安全条件だけをrouterへ返し、
-通常報告を独自に包装しない。最終出力形は同ruleの「最終応答serializer」だけを正本とする。
+通常報告を独自に包装しない。最終出力形は同rule入口から解決される「最終応答serializer」だけを正本とする。
 
 ## はじめに一言（予告と不安の先回り）
 
@@ -77,7 +77,7 @@ Claude の**設定画面 → コネクタ（Connectors）**を開き、次を有
 - ユーザーが選べる次の操作を1つまで。
 
 実コネクタの成功結果が無ければ接続済みと断定しない。ここでは通常報告を作らず、
-内容と安全条件だけをrouterへ返し、出力形は`plain-language.md`の「最終応答serializer」に任せる。
+内容と安全条件だけをrouterへ返し、出力形は`plain-language.md` から解決される「最終応答serializer」に任せる。
 
 接続が完了したら、記憶ケアのしおりを閉じる（`memory-tools.sh resume-clear <secretary>`）。
 

@@ -163,6 +163,7 @@ export function validateScenario(kind, markdown, contract) {
       const bulletPrefixes = topBulletLabels(markdown);
       const expected = [...labels];
       const allowed = [...labels, detailLabel];
+      if (!fixed) problems.push("完了報告が固定3項目schema（存在と順序）を使っていない");
       if (bulletPrefixes.length < 3) problems.push("完了報告の3項目が物理的な別項目になっていない");
       if (!expected.every((label, index) => bulletPrefixes[index] === label)) {
         problems.push("完了報告の項目名または順序がcopyのschemaと一致しない");

@@ -140,7 +140,7 @@ async function discoverRooms() {
 function renderRooms() {
   state.step = 1; progress(1);
   const shown = state.rooms.filter((room) => room.name.toLocaleLowerCase("ja").includes(state.query.toLocaleLowerCase("ja")) || room.roomId.includes(state.query));
-  show("select-rooms", `<p class="eyebrow">STEP 1 / 4</p><h1>保存するChatworkルームを選びます。</h1>${nowCopy("保存したいChatworkルームにチェックを入れます。")}
+  show("select-rooms", `<p class="eyebrow">設定 1 / 4</p><h1>保存するChatworkルームを選びます。</h1>${nowCopy("保存したいChatworkルームにチェックを入れます。")}
     <div class="panel"><label class="search-label" for="room-search">ルームを検索</label><input class="search" id="room-search" type="search" value="${escape(state.query)}" placeholder="ルーム名またはルームID">
     <ul class="room-list">${shown.map((room) => `<li><label class="choice"><input data-focus-key="room-${escape(room.roomId)}" type="checkbox" value="${escape(room.roomId)}" ${state.selected.has(room.roomId) ? "checked" : ""}><span class="choice-copy"><span class="choice-title">${escape(room.name)}</span></span></label></li>`).join("")}</ul>
     <p class="hint" role="status">選択中: ${state.selected.size}ルーム</p>${technicalDetails("管理者向け: ルームを識別する番号", `<ul>${shown.map((room) => `<li>${escape(room.name)}: <code>${escape(room.roomId)}</code></li>`).join("")}</ul>`, "admin")}</div><p class="notice">選んだルームだけを読みます。選んでいないルームは読みません。</p>${actions("Chatworkの取得間隔を選ぶ", "Chatworkの設定をキャンセル")}`);
@@ -153,7 +153,7 @@ function renderRooms() {
 
 function renderFrequency() {
   state.step = 2; progress(2);
-  show("select-interval", `<p class="eyebrow">STEP 2 / 4</p><h1>Chatworkの取得間隔を選びます。</h1>${nowCopy("新しいメッセージを自動で確認する間隔を選びます。")}
+  show("select-interval", `<p class="eyebrow">設定 2 / 4</p><h1>Chatworkの取得間隔を選びます。</h1>${nowCopy("新しいメッセージを自動で確認する間隔を選びます。")}
     <div class="panel"><ul class="frequency-list">${frequencies.map(([value, label, runs]) => `<li><label class="choice"><input type="radio" name="interval" value="${value}" ${state.interval === value ? "checked" : ""}><span class="choice-copy"><span class="choice-title">${label}</span><span class="choice-meta">約${runs.toLocaleString("ja-JP")}回 / 30日</span></span></label></li>`).join("")}</ul>
     ${technicalDetails("詳しい説明: 料金と実行時間について", `<p>実行回数とGitHub Actionsの処理時間は別です。GitHub Freeの非公開リポジトリでは、2026年7月時点で月2,000分の処理時間が含まれます。2,000回の実行枠ではありません。実使用量はプラン、runner、1回あたりの処理時間で変わり、料金や利用枠も変更される可能性があります。</p><p>${externalLink(officialLinks.billing, "GitHub Actionsの料金と利用枠を見る")}</p>`)}
     </div><p class="notice">3時間ごとは、負担と新しさのバランスを取りやすいおすすめ設定です。</p>${actions("Chatworkの保存内容を確認する")}`);
@@ -169,7 +169,7 @@ function renderReview() {
   const removed = state.rooms.filter((room) => state.originalSelected.has(room.roomId) && !state.selected.has(room.roomId));
   const automatic = state.interval !== "manual";
   const reading = selectedRooms.map((room) => room.name).join("、");
-  show("review", `<p class="eyebrow">STEP 3 / 4</p><h1>Chatworkの保存内容を確認します。</h1>${nowCopy("読むルーム、保存先、自動取得の設定を確認します。")}
+  show("review", `<p class="eyebrow">設定 3 / 4</p><h1>Chatworkの保存内容を確認します。</h1>${nowCopy("読むルーム、保存先、自動取得の設定を確認します。")}
     <dl class="summary"><div class="summary-row"><dt>選んだルーム</dt><dd>${escape(reading)}</dd></div><div class="summary-row"><dt>取得間隔</dt><dd>${frequency[1]}（約${frequency[2].toLocaleString("ja-JP")}回 / 30日）</dd></div></dl>
     ${safetyList([
       { label: "読む対象", text: `選んだChatworkルーム（${reading}）だけです。` },
@@ -197,7 +197,8 @@ function renderReview() {
 async function confirm() {
   const button = app.querySelector('[data-action="next"]');
   button.disabled = true;
-  show("saving", '<p class="eyebrow">STEP 4 / 4</p><h1>Chatworkの設定を保存しています。</h1><p class="lead" data-copy-role="status">選んだルームと取得間隔を保存しています。</p><p class="notice">保存結果を確認するまで、この画面を開いたままお待ちください。</p>', "loading");
+  state.step = 4; progress(4);
+  show("saving", '<p class="eyebrow">設定 4 / 4</p><h1>Chatworkの設定を保存しています。</h1><p class="lead" data-copy-role="status">選んだルームと取得間隔を保存しています。</p><p class="notice">保存結果を確認するまで、この画面を開いたままお待ちください。</p>', "loading");
   const response = await fetch("/api/confirm", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ selectedRoomIds: [...state.selected], interval: state.interval, automaticPushConsent: state.consent }) });
   const result = await response.json();
   if (!response.ok) {
@@ -223,11 +224,11 @@ async function renderResult() {
     const done = ["success", "failed", "fixture"].includes(result.dispatch.status);
     const failed = result.dispatch.status === "failed";
     if (!done) {
-      show("result-loading", '<p class="eyebrow">STEP 4 / 4</p><h1>Chatworkの保存結果を確認しています。</h1><p class="lead" data-copy-role="status">新しい設定が使える状態になったか確認しています。</p><p class="notice">確認が終わるまで、この画面を開いたままお待ちください。</p>', "loading");
+      show("result-loading", '<p class="eyebrow">設定 4 / 4</p><h1>Chatworkの保存結果を確認しています。</h1><p class="lead" data-copy-role="status">新しい設定が使える状態になったか確認しています。</p><p class="notice">確認が終わるまで、この画面を開いたままお待ちください。</p>', "loading");
       window.setTimeout(renderResult, 2000);
       return;
     }
-    show(failed ? "settings-result-failure" : "settings-result", `<p class="eyebrow">STEP 4 / 4</p><h1>${failed ? "Chatworkの設定は保存しましたが、最新メッセージを確認できませんでした。" : "Chatworkの設定を保存しました。"}</h1><p class="lead" data-copy-role="result">${failed ? "設定は残っています。接続を確認してから、もう一度取得できます。" : "次は保存したChatworkメッセージを検索できます。"}</p>
+    show(failed ? "settings-result-failure" : "settings-result", `<p class="eyebrow">設定 4 / 4</p><h1>${failed ? "Chatworkの設定は保存しましたが、最新メッセージを確認できませんでした。" : "Chatworkの設定を保存しました。"}</h1><p class="lead" data-copy-role="result">${failed ? "設定は残っています。接続を確認してから、もう一度取得できます。" : "次は保存したChatworkメッセージを検索できます。"}</p>
       <dl class="summary"><div class="summary-row"><dt>現在の対象ルーム</dt><dd>${selectedRooms.map((room) => escape(room.name)).join("、")}</dd></div><div class="summary-row"><dt>現在の自動取得の間隔</dt><dd>${frequency[1]}</dd></div><div class="summary-row"><dt>自動実行</dt><dd>${automaticExecution ? "有効（自動取得・commit・push）" : "無効（手動のみ）"}</dd></div></dl>
       <p class="notice">ルームの選択を外した場合も、保存済み履歴は削除していません。</p>${technicalDetails("詳しい説明: 保存結果", `<p>${escape(result.dispatch.message || "詳しい結果はありません。")}</p><p>自動実行が有効な場合は、GitHub ActionsがGitのcommit・pushで保存します。</p>`)}<div class="actions" data-copy-role="actions"><button class="button button-primary" data-action="close" aria-label="Chatworkの設定を終了して検索案内を見る">設定を終了する</button></div>`, failed ? "error" : "success");
     app.querySelector('[data-action="close"]').onclick = renderComplete;
@@ -235,7 +236,7 @@ async function renderResult() {
   }
   const done = ["success", "failed", "fixture"].includes(result.dispatch.status);
   if (!done) {
-    show("initial-result-loading", '<p class="eyebrow">STEP 4 / 4</p><h1>Chatworkの最初の取得を進めています。</h1><p class="lead" data-copy-role="status">選んだルームの新しいメッセージを確認しています。</p><p class="notice">取得結果が出るまで、この画面を開いたままお待ちください。</p>', "loading");
+    show("initial-result-loading", '<p class="eyebrow">設定 4 / 4</p><h1>Chatworkの最初の取得を進めています。</h1><p class="lead" data-copy-role="status">選んだルームの新しいメッセージを確認しています。</p><p class="notice">取得結果が出るまで、この画面を開いたままお待ちください。</p>', "loading");
     window.setTimeout(renderResult, 2000);
     return;
   }
@@ -246,7 +247,7 @@ async function renderResult() {
   const screen = failed ? "initial-result-failure" : partial ? "initial-result-partial" : zero ? "initial-result-empty" : "initial-result";
   const heading = failed ? "選んだChatworkルームを取得できませんでした。" : partial ? "一部のChatworkルームを取得できませんでした。" : "Chatworkの最初の取得が完了しました。";
   const primary = failed ? "接続を確認してから、もう一度取得してください。" : partial ? "取得できたメッセージは保存しました。失敗したルームは接続を確認してください。" : zero ? "まだ保存するメッセージはありません。" : "取得したメッセージを保存しました。";
-  show(screen, `<p class="eyebrow">STEP 4 / 4</p><h1>${heading}</h1><p class="lead" data-copy-role="result">${primary}</p>
+  show(screen, `<p class="eyebrow">設定 4 / 4</p><h1>${heading}</h1><p class="lead" data-copy-role="result">${primary}</p>
     <p class="hint" data-copy-role="selected-result-count">選んだルームで保存できたメッセージ: ${model.totalFetched}件</p>
     ${model.results.length ? `<ul class="result-list">${model.results.map((item) => `<li><strong>${escape(item.roomName)}</strong> — ${item.status === "success" ? `成功・${Number(item.fetched) || 0}件` : `失敗・${escape(item.message || "再実行してください")}`}</li>`).join("")}</ul>` : ""}
     ${zero ? '<p class="empty">次回以降の取得で、新しい内容を保存します。</p>' : ""}

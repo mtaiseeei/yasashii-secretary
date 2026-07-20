@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 import {
   loadConversationContract,
   scenarioScene,
+  usesFixedThreeSchema,
   validateScenario,
 } from "./lib/sprint-032-patch-001-conversation.mjs";
 
@@ -191,6 +192,25 @@ for (const kind of SCENARIOS) {
     assert(verdict.problems.length >= 1, `${kind} bad fixture was not rejected`);
   });
 }
+
+check("B: completion report without fixed labels is rejected (fixed === false)", () => {
+  const bad = read(join(fixtureRoot, "conversations", "completion-report.unlabeled.bad.md"));
+  assert.equal(usesFixedThreeSchema(bad, contract.labels), false, "unlabeled fixture must not count as fixed schema");
+  const verdict = validateScenario("completion-report", bad, contract);
+  assert(verdict.problems.some((problem) => problem.includes("固定3項目schema")), "missing fixed-schema rejection");
+});
+
+check("B: completion report with out-of-order labels is rejected", () => {
+  const bad = read(join(fixtureRoot, "conversations", "completion-report.out-of-order.bad.md"));
+  const verdict = validateScenario("completion-report", bad, contract);
+  assert(verdict.problems.some((problem) => problem.includes("順序")), "missing label-order rejection");
+});
+
+check("B: general answers are not required to use the fixed three-item schema", () => {
+  const good = read(join(fixtureRoot, "conversations", "complex-question.good.md"));
+  assert.equal(usesFixedThreeSchema(good, contract.labels), false);
+  assert.deepEqual(validateScenario("complex-question", good, contract).problems, []);
+});
 
 check("B: agentic and yasashii keep distinct audiences while sharing structure", () => {
   const editions = readRelative("docs/spec/editions.md");

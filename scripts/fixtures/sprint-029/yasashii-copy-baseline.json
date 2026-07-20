@@ -35,8 +35,8 @@
     }
   },
   "wizardAssets": {
-    "plugins/secretary/skills/chatwork/assets/wizard/app.js": "32b3337996faed9f080ab4ccaa6b3e604dca26e44a7d3ba4d0837df30d6e9ad5",
-    "plugins/secretary/skills/google-chat/assets/wizard/app.js": "17bf3d8002b01865ed4a2391935e2ebaff240019091e8c469ed04532d791ba56",
+    "plugins/secretary/skills/chatwork/assets/wizard/app.js": "4b0d5350569516044fd5cd89c62d7b9a734a10dc009db455dc40bfe143e070a1",
+    "plugins/secretary/skills/google-chat/assets/wizard/app.js": "de6d6a95e46910e4f1e52bbc8df60d4bb5f4beda3b56a6e1a19bbf5b3d6e90d1",
     "plugins/secretary/skills/chatwork/assets/wizard/common.js": "beda14d03d611af725c46ac1e3d9f4fad9af924aef30d2db69dfe118ccc2cb41",
     "plugins/secretary/skills/chatwork/assets/wizard/result-model.js": "9adffbc1a8b94213cc7ee7b756dd0db68b4f7b96212b5a10af24b1a489710e0d",
     "plugins/secretary/skills/chatwork/assets/wizard/style.css": "37172c51374e94fc92d0c7d0aac48434eaa06a22e2a83bc30f6bc790ea30c207"

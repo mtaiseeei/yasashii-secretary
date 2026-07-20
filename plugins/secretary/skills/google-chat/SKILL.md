@@ -10,7 +10,7 @@ Gmail等の公式Googleコネクタとは別の機能であり、各利用組織
 利用者本人のOAuthを使う。OAuthは、Googleのパスワードを渡さず、許可した範囲だけ読み取る認証である。
 
 最初に `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
-`secretary/memory/preferences.md` を読む。通常報告の形式は同ruleの最終応答serializerだけに任せる。
+`secretary/memory/preferences.md` を読む。通常報告の形式は同rule入口から解決される最終応答serializerだけに任せる。
 
 ## 状態を先に示す
 

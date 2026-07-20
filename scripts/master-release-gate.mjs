@@ -63,6 +63,7 @@ function defaultInventory(root, mode) {
       { id: "sprint-031-plugin-path", command: "bash", args: [script("sprint-031-regression.sh")], archive: true },
       { id: "sprint-032-release-preparation", excluded: true, reason: "published 0.7.0 history and its known scanner blocker are checkout-only evidence", archive: false },
       { id: "sprint-032-patch-001-readability", command: "bash", args: [script("sprint-032-patch-001-regression.sh")], archive: true },
+      { id: "sprint-032-patch-002-conversation-safety", command: "bash", args: [script("sprint-032-patch-002-regression.sh")], archive: true },
     ];
   }
   // The existing regression-check is the long-lived master suite.  The two
@@ -78,6 +79,7 @@ function defaultInventory(root, mode) {
     { id: "sprint-031-plugin-path", command: "bash", args: [script("sprint-031-regression.sh")], archive: false },
     { id: "sprint-032-release-preparation", command: "bash", args: [script("sprint-032-regression.sh")], archive: false },
     { id: "sprint-032-patch-001-readability", command: "bash", args: [script("sprint-032-patch-001-regression.sh")], archive: false },
+    { id: "sprint-032-patch-002-conversation-safety", command: "bash", args: [script("sprint-032-patch-002-regression.sh")], archive: false },
     { id: "master-regression-check", command: "bash", args: [script("regression-check.sh"), modeArg], archive: false },
   ];
 }

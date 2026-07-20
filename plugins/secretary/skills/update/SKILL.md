@@ -25,7 +25,7 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/update-diagnose.mjs" --workspace .
 `legacy-yasashii` は互換読取した状態と、neutral marker／edition付きledgerへの予定migrationを示します。
 `opposite-edition`、`mixed`、`unknown` は検出edition、現在のworkspace、実行しなかった操作を示し、
 ledger、marker、履歴、設定、Git、pluginを変更せず停止します。edition切替や削除は案内しません。
-最後に `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md` の最終応答serializerを1回だけ適用します。
+最後に `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md` から解決される最終応答serializerを1回だけ適用します。
 
 ## 読み取り専用診断で絶対に行わないこと
 
