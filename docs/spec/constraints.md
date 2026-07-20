@@ -274,10 +274,11 @@
 4. 実会話テストの証跡には、host名、runner名、実行面（CLI／App等）を必ず記録する。Claude Code上の結果は「Claude Code実行面の証拠」に限定して表現する。
 5. 共通会話validator・共通fixtureは特定ホストの応答形式・専用commandを前提にしない。共通rulesへホスト固有commandを新規追加しない。ホスト固有の起動方法はrunnerの責務とする。
 6. 実会話runnerの子プロセスenvはallowlist方式とし、`process.env` 全体を複製せず、認証情報・APIキー・token・secret類を渡さない。子セッションへは各scenarioに必要な最小ツールだけを許可し、原則Bashを許可しない。
-7. 実会話runnerの読み取り拒否・境界テストは一時workspace内の管理対象fixtureだけで行い、`/System` やuser home等のworkspace外パスを対象にしない。子プロセスは一時workspace外へ書き込めない条件で動かし、実行前後のworkspace外変更0件を確認する。
+7. 実会話runnerの読み取り拒否・境界テストは一時workspace内の管理対象fixtureだけで行い、`/System` やuser home等のworkspace外パスを対象にしない。封じ込めはcwd・TMPDIRの誘導や許可ツールの絞り込みだけでは成立せず、合成HOME（実HOME非透過）、plugin本体のread-only参照、OS sandboxまたはホスト保証のpath-scoped permissionによる書込み先限定を必須とし、制御されたworkspace外canaryへの書き込みが実際に拒否されることを実証する。canary拒否を実証できない構成ではWrite/Editを使うscenarioを自動実行しない。無限定の「workspace外変更0件」という主張はせず、検査対象を列挙した範囲限定の表現だけを用いる。
 8. 実会話runnerは成功・失敗を問わず一時workspaceをcleanupし、証跡は秘密情報を含まないサニタイズ済み構造化結果だけとする。安全な環境を用意できない項目は `unverified` と記録し、安全条件を弱めてPASSにしない。
 9. 会話回帰の合否判定は共通契約を正本とする。完了・状態報告は固定3項目の存在と順序を必須にし、固定schemaなしの応答を行数だけで合格にしない。一般回答には固定3項目を要求せず、圧縮された改行なし平文を不合格にする。誤合格を作る緩和は禁止し、必要な緩和は理由つきで明示する。
 10. 公式仕様の裏づけがないホスト機構を推測実装しない。公式ドキュメント・正式schemaで確認できない事項は `unverified` として記録する。
+11. 実会話出力の回帰確認は、offline回帰・構文チェック・master gateから分離した明示的なlive conversation gateとして扱い、未実行・未認証・隔離未実証は「未完了（incomplete）」として集計・表示する。offline検証の合格・runnerの構文チェックを実会話の回帰保証として数えない。「解消済み」「回帰保証」という主張は実際に実行された検証に限定する。過去のfeedback・progress・stateの記述は遡って書き換えず、訂正は新しい記録で行う。
 
 ## 17. 全ユーザー会話の可読性
 

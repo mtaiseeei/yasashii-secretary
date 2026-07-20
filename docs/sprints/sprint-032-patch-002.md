@@ -27,6 +27,27 @@ sprint-032
 4. 対応対象ホストと検証済みホストの表示を扱うため、未検証環境を「対応済み」と誤表示する
    リスクがある。
 
+## 改訂（2026-07-21 Retry 1: ユーザーレビュー差し戻しの反映）
+
+2026-07-21のユーザーレビューで、初回PASSに対し2件の差し戻しが確定した。本改訂はこの契約だけを
+正本として反映する。過去のfeedback・progress・stateの記述は遡って書き換えない（訂正は新しい
+記録で行う）。
+
+- **P1（封じ込め不足）**: 初版契約Scope 2-5「cwd固定・許可ツール制限・書込み先の検証で
+  一時workspace外へ書き込めない条件を成立させる」は、封じ込めの定義として不十分だった。
+  現行runnerは子のcwdとTMPDIRを一時workspaceへ向けるだけで、実HOMEを子へ渡し、Write/Editを許可し、
+  `--permission-mode acceptEdits` で動くため、絶対pathや `../` によるworkspace外書き込みと
+  HOME内の認証情報・個人ファイル読み取りを技術的に防いでいない。前後比較が証明するのは
+  「plugin dirとguard sentinelが変わらなかった」ことだけで、「workspace外への書き込みを禁止した」
+  ことの証明にならない。→ Scope 2を改訂（合成HOME・plugin read-only・sandbox／path-scoped
+  permission・canary拒否実証・隔離未実証時のWrite/Edit禁止・検査範囲の限定表現）。
+- **P2（実会話が回帰に未組み込み）**: `sprint-032-patch-002-regression.sh` はrunnerを
+  `node --check` で構文確認するだけで、master release gateも実会話0件のまま通る。
+  live scenario 5件は全てunverified（認証できないこと自体は安全条件を守った正しい判断）だが、
+  元指摘「自作fixtureではなく実plugin sessionの会話出力を回帰確認する」は未解消であり、
+  解消済み・回帰保証としてPASS扱いにしない。→ Scope 7とAcceptance 13を新設
+  （live conversation gateの分離、未実行の「未完了（incomplete）」表示、合格条件の改訂）。
+
 ## 依存と実施体制
 
 - 依存: sprint-032-patch-001 done。sprint-033（agentic別directory／別repo作成）より前に完了する。
@@ -78,29 +99,50 @@ sprint-032
 - 圧縮された一般回答（複数論点の改行なし平文）は不合格にする。1要点の短い回答は
   1段落のままでよく、過剰なbullet化を要求しない。
 
-### 2. 必須修正1: 実会話runnerの安全性
+### 2. 必須修正1: 実会話runnerの安全性（2026-07-21改訂）
 
 対象: `scripts/sprint-032-patch-001-conversation-smoke.mjs`（および分離後のClaude用runner）。
-現在は親の `process.env` をほぼそのまま子プロセスへ渡し、`Bash` 等の強い権限を許可し、
-一時workspace外の `/System/...` を読み取り拒否テストの対象にしている。次を必須にする。
+初版のenv allowlist・最小ツール・workspace内fixture・cleanup・サニタイズは実装済みだが、
+ユーザーレビュー（P1）により、cwd／TMPDIRの誘導は**ファイルアクセスの封じ込めではない**ことが
+確定した。次を必須にする（1・3〜5・8〜10は既存要件の維持、2・6・7・9は改訂・新設）。
 
 1. 子プロセスenvは**allowlist方式**にする。`process.env` 全体を複製せず、実行に必要な
-   最小の変数（PATH、HOME相当、locale、一時領域等）だけを明示的に列挙して渡す。
-2. 認証情報・APIキー・GitHub Token・Chatwork Token・Google認証情報（`*_TOKEN`、`*_KEY`、
-   `*_SECRET`、`GH_*`／`GITHUB_*` 資格情報、OAuth値等）を子プロセスへ渡さない。
+   最小の変数だけを明示的に列挙して渡す。認証情報・APIキー・GitHub Token・Chatwork Token・
+   Google認証情報（`*_TOKEN`、`*_KEY`、`*_SECRET`、`GH_*`／`GITHUB_*` 資格情報、OAuth値等）を
+   子プロセスへ渡さない。
+2. **合成HOME**: 子プロセスへ実HOMEを渡さない。個人ファイル・認証情報・ユーザーデータを
+   含まない合成HOMEディレクトリ（一時領域内にrunnerが作成）を `HOME` として渡し、
+   CLI起動に必要な最小の設定ファイルだけを合成HOME内へ明示的に配置する。
+   合成HOMEの内容（配置したファイルの一覧）を証跡へ記録する。
 3. 原則 `Bash` を許可しない。各scenarioの検証に必要な最小ツールだけを許可し、
    scenarioごとの許可ツール一覧を証跡へ記録する。
 4. 読み取り拒否・保存不能のテストは、一時workspace内に作成した管理対象fixture
    （読み取り専用化したファイル／ディレクトリ等）で行う。`/System`、user home、
    その他workspace外の実パスをテスト対象にしない。
-5. 子プロセスが一時workspace外へ書き込めない条件（cwd固定、許可ツール制限、
-   書込み先の検証）を成立させる。
-6. `try/finally` 等で、成功・失敗を問わず一時workspaceと証跡外の生成物をcleanupする。
-7. 証跡は秘密情報を含まないサニタイズ済みの構造化結果だけとする。stderr等を保存する場合も
-   環境変数値・token様文字列・ユーザー固有パス以外へサニタイズする。
-8. 実行前後でworkspace外の変更が0件であることを確認する検査をrunner自体に持たせる。
-9. 安全な実行環境を用意できない項目（CLI不在等）は `unverified` と記録し、
-   安全条件を弱めてPASSにしない。skipはPASSと区別して集計する。
+5. **plugin本体のread-only参照**: 子セッションが実plugin本体（`plugins/secretary/`）へ
+   書き込めない構成にする（read-onlyにしたコピーの参照、または権限による書込み不能化）。
+   plugin dirのハッシュ前後比較は補助検査として維持してよいが、「書き込めない」保証は
+   事後のハッシュ比較ではなく構成側で成立させる。
+6. **書込み先の技術的封じ込め**: OS sandbox、またはホストが保証するpath-scoped permission
+   （例: Claude Codeのpermission deny/allowルールによる書込み先限定）で、子セッションの
+   書込み先を一時workspaceへ限定する。cwd・TMPDIRの誘導、許可ツールの絞り込み、
+   `acceptEdits` の組合せだけを封じ込めの根拠にしない。
+7. **canary検査**: 実行のたびに、runnerが用意した**制御されたworkspace外ファイル**への
+   書き込みを実際に試み、sandbox／permissionによって**拒否されたこと**を確認して証跡へ
+   記録する。canary拒否を実証できない構成を「封じ込め成立」と表現しない。
+8. **隔離未実証時のWrite/Edit禁止**: canary拒否を実証できないホスト・構成では、
+   Write/Editを使うscenario（partial-failure、completion-report等）を自動実行しない。
+   該当scenarioは未実行として記録し、live conversation gate上は「未完了（incomplete）」に
+   集計する（Scope 7）。
+9. **検査範囲の正直な表現**: 無限定の「workspace外変更0件」「workspace外への書き込みを
+   禁止した」という主張をしない。実際に検査できた対象（例: canary拒否、plugin dirハッシュ、
+   guard sentinel）を証跡・出力・報告で列挙し、「検査対象の範囲で変更0件」と範囲を限定して
+   表現する。
+10. `try/finally` 等で、成功・失敗を問わず一時workspace・合成HOME・証跡外の生成物を
+    cleanupする。証跡は秘密情報を含まないサニタイズ済みの構造化結果だけとし、stderr等を
+    保存する場合も環境変数値・token様文字列・ユーザー固有パスをサニタイズする。
+    安全な実行環境を用意できない項目（CLI不在・未認証・隔離未実証等）は `unverified` と
+    記録し、安全条件を弱めてPASSにしない。skipはPASSと区別して集計する。
 
 ### 3. 必須修正2: 完了報告テストの誤合格
 
@@ -181,6 +223,27 @@ sprint-032
   sprint-032-patch-001合格時の案内を維持する。
 - Google Chatの既存Secret案内・OAuth scopeも無回帰とする。
 
+### 7. 必須修正3: live conversation gateの分離（2026-07-21新設）
+
+元指摘（Draft PR #2レビュー）は「自作fixtureではなく、実plugin sessionの会話出力を
+回帰確認する」こと。offline回帰・構文チェック・master gateの合格は、この元指摘の解消根拠に
+ならない。次を必須にする。
+
+1. 実会話出力の回帰確認を **live conversation gate** として、通常のoffline回帰・
+   master release gateから分離した明示的なgateにする。gateはscenarioごとの実行結果を
+   pass／fail／incomplete（未実行・未認証・隔離未実証を含む）の三値で独立に集計・表示する。
+2. live conversation gateが未実行・未認証の場合、その項目を「未完了（incomplete）」として
+   集計・表示する。offline回帰のPASS、runnerの構文チェック（`node --check`）、
+   master gateの合格を、実会話の回帰保証として数えない。
+3. master release gate等の総合表示は、live conversation gateがincompleteのままの状態を
+   「実会話回帰も保証済み」と表示しない。incompleteはFAIL・0点にはしないが、
+   完了済みの回帰保証としても数えない（第三状態のまま可視化する）。
+4. **文言規律**: 「解消済み」「回帰保証あり」という主張は、実際に実行された検証だけに
+   限定する。未実行の検証は「未完了」「未解消」と表現する。この規律はrunner出力・証跡・
+   progress・feedback・PR説明のすべてに適用する。
+5. 過去のfeedback・progress・stateの記述は遡って書き換えない。訂正が必要な場合は
+   新しい記録（新しいentry・新しい評価）で行う。
+
 ## 前提（Plannerが置いた前提）
 
 - 「Claude Code Desktop App」は、Anthropic公式のClaude desktop app内のClaude Code実行面
@@ -204,15 +267,22 @@ sprint-032
 1. **一般回答の分離**: 一般質問・複雑な説明・診断・検索結果・部分失敗の各scenarioで、
    固定3項目schemaが強制されず、複数論点の改行なし平文が0件である。完了・状態報告だけが
    固定3項目になる。適用場面の正本は `styles/yasashii.md` から導出される。
-2. **runner env安全**: 実会話runnerの子プロセスenvがallowlist方式であり、合成の
+2. **runner env安全と合成HOME**: 実会話runnerの子プロセスenvがallowlist方式であり、合成の
    credential様変数（token・key・secret・GH系）を親環境へ注入しても子プロセスへ渡らないことが
-   テストで確認できる。
-3. **runner権限・境界**: 子セッションは原則Bashなしの最小ツール許可で動き、読み取り拒否
+   テストで確認できる。子プロセスへ渡る `HOME` は実HOMEではなく、個人ファイル・認証情報を
+   含まない合成HOMEであり、その内容一覧が証跡に記録されている。
+3. **runner封じ込め（改訂）**: 子セッションは原則Bashなしの最小ツール許可で動き、読み取り拒否
    テストは一時workspace内fixtureで行われ、`/System` やuser home等のworkspace外パスが
-   テスト対象・書込み対象に0件である。実行前後のworkspace外変更0件検査がrunnerに存在する。
-4. **runner後始末と証跡**: 成功・失敗の両方で一時workspaceがcleanupされ、証跡は
-   サニタイズ済み構造化結果だけである。安全に実行できない項目は `unverified` としてPASSと
-   別集計される。
+   テスト対象・書込み対象に0件である。plugin本体はread-only参照で子から書込み不能であり、
+   書込み先はOS sandboxまたはpath-scoped permissionで一時workspaceへ限定されている。
+   制御されたworkspace外canaryへの書込み試行が**実際に拒否された**証跡があり、
+   canary拒否を実証できない構成ではWrite/Editを使うscenarioが自動実行されず
+   incompleteとして記録されることがテストで確認できる。
+4. **runner後始末・証跡・検査範囲の表現（改訂）**: 成功・失敗の両方で一時workspaceと
+   合成HOMEがcleanupされ、証跡はサニタイズ済み構造化結果だけである。安全に実行できない項目は
+   `unverified` としてPASSと別集計される。runner出力・証跡・報告に無限定の
+   「workspace外変更0件」という主張がなく、検査対象（canary・plugin dirハッシュ・
+   guard sentinel等）を列挙した範囲限定の表現になっている。
 5. **完了報告の誤合格解消**: 完了報告判定が固定3項目の存在と順序を必須にし、
    `fixed === false` で合格しない。固定ラベルなしの任意3行・順序違いのnegative caseが不合格になり、
    一般回答には3項目が要求されない。判定は共通契約（`validateScenario`）へ統一されているか、
@@ -237,11 +307,24 @@ sprint-032
     OAuth scope、同期境界、wizard flow・DOM骨格がsprint-032-patch-001合格状態から回帰していない。
 12. **全必須回帰**: Patch専用回帰、sprint-032-patch-001回帰、Sprint 029〜032関連回帰、
     master offline、Gitなしarchive gateが0 FAILである。
+13. **live conversation gate（2026-07-21新設）**: 実会話出力の回帰確認が、offline回帰・
+    master gateから分離された明示的なgateとして存在し、scenarioごとに
+    pass／fail／incompleteの三値で集計・表示される。未実行・未認証・隔離未実証の項目は
+    「未完了（incomplete）」と表示され、offline回帰のPASSやrunnerの構文チェックが
+    実会話の回帰保証として集計・表現されていない。さらに、(a) 安全に隔離された
+    （canary拒否実証済みの）認証済みホストで少なくとも1件の実会話検証がPASSしているか、
+    (b) 未完了がstate・progress・feedback・PR #2の説明で明示され、元指摘
+    （実plugin sessionの会話出力の回帰確認）が未解消として保持され、実会話検証の完了が
+    Sprint 033へ引き継がれている（引き継ぎ先はsprint-033受入基準6の
+    「4環境それぞれの検証」で、実会話runner検証を含む）、のどちらかを満たす。
 
 ## 回帰保護
 
-- 実会話runnerのenv allowlist・ツール制限・境界・cleanupを検査する専用テスト
-  （合成credential注入、workspace外書込み試行、cleanup検証を含む）。
+- 実会話runnerのenv allowlist・合成HOME・plugin read-only・ツール制限・境界・cleanupを
+  検査する専用テスト（合成credential注入、canaryによるworkspace外書込み試行と拒否確認、
+  隔離未実証時のWrite/Edit scenario自動実行抑止、cleanup検証を含む）。
+- live conversation gateの集計検査（incompleteがpassへ数えられないこと、構文チェックや
+  offline PASSが実会話回帰の保証として集計されないこと、総合表示がincompleteを隠さないこと）。
 - 完了報告のnegative case（ラベルなし3行、順序違い）と一般回答のnegative case（圧縮平文）。
 - wizard進捗の後戻り検出回帰（両wizard、全導線）。
 - serializer正本参照の解決検査（不在参照・所在誤記の負fixture）。
@@ -256,14 +339,26 @@ sprint-032
   （後戻り0件、フェーズ切替表示）をscreenshotで記録する。
 - yasashii onboardingのGitHub用語説明の表示を確認する。
 - 実会話runnerを安全条件下で1回以上実行し、host・runner・実行面が記録された
-  サニタイズ済み証跡を確認する。claude CLIを利用できない場合は `unverified` として記録し、
-  層A／層Bの静的・契約検査を合格根拠にする。
+  サニタイズ済み証跡と、canary書込みが拒否された記録を確認する。claude CLIを利用できない・
+  未認証・隔離未実証の場合はlive conversation gateを「未完了（incomplete）」として記録する。
+  層A／層Bの静的・契約検査はoffline部分の合格根拠にとどめ、実会話の回帰保証として数えない。
 
 ## 評価・証跡
 
-- **必須回帰一覧と合格条件**（rubric準拠）: 機能完全性（C1）4/5以上、動作安定性（C3相当）4/5以上、
-  エラーハンドリング3/5以上、回帰なし（C6）5/5必須、安全性ゼロ許容（C2・C5・C12・C13・C14）全合格。
-  受け入れ基準1〜12のうち1件でも未達なら不合格。
+- **必須回帰一覧と合格条件**（rubric準拠、2026-07-21改訂）: 機能完全性（C1）4/5以上、
+  動作安定性（C3相当）4/5以上、エラーハンドリング3/5以上、回帰なし（C6）5/5必須、
+  安全性ゼロ許容（C2・C5・C12・C13・C14）全合格。受け入れ基準1〜13のうち1件でも未達なら不合格。
+- **live conversation gateの合格条件（Patch合格条件の改訂）**: offline部分
+  （受け入れ基準1〜12でoffline検証可能な範囲）が全PASSであることに加え、
+  live conversation gateについて次のどちらかを満たすこと。
+  - (a) 安全に隔離された（canary拒否を実証済みの）認証済みホストで、少なくとも1件の
+    実会話検証を実行してPASSする。
+  - (b) 未実行を「未完了（incomplete）」としてstate・progress・feedback・PR #2の説明に明示し、
+    元指摘（実plugin sessionの会話出力の回帰確認）を未解消として保持する。この場合、
+    実会話検証の完了はSprint 033の受入条件（受入基準6の4環境別検証）へ明示的に引き継ぎ、
+    Sprint 033はこの項目の完了なしに該当ホストを検証済みへ数えない。
+  incompleteを0点・FAILとして扱わない一方、実行していない検証を完了済みの回帰保証として
+  数えることも禁止する。
 - 実会話テスト結果には必ずhost・runnerを記録し、Claude Code上の結果は
   「Claude Code実行面の証拠」に限定して表現する。他ホストへの読み替えは不合格。
 - **Patch専用証跡場所**: UI評価で新規screenshotをcommitする必要がある場合は
@@ -276,8 +371,9 @@ sprint-032
 
 実Token、Repository Secret、Actions、OAuth、実API、remote変更、push（PR #2 branch更新を除く）、
 plugin install、公開は不要かつ対象外。実会話runnerはローカルの合成workspaceだけを使い、
-外部書込み0件を証跡化する。追加の外部操作が必要になった場合は、対象と副作用を示して
-ユーザーの新しい明示許可を得るまで実行しない。
+封じ込め（canary拒否）と検査対象を列挙した範囲限定の無変更確認を証跡化する
+（無限定の「外部書込み0件」とは表現しない）。追加の外部操作が必要になった場合は、
+対象と副作用を示してユーザーの新しい明示許可を得るまで実行しない。
 
 ## 公式仕様確認（本契約作成時の根拠）
 
