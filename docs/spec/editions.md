@@ -54,6 +54,65 @@ edition差分は次の4面に限定する。
 Chatwork／Google Chat wizardはcommon by design、つまり意図的に共通である。wizardの文言をedition可変copyへ入れない。
 4面の内容差は維持するが、どちらのeditionも複数要素を改行なしの平文へ連結しない。可読性はedition差分ではない。
 
+## 正式対象ホストとhost adapter
+
+2026-07-20 に、`agentic-secretary` を技術者向けにそのまま配布できる完成品とし、
+正式な必須対象環境を次の4つとする方針が承認された。
+
+1. **Claude Code Desktop App**（Anthropic公式のClaude desktop app内のClaude Code実行面。
+   MCPコネクタ中心の一般Claude Desktop chat面とは実行面として区別し、混同しない）
+2. **Claude Code CLI**
+3. **Codex App**（OpenAI公式のCodex macOSアプリ）
+4. **Codex CLI**
+
+その他のコーディングエージェントは「共通本体を再利用しやすくする設計対象」に含めるが、
+公式受入対象・配布保証・実環境検証必須対象には含めない。
+
+### 共通本体（ホスト非依存）
+
+次はホスト非依存の共通本体として1実装だけを持ち、ホストごとに複製・分岐しない。
+
+- skillsの意味内容、会話ルール、Markdown可読性、edition別style
+- 診断方針、完了報告契約、developer handoff契約
+- 安全ルール、workspace境界、secret保護
+- Chatwork／Google Chatデータ処理、wizard本体、OAuth scope、同期境界
+- ホスト非依存のfixture・validator（会話契約の検査を含む）
+
+### host adapter（ホスト固有）
+
+次だけをhost adapterとして分離する。共通機能を4コピーしない。
+
+- plugin manifest、marketplace／導入経路、plugin root解決、skill発見方法
+- command／slash command、構造化質問UI
+- 更新経路、reload／restart経路
+- ブラウザ検証面、実会話runner、host metadata、インストール検証、official validator
+
+配布形式の根拠は各ホストの公式仕様に置く。Claude Code系はplugin manifest／marketplace
+（`.claude-plugin/`）、Codex系はconfig.toml／AGENTS.md／skillsが公式のカスタマイズ面である。
+公式に提供されていない機構（例: Codexのplugin marketplace相当）を存在する前提で設計しない。
+公式仕様で確認できない事項は `unverified` として記録し、推測で実装しない。
+
+### 「対応済み」判定の条件
+
+あるホストを「対応済み」と表示できるのは、そのホストで次が**すべて**確認できた場合だけとする。
+
+1. 配布形式（manifestまたは正式配布形式）の整合
+2. 導入手順の実際の成立
+3. rules／skillsの読込
+4. 基本会話と複雑な一般回答
+5. 完了報告・状態報告
+6. 診断とdeveloper handoff
+7. wizard起動
+8. workspace境界の維持
+9. secret非露出
+10. 更新経路の成立、または安全な「未対応」明示表示
+11. ホスト固有回帰の0 FAIL
+12. 実環境証跡または公式validator証跡
+
+1ホストのPASSを他ホストへ流用しない。Claude CodeでのPASSを4環境PASSとして扱わない。
+対応対象ホストと検証済みホストは別集計し、未検証環境を「対応済み」と表示しない。
+現在の `yasashii-secretary` を、未検証のまま「4環境対応済み」と表示しない。
+
 ## edition設定
 
 editionごとに1つの宣言的設定を持ち、分散した文字列置換で製品差分を作らない。最低限、次を設定対象にする。

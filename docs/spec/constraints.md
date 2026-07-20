@@ -266,7 +266,20 @@
 10. LICENSEとShin-sibainu/cc-company単段クレジットを両editionで保持する。`forkedFrom` は公式validatorまたはlive gateの証拠なしに推測変更しない。
 11. yasashii overlayは共通plugin、共通安全回帰、必要な互換／release checkだけを対象とする。spec、Sprint、progress、feedback、evidenceは各repoが所有し、同期しない。
 
-## 16. 全ユーザー会話の可読性
+## 16. ホスト対応・検証表示と実会話回帰の安全境界
+
+1. 正式な必須対象環境は Claude Code Desktop App、Claude Code CLI、Codex App、Codex CLI の4つとする（正本: `editions.md`）。その他のコーディングエージェントは設計対象だが、公式受入対象・配布保証・実環境検証必須対象ではない。
+2. 共通本体（安全性、会話ルール、wizard、OAuth scope、同期境界、fixture・validator等）はホスト非依存の1実装とし、ホストごとに複製・二重実装しない。ホスト固有はmanifest・導入・更新・plugin root・command・実会話runner等のadapterに限る。
+3. 対応対象ホストと検証済みホストは常に別集計する。1ホストのPASSを他ホストのPASSへ昇格・流用せず、未検証環境を「対応済み」と表示しない。未実行ホストは `unverified` と明示する。
+4. 実会話テストの証跡には、host名、runner名、実行面（CLI／App等）を必ず記録する。Claude Code上の結果は「Claude Code実行面の証拠」に限定して表現する。
+5. 共通会話validator・共通fixtureは特定ホストの応答形式・専用commandを前提にしない。共通rulesへホスト固有commandを新規追加しない。ホスト固有の起動方法はrunnerの責務とする。
+6. 実会話runnerの子プロセスenvはallowlist方式とし、`process.env` 全体を複製せず、認証情報・APIキー・token・secret類を渡さない。子セッションへは各scenarioに必要な最小ツールだけを許可し、原則Bashを許可しない。
+7. 実会話runnerの読み取り拒否・境界テストは一時workspace内の管理対象fixtureだけで行い、`/System` やuser home等のworkspace外パスを対象にしない。子プロセスは一時workspace外へ書き込めない条件で動かし、実行前後のworkspace外変更0件を確認する。
+8. 実会話runnerは成功・失敗を問わず一時workspaceをcleanupし、証跡は秘密情報を含まないサニタイズ済み構造化結果だけとする。安全な環境を用意できない項目は `unverified` と記録し、安全条件を弱めてPASSにしない。
+9. 会話回帰の合否判定は共通契約を正本とする。完了・状態報告は固定3項目の存在と順序を必須にし、固定schemaなしの応答を行数だけで合格にしない。一般回答には固定3項目を要求せず、圧縮された改行なし平文を不合格にする。誤合格を作る緩和は禁止し、必要な緩和は理由つきで明示する。
+10. 公式仕様の裏づけがないホスト機構を推測実装しない。公式ドキュメント・正式schemaで確認できない事項は `unverified` として記録する。
+
+## 17. 全ユーザー会話の可読性
 
 1. 両editionの会話、診断、確認、進行、成功、部分失敗、エラー、検索結果、更新、プロジェクト、接続案内、developer handoffは、複数要素を改行なしの平文へ連結しない。
 2. 1要点だけの短い内容は1段落でよい。複数の手順、選択肢、変更点、結果、原因、影響、次の行動は、空行で分けた段落またはMarkdown箇条書きで構造化する。

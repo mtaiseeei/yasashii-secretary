@@ -2,11 +2,11 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-033
+- Current ID: sprint-032-patch-002
 - Retry Count: 0
-- Model Tier: strong
+- Model Tier: standard
 - Rotate: none
-- Next Planned: sprint-034
+- Next Planned: sprint-033
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
      ユーザー確認で単段クレジットに正本改訂、回帰assert強化のうえ合格）。
@@ -56,6 +56,7 @@
 | sprint-031 | done | [contract](sprint-031.md) | [progress](../progress/sprint-031.md) | [feedback](../feedback/sprint-031.md) |
 | sprint-032 | done | [contract](sprint-032.md) | [progress](../progress/sprint-032.md) | [feedback](../feedback/sprint-032.md) |
 | sprint-032-patch-001 | done | [contract](sprint-032-patch-001.md) | [progress](../progress/sprint-032-patch-001.md) | [feedback](../feedback/sprint-032-patch-001.md) |
+| sprint-032-patch-002 | active | [contract](sprint-032-patch-002.md) | - | - |
 | sprint-033 | planned | [contract](sprint-033.md) | - | - |
 | sprint-034 | planned | [contract](sprint-034.md) | - | - |
 | sprint-035 | planned | [contract](sprint-035.md) | - | - |
@@ -189,3 +190,4 @@
 - 2026-07-20: sprint-032はfresh独立EvaluatorでPASS。固定candidateの335 files・3,608,748 bytes・SHA-256一致、専用15/15、wrapper 5/5、関連回帰、master offline 442/442、git-free archive 102/102が0 FAIL。Chatwork／Google Chat両wizardをdesktop／390px mobileで実操作し、横overflow 0、主要button 48px、console error 0を確認。旧0.7.0 scanner blockerは未解消／非保証として正しく分離され、private test repoのmain／test branch不変、external write 0件、fixture server／browser残存0件。sprint-032をdone、Retry Count 0、Current IDをsprint-032-patch-001、Next Plannedをsprint-033へ進める。
 - 2026-07-20: sprint-032-patch-001 fresh Generatorが全ユーザー会話surface 32件・全SKILL 15件を棚卸しし、一行圧縮・改行禁止・平文強制の配布指示を0件化。複数要素を段落／Markdown箇条書きへ構造化し、yasashii既定3行報告を3物理項目化しつつ、agentic／yasashiiの思想・target・edition 4面差を維持。Chatwork wizardへ `Name=CHATWORK_API_TOKEN`、`Secret=本人がChatwork公式画面で取得したAPI Token`、実値はGitHub画面だけへ入力する案内を追加した。専用10/10・wrapper 5/5、関連回帰、master offline 447/447、両wizard browser各3/3、git-free archive 107/107が0 FAIL。342 files・3,653,045 bytes・SHA-256 `73c6981d5d4f623e576266092fbea197f2a8dc62c2d2fc017488725026d4f832`へ固定し、external writeとmain repo add／commit／pushは0件。awaiting-evalへ更新してfresh独立Evaluatorへ引き渡す。
 - 2026-07-20: sprint-032-patch-001はfresh独立EvaluatorでPASS（70/70）。専用10/10、wrapper 5/5、Sprint 029〜032関連回帰、master offline 447/447、git-free archive 107/107が0 FAIL。Chatwork／Google Chat両wizardをdesktop／mobile／200%で各3/3確認し、ChatworkのName／Secret案内、Token入力0、48px、focus、overflow／console 0、Google Chat無回帰を実証。会話surface 32件・SKILL 15件、禁止圧縮指示0、負fixture、3物理項目、agentic／yasashiiの思想・target・4面差を独立確認した。初回EvaluatorのGUI無応答とfresh Evaluatorのscreenshot保存境界逸脱は製品判定と分離し、後者が新規作成した2画像だけをrepo外へ移動して既存`docs/evidence`には触れず是正。最終評価はlocal CDPへ切替えて完走し、external write 0、browser／fixture／一時checkout残存0。sprint-032-patch-001をdone、Retry Count 0、Current IDをsprint-033、Next Plannedをsprint-034へ進め、別directory／別repo作成の外部操作許可待ちとする。
+- 2026-07-20: ユーザーが既存Draft PR #2（base `codex/sprint-032-patch-001-baseline`、head `fable/conversation-markdown-review`、開始HEAD `6605b98`）の完成をHarnessへ依頼し、通常Patch `sprint-032-patch-002` を新設。fresh Plannerが契約（Risk: high、実会話runner安全化、完了報告誤合格修正、wizard進捗、GitHub用語補足、serializer正本、room表記、4環境対応のホスト非依存境界）とspec正本・sprint-033／034契約を更新。resolverはhost=claudeCodeで全role model/effort=inherit、generator tier=standard（host-default、rotateReason=null）、lifecycle=fresh独立作業単位を返したため、Model Tierをstrong→standardへ更新しRotate: noneのままfresh Generatorをdispatchする。Current IDをsprint-032-patch-002（active）、Retry Count 0、Next Plannedをsprint-033とする。sprint-033はplannedのまま未着手。
