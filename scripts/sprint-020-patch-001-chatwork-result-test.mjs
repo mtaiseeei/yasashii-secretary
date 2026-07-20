@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { chatworkInitialResultModel } from "../plugins/yasashii-secretary/skills/chatwork/assets/wizard/result-model.js";
+import { chatworkInitialResultModel } from "../plugins/secretary/skills/chatwork/assets/wizard/result-model.js";
 
 let passed = 0;
 let failed = 0;

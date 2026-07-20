@@ -4,7 +4,7 @@
 set -u
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PLUGIN="$ROOT/plugins/yasashii-secretary"
+PLUGIN="$ROOT/plugins/secretary"
 TOOLS="$PLUGIN/skills/memory-care/scripts/memory-tools.sh"
 WORKSPACE="$PLUGIN/scripts/workspace-tools.sh"
 WEEKLY_SKILL="$PLUGIN/skills/weekly/SKILL.md"

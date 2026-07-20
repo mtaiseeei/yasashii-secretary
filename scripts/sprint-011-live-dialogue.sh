@@ -4,7 +4,7 @@
 set -u
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PLUGIN="$ROOT/plugins/yasashii-secretary"
+PLUGIN="$ROOT/plugins/secretary"
 TEMPLATES="$PLUGIN/templates"
 RUNS="${LIVE_RUNS:-3}"
 PARALLEL="${LIVE_PARALLEL:-1}"
@@ -109,11 +109,11 @@ check_result() { # $1=scenario $2=run
   [ "$scenario" = settings-formal ] && expected=4
   [ "$lines" -eq "$expected" ] || status=FAIL
   ! printf '%s\n' "$result" | grep -q '^[[:space:]]*$' || status=FAIL
-  printf '%s\n' "$result" | sed -n '1p' | grep -q '^やったこと: .\+' || status=FAIL
-  printf '%s\n' "$result" | sed -n '2p' | grep -q '^結果: .\+' || status=FAIL
-  printf '%s\n' "$result" | sed -n '3p' | grep -q '^次に何が起きるか: .\+' || status=FAIL
+  printf '%s\n' "$result" | sed -n '1p' | grep -q '^- やったこと: .\+' || status=FAIL
+  printf '%s\n' "$result" | sed -n '2p' | grep -q '^- 結果: .\+' || status=FAIL
+  printf '%s\n' "$result" | sed -n '3p' | grep -q '^- 次に何が起きるか: .\+' || status=FAIL
   if [ "$expected" -eq 4 ]; then
-    printf '%s\n' "$result" | sed -n '4p' | grep -q '^補足: .\+' || status=FAIL
+    printf '%s\n' "$result" | sed -n '4p' | grep -q '^- 補足: .\+' || status=FAIL
   fi
   ! printf '%s\n' "$result" | grep -Eq 'push(も|を)?(こちらで)?(します|やります|行います|予定|しておきます)|必要.*push' || status=FAIL
   case "$scenario" in

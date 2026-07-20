@@ -1,6 +1,6 @@
 # Features
 
-機能IDと、ユーザーから見える振る舞いの正本。F01〜F16 は受け入れ済みの既存機能、F17〜F22 は 2026-07-15 方針転換、F23〜F27 は 2026-07-16 のsingle-repo Git-first + Chatwork方針、F28 は 2026-07-17 の一般プロジェクト管理方針、F29 は配布チャネルから独立した製品説明、F30〜F31 は更新の説明と実行を分ける安全な更新体験、F32〜F35 は各社所有Google Cloudプロジェクトを使うGoogle Chat同期、F36〜F43 は `0.7.0` 配布前監査の全指摘を閉じるrelease hardeningである。
+機能IDと、ユーザーから見える振る舞いの正本。F01〜F16 は受け入れ済みの既存機能、F17〜F22 は 2026-07-15 方針転換、F23〜F27 は 2026-07-16 のsingle-repo Git-first + Chatwork方針、F28 は 2026-07-17 の一般プロジェクト管理方針、F29 は配布チャネルから独立した製品説明、F30〜F31 は更新の説明と実行を分ける安全な更新体験、F32〜F35 は各社所有Google Cloudプロジェクトを使うGoogle Chat同期、F36〜F43 は `0.7.0` の配布前監査を閉じたrelease hardening、F44〜F50 は次候補 `0.8.0` で2 editionへ安全に分離する機能、F51は両edition共通の会話可読性である。
 
 ## 既存機能（F01〜F16）
 
@@ -90,7 +90,7 @@
 - 「詳しい説明」は、山形アイコン等により開閉できることが見た目で分かり、keyboard、visible focus、開閉状態、accessible nameを備える。閉じた状態でも主導線を完了できる。
 - `/chatwork` から接続状態と次の行動を確認でき、未設定ならChatworkのAPI Token取得、GitHub上の安全な保管場所への登録、ルーム選択を順に進められる。
 - API Token取得ではChatwork公式のTokenページと発行ヘルプへ直接進める。組織契約でTokenページを利用できない場合は、実際にAPIを使うアカウントで組織管理者へ利用申請し、承認後にこの設定画面へアクセスする導線を示す。承認前はルーム一覧取得へ進めない。
-- Tokenはwizardや会話へ貼らせない。現在のGitHub repoのowner／nameから組み立てたSecret追加画面を「GitHub上の安全な保管場所を開く」と案内し、利用者自身が名前 `CHATWORK_API_TOKEN` で登録する。固定ownerや固定repo pathへ誘導しない。
+- Tokenはwizardや会話へ貼らせない。現在のGitHub repoのowner／nameから組み立てたSecret追加画面を「GitHub上の安全な保管場所を開く」と案内する。開いたGitHub画面では `Name` 欄へ `CHATWORK_API_TOKEN`、`Secret` 欄へ利用者本人がChatwork公式画面で取得したAPI Tokenを入力すると具体的に示す。Token実値はGitHub画面だけへ入力し、固定ownerや固定repo pathへ誘導しない。
 - API Tokenの値はrepo本文、設定ファイル、ログ、journal、fixture、画面キャプチャへ保存しない。
 - Secret登録を利用者が確認した後、GitHub Actionsが参加中のルーム一覧を取得して同じ非公開のGitHubリポジトリへ反映し、ローカル設定wizardはその一覧を読み、ルーム名を見ながら複数選択できる。Git管理するのはルーム一覧・選択結果・ルームIDであり、Tokenではない。
 - wizardは選択ルーム、自動取得の間隔、保存内容、非公開のGitHubリポジトリの共同編集者にも履歴が見えることを確定前に示す。
@@ -159,6 +159,7 @@
 - 配布済みの管理対象ファイルについて、配布版、配布時の基準hash、置換されたテンプレート変数だけを最小台帳として扱う。ファイル本文、記憶、会話、外部データ、secret、資格情報は台帳へ保存しない。
 - 自動更新を有効にできる環境では、既定状態、利点、注意点、利用者が行う操作を案内する。案内を理由に設定を自動変更しない。
 - 「最新版にして」では、現在版、利用できる最新版、CHANGELOGの要点、影響する設定・ファイル、必要な操作、カスタマイズとの衝突可能性を先に説明する。
+- 更新可能とするのは、確認できた候補versionが導入済みversionよりsemver上で新しい場合だけとする。同一versionまたはdowngradeは理由と両versionを示し、実更新へ進まず副作用0件で終える。
 - F30は完全な読み取り専用である。plugin更新、workspace書込み、migration、commit、push、設定変更を行わず、実更新へ進むかを利用者に委ねる。
 
 ### F31 確認後の安全な更新・移行・復元
@@ -169,6 +170,7 @@
 - plugin更新後に、必要なreload／restartを利用者が迷わない順序で案内する。更新後の版、管理対象ファイル、主要機能を検証してから成功と報告する。
 - version別migrationはdry-runで予定変更を先に示し、冪等、つまり同じ移行を複数回実行しても結果が変わらないようにする。対象外ファイル、私的内容、secretを変更しない。
 - 台帳が存在しない0.2.0利用者は、現状ファイルを新規配布物として決めつけず、安全な初回判定を行うbootstrap経路から更新する。
+- 台帳なし既存利用者のbootstrap判定は基準hashを確定するための既存機能であり、同一versionを更新可能にするsame-version bootstrap bridgeとして使わない。
 - 失敗または利用者の希望時は、更新直前のローカルcommitを基準にrollbackできる。pushは別の操作として扱い、秘書が勝手に行わない。
 
 ## Google Chat高度接続（F32〜F35）
@@ -223,7 +225,7 @@
 - 再検索でも見つからない場合は、未選択スペース、組織の保持設定、APIが返さない履歴、キーワード差、編集・削除、認証・workflow失敗を区別する。
 - キャンセル、失敗、timeout、再認証待ちではrepo内容を壊さず、何が起きたかと次の選択肢を示す。
 
-## 0.7.0 配布前ハードニング（F36〜F43）
+## 公開済み0.7.0で確定した配布前ハードニング（F36〜F43）
 
 ### F36 secret検査とGit変更範囲の分離
 
@@ -280,7 +282,7 @@
 - `.mcp.json`、onboarding、README、公開ガイドは、Microsoft／Notion対応、Google公式コネクタ、Chatwork／Google Chat同期、更新、`0.7.0`の現行機能と一致する。古い「後続対応予定」、古い版、古い導線を現行説明に残さない。
 - READMEの主導線は短く保ち、技術者向けの配布検査、live gate、復元情報は後半または公開ガイドへ分ける。文書整理で安全同意や正式名称を削らない。
 
-### F43 正式な0.7.0 release gate
+### F43 公開済み0.7.0の正式release gate
 
 - release candidateはF36〜F42の専用回帰とmaster offline／online suiteが0 FAIL、Git archive相当の配布検査がPASSになるまでlive gateへ進まない。
 - live gateはユーザーが許可した1つの専用private test workspaceで、ChatworkのToken、Google Chatの組織所有Internal OAuth、両サービスのRepository Secret、選択した非機密room／spaceだけを使う。
@@ -288,17 +290,69 @@
 - 証跡はprivate状態、版、Secret名、伏せ字対象、run ID／時刻／状態、件数、commit hash、push／pull、検索状態、重複0件だけとし、資格情報、OAuth URL、本文、発言者名を残さない。
 - 評価後は両サービスのschedule停止、全チャットSecret削除、room／space選択解除、Google OAuth grant／token取消を確認する。後始末が1つでも未完了なら `cleanup-required`で不合格とし、取得履歴やworkspaceの削除は別の明示確認なしに行わない。
 
+## 2 editionへの安全な分離（F44〜F50）
+
+### F44 rule境界とedition可変copy
+
+安全性・証拠・文体を別ruleとして扱い、edition styleが安全条件を弱められないようにする。
+会話、診断、報告、developer handoffのedition可変copyを1か所へ集約する。Chatwork／Google Chat wizard copyは集約対象外で、現行表示を変えない。
+
+### F45 edition設定と衝突停止
+
+配布ID、repository、更新URL、ledger、session directory、保護commit prefix、Harness、表現copyを宣言的設定から得る。
+新規workspaceはneutral markerとedition値を持ち、legacy yasashii markerも認識する。反対edition、混在、判定不能を検出したら書込み前に停止し、既存データを移動・統合・上書きしない。
+
+### F46 共通plugin pathと旧CHANGELOG互換
+
+両editionの内部plugin pathを `plugins/secretary/` にする。manifest、回帰、archive、release gateを新pathへ揃える一方、
+旧 `plugins/yasashii-secretary/CHANGELOG.md` をredirect説明ではないraw CHANGELOG長期互換fileとして残し、
+新しい正本と常にbyte-for-byteで同一にする。旧 `0.7.0` の診断処理がこのfileから `0.8.0` と変更点を読めることを守る。
+
+### F47 未配布段階の0.8.0 release preparation
+
+`0.7.0` のrelease記録は不変、まだ利用者へ明示配布していない2 editionの最初のrelease candidate／latestは `0.8.0` とする。
+marketplace、plugin manifest、正本／legacy CHANGELOG、edition設定、README、公開ガイドを揃え、新規または未導入状態から
+0.8.0を導入できることを同一candidateで検証する。旧0.7.0 updaterがGoogle Chat標準生成fileをscannerで止める既知事実を保持し、
+external recovery／bootstrap、fixture削除、安全scan弱体化で回避しない。未検証の旧0.7.0 live updateを対応済みと主張しない。
+same-version bootstrap bridgeは作らず、`0.8.0 → 0.8.0` と `0.8.0 → 0.7.0` は副作用0件で停止する。
+
+### F48 agentic-secretary上流edition
+
+neutralization commitまでの全Git履歴を継承し、`/Users/taisei/workspace/agentic-secretary` の別directoryと
+GitHubの別repo `mtaiseeei/agentic-secretary` に上流editionを成立させる。monorepo／subdirectoryにはしない。
+技術者向け差分は会話、診断、報告、developer handoffだけで、wizardと安全動作は共通にする。
+
+### F49 yasashii-secretary下流overlay
+
+`yasashii-secretary` はfetch専用 `upstream` remoteで `agentic-secretary` を参照する。overlayは共通pluginのedition style、
+共通安全回帰、必要な互換／release checkだけに限定し、spec、Sprint、progress、feedback、evidenceは各repoが所有する。
+
+### F50 2 edition公開gate
+
+共通回帰、edition別回帰、公式validator、Git共通祖先、overlay冪等性、反対edition停止、wizard parity、
+旧raw CHANGELOG互換、新規0.8.0導入、equal／downgrade停止、旧blockerの非誤表示、
+candidate／latest／versionの `0.8.0` 整合、LICENSE／クレジット／mappingを証拠化する。別directory／repo作成、remote、push、公開、
+release、実plugin install／updateは該当Sprintで明示許可された操作だけ実行する。
+
+### F51 全会話のMarkdown可読性
+
+両editionの会話、診断、確認、進行、成功、部分失敗、エラー、検索結果、更新、プロジェクト、接続案内、developer handoffは、
+複数要素を改行なしの平文へ連結しない。1要点は短い段落、複数の手順・選択肢・結果・原因・次の行動は空行で分けた段落または
+Markdown箇条書きにする。既定3行報告は物理的にも別行または別項目で出す。改行の有無をユーザーへ質問せず、preferencesで無効化しない。
+一方、1文ごとのbullet、不要な見出し、装飾目的のMarkdownは増やさない。agentic／yasashiiの思想、対象、4面の内容差は維持する。
+
 ## Gテーマと機能の対応
 
 | テーマ | 主な機能 |
 |---|---|
 | G1 | F05 F06 F07 F08 F17 F18 F19 F21 |
-| G2 | F04 F10 F20 |
+| G2 | F04 F10 F20 F51 |
 | G3 | F14 F15 F22 |
-| G4 | F10 F14 F15 F20 F22 |
+| G4 | F10 F14 F15 F20 F22 F51 |
 | G5 | F04 F07 F23 F24 F25 F26 F27 |
 | G6 | F03 F05 F06 F07 F08 F15 F17 F18 F19 F28 |
 | G7 | F01 F02 F04 F10 F16 F29 |
 | G8 | F01 F02 F07 F10 F16 F20 F30 F31 |
 | G9 | F03 F07 F10 F16 F23 F32 F33 F34 F35 |
 | G10 | F01 F02 F04 F05 F07 F10 F16 F23 F24 F30 F31 F32 F33 F34 F35 F36 F37 F38 F39 F40 F41 F42 F43 |
+| G11 | F30 F31 F36 F40 F41 F42 F43 F44 F45 F46 F47 F48 F49 F50 F51 |

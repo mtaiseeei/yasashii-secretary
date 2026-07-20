@@ -14,12 +14,12 @@ check() {
   fi
 }
 
-check "wizard session guardの構文" node --check "$ROOT/plugins/yasashii-secretary/scripts/lib/wizard-session.mjs"
-check "Google Chat OAuth moduleの構文" node --check "$ROOT/plugins/yasashii-secretary/skills/google-chat/scripts/oauth-session.mjs"
-check "Google Chat wizard serverの構文" node --check "$ROOT/plugins/yasashii-secretary/skills/google-chat/scripts/wizard-server.mjs"
-check "Google Chat wizard UIの構文" node --check "$ROOT/plugins/yasashii-secretary/skills/google-chat/assets/wizard/app.js"
-check "Chatwork wizard serverの構文" node --check "$ROOT/plugins/yasashii-secretary/skills/chatwork/scripts/wizard-server.mjs"
-check "Chatwork wizard UIの構文" node --check "$ROOT/plugins/yasashii-secretary/skills/chatwork/assets/wizard/app.js"
+check "wizard session guardの構文" node --check "$ROOT/plugins/secretary/scripts/lib/wizard-session.mjs"
+check "Google Chat OAuth moduleの構文" node --check "$ROOT/plugins/secretary/skills/google-chat/scripts/oauth-session.mjs"
+check "Google Chat wizard serverの構文" node --check "$ROOT/plugins/secretary/skills/google-chat/scripts/wizard-server.mjs"
+check "Google Chat wizard UIの構文" node --check "$ROOT/plugins/secretary/skills/google-chat/assets/wizard/app.js"
+check "Chatwork wizard serverの構文" node --check "$ROOT/plugins/secretary/skills/chatwork/scripts/wizard-server.mjs"
+check "Chatwork wizard UIの構文" node --check "$ROOT/plugins/secretary/skills/chatwork/assets/wizard/app.js"
 check "Sprint 023 browser確認scriptの構文" node --check "$ROOT/scripts/sprint-023-browser-check.mjs"
 check "Google Chat browser fixtureの構文" node --check "$ROOT/scripts/start-sprint-020-patch-001-google-chat-fixture.mjs"
 check "Sprint 023 Origin・session・OAuth再入の専用回帰" node "$ROOT/scripts/sprint-023-security-test.mjs"

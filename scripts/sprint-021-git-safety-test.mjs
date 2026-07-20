@@ -5,9 +5,9 @@ import { chmodSync, cpSync, existsSync, mkdtempSync, mkdirSync, readFileSync, re
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { applyChatworkConfig } from "../plugins/yasashii-secretary/skills/chatwork/scripts/config-transaction.mjs";
-import { applyGoogleChatConfig } from "../plugins/yasashii-secretary/skills/google-chat/scripts/config-transaction.mjs";
-import { commitOwnedChanges, inspectWorkingCandidates, pushOwnedCommit, stagedSnapshot } from "../plugins/yasashii-secretary/scripts/lib/safe-git.mjs";
+import { applyChatworkConfig } from "../plugins/secretary/skills/chatwork/scripts/config-transaction.mjs";
+import { applyGoogleChatConfig } from "../plugins/secretary/skills/google-chat/scripts/config-transaction.mjs";
+import { commitOwnedChanges, inspectWorkingCandidates, pushOwnedCommit, stagedSnapshot } from "../plugins/secretary/scripts/lib/safe-git.mjs";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const work = mkdtempSync(join(realpathSync(tmpdir()), "yasashii-sprint-021-"));
@@ -322,7 +322,7 @@ try {
   git(publish, "add", "unrelated-staged.txt");
   write(publish, "unrelated-root.txt", "do not publish\n");
   const publishIndex = stagedSnapshot(publish);
-  const publishResult = run("node", [join(repo, "plugins/yasashii-secretary/scripts/workspace-repo.mjs"), "publish", "--root", publish, "--visibility", "private", "--confirm", "--use-existing-remote"], publish, { YASASHII_GH_BIN: fakeGh });
+  const publishResult = run("node", [join(repo, "plugins/secretary/scripts/workspace-repo.mjs"), "publish", "--root", publish, "--visibility", "private", "--confirm", "--use-existing-remote"], publish, { YASASHII_GH_BIN: fakeGh });
   check(publishResult.status === 0 && commitPaths(publish).join(",") === "secretary/memory/MEMORY.md", "初回publishは明示inventoryだけをcommit");
   check(stagedSnapshot(publish) === publishIndex && existsSync(join(publish, "unrelated-root.txt")), "初回publishも既存stage／rootファイルを維持");
   check(git(publishRemote, "rev-parse", "refs/heads/main") === git(publish, "rev-parse", "HEAD"), "初回publishは検証済みcommitをlocal bare remoteへpush");
@@ -334,7 +334,7 @@ try {
   const publishSecretValue = synthetic("publish-oauth");
   generatedSecrets.push(publishSecretValue);
   write(publishSecret, "secretary/oauth-client.json", JSON.stringify({ installed: { client_id: synthetic("id"), client_secret: publishSecretValue, token_uri: "https://oauth2.example.invalid/token" } }));
-  const rejectedPublish = run("node", [join(repo, "plugins/yasashii-secretary/scripts/workspace-repo.mjs"), "publish", "--root", publishSecret, "--visibility", "private", "--confirm", "--use-existing-remote"], publishSecret, { YASASHII_GH_BIN: fakeGh }, true);
+  const rejectedPublish = run("node", [join(repo, "plugins/secretary/scripts/workspace-repo.mjs"), "publish", "--root", publishSecret, "--visibility", "private", "--confirm", "--use-existing-remote"], publishSecret, { YASASHII_GH_BIN: fakeGh }, true);
   check(rejectedPublish.status === 3 && git(publishSecret, "rev-parse", "HEAD") === publishSecretHead && run("git", ["show-ref"], publishSecretRemote, {}, true).stdout === "", "OAuth JSONの初回publishはcommit／push 0件");
 
   const publishCallback = init("publish-callback");
@@ -344,7 +344,7 @@ try {
   const publishCallbackValue = synthetic("publish-callback-code");
   generatedSecrets.push(publishCallbackValue);
   write(publishCallback, "secretary/docs/oauth-result.txt", `http://localhost:49152/oauth/callback?state=${synthetic("publish-state")}&code=${publishCallbackValue}\n`);
-  const rejectedCallbackPublish = run("node", [join(repo, "plugins/yasashii-secretary/scripts/workspace-repo.mjs"), "publish", "--root", publishCallback, "--visibility", "private", "--confirm", "--use-existing-remote"], publishCallback, { YASASHII_GH_BIN: fakeGh }, true);
+  const rejectedCallbackPublish = run("node", [join(repo, "plugins/secretary/scripts/workspace-repo.mjs"), "publish", "--root", publishCallback, "--visibility", "private", "--confirm", "--use-existing-remote"], publishCallback, { YASASHII_GH_BIN: fakeGh }, true);
   const callbackHistory = git(publishCallback, "log", "-p", "--all");
   check(
     rejectedCallbackPublish.status === 3
@@ -386,7 +386,7 @@ try {
   await withEnv({ YASASHII_GOOGLE_CHAT_TEST_PRIVATE: "1", YASASHII_GOOGLE_CHAT_TEST_SECRETS: "1" }, () => applyGoogleChatConfig({ root: google, selectedSpaces: spaces, availableSpaces: spaces, interval: "6h", automaticPushConsent: true, commitPushConsent: true }));
   check(stagedSnapshot(google) === secondIndex && commitPaths(google).every((path) => path.startsWith("google-chat/") || path === ".github/workflows/google-chat-sync.yml"), "Google Chat通常設定変更も既存stageを維持");
 
-  const googleWizardSource = readFileSync(join(repo, "plugins/yasashii-secretary/skills/google-chat/scripts/wizard-server.mjs"), "utf8");
+  const googleWizardSource = readFileSync(join(repo, "plugins/secretary/skills/google-chat/scripts/wizard-server.mjs"), "utf8");
   check(
     googleWizardSource.includes("commitOwnedChanges")
       && googleWizardSource.includes("pushOwnedCommit")
@@ -409,7 +409,7 @@ try {
   const memoryIndex = stagedSnapshot(memory);
   const memoryDocsBefore = readFileSync(join(memory, "secretary/docs/guide.md"), "utf8");
   const memoryUntrackedBefore = readFileSync(join(memory, "secretary/projects/existing/untracked.md"), "utf8");
-  const memoryResult = run("bash", [join(repo, "plugins/yasashii-secretary/skills/memory-care/scripts/memory-tools.sh"), "commit", join(memory, "secretary"), "記憶を更新"], memory);
+  const memoryResult = run("bash", [join(repo, "plugins/secretary/skills/memory-care/scripts/memory-tools.sh"), "commit", join(memory, "secretary"), "記憶を更新"], memory);
   check(memoryResult.status === 0 && commitPaths(memory).join(",") === "secretary/memory/MEMORY.md", "memory commitは実際に更新したmemory関連pathだけをcommit");
   check(
     stagedSnapshot(memory) === memoryIndex

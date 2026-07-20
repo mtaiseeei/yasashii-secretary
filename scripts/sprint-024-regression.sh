@@ -14,11 +14,11 @@ check() {
   fi
 }
 
-check "Actions run相関moduleの構文" node --check "$ROOT/plugins/yasashii-secretary/scripts/lib/actions-run.mjs"
-check "Google Chat履歴moduleの構文" node --check "$ROOT/plugins/yasashii-secretary/skills/google-chat/scripts/history.mjs"
-check "Google Chat再取得flowの構文" node --check "$ROOT/plugins/yasashii-secretary/skills/google-chat/scripts/search-flow.mjs"
-check "Chatwork再取得flowの構文" node --check "$ROOT/plugins/yasashii-secretary/skills/chatwork/scripts/search-flow.mjs"
-check "Chatwork wizardの構文" node --check "$ROOT/plugins/yasashii-secretary/skills/chatwork/scripts/wizard-server.mjs"
+check "Actions run相関moduleの構文" node --check "$ROOT/plugins/secretary/scripts/lib/actions-run.mjs"
+check "Google Chat履歴moduleの構文" node --check "$ROOT/plugins/secretary/skills/google-chat/scripts/history.mjs"
+check "Google Chat再取得flowの構文" node --check "$ROOT/plugins/secretary/skills/google-chat/scripts/search-flow.mjs"
+check "Chatwork再取得flowの構文" node --check "$ROOT/plugins/secretary/skills/chatwork/scripts/search-flow.mjs"
+check "Chatwork wizardの構文" node --check "$ROOT/plugins/secretary/skills/chatwork/scripts/wizard-server.mjs"
 check "Sprint 024専用fixtureの構文" node --check "$ROOT/scripts/sprint-024-data-causality-test.mjs"
 check "Sprint 024履歴marker・run因果相関" node "$ROOT/scripts/sprint-024-data-causality-test.mjs"
 check "Chatwork接続・初回回帰" bash "$ROOT/scripts/sprint-013-regression.sh"

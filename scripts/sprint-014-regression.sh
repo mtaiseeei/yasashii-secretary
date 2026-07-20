@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-PLUGIN="$REPO/plugins/yasashii-secretary"
+PLUGIN="$REPO/plugins/secretary"
 CHATWORK="$PLUGIN/skills/chatwork"
 TEMPLATES="$PLUGIN/workspace-templates"
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/yasashii-s014-regression.XXXXXX")"

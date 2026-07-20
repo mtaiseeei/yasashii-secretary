@@ -2,7 +2,7 @@
 
 // Small archive-only assertions.  It intentionally has no Git dependency so
 // it can be shipped and executed from a source archive.
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join, resolve } from "node:path";
 
@@ -19,15 +19,15 @@ function check(label, condition) {
 
 check("archive root has no .git", !existsSync(join(root, ".git")));
 const marketPath = join(root, ".claude-plugin", "marketplace.json");
-const pluginPath = join(root, "plugins", "yasashii-secretary", ".claude-plugin", "plugin.json");
+const pluginPath = join(root, "plugins", "secretary", ".claude-plugin", "plugin.json");
 try {
   const market = JSON.parse(readFileSync(marketPath, "utf8"));
   const plugin = JSON.parse(readFileSync(pluginPath, "utf8"));
   const entry = market.plugins?.[0] || {};
-  check("marketplace/plugin version is 0.7.0", entry.version === "0.7.0" && plugin.version === "0.7.0");
+  check("marketplace/plugin version is 0.8.0", entry.version === "0.8.0" && plugin.version === "0.8.0");
   check("author and MIT are present", JSON.stringify(entry.author) === JSON.stringify({ name: "mtaiseeei" }) && JSON.stringify(plugin.author) === JSON.stringify({ name: "mtaiseeei" }) && entry.license === "MIT" && plugin.license === "MIT");
   check("forkedFrom uses the single credit", entry.forkedFrom === "https://github.com/Shin-sibainu/cc-company");
-  check("plugin source is present", entry.source === "./plugins/yasashii-secretary" && existsSync(join(root, entry.source.slice(2))));
+  check("plugin source is present", entry.source === "./plugins/secretary" && existsSync(join(root, entry.source.slice(2))));
 } catch (error) {
   check(`distribution manifests parse (${error.message})`, false);
 }
@@ -46,6 +46,12 @@ if (validatorIncluded) {
     validator.error?.message || `exit=${validator.status}`,
   );
 }
-check("CHANGELOG is included", existsSync(join(root, "plugins", "yasashii-secretary", "CHANGELOG.md")));
+const canonicalChangelog = join(root, "plugins", "secretary", "CHANGELOG.md");
+const legacyRoot = join(root, "plugins", "yasashii-secretary");
+const legacyChangelog = join(legacyRoot, "CHANGELOG.md");
+check("canonical CHANGELOG is included", existsSync(canonicalChangelog));
+check("legacy path contains only CHANGELOG", existsSync(legacyChangelog) && readdirSync(legacyRoot).join("\0") === "CHANGELOG.md");
+check("canonical and legacy CHANGELOG bytes match", existsSync(canonicalChangelog) && existsSync(legacyChangelog) && readFileSync(canonicalChangelog).equals(readFileSync(legacyChangelog)));
+check("0.7.0 to 0.8.0 migration is included", existsSync(join(root, "plugins", "secretary", "migrations", "0.7.0-to-0.8.0.json")));
 process.stdout.write(`ARCHIVE_RELEASE_PASS=${pass} ARCHIVE_RELEASE_FAIL=${fail}\n`);
 process.exitCode = fail === 0 ? 0 : 1;

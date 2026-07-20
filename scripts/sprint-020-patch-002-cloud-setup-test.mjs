@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import {
   REQUIRED_APIS, acknowledgeManualStep, approveProjectConfirmation, discoverRepository, executeApprovedPlan, gcloudPlan,
   inspectGcloud, manualStep, officialLinks, projectConfirmation, projectProposal, resumeState,
-} from "../plugins/yasashii-secretary/skills/google-chat/scripts/cloud-setup.mjs";
+} from "../plugins/secretary/skills/google-chat/scripts/cloud-setup.mjs";
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), "..");
 let pass = 0;
@@ -269,12 +269,12 @@ const safeResume = resumeState({ repo: "/tmp/hogehoge", displayName: proposal.di
 const resumeText = JSON.stringify(safeResume);
 check("再開情報は許可fieldと完了工程だけ", safeResume.completed.length === 2 && !resumeText.includes("must-not-remain") && !Object.hasOwn(safeResume, "clientSecret") && !Object.hasOwn(safeResume, "accessToken"));
 
-const skill = readFileSync(join(repo, "plugins/yasashii-secretary/skills/google-chat/SKILL.md"), "utf8");
-const app = readFileSync(join(repo, "plugins/yasashii-secretary/skills/google-chat/assets/wizard/app.js"), "utf8");
-const server = readFileSync(join(repo, "plugins/yasashii-secretary/skills/google-chat/scripts/wizard-server.mjs"), "utf8");
+const skill = readFileSync(join(repo, "plugins/secretary/skills/google-chat/SKILL.md"), "utf8");
+const app = readFileSync(join(repo, "plugins/secretary/skills/google-chat/assets/wizard/app.js"), "utf8");
+const server = readFileSync(join(repo, "plugins/secretary/skills/google-chat/scripts/wizard-server.mjs"), "utf8");
 const readme = readFileSync(join(repo, "README.md"), "utf8");
-const router = readFileSync(join(repo, "plugins/yasashii-secretary/skills/secretary/SKILL.md"), "utf8");
-const guidePath = join(repo, "plugins/yasashii-secretary/skills/google-chat/assets/wizard/google-cloud-setup-guide.svg");
+const router = readFileSync(join(repo, "plugins/secretary/skills/secretary/SKILL.md"), "utf8");
+const guidePath = join(repo, "plugins/secretary/skills/google-chat/assets/wizard/google-cloud-setup-guide.svg");
 const userSurface = `${skill}\n${app}\n${readme.slice(readme.indexOf("### Google Chatをつなぐ"), readme.indexOf("## できること"))}`;
 check("利用者向けGoogle Chat面はGoogle Workspace版を明示", userSurface.includes("Google Workspace版Google Chat") && userSurface.includes("Audience `Internal`"));
 check("対象外アカウント・Audienceの利用者向け分岐0件", !/個人Google|無料版Google|External|Test users|公開審査/.test(userSurface));
@@ -289,7 +289,7 @@ check("READMEはAI主導線と手動公式リンクを持つ", readme.includes("
 check("READMEはBilling非接続とgcloud安心説明を持つ", readme.includes("Google公式の管理ツール") && readme.includes("インストール自体は無料") && readme.includes("Billing Accountを自動接続しません"));
 check("OAuthはJSON後の明示ボタン・別タブ・SPACE自動選択を維持", app.includes("Googleの確認画面を開く") && app.includes('window.open("about:blank", "yasashii-google-chat-oauth")') && app.includes('await json("/api/oauth/authorize", { method: "POST" })') && app.includes('authWindow.location.replace("/api/oauth/authorize")') && app.includes("await discoverSpaces()"));
 check("一体型確定・3時間推奨・完了CTAを維持", app.includes('actions("この設定で始める")') && app.includes('interval: "3h"') && app.includes("設定を終了する") && !app.includes("自動取得を設定する"));
-check("Chatwork実装は本Patchで変更対象外", existsSync(join(repo, "plugins/yasashii-secretary/skills/chatwork/assets/wizard/app.js")));
+check("Chatwork実装は本Patchで変更対象外", existsSync(join(repo, "plugins/secretary/skills/chatwork/assets/wizard/app.js")));
 
 process.stdout.write(`SPRINT020_PATCH002_PASS=${pass} FAIL=${fail}\n`);
 if (fail) process.exit(1);

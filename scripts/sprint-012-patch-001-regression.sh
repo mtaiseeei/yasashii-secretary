@@ -4,7 +4,7 @@
 set -u
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PLUGIN="$ROOT/plugins/yasashii-secretary"
+PLUGIN="$ROOT/plugins/secretary"
 VALIDATOR="$ROOT/scripts/check-report-schema.py"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT

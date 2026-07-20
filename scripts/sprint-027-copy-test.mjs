@@ -7,16 +7,16 @@ import { fileURLToPath } from "node:url";
 const repo = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative) => readFileSync(join(repo, relative), "utf8");
 const files = {
-  common: read("plugins/yasashii-secretary/skills/chatwork/assets/wizard/common.js"),
-  chatwork: read("plugins/yasashii-secretary/skills/chatwork/assets/wizard/app.js"),
-  google: read("plugins/yasashii-secretary/skills/google-chat/assets/wizard/app.js"),
-  style: read("plugins/yasashii-secretary/skills/chatwork/assets/wizard/style.css"),
-  mcp: JSON.parse(read("plugins/yasashii-secretary/.mcp.json")),
-  onboarding: read("plugins/yasashii-secretary/skills/onboarding/SKILL.md"),
+  common: read("plugins/secretary/skills/chatwork/assets/wizard/common.js"),
+  chatwork: read("plugins/secretary/skills/chatwork/assets/wizard/app.js"),
+  google: read("plugins/secretary/skills/google-chat/assets/wizard/app.js"),
+  style: read("plugins/secretary/skills/chatwork/assets/wizard/style.css"),
+  mcp: JSON.parse(read("plugins/secretary/.mcp.json")),
+  onboarding: read("plugins/secretary/skills/onboarding/SKILL.md"),
   readme: read("README.md"),
   guide: ["README.md", "features.md", "connectors.md", "getting-started.md", "updates.md"].map((name) => read(`docs/guide/${name}`)).join("\n"),
   marketplace: JSON.parse(read(".claude-plugin/marketplace.json")),
-  plugin: JSON.parse(read("plugins/yasashii-secretary/.claude-plugin/plugin.json")),
+  plugin: JSON.parse(read("plugins/secretary/.claude-plugin/plugin.json")),
 };
 
 let pass = 0;

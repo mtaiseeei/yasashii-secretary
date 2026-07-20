@@ -5,10 +5,10 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSy
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-import { applyGoogleChatConfig } from "../plugins/yasashii-secretary/skills/google-chat/scripts/config-transaction.mjs";
-import { continuousGoogleChatSync } from "../plugins/yasashii-secretary/skills/google-chat/scripts/continuous-sync.mjs";
-import { exchangeRefreshToken } from "../plugins/yasashii-secretary/skills/google-chat/scripts/refresh-token.mjs";
-import { GOOGLE_CHAT_INTERVALS, googleChatScheduleFor, renderGoogleChatWorkflow } from "../plugins/yasashii-secretary/skills/google-chat/scripts/schedule.mjs";
+import { applyGoogleChatConfig } from "../plugins/secretary/skills/google-chat/scripts/config-transaction.mjs";
+import { continuousGoogleChatSync } from "../plugins/secretary/skills/google-chat/scripts/continuous-sync.mjs";
+import { exchangeRefreshToken } from "../plugins/secretary/skills/google-chat/scripts/refresh-token.mjs";
+import { GOOGLE_CHAT_INTERVALS, googleChatScheduleFor, renderGoogleChatWorkflow } from "../plugins/secretary/skills/google-chat/scripts/schedule.mjs";
 
 let passed = 0;
 let failed = 0;
@@ -264,7 +264,7 @@ fi
 exit 0
 `);
   chmodSync(fakeGit, 0o755); chmodSync(fakeGh, 0o755);
-  const searchFlow = resolve(dirname(fileURLToPath(import.meta.url)), "..", "plugins", "yasashii-secretary", "skills", "google-chat", "scripts", "search-flow.mjs");
+  const searchFlow = resolve(dirname(fileURLToPath(import.meta.url)), "..", "plugins", "secretary", "skills", "google-chat", "scripts", "search-flow.mjs");
   const flow = (choice, mode, query = "見つからない", timeoutMs = "1000") => spawnSync(process.execPath, [searchFlow, "--root", flowRoot, "--query", query, "--choice", choice, "--timeout-ms", timeoutMs], { encoding: "utf8", env: { ...process.env, YASASHII_GIT_BIN: fakeGit, YASASHII_GH_BIN: fakeGh, FAKE_GH_ROOT: flowRoot, FAKE_GH_MODE: mode } });
   const declined = JSON.parse(flow("decline", "success").stdout);
   check(declined.status === "sync-declined" && declined.events.join(",") === "pull-before-search,search-local,structured-choice", "not found拒否はdispatch・commit・push 0件");

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-PLUGIN="$REPO/plugins/yasashii-secretary"
+PLUGIN="$REPO/plugins/secretary"
 WORK_PARENT="$(cd "${TMPDIR:-/tmp}" && pwd -P)"
 WORK="$(mktemp -d "$WORK_PARENT/yasashii-s013-regression.XXXXXX")"
 PASS=0; FAIL=0

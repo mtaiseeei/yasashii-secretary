@@ -159,10 +159,10 @@ Google People APIの `contacts.readonly` では、連絡先にない同僚名を
 
 ### 更新を確認する
 
-公開版は`0.7.0`です。「更新ある？」と話しかけると、現在版・最新版・主な変更・設定やファイルへの影響を確認できます。
-この診断はplugin、workspace、Git、Claude Code設定を変更しません。診断後の別の確認で明示了承した場合だけ、pushしない保護commit、plugin更新、dry-run、workspace migration、検証へ進みます。
+公開済み`0.7.0`の記録はそのまま残し、最初の明示配布候補を`0.8.0`へ揃えています。「更新ある？」と話しかけると、現在版・最新版・主な変更・設定やファイルへの影響を確認できます。
+この診断はplugin、workspace、Git、Claude Code設定を変更しません。なお、公開済み`0.7.0`の旧updaterにはGoogle Chat標準生成fileで止まる既知のblockerがあるため、`0.7.0 → 0.8.0`のlive updateは今回の配布保証に含めず、`0.8.0`を新規導入する候補として検証しています。
 失敗時はworkspaceとpluginを別々に復元し、片方しか戻っていない状態を完了と表示しません。
-変更内容の正本は [CHANGELOG](plugins/yasashii-secretary/CHANGELOG.md) です。
+変更内容の正本は [CHANGELOG](plugins/secretary/CHANGELOG.md) です。
 
 公開版の配布前には、masterの自動回帰、`.git`なしの配布物、専用private test workspaceでのChatwork／Google Chat実API確認、Secret・schedule・OAuthの後始末をまとめて確認します。どれかを確認できない場合は、配布済みとは案内しません。
 
@@ -203,7 +203,7 @@ Google People APIの `contacts.readonly` では、連絡先にない同僚名を
 ```
 yasashii-secretary/                         ← public / MIT
 ├── .claude-plugin/marketplace.json   ← 配布元（forkedFrom で元作者をクレジット）
-├── plugins/yasashii-secretary/        ← プラグイン本体（薄いルーター＋機能スキル）
+├── plugins/secretary/        ← プラグイン本体（薄いルーター＋機能スキル）
 │   ├── skills/                       ← secretary(ルーター)/onboarding/memory-care/daily/projects/settings/weekly/chatwork/google-chat/update/
 │   │                                    setup-google/setup-microsoft/setup-notion/connections/build
 │   ├── rules/plain-language.md       ← 言葉づかいルール（既定3行・明示設定・語彙方針の一元定義）

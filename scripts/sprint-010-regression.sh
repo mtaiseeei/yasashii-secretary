@@ -5,7 +5,7 @@ set -u
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/.." && pwd)"
-PLUGIN="$REPO/plugins/yasashii-secretary"
+PLUGIN="$REPO/plugins/secretary"
 MEM="$PLUGIN/skills/memory-care/scripts/memory-tools.sh"
 WORKSPACE="$PLUGIN/scripts/workspace-tools.sh"
 TEMPLATES="$PLUGIN/templates"
@@ -107,14 +107,14 @@ DAILY_SKILL="$PLUGIN/skills/daily/SKILL.md"
 AGENTS_TEMPLATE="$PLUGIN/templates/AGENTS.md"
 assert "決定の異なる3表現を会話規律に定義" \
   "grep -q '〜にしよう' '$MEMCARE_SKILL' && grep -q 'じゃあそれで' '$MEMCARE_SKILL' && grep -q 'それで決定' '$MEMCARE_SKILL'"
-assert "決定は原文1行確認後だけ記録" \
+assert "決定は原文の短い確認後だけ記録" \
   "grep -q 'この内容を決定として残しますね' '$MEMCARE_SKILL' && grep -q '了承を得た後だけ.*remember-decision' '$MEMCARE_SKILL'"
-assert "確認ターンは厳密な1行だけで停止" \
-  "grep -q '確認ターンでは次の1行だけを返して、そこで止まる' '$SECRETARY_SKILL' && grep -q '確認ターンでは次の1行だけを返して、そこで止まる' '$MEMCARE_SKILL' && grep -q '確認ターンでは次の1行だけを返して、そこで止まる' '$AGENTS_TEMPLATE'"
+assert "確認ターンは短い確認文だけで停止" \
+  "grep -q '確認ターンでは次の短い確認文だけを返して、そこで止まる' '$SECRETARY_SKILL' && grep -q '確認ターンでは次の短い確認文だけを返して、そこで止まる' '$MEMCARE_SKILL' && grep -q '確認ターンでは次の短い確認文だけを返して、そこで止まる' '$AGENTS_TEMPLATE'"
 assert "決定確認は入力全文を無加工で保持" \
   "grep -q '句読点・助詞・.*一字も削らず、並べ替えず、言い換えず' '$SECRETARY_SKILL' && grep -q '句読点・助詞・.*一字も削らず、並べ替えず、言い換えず' '$MEMCARE_SKILL' && grep -q '句読点・助詞・.*一字も削らず、並べ替えず、言い換えず' '$AGENTS_TEMPLATE'"
-assert "決定確認に説明・再確認・2行目を足さない" \
-  "grep -q '挨拶、解釈、補足.*再確認.*2行目を足さない' '$SECRETARY_SKILL' && grep -q '挨拶、解釈、補足.*再確認.*2行目を足さない' '$MEMCARE_SKILL' && grep -q '挨拶、解釈、補足.*再確認.*2行目を足さない' '$AGENTS_TEMPLATE'"
+assert "決定確認に挨拶・説明・再確認を混ぜない" \
+  "grep -q '挨拶、解釈、補足.*再確認.*足さない' '$SECRETARY_SKILL' && grep -q '挨拶、解釈、補足.*再確認.*混ぜない' '$MEMCARE_SKILL' && grep -q '挨拶、解釈、補足.*再確認.*混ぜない' '$AGENTS_TEMPLATE'"
 assert "確認ターンは無副作用で別ターン了承後だけ記録" \
   "grep -q '確認ターンではツールを呼ばず' '$SECRETARY_SKILL' && grep -q '次の別ターンで明示的に了承した後だけ' '$SECRETARY_SKILL' && grep -q '確認ターンではツールを呼ばず' '$MEMCARE_SKILL' && grep -q '次の別ターンで明示的に了承した後だけ' '$MEMCARE_SKILL' && grep -q '確認ターンではツールを呼ばず' '$AGENTS_TEMPLATE' && grep -q '次の別ターンで明示的に了承した後だけ' '$AGENTS_TEMPLATE'"
 assert "決定3表現の厳密な出力例を配布" \
@@ -122,7 +122,7 @@ assert "決定3表現の厳密な出力例を配布" \
 assert "決定検出が完全自動でないことを明示" "grep -q '完全自動ではない' '$MEMCARE_SKILL'"
 assert "decidedゼロの締め確認を定義" \
   "grep -q '当日の.*decisions.*0件' '$MEMCARE_SKILL' && grep -q '会話を読み返' '$MEMCARE_SKILL'"
-assert "topicは1行確認後に要点だけ保存" \
+assert "topicは短い確認後に要点だけ保存" \
   "grep -q '要点を案件メモに残しますね' '$MEMCARE_SKILL' && grep -q '逐語ログ' '$MEMCARE_SKILL'"
 assert "決定確認設定を都度とまとめてへ接続" \
   "grep -q '決定の確認.*都度' '$MEMCARE_SKILL' && grep -q 'まとめて.*候補を未確認のまま記録せず' '$MEMCARE_SKILL'"
@@ -148,8 +148,8 @@ assert "生成AGENTSにも節目プロトコルを配布" \
   "grep -q '会話の節目と1日の流れ' '$AGENTS_TEMPLATE' && grep -q '都度＋締めの二段構え' '$AGENTS_TEMPLATE'"
 assert "生成AGENTSの専門用語規約が現行specと一致" \
   "grep -q '一般的な技術用語はそのまま使う' '$AGENTS_TEMPLATE' && grep -q '馴染みの薄い語だけ、初出時に短い補足を添える' '$AGENTS_TEMPLATE' && ! grep -q '専門用語には、やさしい言い換えをカッコで併記する' '$AGENTS_TEMPLATE'"
-assert "既定3行報告を維持" \
-  "grep -q '最終応答serializer.*だけを正本' '$DAILY_SKILL' && grep -q '^### 2\. 最終応答serializer' '$REPO/plugins/yasashii-secretary/rules/plain-language.md' && grep -q '物理3行だけにする' '$REPO/plugins/yasashii-secretary/rules/plain-language.md' && grep -q '明示的に「くわしく」の場合だけ' '$REPO/plugins/yasashii-secretary/rules/plain-language.md'"
+assert "既定3項目のMarkdown報告を維持" \
+  "grep -q '最終応答serializer.*だけを正本' '$DAILY_SKILL' && grep -q '通常報告の唯一の正本は.*styles/yasashii.md' '$REPO/plugins/secretary/rules/plain-language.md' && grep -q '^## 最終応答serializer' '$REPO/plugins/secretary/rules/styles/yasashii.md' && grep -q 'Markdown箇条書きとして物理的に分けます' '$REPO/plugins/secretary/rules/styles/yasashii.md' && grep -q '明示的に「くわしく」の場合だけ' '$REPO/plugins/secretary/rules/styles/yasashii.md'"
 
 # morning→daily→eveningで使う正規シームを一続きで実行し、閲覧による増分がないことを確認する。
 FLOW="$WORK/flow-secretary"; cp -R "$TEMPLATES/." "$FLOW/"

@@ -1,20 +1,20 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { renderWizardScreen } from "../plugins/yasashii-secretary/skills/chatwork/assets/wizard/common.js";
+import { renderWizardScreen } from "../plugins/secretary/skills/chatwork/assets/wizard/common.js";
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), "..");
 const files = {
-  chatwork: join(repo, "plugins/yasashii-secretary/skills/chatwork/assets/wizard/app.js"),
-  google: join(repo, "plugins/yasashii-secretary/skills/google-chat/assets/wizard/app.js"),
-  common: join(repo, "plugins/yasashii-secretary/skills/chatwork/assets/wizard/common.js"),
-  style: join(repo, "plugins/yasashii-secretary/skills/chatwork/assets/wizard/style.css"),
-  resultModel: join(repo, "plugins/yasashii-secretary/skills/chatwork/assets/wizard/result-model.js"),
+  chatwork: join(repo, "plugins/secretary/skills/chatwork/assets/wizard/app.js"),
+  google: join(repo, "plugins/secretary/skills/google-chat/assets/wizard/app.js"),
+  common: join(repo, "plugins/secretary/skills/chatwork/assets/wizard/common.js"),
+  style: join(repo, "plugins/secretary/skills/chatwork/assets/wizard/style.css"),
+  resultModel: join(repo, "plugins/secretary/skills/chatwork/assets/wizard/result-model.js"),
   launcher: join(repo, "scripts/start-sprint-020-patch-001-google-chat-fixture.mjs"),
   clientHelper: join(repo, "scripts/create-sprint-020-patch-001-google-chat-test-client.mjs"),
   browserCheck: join(repo, "scripts/sprint-020-patch-001-browser-check.mjs"),
   googleFixture: join(repo, "scripts/fixtures/google-chat-wizard/google-chat.json"),
-  googleServer: join(repo, "plugins/yasashii-secretary/skills/google-chat/scripts/wizard-server.mjs"),
+  googleServer: join(repo, "plugins/secretary/skills/google-chat/scripts/wizard-server.mjs"),
   readme: join(repo, "README.md"),
   inventory: join(repo, "docs/progress/sprint-020-patch-001-copy-inventory.md"),
 };

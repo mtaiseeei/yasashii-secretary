@@ -5,7 +5,7 @@ set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$SCRIPT_DIR/.." && pwd)"
-PLUGIN="$REPO/plugins/yasashii-secretary"
+PLUGIN="$REPO/plugins/secretary"
 TEMPLATES="$PLUGIN/templates"
 MT="$PLUGIN/skills/memory-care/scripts/memory-tools.sh"
 WT="$PLUGIN/scripts/workspace-tools.sh"

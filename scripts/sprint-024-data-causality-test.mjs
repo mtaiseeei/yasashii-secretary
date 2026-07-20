@@ -4,9 +4,9 @@ import { execFileSync } from "node:child_process";
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { dispatchCorrelatedWorkflow, watchCorrelatedWorkflow } from "../plugins/yasashii-secretary/scripts/lib/actions-run.mjs";
-import { normalizeMessage, writeSpaceHistory } from "../plugins/yasashii-secretary/skills/google-chat/scripts/history.mjs";
-import { searchGoogleChat } from "../plugins/yasashii-secretary/skills/google-chat/scripts/search.mjs";
+import { dispatchCorrelatedWorkflow, watchCorrelatedWorkflow } from "../plugins/secretary/scripts/lib/actions-run.mjs";
+import { normalizeMessage, writeSpaceHistory } from "../plugins/secretary/skills/google-chat/scripts/history.mjs";
+import { searchGoogleChat } from "../plugins/secretary/skills/google-chat/scripts/search.mjs";
 
 const repo = resolve(import.meta.dirname, "..");
 const roots = [];
@@ -149,16 +149,16 @@ process.exit(0);
     check(currentFailure.error?.runId === "200", `${service}は古い成功より今回失敗runを優先`);
   }
 
-  const wizardSource = readFileSync(join(repo, "plugins/yasashii-secretary/skills/chatwork/scripts/wizard-server.mjs"), "utf8");
-  const chatworkWorkflow = readFileSync(join(repo, "plugins/yasashii-secretary/skills/chatwork/scripts/schedule.mjs"), "utf8");
-  const googleWorkflow = readFileSync(join(repo, "plugins/yasashii-secretary/skills/google-chat/scripts/schedule.mjs"), "utf8");
+  const wizardSource = readFileSync(join(repo, "plugins/secretary/skills/chatwork/scripts/wizard-server.mjs"), "utf8");
+  const chatworkWorkflow = readFileSync(join(repo, "plugins/secretary/skills/chatwork/scripts/schedule.mjs"), "utf8");
+  const googleWorkflow = readFileSync(join(repo, "plugins/secretary/skills/google-chat/scripts/schedule.mjs"), "utf8");
   check((wizardSource.match(/dispatchCorrelatedWorkflow\(/g) || []).length === 2, "Chatwork discoveryと初回・設定変更が共通run相関を使用");
   check(chatworkWorkflow.includes("run-name: Chatwork sync") && chatworkWorkflow.includes("correlation_id"), "Chatwork workflowは相関IDをrun titleへ保持");
   check(googleWorkflow.includes("run-name: Google Chat sync") && googleWorkflow.includes("correlation_id"), "Google Chat workflowは相関IDをrun titleへ保持");
 
   const flows = [
-    ["google", join(repo, "plugins/yasashii-secretary/skills/google-chat/scripts/search-flow.mjs")],
-    ["chatwork", join(repo, "plugins/yasashii-secretary/skills/chatwork/scripts/search-flow.mjs")],
+    ["google", join(repo, "plugins/secretary/skills/google-chat/scripts/search-flow.mjs")],
+    ["chatwork", join(repo, "plugins/secretary/skills/chatwork/scripts/search-flow.mjs")],
   ];
   for (const [service, script] of flows) {
     for (const mode of ["success", "current-failure", "missing-time"]) {

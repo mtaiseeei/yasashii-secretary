@@ -5,7 +5,7 @@
 set -u
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PLUGIN="$ROOT/plugins/yasashii-secretary"
+PLUGIN="$ROOT/plugins/secretary"
 TEMPLATES="$PLUGIN/templates"
 WORK="${LIVE_WORK:-$(mktemp -d)}"
 RECHECK_ONLY="${LIVE_RECHECK_ONLY:-0}"

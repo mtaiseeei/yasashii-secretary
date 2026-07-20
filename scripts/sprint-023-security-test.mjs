@@ -53,8 +53,8 @@ async function start(kind, extraEnv = {}) {
     writeFileSync(join(root, "chatwork", "rooms.json"), `${JSON.stringify({ status: "ready", rooms: [{ roomId: "101", name: "fixture room" }] }, null, 2)}\n`);
   }
   const script = kind === "google"
-    ? join(repo, "plugins", "yasashii-secretary", "skills", "google-chat", "scripts", "wizard-server.mjs")
-    : join(repo, "plugins", "yasashii-secretary", "skills", "chatwork", "scripts", "wizard-server.mjs");
+    ? join(repo, "plugins", "secretary", "skills", "google-chat", "scripts", "wizard-server.mjs")
+    : join(repo, "plugins", "secretary", "skills", "chatwork", "scripts", "wizard-server.mjs");
   const env = kind === "google" ? {
     YASASHII_GOOGLE_CHAT_SYNTHETIC: "1",
     YASASHII_GOOGLE_CHAT_TEST_PRIVATE: "1",
@@ -195,13 +195,13 @@ try {
   check("Secret 2件目登録失敗は作成済みだけcleanupし残存名を表示", failedSecond.response.status === 400 && failedSecond.json.status === "cleanup-required" && failedSecond.json.cleanup.remainingSecretNames.join() === "GOOGLE_OAUTH_CLIENT_ID" && failedSecond.json.cleanup.grantRevoked === true);
   check("部分登録cleanupはSecret値を表示しない", !partialText.includes("memory-") && !partialText.includes("runtime-") && !partialText.includes(clientSecret));
   const retry = await post(partialFailure, "api/cancel", {});
-  const appSource = readFileSync(join(repo, "plugins", "yasashii-secretary", "skills", "google-chat", "assets", "wizard", "app.js"), "utf8");
+  const appSource = readFileSync(join(repo, "plugins", "secretary", "skills", "google-chat", "assets", "wizard", "app.js"), "utf8");
   check("cleanup-requiredは再実行可能な次の操作を示す", retry.json.oauth.status === "cleanup-required" && retry.json.cleanup.retryable === true && appSource.includes("後始末をもう一度試す"));
   stop(partialFailure);
 
   const serverSources = [
-    readFileSync(join(repo, "plugins", "yasashii-secretary", "skills", "google-chat", "scripts", "wizard-server.mjs"), "utf8"),
-    readFileSync(join(repo, "plugins", "yasashii-secretary", "skills", "chatwork", "scripts", "wizard-server.mjs"), "utf8"),
+    readFileSync(join(repo, "plugins", "secretary", "skills", "google-chat", "scripts", "wizard-server.mjs"), "utf8"),
+    readFileSync(join(repo, "plugins", "secretary", "skills", "chatwork", "scripts", "wizard-server.mjs"), "utf8"),
   ].join("\n");
   check("server sourceは固定loopback bindで外部interface指定を受け付けない", (serverSources.match(/const host = "127\.0\.0\.1"/g) || []).length === 2 && !serverSources.includes("0.0.0.0"));
 } finally {

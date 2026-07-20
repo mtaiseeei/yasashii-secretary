@@ -9,9 +9,9 @@
   "plugins": [
     {
       "name": "yasashii-secretary",
-      "source": "./plugins/yasashii-secretary",
+      "source": "./plugins/secretary",
       "description": "あなた専属のAI秘書。記憶、プロジェクト、選択したChatwork／Google Chat履歴を1つのprivate GitHub repoで管理する。",
-      "version": "0.7.0",
+      "version": "0.8.0",
       "author": {
         "name": "mtaiseeei"
       },

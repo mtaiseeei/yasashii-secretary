@@ -4,10 +4,15 @@
 set -u
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PLUGIN="$ROOT/plugins/yasashii-secretary"
+PLUGIN="$ROOT/plugins/secretary"
 TOOLS="$PLUGIN/skills/memory-care/scripts/memory-tools.sh"
 SETTINGS="$PLUGIN/skills/settings/SKILL.md"
-RULES="$PLUGIN/rules/plain-language.md"
+RULES_ENTRY="$PLUGIN/rules/plain-language.md"
+RULES="$PLUGIN/rules/styles/yasashii.md"
+COMMON_RULES="$PLUGIN/rules/common-language.md"
+SAFETY_RULES="$PLUGIN/rules/safety.md"
+EVIDENCE_RULES="$PLUGIN/rules/evidence.md"
+RULE_MANIFEST="$PLUGIN/rules/rule-manifest.json"
 ONBOARD="$PLUGIN/skills/onboarding/SKILL.md"
 TEMPLATES="$PLUGIN/templates"
 WORK="$(mktemp -d)"
@@ -56,15 +61,16 @@ serializer_contract_ok(){
   grep -q '最終応答serializer（通常報告の唯一の正本）' "$file" &&
     grep -q '無言で完了する' "$file" && grep -q 'serializerを1回だけ適用する' "$file" &&
     grep -q 'CLIの`result`はtool前後の途中メッセージも連結する' "$file" &&
-    grep -q '^やったこと:' "$file" && grep -q '^結果:' "$file" && grep -q '^次に何が起きるか:' "$file" &&
-    grep -q 'push' "$file" && grep -q '明示指示' "$file" &&
-    grep -q '実コネクタ' "$file" && grep -q '接続状態は未確認' "$file"
+    grep -q 'Markdown箇条書きとして物理的に分けます' "$file" &&
+    grep -q '^- やったこと:' "$file" && grep -q '^- 結果:' "$file" && grep -q '^- 次に何が起きるか:' "$file"
 }
 
 serializer_reference_ok(){
   local file="$1"
   grep -q '最終応答serializer' "$file" &&
-    ! grep -q '^やったこと:' "$file" && ! grep -q '^結果:' "$file" && ! grep -q '^次に何が起きるか:' "$file" &&
+    ! grep -Eq '^[[:space:]]*[-+*]?[[:space:]]*やったこと:' "$file" &&
+    ! grep -Eq '^[[:space:]]*[-+*]?[[:space:]]*結果:' "$file" &&
+    ! grep -Eq '^[[:space:]]*[-+*]?[[:space:]]*次に何が起きるか:' "$file" &&
     ! grep -q '固定prefix' "$file" && ! grep -q '物理的に3行' "$file"
 }
 
@@ -75,11 +81,11 @@ report_shape_ok(){ # $1=output file $2=short|detail
   lines="$(wc -l < "$file" | tr -d ' ')"
   expected=3; [ "$detail" = detail ] && expected=4
   [ "$lines" -eq "$expected" ] || return 1
-  sed -n '1p' "$file" | grep -q '^やったこと: .\+' || return 1
-  sed -n '2p' "$file" | grep -q '^結果: .\+' || return 1
-  sed -n '3p' "$file" | grep -q '^次に何が起きるか: .\+' || return 1
+  sed -n '1p' "$file" | grep -q '^- やったこと: .\+' || return 1
+  sed -n '2p' "$file" | grep -q '^- 結果: .\+' || return 1
+  sed -n '3p' "$file" | grep -q '^- 次に何が起きるか: .\+' || return 1
   if [ "$detail" = detail ]; then
-    sed -n '4p' "$file" | grep -q '^補足: .\+' || return 1
+    sed -n '4p' "$file" | grep -q '^- 補足: .\+' || return 1
   fi
 }
 
@@ -88,8 +94,8 @@ check "templates/AGENTSはserializer正本を参照し再包装しない" \
   "grep -q '最終応答serializer.*唯一の出力形正本' '$TEMPLATES/AGENTS.md' && grep -q 'schemaを複製・再包装しない' '$TEMPLATES/AGENTS.md'"
 check "templates/CLAUDEもserializer正本だけを参照" \
   "grep -q '最終応答serializer.*だけを正本' '$TEMPLATES/CLAUDE.md' && grep -q 'schemaをここへ複製しません' '$TEMPLATES/CLAUDE.md'"
-check "plain-languageは不変規律と個人設定の二部" \
-  "grep -q '^## 第1部: 全員共通の不変規律' '$RULES' && grep -q '^## 第2部: その人に合わせる設定' '$RULES'"
+check "plain-language入口は4責務とmanifestを参照" \
+  "grep -q 'rule-manifest.json' '$RULES_ENTRY' && grep -q 'safety.md' '$RULES_ENTRY' && grep -q 'evidence.md' '$RULES_ENTRY' && grep -q 'common-language.md' '$RULES_ENTRY' && grep -q 'styles/yasashii.md' '$RULES_ENTRY'"
 
 # I1: schemaの重複ではなく、唯一正本・競合0・適用順を検査する。
 REFERENCE_SURFACES=(
@@ -101,20 +107,22 @@ reference_bad=0
 for surface in "${REFERENCE_SURFACES[@]}"; do
   serializer_reference_ok "$surface" || { printf '  serializer参照不整合: %s\n' "$surface"; reference_bad=$((reference_bad+1)); }
 done
-check "plain-languageのserializer唯一正本はI1-I3境界を満たす" "serializer_contract_ok '$RULES'"
+check "yasashii styleのserializer唯一正本はI1-I3境界を満たす" "serializer_contract_ok '$RULES'"
+check "安全・証拠境界はstyleから分離" \
+  "grep -q 'push.*明示的に指示' '$SAFETY_RULES' && grep -q '実コネクタ' '$EVIDENCE_RULES' && grep -q '接続状態は未確認' '$EVIDENCE_RULES' && ! grep -q '実コネクタの証跡が無い' '$RULES'"
 check "templates/tones/全15スキルは正本参照だけでschema重複0" \
   "[ '${#REFERENCE_SURFACES[@]}' -eq 20 ] && [ '$reference_bad' -eq 0 ]"
-SCHEMA_OWNER_COUNT="$(grep -Rsl '^やったこと:' "$PLUGIN/rules" "$PLUGIN/skills" "$PLUGIN/templates" --include='*.md' | wc -l | tr -d ' ')"
-check "固定schemaの所有ファイルはplain-language 1件だけ" \
-  "[ '$SCHEMA_OWNER_COUNT' -eq 1 ] && grep -q '^やったこと:' '$RULES'"
+SCHEMA_OWNER_COUNT="$(grep -Rsl '^- やったこと:' "$PLUGIN/rules" "$PLUGIN/skills" "$PLUGIN/templates" --include='*.md' | wc -l | tr -d ' ')"
+check "固定schemaの所有ファイルはyasashii style 1件だけ" \
+  "[ '$SCHEMA_OWNER_COUNT' -eq 1 ] && grep -q '^- やったこと:' '$RULES'"
 ROUTER="$PLUGIN/skills/secretary/SKILL.md"
 SERIALIZER_REF_LINE="$(grep -n -m1 '最終応答serializer.*節である' "$ROUTER" | cut -d: -f1)"
 SILENT_LINE="$(grep -n -m1 'ルーティング、段階ロードは無言' "$ROUTER" | cut -d: -f1)"
 ROUTE_LINE="$(grep -n -m1 '^## まずやること' "$ROUTER" | cut -d: -f1)"
 check "routerはserializer読込→無言境界→routingの順" \
   "[ '$SERIALIZER_REF_LINE' -lt '$SILENT_LINE' ] && [ '$SILENT_LINE' -lt '$ROUTE_LINE' ]"
-check "plain-languageの進行表示は同一turn read-onlyで途中出力しない" \
-  "grep -q '同じturn内のRead・ルーティング・read-only確認では途中メッセージにせず' '$RULES' && grep -q '同じturn内のRead・ルーティング・read-only確認には予告を足さず' '$RULES'"
+check "共通表現とyasashii styleは同一turn read-onlyで途中出力しない" \
+  "grep -q '同じturn内のRead、routing、read-only確認では途中メッセージを出さず' '$COMMON_RULES' && grep -q 'tool実行を無言で完了' '$RULES'"
 check "routerの競合する旧予告と末尾schema複製は0" \
   "! grep -q 'ひとこと予告してから' '$ROUTER' && ! grep -q '^## 最終出力の絶対条件' '$ROUTER'"
 
@@ -126,12 +134,12 @@ check "意図的失敗fixtureはserializer無言境界の欠落を検出" "! ser
 check "意図的失敗fixtureは下位skillのschema重複を検出" "! serializer_reference_ok '$WORK/bad-duplicate.md'"
 check "意図的失敗fixtureはrouterの途中出力境界欠落を検出" "! grep -q 'ルーティング、段階ロードは無言' '$WORK/bad-silent.md'"
 
-printf 'やったこと: 商談メモを保存しました。\n結果: local commit済みで、pushはしていません。\n次に何が起きるか: 内容を確認できます。\n' > "$WORK/report-short-ok.txt"
-printf '村山さん、完了しました。\nやったこと: 商談メモを保存しました。\n結果: local commit済みです。\n次に何が起きるか: 内容を確認できます。\n' > "$WORK/report-greeting-ng.txt"
-printf 'やったこと: 商談メモを保存しました。\n結果: local commit済みで、pushはしていません。\n次に何が起きるか: 内容を確認できます。\n補足: 外部サービスの接続状態は未確認です。\n' > "$WORK/report-detail-ok.txt"
-check "物理3行validatorは正しい短い報告を許可" "report_shape_ok '$WORK/report-short-ok.txt' short"
-check "物理3行validatorは挨拶の独立行を拒否" "! report_shape_ok '$WORK/report-greeting-ng.txt' short"
-check "物理4行validatorは明示くわしい補足1行だけ許可" "report_shape_ok '$WORK/report-detail-ok.txt' detail"
+printf -- '- やったこと: 商談メモを保存しました。\n- 結果: local commit済みで、pushはしていません。\n- 次に何が起きるか: 内容を確認できます。\n' > "$WORK/report-short-ok.txt"
+printf -- '村山さん、完了しました。\n- やったこと: 商談メモを保存しました。\n- 結果: local commit済みです。\n- 次に何が起きるか: 内容を確認できます。\n' > "$WORK/report-greeting-ng.txt"
+printf -- '- やったこと: 商談メモを保存しました。\n- 結果: local commit済みで、pushはしていません。\n- 次に何が起きるか: 内容を確認できます。\n- 補足: 外部サービスの接続状態は未確認です。\n' > "$WORK/report-detail-ok.txt"
+check "Markdown 3項目validatorは正しい短い報告を許可" "report_shape_ok '$WORK/report-short-ok.txt' short"
+check "Markdown 3項目validatorは挨拶の独立行を拒否" "! report_shape_ok '$WORK/report-greeting-ng.txt' short"
+check "Markdown 4項目validatorは明示くわしい補足1項目だけ許可" "report_shape_ok '$WORK/report-detail-ok.txt' detail"
 check "preferences v2は4セクション" \
   "grep -q '^## 基本$' '$TEMPLATES/memory/preferences.md' && grep -q '^## 言葉遣い$' '$TEMPLATES/memory/preferences.md' && grep -q '^## 口調のお手本$' '$TEMPLATES/memory/preferences.md' && grep -q '^## 秘書のメモ$' '$TEMPLATES/memory/preferences.md'"
 check "preferences v2は4つのcategorical項目" \

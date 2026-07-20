@@ -60,19 +60,21 @@ try {
 
   const archive = join(fixture, "archive");
   mkdirSync(join(archive, ".claude-plugin"), { recursive: true });
-  mkdirSync(join(archive, "plugins", "yasashii-secretary", ".claude-plugin"), { recursive: true });
+  mkdirSync(join(archive, "plugins", "secretary", ".claude-plugin"), { recursive: true });
+  mkdirSync(join(archive, "plugins", "yasashii-secretary"), { recursive: true });
   mkdirSync(join(archive, "scripts"), { recursive: true });
-  writeFileSync(join(archive, ".claude-plugin", "marketplace.json"), JSON.stringify({ name: "yasashii-secretary", owner: { name: "mtaiseeei" }, plugins: [{ name: "yasashii-secretary", source: "./plugins/yasashii-secretary", version: "0.7.0", author: { name: "mtaiseeei" }, license: "MIT", forkedFrom: "https://github.com/Shin-sibainu/cc-company" }] }));
+  writeFileSync(join(archive, ".claude-plugin", "marketplace.json"), JSON.stringify({ name: "yasashii-secretary", owner: { name: "mtaiseeei" }, plugins: [{ name: "yasashii-secretary", source: "./plugins/secretary", version: "0.7.0", author: { name: "mtaiseeei" }, license: "MIT", forkedFrom: "https://github.com/Shin-sibainu/cc-company" }] }));
   const validPlugin = { name: "yasashii-secretary", version: "0.7.0", author: { name: "mtaiseeei" }, license: "MIT", homepage: "https://github.com/mtaiseeei/yasashii-secretary", repository: "https://github.com/mtaiseeei/yasashii-secretary" };
-  writeFileSync(join(archive, "plugins", "yasashii-secretary", ".claude-plugin", "plugin.json"), JSON.stringify(validPlugin));
-  writeFileSync(join(archive, "plugins", "yasashii-secretary", "CHANGELOG.md"), "# 変更履歴\n\n## [0.7.0]\n\n### 対象者\n- 利用者\n\n### 変わること\n- 配布準備\n\n### 設定・ファイルへの影響\n- なし\n\n### 必要な操作\n- なし\n\n### 互換性上の注意\n- なし\n");
+  writeFileSync(join(archive, "plugins", "secretary", ".claude-plugin", "plugin.json"), JSON.stringify(validPlugin));
+  writeFileSync(join(archive, "plugins", "secretary", "CHANGELOG.md"), "# 変更履歴\n\n## [0.7.0]\n\n### 対象者\n- 利用者\n\n### 変わること\n- 配布準備\n\n### 設定・ファイルへの影響\n- なし\n\n### 必要な操作\n- なし\n\n### 互換性上の注意\n- なし\n");
+  cpSync(join(archive, "plugins", "secretary", "CHANGELOG.md"), join(archive, "plugins", "yasashii-secretary", "CHANGELOG.md"));
   writeFileSync(join(archive, "LICENSE"), "MIT License\n\nShin-sibainu/cc-company (MIT)\n\ninherits credit from the original author\n");
   writeFileSync(join(archive, "scripts", "check-release-integrity.py"), "# fixture\n");
   cpSync(join(root, "scripts", "check-release-integrity.py"), join(archive, "scripts", "check-release-integrity.py"));
   const archiveResult = spawnSync(process.execPath, [archiveGate, "--root", archive], { encoding: "utf8" });
-  check(".git-free archive gate passes", archiveResult.status === 0 && /ARCHIVE_RELEASE_PASS=8 ARCHIVE_RELEASE_FAIL=0/.test(archiveResult.stdout));
+  check(".git-free archive gate passes", archiveResult.status === 0 && /ARCHIVE_RELEASE_PASS=10 ARCHIVE_RELEASE_FAIL=0/.test(archiveResult.stdout));
 
-  const pluginPath = join(archive, "plugins", "yasashii-secretary", ".claude-plugin", "plugin.json");
+  const pluginPath = join(archive, "plugins", "secretary", ".claude-plugin", "plugin.json");
   for (const field of ["homepage", "repository"]) {
     const brokenPlugin = { ...validPlugin, [field]: "https://invalid.example/not-the-repository" };
     writeFileSync(pluginPath, JSON.stringify(brokenPlugin));

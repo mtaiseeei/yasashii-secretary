@@ -200,7 +200,12 @@ token値、OAuth client値、不要な対象名、チャット本文、業務固
 - workflow、取得履歴、test workspaceを残す必要がある場合は、目的・保持期間・閲覧者をユーザーへ示す。
 - repoや履歴の削除・archiveは別の破壊的操作として、対象と影響を示した後の明示確認でだけ行う。
 
-## 0.7.0 release candidate
+## 0.7.0の歴史記録と最初の明示配布候補0.8.0
+
+`0.7.0` は監査済みの不変なrelease記録であり、そのmanifest、migration、fixture、評価記録、Git履歴を変更しない。
+2 edition完成品はまだ利用者へ明示配布していないため、最初の明示配布candidate／latestを `0.8.0` とする。
+以下のrelease readinessは、過去の `0.7.0` 合格記録を流用せず、
+同一の `0.8.0` 配布対象bytesについて判定する。
 
 ### Git変更集合
 
@@ -218,7 +223,7 @@ Gitを使う各操作は、次の集合を混ぜずに扱う。
 
 - **secret実値と正本**: OAuth client secret、認可コード、access／refresh token、Chatwork API Token等。継続取得の正本は、現在のprivate repoのRepository Secretである。
 - **Google Chat登録導線**: OAuth実値はlocal wizard sessionのmemoryから `gh` のstdin経由でRepository Secretへ直接登録し、利用者のコピー／貼り付けを求めない。
-- **Chatwork登録導線**: wizardはAPI Tokenを自動取得・受領・登録しない。F24の既存導線どおり、利用者本人がChatwork公式画面で取得し、GitHubのRepository Secret画面へ直接入力する。Tokenをwizard、AI会話、repo本文、ログ、製品側DOMへ入力・貼り付けさせない。
+- **Chatwork登録導線**: wizardはAPI Tokenを自動取得・受領・登録しない。利用者本人がChatwork公式画面で取得し、GitHubのRepository Secret画面の `Name` 欄へ `CHATWORK_API_TOKEN`、`Secret` 欄へ取得したAPI Tokenを直接入力する。Token実値をwizard、AI会話、repo本文、ログ、製品側DOMへ入力・貼り付けさせない。
 - **通常フローの非露出**: 両サービスとも、実値をrepo・Git履歴・ログ・製品側DOM・会話へ残さない。
 - **強制検査対象**: 製品が生成・管理するworkflow／config／historyと、初回publish時に確定したcommit候補inventory。OAuth client JSON、private key、known token field、通常のliteral assignment等、通常利用で合理的に起こり得る誤混入をcommit前に拒否する。
 - **安全な参照**: `${{ secrets.NAME }}` 等の、実値を持たず実行時にRepository Secretを参照する正規参照。通常文書と合理的な非機密metadataも含め、補助scannerが誤拒否しない。
@@ -243,12 +248,15 @@ Gitを使う各操作は、次の集合を混ぜずに扱う。
 ### release readiness状態
 
 - `blocked`: F36〜F42、master suite、version整合、Git archive相当のいずれかが未合格。live gateを開始しない。
-- `offline-passed`: 自動回帰、online参照検査、archive検査、`0.7.0`整合が合格し、同一release candidateを固定できた。
+- `offline-passed`: 自動回帰、online参照検査、archive検査、`0.8.0`整合が合格し、同一release candidateを固定できた。
 - `live-running`: 専用private test workspaceで両チャットのlive gateを実施中。片方の完了を全体合格にしない。
 - `cleanup-required`: live動作は完了したが、schedule、Secret、選択、Google OAuthの後始末が未完了。
 - `ready`: 同一release candidateで両チャットのActions、commit、push、pull後検索、冪等再実行と後始末がすべて合格した。
 
 `ready`は過去runや過去commitから引き継がない。候補commitが変わった場合、影響するoffline gateとlive gateを再評価する。
+candidate identityは配布対象bytesで決める。Git履歴やrepo所有の監査evidenceを使うcheckout専用検査と、`.git`／監査evidenceを
+含まないarchive配布検査は別結果として記録する。checkout専用入力をarchiveへ混ぜず、両方の必須結果が合格した場合だけ
+`offline-passed` とする。
 
 ### 0.6.0から0.7.0の更新状態
 
@@ -258,6 +266,31 @@ Gitを使う各操作は、次の集合を混ぜずに扱う。
 - `verified`: plugin版、管理対象、migration、主要導線を検証済み。ここで初めて更新成功とする。
 - `rollback-required`: pluginまたはworkspaceの一方でも検証不合格。両方の変更範囲と復元方法を示す。
 - `rolled-back`: workspaceとpluginの両方が更新前状態であることを確認済み。片方だけの復元はこの状態にしない。
+
+この状態遷移と対応fixtureは公開済み `0.7.0` の履歴回帰であり、`0.8.0` の期待値へ書き換えない。
+
+### 未配布段階の0.8.0準備状態
+
+- `candidate-aligned`: marketplace、plugin manifest、正本／legacy CHANGELOG、edition設定、README、公開ガイドが `0.8.0` で一致する。
+- `fresh-install-verified`: 新規または未導入状態から0.8.0を導入し、正本plugin path、neutral marker、edition付きledger、主要skillを確認済み。
+- `legacy-live-blocked`: 旧0.7.0 updaterがGoogle Chat標準生成fileをscannerで停止し、plugin update前に副作用0件で止まる。対応済みやlive互換PASSではない。
+- `not-newer`: 候補が導入済みversionと同一または古い。理由と両versionを示し、plugin、workspace、Git、設定、ledger、migrationへ副作用0件で停止する。
+- `portable-verified`: 同一candidate bytesでcheckout用gateと `.git` なしarchive用gateが合格する。
+
+旧0.7.0利用者向けexternal recovery／bootstrapは状態として持たない。same-version bridge、fixture削除、安全scan弱体化、
+公開済みartifactの改変で `legacy-live-blocked` を回避しない。将来この互換を提供する場合は、別のユーザー判断とSprint契約を必要とする。
+
+## ユーザー会話の構造
+
+ユーザー向けの意味単位を次のように扱う。
+
+- `single-point`: 1要点だけの短い確認や回答。1段落でよく、機械的にbulletへしない。
+- `multi-point`: 複数の手順、選択肢、結果、原因、影響、次の行動。空行で分けた段落またはMarkdown箇条書きにする。
+- `three-line-report`: やったこと、結果、次に起きること／提案の3意味。物理的にも別行または別項目にする。
+- `technical-handoff`: agentic／yasashiiの内容差を保ちつつ、再現条件、証拠、残課題等の複数要素を構造化する。
+
+改行有無は個人設定ではなく両edition共通の表示不変条件である。内部record、commit message、index、machine-readable出力の
+1行契約は会話構造と分けて扱う。
 
 ## 三層記憶
 
@@ -532,3 +565,52 @@ OAuth client JSON本文、client secret、認可URL、認可コード、tokenは
 - `yasashii-secretary` 側のoffline回帰は、案内・3コマンドの構造、同梱コピー・agents・旧ベースラインの不在を検査する。online検査はGitHub APIでrepo実在、public、owner/name、`fork=false`、remote manifestのname / source / repository / homepageと3コマンドの整合を確認する。
 - ネットワーク不可はonline検査のPASSにしない。offline構造検査の成功と、Evaluatorが取得するonline証跡を別結果として記録する。
 - 上流へ返す変更は `yasashii-harness` から直接送らず、`agentic-harness` 側の別branch / PR手順に分離する。
+
+## secretary edition
+
+### EditionId
+
+- `agentic-secretary`
+- `yasashii-secretary`
+
+editionは外部plugin IDとworkspace保護の識別に使う。workspace root `secretary/` やskill／command名はedition値にしない。
+
+### WorkspaceEditionState
+
+| 状態 | 条件 | 動作 |
+|---|---|---|
+| `new` | marker／ledgerなし | 導入editionのneutral markerとedition付きledgerを作成可能 |
+| `same-edition` | marker／ledgerが導入editionと一致 | 通常のdiagnose／updateを許可 |
+| `legacy-yasashii` | legacy markerまたは旧ledgerだけでyasashiiと一意判定 | yasashiiとして互換読取し、確認済みmigrationだけ許可 |
+| `opposite-edition` | 反対editionを一意検出 | 副作用0件で停止 |
+| `mixed` | 両editionの痕跡がある | 副作用0件で停止 |
+| `unknown` | editionを安全に一意判定できない | 副作用0件で停止 |
+
+neutral markerはmarker versionとEditionIdを持つ。update ledgerは `schemaVersion`、`edition`、既存のversion／保護／migration情報を持つ。
+反対editionの情報を現在editionへ書き換えず、将来の明示的migrationが追加できる余地だけを残す。
+
+### EditionConfig
+
+edition configは配布識別子、repository、CHANGELOG／配布URL、ledger path、session directory、保護commit prefix、
+Harness導線、4面の可変copyをまとめる。値を取得できない場合は暗黙のyasashii fallbackをせず停止する。
+wizard copy、OAuth scope、workspace path、skill／command、migration filenameはconfig対象にしない。
+
+### PluginPathCompatibility
+
+- 新しい正本: `plugins/secretary/CHANGELOG.md`
+- legacy read URL: `plugins/yasashii-secretary/CHANGELOG.md`
+- invariant: 両fileのbytesとversion entryが一致する
+
+legacy fileはredirectの説明だけに置き換えない。正本と同じ `0.8.0` entryを持つ完全なraw互換contentとし、
+`0.7.0` の過去entryは書き換えない。このfile一致だけで旧0.7.0 updaterのlive互換を合格とはみなさない。
+
+### RepositoryTopology
+
+- upstream checkout: `/Users/taisei/workspace/agentic-secretary`
+- upstream GitHub repo: `mtaiseeei/agentic-secretary`
+- downstream checkout: `/Users/taisei/workspace/yasashii-secretary`
+- downstream GitHub repo: `mtaiseeei/yasashii-secretary`
+- relation: 共通祖先を持つ別repo。monorepo／subdirectoryではない
+- downstream remote: `upstream` fetch enabled、push disabled
+
+directory／repo作成、remote変更、push、公開は該当Sprintでユーザーが明示許可するまで未実行状態を正常とする。

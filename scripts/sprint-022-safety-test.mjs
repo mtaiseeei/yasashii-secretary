@@ -27,19 +27,19 @@ import {
   safeWritePath,
   workingRoot,
   writeFileAtomicSafe,
-} from "../plugins/yasashii-secretary/scripts/lib/safe-fs.mjs";
-import { fetchWithTimeout, runExternal } from "../plugins/yasashii-secretary/scripts/lib/external-ops.mjs";
-import { commitOwnedChanges } from "../plugins/yasashii-secretary/scripts/lib/safe-git.mjs";
-import { latestRelease } from "../plugins/yasashii-secretary/scripts/update-diagnose.mjs";
-import { applyChatworkConfig } from "../plugins/yasashii-secretary/skills/chatwork/scripts/config-transaction.mjs";
-import { createGoogleChatClient } from "../plugins/yasashii-secretary/skills/google-chat/scripts/client.mjs";
-import { exchangeRefreshToken } from "../plugins/yasashii-secretary/skills/google-chat/scripts/refresh-token.mjs";
-import { exchangeAuthorizationCode } from "../plugins/yasashii-secretary/skills/google-chat/scripts/oauth-session.mjs";
-import { fetchWithTimeout as distributedFetchWithTimeout } from "../plugins/yasashii-secretary/skills/google-chat/scripts/runtime-safety.mjs";
-import { searchGoogleChat } from "../plugins/yasashii-secretary/skills/google-chat/scripts/search.mjs";
-import { systemRunner } from "../plugins/yasashii-secretary/skills/google-chat/scripts/cloud-setup.mjs";
-import { writeSpaceHistory } from "../plugins/yasashii-secretary/skills/google-chat/scripts/history.mjs";
-import { requestJson as chatworkRequest } from "../plugins/yasashii-secretary/workspace-templates/chatwork/scripts/chatwork-sync.mjs";
+} from "../plugins/secretary/scripts/lib/safe-fs.mjs";
+import { fetchWithTimeout, runExternal } from "../plugins/secretary/scripts/lib/external-ops.mjs";
+import { commitOwnedChanges } from "../plugins/secretary/scripts/lib/safe-git.mjs";
+import { latestRelease } from "../plugins/secretary/scripts/update-diagnose.mjs";
+import { applyChatworkConfig } from "../plugins/secretary/skills/chatwork/scripts/config-transaction.mjs";
+import { createGoogleChatClient } from "../plugins/secretary/skills/google-chat/scripts/client.mjs";
+import { exchangeRefreshToken } from "../plugins/secretary/skills/google-chat/scripts/refresh-token.mjs";
+import { exchangeAuthorizationCode } from "../plugins/secretary/skills/google-chat/scripts/oauth-session.mjs";
+import { fetchWithTimeout as distributedFetchWithTimeout } from "../plugins/secretary/skills/google-chat/scripts/runtime-safety.mjs";
+import { searchGoogleChat } from "../plugins/secretary/skills/google-chat/scripts/search.mjs";
+import { systemRunner } from "../plugins/secretary/skills/google-chat/scripts/cloud-setup.mjs";
+import { writeSpaceHistory } from "../plugins/secretary/skills/google-chat/scripts/history.mjs";
+import { requestJson as chatworkRequest } from "../plugins/secretary/workspace-templates/chatwork/scripts/chatwork-sync.mjs";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const work = mkdtempSync(join(realpathSync(tmpdir()), "yasashii-s022-"));
@@ -179,12 +179,12 @@ try {
   check("外部repo自身をworking rootにした通常開発を許可", externalRemoved.kind === "file" && !existsSync(join(externalRepo, "src", "renamed.txt")) && readlinkSync(workspacePointer) === externalRepo);
 
   const secretary = join(work, "secretary");
-  cpSync(join(repo, "plugins", "yasashii-secretary", "templates"), secretary, { recursive: true });
+  cpSync(join(repo, "plugins", "secretary", "templates"), secretary, { recursive: true });
   const shellFileTarget = join(outside, "shell-file.txt");
   writeFileSync(shellFileTarget, "shell-file\n");
   const shellFileBefore = snapshot(shellFileTarget);
   symlinkSync(shellFileTarget, join(secretary, "memory", "shell-file-link"));
-  const memoryTools = join(repo, "plugins", "yasashii-secretary", "skills", "memory-care", "scripts", "memory-tools.sh");
+  const memoryTools = join(repo, "plugins", "secretary", "skills", "memory-care", "scripts", "memory-tools.sh");
   const noConfirm = spawnSync("bash", [memoryTools, "delete", secretary, "shell-file-link"], { encoding: "utf8" });
   check("shell symlink削除は2段階確認を維持", noConfirm.status === 3 && lstatSync(join(secretary, "memory", "shell-file-link")).isSymbolicLink());
   const confirmed = spawnSync("bash", [memoryTools, "delete", secretary, "shell-file-link", "--confirm"], { encoding: "utf8" });
@@ -197,7 +197,7 @@ try {
   const shellOutside = join(outside, "2026");
   rmSync(join(secretary, "docs"), { recursive: true, force: true });
   symlinkSync(outside, join(secretary, "docs"));
-  const workspaceTools = join(repo, "plugins", "yasashii-secretary", "scripts", "workspace-tools.sh");
+  const workspaceTools = join(repo, "plugins", "secretary", "scripts", "workspace-tools.sh");
   const shellBoundary = spawnSync("bash", [workspaceTools, "save-deliverable", secretary, "2026-07-19", "境界確認"], { input: "本文", encoding: "utf8" });
   check("shell成果物導線も外向きsymlinkを拒否", shellBoundary.status === 3 && !existsSync(shellOutside));
 
@@ -206,7 +206,7 @@ try {
   const shellRequestedSecretary = join(shellRequestedOutside, "nested");
   mkdirSync(shellRequestedBase);
   mkdirSync(shellRequestedOutside);
-  cpSync(join(repo, "plugins", "yasashii-secretary", "templates"), shellRequestedSecretary, { recursive: true });
+  cpSync(join(repo, "plugins", "secretary", "templates"), shellRequestedSecretary, { recursive: true });
   symlinkSync(shellRequestedOutside, join(shellRequestedBase, "escape"));
   const shellRequestedRoot = join(shellRequestedBase, "escape", "nested");
   const shellRequestedSentinel = join(shellRequestedSecretary, "memory", "component-sentinel.txt");
@@ -237,8 +237,8 @@ try {
   execFileSync("git", ["commit", "-qm", "fixture"], { cwd: updateExternalRepo });
   const updateBefore = gitRepositoryState(updateExternalRepo);
   const updateSentinelBefore = snapshot(updateSentinel);
-  const updateApply = join(repo, "plugins", "yasashii-secretary", "scripts", "update-apply.mjs");
-  const updateComponentResult = spawnSync(process.execPath, [updateApply, "start", "--workspace", updateRequestedRoot, "--current-plugin-root", join(repo, "plugins", "yasashii-secretary"), "--no-network", "--json"], { cwd: repo, encoding: "utf8" });
+  const updateApply = join(repo, "plugins", "secretary", "scripts", "update-apply.mjs");
+  const updateComponentResult = spawnSync(process.execPath, [updateApply, "start", "--workspace", updateRequestedRoot, "--current-plugin-root", join(repo, "plugins", "secretary"), "--no-network", "--json"], { cwd: repo, encoding: "utf8" });
   const updateAfter = gitRepositoryState(updateExternalRepo);
   check("更新入口は途中component symlink workspaceを非0終了で拒否", updateComponentResult.status !== 0);
   check("更新workspace拒否で外部HEAD・index・worktree・sentinel不変", JSON.stringify(updateAfter) === JSON.stringify(updateBefore) && unchanged(updateSentinelBefore, snapshot(updateSentinel)));
@@ -323,7 +323,7 @@ else{spawn(process.execPath,[process.argv[1],"--child"],{stdio:"ignore",env:proc
   check("maxBuffer後のbuffer増加・子孫・副作用0件", overflowElapsed < 1_500 && overflowBytes <= 1024 && (!overflowChildPid || !alive(overflowChildPid)) && !existsSync(overflowEffect), `elapsed=${overflowElapsed} bytes=${overflowBytes} pid=${overflowChildPid} alive=${overflowChildPid > 0 && alive(overflowChildPid)} effect=${existsSync(overflowEffect)}`);
 
   const exitProbe = join(work, "external-exit-probe.mjs");
-  writeFileSync(exitProbe, `import {runExternal} from ${JSON.stringify(new URL("../plugins/yasashii-secretary/scripts/lib/external-ops.mjs", import.meta.url).href)};try{await runExternal(process.execPath,[${JSON.stringify(hostileScript)}],{env:{...process.env,YASASHII_FIXTURE_MODE:"hang"},timeoutMs:50,label:"exit-probe"})}catch{}\n`);
+  writeFileSync(exitProbe, `import {runExternal} from ${JSON.stringify(new URL("../plugins/secretary/scripts/lib/external-ops.mjs", import.meta.url).href)};try{await runExternal(process.execPath,[${JSON.stringify(hostileScript)}],{env:{...process.env,YASASHII_FIXTURE_MODE:"hang"},timeoutMs:50,label:"exit-probe"})}catch{}\n`);
   const probeStarted = Date.now();
   execFileSync(process.execPath, [exitProbe], { timeout: 2_000, stdio: "ignore" });
   check("終了後のlistener・timerがprocessを保持しない", Date.now() - probeStarted < 1_500);
@@ -444,7 +444,13 @@ else{spawn(process.execPath,[process.argv[1],"--child"],{stdio:"ignore",env:proc
 
   const previousHttpTimeout = process.env.YASASHII_HTTP_TIMEOUT_MS;
   process.env.YASASHII_HTTP_TIMEOUT_MS = "60";
-  const officialResult = await latestRelease({ values: new Map(), flags: new Set() }, { fetchImpl: async () => responseWithHangingBody() });
+  const officialResult = await latestRelease(
+    { values: new Map(), flags: new Set() },
+    {
+      fetchImpl: async () => responseWithHangingBody(),
+      config: JSON.parse(readFileSync(join(repo, "plugins", "secretary", "edition.json"), "utf8")),
+    },
+  );
   if (previousHttpTimeout === undefined) delete process.env.YASASHII_HTTP_TIMEOUT_MS; else process.env.YASASHII_HTTP_TIMEOUT_MS = previousHttpTimeout;
   check("公式情報取得のbody停止は有限時間で未確認扱い", officialResult.version === null && /接続できず|確認できません/.test(officialResult.reason));
 
@@ -464,7 +470,7 @@ else{spawn(process.execPath,[process.argv[1],"--child"],{stdio:"ignore",env:proc
   const callerAbortError = await rejects("配布runtimeはcaller abortをそのまま伝播", () => callerBody, "caller-abort");
   check("caller abortをtimeoutへ誤分類せずlistenerを解放", callerAbortError === callerReason && abortListeners.size === 0);
 
-  const pluginRoot = join(repo, "plugins", "yasashii-secretary");
+  const pluginRoot = join(repo, "plugins", "secretary");
   const directSyncUsers = productionFiles(pluginRoot).filter((path) => !path.endsWith("scripts/lib/external-ops.mjs") && /\b(?:execFileSync|spawnSync|execSync)\b/.test(readFileSync(path, "utf8")));
   check("productionの直接execFileSync・spawnSync inventoryは0件", directSyncUsers.length === 0, directSyncUsers.map((path) => path.slice(repo.length + 1)).join(", "));
   const routedSources = [

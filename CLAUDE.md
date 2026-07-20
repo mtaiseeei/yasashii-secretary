@@ -12,7 +12,7 @@ Claude Codeを使う一般の非エンジニア向けAI秘書プラグイン
 
 ## リポジトリ境界
 
-- 秘書本体の配布物は `plugins/yasashii-secretary/`。
+- 秘書本体の配布物は `plugins/secretary/`。
 - 開発ハーネスは別リポジトリ `mtaiseeei/yasashii-harness` が正本。本体には `harness/` や Planner / Generator / Evaluator のagentsを同梱しない。
 - `/Users/taisei/workspace/agentic-harness` と `~/workspace/agentic-harness` は、**読み取りを含む全面接触禁止**。
   編集、存在確認、一覧、status / HEAD / branch / remote 確認、checkout / switch、commit、生成物作成、

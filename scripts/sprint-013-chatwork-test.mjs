@@ -9,10 +9,10 @@ import { promisify } from "node:util";
 
 const exec = promisify(execFile);
 const repo = resolve(import.meta.dirname, "..");
-const template = join(repo, "plugins", "yasashii-secretary", "workspace-templates");
+const template = join(repo, "plugins", "secretary", "workspace-templates");
 const syncScript = join(template, "chatwork", "scripts", "chatwork-sync.mjs");
-const searchScript = join(repo, "plugins", "yasashii-secretary", "skills", "chatwork", "scripts", "search.mjs");
-const wizardScript = join(repo, "plugins", "yasashii-secretary", "skills", "chatwork", "scripts", "wizard-server.mjs");
+const searchScript = join(repo, "plugins", "secretary", "skills", "chatwork", "scripts", "search.mjs");
+const wizardScript = join(repo, "plugins", "secretary", "skills", "chatwork", "scripts", "wizard-server.mjs");
 const work = mkdtempSync(join(realpathSync(tmpdir()), "yasashii-s013-"));
 const tokenMarker = ["runtime", "chatwork", String(process.pid), String(Date.now())].join("-");
 let failures = 0;

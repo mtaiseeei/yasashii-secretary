@@ -1,6 +1,8 @@
 # 更新状況を確認する
 
-現在の公開版は`0.7.0`です。`0.6.0`からの更新は、診断→明示確認→保護地点→dry-run→適用→検証の順で行います。
+公開済み`0.7.0`の記録はそのまま残し、最初の明示配布候補を`0.8.0`へ揃えています。今回は`0.8.0`の新規導入を検証対象にし、未検証の`0.7.0 → 0.8.0` live updateを配布保証には含めません。
+
+公開済み`0.7.0`の旧updaterには、Google Chatの標準生成fileをsecret候補として止める既知のblockerがあります。fixture削除やsecret検査の弱体化では回避していません。
 
 公開版の配布前には、masterの自動回帰、`.git`なしの配布物、専用private test workspaceでのChatwork／Google Chat実API確認、Secret・schedule・OAuthの後始末を確認します。確認できない項目が残る場合は、配布可とは案内しません。
 
@@ -18,7 +20,7 @@
 最初の診断は読み取り専用です。plugin更新、workspaceの上書き、migration、commit、push、設定変更、reload、restartは行いません。
 最新版を確認できないときも推測せず、`latest-unverified` と理由を示して止まります。
 
-変更履歴は [CHANGELOG](../../plugins/yasashii-secretary/CHANGELOG.md) で確認できます。
+変更履歴は [CHANGELOG](../../plugins/secretary/CHANGELOG.md) で確認できます。
 
 ## 自動更新を使う場合
 
@@ -52,4 +54,4 @@
 
 失敗時のworkspace復元は、保護commitから更新が所有する管理対象だけを戻します。保護commit後の利用者commitや追加変更を検出した場合は上書きしません。`git reset --hard`、push、remote変更は行いません。
 
-pluginは更新前の`0.6.0`をGit管理外の保護領域へ退避します。安全に自動復元できる場合は同じscopeへ戻し、versionと主要skillを確認します。権限等で自動復元できない場合は、実行可能な退避先、旧版、scope、起動・確認手順を表示し、`partial-restoration`として停止します。
+将来の対応版では、pluginを更新前のversionのままGit管理外の保護領域へ退避します。安全に自動復元できる場合は同じscopeへ戻し、versionと主要skillを確認します。権限等で自動復元できない場合は、実行可能な退避先、旧版、scope、起動・確認手順を表示し、`partial-restoration`として停止します。

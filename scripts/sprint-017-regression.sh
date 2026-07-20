@@ -16,9 +16,10 @@ import tempfile
 from pathlib import Path
 
 repo = Path(sys.argv[1])
-plugin = repo / "plugins/yasashii-secretary"
+plugin = repo / "plugins/secretary"
 diagnose = plugin / "scripts/update-diagnose.mjs"
 ledger = plugin / "scripts/update-ledger.mjs"
+edition_guard = plugin / "scripts/edition-guard.mjs"
 integrity = repo / "scripts/check-release-integrity.py"
 passed = 0
 failed = 0
@@ -51,24 +52,31 @@ check("現行manifestとCHANGELOGが一致", result.returncode == 0)
 with tempfile.TemporaryDirectory(prefix="sprint017-release-") as temp:
     root = Path(temp).resolve()
     (root / ".claude-plugin").mkdir(parents=True)
-    (root / "plugins/yasashii-secretary/.claude-plugin").mkdir(parents=True)
+    (root / "plugins/secretary/.claude-plugin").mkdir(parents=True)
+    (root / "plugins/yasashii-secretary").mkdir(parents=True)
     shutil.copy(repo / ".claude-plugin/marketplace.json", root / ".claude-plugin/marketplace.json")
-    shutil.copy(plugin / ".claude-plugin/plugin.json", root / "plugins/yasashii-secretary/.claude-plugin/plugin.json")
+    shutil.copy(plugin / ".claude-plugin/plugin.json", root / "plugins/secretary/.claude-plugin/plugin.json")
+    shutil.copy(plugin / "CHANGELOG.md", root / "plugins/secretary/CHANGELOG.md")
     shutil.copy(plugin / "CHANGELOG.md", root / "plugins/yasashii-secretary/CHANGELOG.md")
 
-    data = json.loads((root / "plugins/yasashii-secretary/.claude-plugin/plugin.json").read_text())
+    data = json.loads((root / "plugins/secretary/.claude-plugin/plugin.json").read_text())
     data["version"] = "0.2.9"
-    (root / "plugins/yasashii-secretary/.claude-plugin/plugin.json").write_text(json.dumps(data))
+    (root / "plugins/secretary/.claude-plugin/plugin.json").write_text(json.dumps(data))
     check("manifest version不一致を拒否", run([sys.executable, str(integrity), "--root", str(root)]).returncode != 0)
-    shutil.copy(plugin / ".claude-plugin/plugin.json", root / "plugins/yasashii-secretary/.claude-plugin/plugin.json")
+    shutil.copy(plugin / ".claude-plugin/plugin.json", root / "plugins/secretary/.claude-plugin/plugin.json")
 
     original = (plugin / "CHANGELOG.md").read_text()
-    (root / "plugins/yasashii-secretary/CHANGELOG.md").write_text(original.replace("### 必要な操作", "### 操作", 1))
+    changed = original.replace("### 必要な操作", "### 操作", 1)
+    (root / "plugins/secretary/CHANGELOG.md").write_text(changed)
+    (root / "plugins/yasashii-secretary/CHANGELOG.md").write_text(changed)
     check("CHANGELOG必須項目欠落を拒否", run([sys.executable, str(integrity), "--root", str(root)]).returncode != 0)
-    (root / "plugins/yasashii-secretary/CHANGELOG.md").write_text(original + "\n## [0.3.0] - 2026-07-17\n")
+    changed = original + "\n## [0.3.0] - 2026-07-17\n"
+    (root / "plugins/secretary/CHANGELOG.md").write_text(changed)
+    (root / "plugins/yasashii-secretary/CHANGELOG.md").write_text(changed)
     check("CHANGELOG重複versionを拒否", run([sys.executable, str(integrity), "--root", str(root)]).returncode != 0)
     parts = original.split("## [")
     reversed_log = parts[0] + "## [" + parts[2] + "## [" + parts[1]
+    (root / "plugins/secretary/CHANGELOG.md").write_text(reversed_log)
     (root / "plugins/yasashii-secretary/CHANGELOG.md").write_text(reversed_log)
     check("CHANGELOGの降順崩れを拒否", run([sys.executable, str(integrity), "--root", str(root)]).returncode != 0)
 
@@ -80,7 +88,10 @@ with tempfile.TemporaryDirectory(prefix="sprint017-workspace-") as temp:
     latest_manifest = base / "latest.json"
     workspace.mkdir()
     (fake_plugin / ".claude-plugin").mkdir(parents=True)
+    (fake_plugin / "rules/copy").mkdir(parents=True)
     shutil.copy(plugin / ".claude-plugin/plugin.json", fake_plugin / ".claude-plugin/plugin.json")
+    shutil.copy(plugin / "edition.json", fake_plugin / "edition.json")
+    shutil.copy(plugin / "rules/copy/yasashii.json", fake_plugin / "rules/copy/yasashii.json")
     shutil.copy(repo / ".claude-plugin/marketplace.json", latest_manifest)
     (workspace / "secretary/memory/decisions").mkdir(parents=True)
     (workspace / ".claude").mkdir()
@@ -90,6 +101,8 @@ with tempfile.TemporaryDirectory(prefix="sprint017-workspace-") as temp:
     (workspace / "secretary/memory/preferences.md").write_text("detail: short\n")
     (workspace / ".claude/settings.json").write_text('{"enabledPlugins":{}}\n')
     run(["git", "init", "-q"], cwd=workspace)
+    run(["node", str(edition_guard), "--workspace", str(workspace), "--plugin-root", str(fake_plugin),
+         "--entry", "onboarding", "--prepare-new", "--json"])
 
     init = run([
         "node", str(ledger), "init", "--workspace", str(workspace), "--plugin-root", str(fake_plugin),
@@ -98,9 +111,11 @@ with tempfile.TemporaryDirectory(prefix="sprint017-workspace-") as temp:
         "--template-variable", "CREATED_DATE=2026-07-17", "--template-variable", "REPORT_DETAIL=みじかく",
         "--new-install", "--confirm",
     ])
-    ledger_path = workspace / ".yasashii-secretary/update-ledger.json"
+    ledger_path = workspace / ".secretary/update-ledger.json"
     check("新規導入で最小台帳を作成", init.returncode == 0 and ledger_path.is_file())
-    records = json.loads(ledger_path.read_text())
+    ledger_value = json.loads(ledger_path.read_text())
+    records = ledger_value["records"]
+    check("新規台帳はschemaVersionとeditionを持つ", ledger_value["schemaVersion"] == 2 and ledger_value["edition"] == "yasashii-secretary")
     check("台帳は許可4項目だけ", all(set(item) == {"path", "installedVersion", "baselineHash", "templateVariables"} for item in records))
     check("台帳に本文を保存しない", "safe template" not in ledger_path.read_text() and "detail: short" not in ledger_path.read_text())
     check("台帳の生成変数は許可listだけ", all(set(item["templateVariables"]) <= {"CREATED_DATE", "CREATED_AT", "REPORT_DETAIL"} for item in records))
@@ -112,25 +127,27 @@ with tempfile.TemporaryDirectory(prefix="sprint017-workspace-") as temp:
     private_workspace = base / "private-workspace"
     (private_workspace / "secretary").mkdir(parents=True)
     (private_workspace / "secretary/AGENTS.md").write_text("x")
+    run(["node", str(edition_guard), "--workspace", str(private_workspace), "--plugin-root", str(fake_plugin),
+         "--entry", "onboarding", "--prepare-new", "--json"])
     refused = run([
         "node", str(ledger), "init", "--workspace", str(private_workspace), "--plugin-root", str(fake_plugin),
         "--managed-path", "secretary/AGENTS.md", "--template-variable", "OWNER_NAME=個人名",
         "--new-install", "--confirm",
     ])
-    check("私的生成変数を拒否して台帳を作らない", refused.returncode != 0 and not (private_workspace / ".yasashii-secretary/update-ledger.json").exists())
+    check("私的生成変数を拒否して台帳を作らない", refused.returncode != 0 and not (private_workspace / ".secretary/update-ledger.json").exists())
     invalid_private = run([
         "node", str(ledger), "init", "--workspace", str(private_workspace), "--plugin-root", str(fake_plugin),
         "--managed-path", "secretary/AGENTS.md", "--template-variable", "CREATED_DATE=個人名",
         "--new-install", "--confirm",
     ])
-    check("許可名でも私的値になり得る形式を拒否", invalid_private.returncode != 0 and not (private_workspace / ".yasashii-secretary/update-ledger.json").exists())
+    check("許可名でも私的値になり得る形式を拒否", invalid_private.returncode != 0 and not (private_workspace / ".secretary/update-ledger.json").exists())
 
     symlink_workspace = base / "symlink-workspace"
     outside = base / "outside"
     (symlink_workspace / "secretary").mkdir(parents=True)
     outside.mkdir()
     (symlink_workspace / "secretary/AGENTS.md").write_text("x")
-    (symlink_workspace / ".yasashii-secretary").symlink_to(outside, target_is_directory=True)
+    (symlink_workspace / ".secretary").symlink_to(outside, target_is_directory=True)
     refused = run([
         "node", str(ledger), "init", "--workspace", str(symlink_workspace), "--plugin-root", str(fake_plugin),
         "--managed-path", "secretary/AGENTS.md", "--new-install", "--confirm",
@@ -151,7 +168,7 @@ with tempfile.TemporaryDirectory(prefix="sprint017-workspace-") as temp:
     check("同一versionをsameと判定", outputs["check-only"].get("status") == "same")
     check("clean workspaceを判定", outputs["check-only"].get("workspace", {}).get("status") == "clean")
     check("side effect countersが全て0", all(all(value == 0 for value in item.get("sideEffects", {}).values()) for item in outputs.values()))
-    check("実更新希望でも診断中は停止", outputs["proceed-update"].get("selectedOutcome") == "説明を確認しました。実更新は別の最終確認後に開始できます")
+    check("同一versionは実更新を利用不可にして診断中に停止", outputs["proceed-update"].get("choices", [{}, {}])[1].get("available") is False and "すでに最新版" in outputs["proceed-update"].get("selectedOutcome", ""))
 
     (workspace / "secretary/AGENTS.md").write_text("customized\n")
     customized_before = snapshot(workspace)
@@ -173,7 +190,10 @@ with tempfile.TemporaryDirectory(prefix="sprint017-workspace-") as temp:
 
     old_plugin = base / "old-plugin"
     (old_plugin / ".claude-plugin").mkdir(parents=True)
+    (old_plugin / "rules/copy").mkdir(parents=True)
     (old_plugin / ".claude-plugin/plugin.json").write_text('{"name":"yasashii-secretary","version":"0.2.0"}\n')
+    shutil.copy(plugin / "edition.json", old_plugin / "edition.json")
+    shutil.copy(plugin / "rules/copy/yasashii.json", old_plugin / "rules/copy/yasashii.json")
     output = run([
         "node", str(diagnose), "--workspace", str(ledgerless), "--plugin-root", str(old_plugin),
         "--latest-manifest", str(latest_manifest), "--changelog", str(plugin / "CHANGELOG.md"), "--json",
@@ -182,7 +202,10 @@ with tempfile.TemporaryDirectory(prefix="sprint017-workspace-") as temp:
 
     unknown_plugin = base / "unknown-plugin"
     (unknown_plugin / ".claude-plugin").mkdir(parents=True)
+    (unknown_plugin / "rules/copy").mkdir(parents=True)
     (unknown_plugin / ".claude-plugin/plugin.json").write_text('{"name":"yasashii-secretary"}\n')
+    shutil.copy(plugin / "edition.json", unknown_plugin / "edition.json")
+    shutil.copy(plugin / "rules/copy/yasashii.json", unknown_plugin / "rules/copy/yasashii.json")
     output = run([
         "node", str(diagnose), "--workspace", str(ledgerless), "--plugin-root", str(unknown_plugin),
         "--latest-manifest", str(latest_manifest), "--changelog", str(plugin / "CHANGELOG.md"), "--json",
@@ -198,8 +221,10 @@ with tempfile.TemporaryDirectory(prefix="sprint017-workspace-") as temp:
     check("説明不完全な公開版をlatest-unverifiedにする", json.loads(output.stdout)["status"] == "latest-unverified")
 
     secret = "TOP-SECRET-987654"
-    hostile = [{"path":"secretary/AGENTS.md","installedVersion":"0.3.0","baselineHash":"sha256:" + "0"*64,
-                "templateVariables":{"CREATED_DATE":"secret=" + secret}}]
+    hostile = {"schemaVersion": 2, "edition": "yasashii-secretary", "records": [
+        {"path":"secretary/AGENTS.md","installedVersion":"0.3.0","baselineHash":"sha256:" + "0"*64,
+         "templateVariables":{"CREATED_DATE":"secret=" + secret}}
+    ]}
     ledger_path.write_text(json.dumps(hostile))
     output = run([
         "node", str(diagnose), "--workspace", str(workspace), "--plugin-root", str(fake_plugin),

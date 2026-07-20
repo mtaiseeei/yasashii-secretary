@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "0.7.0",
+  "toVersion": "0.8.0",
+  "operations": [],
+  "note": "legacy yasashii workspaceをneutral markerとedition付き台帳へ移行します。記憶、一般PJ、チャット履歴・設定、secret、カスタマイズ済みファイルは自動変更しません。"
+}

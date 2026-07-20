@@ -12,6 +12,6 @@ YASASHII_CHATWORK_TEST_PRIVATE=1 \
 YASASHII_CHATWORK_SKIP_DISPATCH=1 \
 YASASHII_CHATWORK_SKIP_GIT=1 \
 YASASHII_CHATWORK_TEST_SECRET=1 \
-node "$ROOT/plugins/yasashii-secretary/skills/chatwork/scripts/wizard-server.mjs" \
+node "$ROOT/plugins/secretary/skills/chatwork/scripts/wizard-server.mjs" \
   --root "$WORK" \
   --port "${1:-8765}"

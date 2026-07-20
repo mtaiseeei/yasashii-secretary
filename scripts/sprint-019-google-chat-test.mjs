@@ -5,10 +5,10 @@ import { mkdtempSync, mkdirSync, readFileSync, readdirSync, realpathSync, writeF
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createPkceState, authorizationRequest, GOOGLE_CHAT_SCOPES, parseDesktopClientJson, validateCallback } from "../plugins/yasashii-secretary/skills/google-chat/scripts/oauth-session.mjs";
-import { initialGoogleChatSync } from "../plugins/yasashii-secretary/skills/google-chat/scripts/sync.mjs";
-import { searchGoogleChat } from "../plugins/yasashii-secretary/skills/google-chat/scripts/search.mjs";
-import { cleanupDescription } from "../plugins/yasashii-secretary/skills/google-chat/assets/wizard/cleanup.mjs";
+import { createPkceState, authorizationRequest, GOOGLE_CHAT_SCOPES, parseDesktopClientJson, validateCallback } from "../plugins/secretary/skills/google-chat/scripts/oauth-session.mjs";
+import { initialGoogleChatSync } from "../plugins/secretary/skills/google-chat/scripts/sync.mjs";
+import { searchGoogleChat } from "../plugins/secretary/skills/google-chat/scripts/search.mjs";
+import { cleanupDescription } from "../plugins/secretary/skills/google-chat/assets/wizard/cleanup.mjs";
 
 const repo = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const testTmp = realpathSync(tmpdir());
@@ -92,7 +92,7 @@ check("not foundは保存済み範囲に限定", missing.status === "not-found-l
 
 async function startServer(extraEnv = {}, options = {}) {
   const root = options.root || temp(`wizard-${Date.now()}`);
-  const child = spawn(process.execPath, [join(repo, "plugins", "yasashii-secretary", "skills", "google-chat", "scripts", "wizard-server.mjs"), "--root", root, "--port", "0"], { env: { ...process.env, YASASHII_GOOGLE_CHAT_SYNTHETIC: "1", YASASHII_GOOGLE_CHAT_TEST_PRIVATE: "1", YASASHII_GOOGLE_CHAT_TEST_SECRETS: "1", YASASHII_GOOGLE_CHAT_SKIP_GIT: "1", YASASHII_GOOGLE_CHAT_FIXTURE: fixturePath, ...extraEnv } });
+  const child = spawn(process.execPath, [join(repo, "plugins", "secretary", "skills", "google-chat", "scripts", "wizard-server.mjs"), "--root", root, "--port", "0"], { env: { ...process.env, YASASHII_GOOGLE_CHAT_SYNTHETIC: "1", YASASHII_GOOGLE_CHAT_TEST_PRIVATE: "1", YASASHII_GOOGLE_CHAT_TEST_SECRETS: "1", YASASHII_GOOGLE_CHAT_SKIP_GIT: "1", YASASHII_GOOGLE_CHAT_FIXTURE: fixturePath, ...extraEnv } });
   let output = ""; child.stdout.on("data", (chunk) => { output += chunk; });
   let errors = ""; child.stderr.on("data", (chunk) => { errors += chunk; });
   for (let attempt = 0; attempt < 80 && !output.match(/http:\/\//); attempt += 1) await new Promise((wait) => setTimeout(wait, 50));
@@ -226,13 +226,13 @@ const partialConfig = JSON.parse(readFileSync(join(partialWorkspace.root, "googl
 check("初回保存後に自動設定だけ失敗した場合を全体成功にしない", partialResult.response.status === 207 && partialResult.json.git.pushed === true && partialResult.json.schedule.status === "failed" && partialResult.json.connectionState === "completed-with-schedule-failure" && partialConfig.scheduleEnabled === false && readFileSync(join(partialWorkspace.root, ".github", "workflows", "google-chat-sync.yml"), "utf8") === "利用者が確認中の既存ファイル\n");
 partialServer.child.kill("SIGTERM");
 
-const wizardServerSource = readFileSync(join(repo, "plugins", "yasashii-secretary", "skills", "google-chat", "scripts", "wizard-server.mjs"), "utf8");
+const wizardServerSource = readFileSync(join(repo, "plugins", "secretary", "skills", "google-chat", "scripts", "wizard-server.mjs"), "utf8");
 check("Repository Secret値はghのstdinへ渡しハイフン文字を登録しない", wizardServerSource.includes('["secret", "set", name]') && (wizardServerSource.includes("child.stdin.end(value)") || (wizardServerSource.includes("runExternal") && wizardServerSource.includes("input: value"))) && !wizardServerSource.includes('["secret", "set", name, "--body", "-"]'));
 
-const common = readFileSync(join(repo, "plugins", "yasashii-secretary", "skills", "chatwork", "assets", "wizard", "common.js"), "utf8");
-const css = readFileSync(join(repo, "plugins", "yasashii-secretary", "skills", "chatwork", "assets", "wizard", "style.css"), "utf8");
-const chatApp = readFileSync(join(repo, "plugins", "yasashii-secretary", "skills", "chatwork", "assets", "wizard", "app.js"), "utf8");
-const googleApp = readFileSync(join(repo, "plugins", "yasashii-secretary", "skills", "google-chat", "assets", "wizard", "app.js"), "utf8");
+const common = readFileSync(join(repo, "plugins", "secretary", "skills", "chatwork", "assets", "wizard", "common.js"), "utf8");
+const css = readFileSync(join(repo, "plugins", "secretary", "skills", "chatwork", "assets", "wizard", "style.css"), "utf8");
+const chatApp = readFileSync(join(repo, "plugins", "secretary", "skills", "chatwork", "assets", "wizard", "app.js"), "utf8");
+const googleApp = readFileSync(join(repo, "plugins", "secretary", "skills", "google-chat", "assets", "wizard", "app.js"), "utf8");
 check("両wizardは同じshell・index・CSS assetを共有", chatApp.includes('installWizardShell("chatwork")') && googleApp.includes('installWizardShell("google-chat")') && common.includes("Chatworkの設定") && common.includes("Google Chatの設定"));
 check("指定CTA色・黒前景・旧青0", common.includes("#F03747") && common.includes("#11BB62") && css.includes("color: #000000") && !/#3e6ae1/i.test(`${common}\n${css}\n${chatApp}\n${googleApp}`));
 function luminance(hex) { const channels = hex.match(/[0-9a-f]{2}/gi).map((part) => parseInt(part, 16) / 255).map((value) => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4); return .2126 * channels[0] + .7152 * channels[1] + .0722 * channels[2]; }
@@ -240,9 +240,9 @@ check("指定背景と黒前景はcontrast 4.5:1以上", ["F03747", "11BB62"].ev
 check("両サービス3時間推奨・初期値", chatApp.includes('interval: "3h"') && chatApp.includes("3時間ごと（おすすめ・初期値）") && googleApp.includes('interval: "3h"') && googleApp.includes("3時間ごと（おすすめ・初期値）"));
 check("cleanup通信失敗と手動確認先を成功扱いしない", googleApp.includes("cleanupDescription") && cleanupCopies[4].kind === "manual" && cleanupCopies[3].kind === "manual");
 
-const distributed = [readFileSync(join(repo, "README.md"), "utf8"), readFileSync(join(repo, "plugins", "yasashii-secretary", "skills", "google-chat", "SKILL.md"), "utf8")].join("\n");
+const distributed = [readFileSync(join(repo, "README.md"), "utf8"), readFileSync(join(repo, "plugins", "secretary", "skills", "google-chat", "SKILL.md"), "utf8")].join("\n");
 check("README高度設定と管理者順序・People API限界", distributed.includes("Google Chatをつなぐ（少し高度な設定）") && distributed.includes("Google Workspace管理者") && distributed.includes("Internal") && distributed.includes("Desktop app") && distributed.includes("連絡先にない同僚名"));
-check("public repoにGoogle Chat workflow・利用者設定・履歴なし", !readdirSync(join(repo, "plugins", "yasashii-secretary", "workspace-templates", ".github", "workflows")).some((name) => /google|gchat/i.test(name)) && !readdirSync(join(repo, "plugins", "yasashii-secretary", "workspace-templates")).some((name) => name === "google-chat"));
+check("public repoにGoogle Chat workflow・利用者設定・履歴なし", !readdirSync(join(repo, "plugins", "secretary", "workspace-templates", ".github", "workflows")).some((name) => /google|gchat/i.test(name)) && !readdirSync(join(repo, "plugins", "secretary", "workspace-templates")).some((name) => name === "google-chat"));
 
 process.stdout.write(`SPRINT019_PASS=${passed} SPRINT019_FAIL=${failed}\n`);
 process.exit(failed ? 1 : 0);

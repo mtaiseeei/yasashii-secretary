@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "userFacing": [
+    {
+      "category": "rules-and-edition-copy",
+      "paths": [
+        "plugins/secretary/rules/*.md",
+        "plugins/secretary/rules/styles/*.md",
+        "plugins/secretary/rules/copy/*.json"
+      ],
+      "covers": ["conversation", "diagnosis", "report", "developer-handoff"]
+    },
+    {
+      "category": "skills-and-commands",
+      "paths": ["plugins/secretary/skills/*/SKILL.md"],
+      "covers": ["confirmation", "progress", "success", "partial-failure", "error", "search", "update", "projects", "connections"]
+    },
+    {
+      "category": "workspace-guidance",
+      "paths": [
+        "plugins/secretary/templates/AGENTS.md",
+        "plugins/secretary/templates/CLAUDE.md",
+        "plugins/secretary/templates/tones/*.md"
+      ],
+      "covers": ["persistent-instructions", "tone"]
+    },
+    {
+      "category": "wizard",
+      "paths": [
+        "plugins/secretary/skills/chatwork/assets/wizard/index.html",
+        "plugins/secretary/skills/chatwork/assets/wizard/*.js",
+        "plugins/secretary/skills/google-chat/assets/wizard/*.js"
+      ],
+      "covers": ["heading", "body", "label", "progress", "success", "partial-failure", "error", "completion", "secret-guidance"]
+    }
+  ],
+  "machineReadableExclusions": [
+    {
+      "paths": ["plugins/secretary/scripts/**/*.mjs", "plugins/secretary/scripts/**/*.sh"],
+      "reason": "CLI records, exit-code contracts, and validators remain machine-readable; their conversational explanation is governed by the shared rules."
+    },
+    {
+      "paths": ["plugins/secretary/templates/memory/**/*.md", "plugins/secretary/workspace-templates/**/*"],
+      "reason": "Journal, index, config, workflow, and workspace records keep one-record-per-entry formats; they are stored artifacts rather than assistant prose."
+    }
+  ]
+}

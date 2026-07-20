@@ -62,7 +62,7 @@
 1. 共有規律と既定の体験を第1部、個人設定による上書きを第2部として分ける。
 2. `preferences.md` が無い・空・該当項目未設定なら既定値で動く。暗黙推測で設定を変えない。
 3. 既定値は、丁寧で堅すぎない口調、専門用語「ふつう」、報告「みじかく（3行）」、決定確認「都度」。
-4. 報告は**既定3行**。`preferences.md` で「くわしく」が明示された場合だけ、3行＋補足1つへ拡張できる。憲章テンプレの規約も同じ形にする。
+4. 報告は**既定3行**。3つの意味を物理的にも別行または別項目で表示し、1行の平文へ連結しない。`preferences.md` で「くわしく」が明示された場合だけ、3行＋補足1つへ拡張できる。憲章テンプレの規約も同じ形にする。
 5. 一般技術用語は常にそのまま使う。「ことば添え」のopt-inでも語彙を置換せず、馴染みの薄い語またはユーザーの役割から未知と思われる語に短い補足を足すだけにする。
 6. パーソナライズされた文面の完全一致は回帰対象にしない。rubricは既定値を採点し、設定分岐は構造・適用・安全なフォールバックと模擬会話で確認する。
 7. 自発的な `秘書のメモ` 追記、口調・呼び方・詳しさ等の変更は、適用前に1行確認する。
@@ -93,7 +93,7 @@
 ## 8. Chatwork設定wizard
 
 1. wizardはloopbackだけで利用するローカル設定画面とし、外部公開サーバーや常設サービスにしない。
-2. 画面へAPI Token入力欄を作らず、会話にもToken値を貼らせない。接続順は、(1) ChatworkでTokenを取得または組織管理者へ利用申請、(2) 現在のGitHub repoのSecret追加画面を開く、(3) 名前 `CHATWORK_API_TOKEN` で登録、(4) 登録確認後にルーム一覧取得、とする。
+2. 画面へAPI Token入力欄を作らず、会話にもToken値を貼らせない。接続順は、(1) ChatworkでTokenを取得または組織管理者へ利用申請、(2) 現在のGitHub repoのSecret追加画面を開く、(3) GitHub画面の `Name` 欄へ `CHATWORK_API_TOKEN`、`Secret` 欄へ本人がChatwork公式画面で取得したAPI Tokenを入力、(4) 登録確認後にルーム一覧取得、とする。Token実値はGitHub画面だけへ入力する。
 3. Chatwork公式のTokenページ、発行ヘルプ、組織契約のAPI利用申請ヘルプへ直接案内する。パーソナルプランを除き組織管理者への申請が必要であり、実際にAPIを利用するアカウントで申請する。承認前はルーム一覧取得へ進めない。Tokenページが利用できない状態では「組織管理者へAPI利用申請→承認後にこの設定画面へアクセスする」を示し、設定途中の選択を保持する。
 4. Secret追加画面は `https://github.com/<owner>/<repo>/settings/secrets/actions/new` を現在のrepo情報から組み立て、CTAを「GitHub上の安全な保管場所を開く」とする。固定owner／repo pathを使わず、外部リンクは新しいタブで開き、行き先と目的が分かる日本語ラベルを付ける。
 5. 変更は確認画面まで副作用を出さず、確定後だけルーム設定・自動取得の間隔・scheduleへ一貫して反映する。キャンセル時は0変更。
@@ -215,9 +215,9 @@
 13. Cloud準備の会話とlocal wizardを分ける。skill会話はJSON取得までを担当し、JSON取得を確認してからwizardを起動する。wizardはJSON選択→OAuth許可→通常スペース選択へ進み、Cloud project作成・API有効化・Audience・OAuth Client作成の画像や重複説明を表示しない。
 14. OAuth許可はJSON確認後の明示ボタンで別タブに開く。元wizardの状態確認、ポップアップ拒否、タブ閉鎖、同意拒否、再試行、許可後の自動SPACE選択というSprint 019の合格動作を維持する。OAuth画面をJSON選択だけで勝手に開かない。
 
-## 14. 0.7.0 配布前安全境界
+## 14. 公開済み0.7.0と次候補0.8.0の配布安全境界
 
-1. 公開版は `0.7.0` とし、marketplace、plugin manifest、CHANGELOG、更新診断、最小台帳、migration、公開ガイドの版を一致させる。`0.6.0`のまま監査対応を大幅追加して配布しない。
+1. 2026-07-18の公開判断では公開版を `0.7.0` とし、marketplace、plugin manifest、CHANGELOG、更新診断、最小台帳、migration、公開ガイドの版を一致させた。これは公開済みreleaseの歴史的な不変条件であり、`0.6.0`のまま監査対応を大幅追加して配布しない。
 2. 初回publish、チャット設定、記憶commit、更新等のGit操作は、その操作が所有するpathだけをstage・commitする。操作開始前からstage済みの変更、別サービス、一般PJ、repo rootの無関係ファイルをcommitへ混ぜず、既存indexを勝手にunstage・上書き・削除しない。
 3. 初回publishのように複数領域を初期化する場合も、commit候補のinventoryを明示的に確定してから全候補をsecret検査する。製品が生成・管理するworkflow／config／historyと初回publish inventoryでは、Google OAuth client JSON、client secret、認可コード、access／refresh token、Chatwork API Token、private key／秘密鍵、credential URL、known token field、通常のliteral assignment等の合理的な誤混入が1件でもあればcommit・push前に停止する。検査後に候補が変われば再検査する。
 4. OAuth／Chatwork資格情報の正本は、現在のprivate repoのRepository Secretとする。サービスごとの登録境界を混同しない。
@@ -243,3 +243,34 @@
 18. `.mcp.json`、onboarding、README、公開ガイドは `0.7.0`の現行機能と一致させる。古い「後続対応予定」、古いversion、既に置き換えた導線を現行説明へ残さない。
 19. `0.7.0`の配布合格には、F36〜F42の回帰、master offline／online、Git archive相当の検査、専用private test workspaceのChatwork／Google Chat live gateがすべて必要である。片方のサービス、合成fixture、過去run、過去版の成功で代替しない。
 20. live gate完了後は両チャットschedule、全Repository Secret、room／space選択、Google OAuth grant／tokenが残っていないことを確認する。後始末未完了は不合格。履歴またはtest workspaceの削除は別の明示確認を必要とする。
+21. 1〜20は公開済み `0.7.0` で確定した不変条件として維持する。公開済み `0.7.0` のmanifest、migration、fixture、評価記録、Git履歴を `0.8.0` 前提へ書き換えず、同一versionのまま配布物を差し替えない。
+22. まだ利用者へ明示配布していない2 editionの最初のrelease candidate／latestは `0.8.0` とし、marketplace、plugin manifest、正本CHANGELOG、edition設定、README／公開ガイドの候補versionを一致させる。
+23. 旧 `plugins/yasashii-secretary/CHANGELOG.md` はredirectではないraw CHANGELOG互換fileとして残し、新しい正本とbyte-for-byteで一致させる。過去entryを書き換えず、未検証の旧0.7.0 live update成功を説明しない。
+24. 更新可能とするのは候補versionが導入済みversionよりsemver上で新しい場合だけとする。同一versionとdowngradeはplugin、workspace、Git、設定、ledger、migrationへ副作用0件で停止する。same-version bootstrap bridge、別配布物による橋渡し、公開済み `0.7.0` のin-place差替えを作らない。
+25. 0.8.0は新規または未導入状態から導入でき、正本plugin path、neutral marker、edition付きledger、主要skillを整合させる。旧0.7.0 updaterのscanner停止は既知blockerとして保持し、対応済み・live互換PASS・配布保証のいずれにも数えない。
+26. 旧0.7.0利用者向けexternal recovery／bootstrapは作らない。旧scannerで止まる標準生成fileのfixture削除、既知pathの広い除外、secret scan弱体化、公開済みartifactの改変で合格を作らない。
+27. `0.8.0` release candidateのidentityは配布対象bytesで固定する。checkout専用のGit履歴・監査evidence検査と、`.git`／監査evidenceを含まないarchive配布検査は役割を分ける。checkout専用入力をarchiveへ混ぜず、どちらか一方の合格で全体を代替しない。
+28. 旧 `0.6.0 → 0.7.0` と調査済み `0.7.0 → 0.8.0` のmigration、fixture、受入記録は歴史的回帰として期待値を変更せず保持する。未実施live gateを合格として追加しない。
+
+## 15. 2 edition境界
+
+1. `agentic-secretary` は `/Users/taisei/workspace/agentic-secretary` の別directoryかつ `mtaiseeei/agentic-secretary` の別GitHub repoとする。`yasashii-secretary` 内のmonorepo／subdirectoryにしない。
+2. `agentic-secretary` は上流、`yasashii-secretary` は下流とし、下流の `upstream` remoteはfetch専用・push無効とする。両者はneutralization commitまでのGit履歴と共通祖先を持つ。
+3. 別directory／repo作成、remote追加・変更、push、公開、release、実plugin install／updateは、該当Sprintのexternal gateで操作ごとのユーザー明示許可を再確認する。
+4. 内部plugin pathは両editionで `plugins/secretary/`。外部plugin ID、marketplace名、repository／homepageはedition別とする。
+5. workspace `secretary/`、skill／command名、migration filename、OAuth scope、Chatwork／Google Chat wizardとそのcopy、安全・証拠ruleは共通とする。
+6. edition差分は会話、診断、報告、developer handoffに限定する。やさしさoverlayから安全rule、証拠要件、wizard動作を上書きしない。
+7. 新規workspaceはneutral markerとedition値を使う。legacy yasashii markerを認識し、反対edition、混在、判定不能は副作用0件で停止する。別editionのledger／marker／履歴を移動・統合・削除・上書きしない。
+8. 旧 `plugins/yasashii-secretary/CHANGELOG.md` はraw CHANGELOGの長期互換fileとして、新しい正本とbyte-for-byte一致させる。不一致、過去entry改変、equal／downgradeの副作用、same-version bridge、旧blockerを解消済みとする誤表示は公開不合格とする。
+9. 新規生成bot名の第一候補は `secretary[bot]`。既存workspaceのbot名やworkflowは強制改名しない。
+10. LICENSEとShin-sibainu/cc-company単段クレジットを両editionで保持する。`forkedFrom` は公式validatorまたはlive gateの証拠なしに推測変更しない。
+11. yasashii overlayは共通plugin、共通安全回帰、必要な互換／release checkだけを対象とする。spec、Sprint、progress、feedback、evidenceは各repoが所有し、同期しない。
+
+## 16. 全ユーザー会話の可読性
+
+1. 両editionの会話、診断、確認、進行、成功、部分失敗、エラー、検索結果、更新、プロジェクト、接続案内、developer handoffは、複数要素を改行なしの平文へ連結しない。
+2. 1要点だけの短い内容は1段落でよい。複数の手順、選択肢、変更点、結果、原因、影響、次の行動は、空行で分けた段落またはMarkdown箇条書きで構造化する。
+3. 1文ごとのbullet、不要な見出し、同じ内容の重複、装飾目的のMarkdownは避ける。可読性のための改行を、冗長化や情報追加の理由にしない。
+4. 改行の有無をユーザーへ質問せず、preferencesへ設定項目を追加しない。口調、専門用語、報告詳しさを変更しても、この最低基準は無効にできない。
+5. 「改行しない」「1行にまとめる」「平文で返す」「箇条書きを使わない」等のユーザー向け指示を配布rules、skills、templates、commands、edition copy、handoffに残さない。内部record、commit message、index、machine-readable出力の1行契約は対象外として区別する。
+6. agenticは結論・正式名称・証拠を早めに、yasashiiは何が起きたか・影響・次にすることを先に示す。可読性の共通化を理由に、思想・対象・4つのedition差分を同一化しない。

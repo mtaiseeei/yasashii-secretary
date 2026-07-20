@@ -17,7 +17,7 @@ import tempfile
 from pathlib import Path
 
 repo = Path(sys.argv[1])
-plugin = repo / "plugins/yasashii-secretary"
+plugin = repo / "plugins/secretary"
 apply_cli = plugin / "scripts/update-apply.mjs"
 manifest = repo / ".claude-plugin/marketplace.json"
 changelog = plugin / "CHANGELOG.md"
@@ -66,9 +66,9 @@ def seed_ledger(workspace, version="0.3.0"):
     for rel in ("secretary/AGENTS.md", "secretary/CLAUDE.md"):
         digest = hashlib.sha256((workspace / rel).read_bytes()).hexdigest()
         records.append({"path": rel, "installedVersion": version, "baselineHash": f"sha256:{digest}", "templateVariables": {}})
-    ledger = workspace / ".yasashii-secretary/update-ledger.json"
+    ledger = workspace / ".secretary/update-ledger.json"
     ledger.parent.mkdir(parents=True, exist_ok=True)
-    ledger.write_text(json.dumps(records, indent=2) + "\n")
+    ledger.write_text(json.dumps({"schemaVersion": 2, "edition": "yasashii-secretary", "records": records}, indent=2) + "\n")
     run(["git", "add", str(ledger.relative_to(workspace))], cwd=workspace)
     result = run(["git", "commit", "-qm", "更新台帳を追加"], cwd=workspace)
     assert result.returncode == 0
@@ -143,6 +143,8 @@ raise SystemExit(0)
 """)
     mock.chmod(mock.stat().st_mode | stat.S_IXUSR)
 
+    # The pinned 0.2.0 commit predates Sprint 031 and therefore uses the legacy
+    # implementation path. This is historical input, not a current path.
     old_agents = run(["git", "show", "d569fef:plugins/yasashii-secretary/templates/AGENTS.md"], cwd=repo).stdout
     old_claude = run(["git", "show", "d569fef:plugins/yasashii-secretary/templates/CLAUDE.md"], cwd=repo).stdout
     current020 = make_current(root, "0.2.0")
@@ -199,9 +201,9 @@ raise SystemExit(0)
     applied = cli("resume", approved, extra=["--apply", "--plan-hash", plan_hash])
     applied_data = parse(applied)
     check("確認済みplanだけを適用", applied.returncode == 0 and applied_data.get("verification", {}).get("ok") is True)
-    check("0.2.0既知baselineだけをbootstrap台帳化", (approved / ".yasashii-secretary/update-ledger.json").is_file())
-    ledger = json.loads((approved / ".yasashii-secretary/update-ledger.json").read_text())
-    check("bootstrap台帳は確認済み2件・許可4fieldだけ", len(ledger) == 2 and all(set(item) == {"path", "installedVersion", "baselineHash", "templateVariables"} and item["installedVersion"] == release_version for item in ledger))
+    check("0.2.0既知baselineだけをbootstrap台帳化", (approved / ".secretary/update-ledger.json").is_file())
+    ledger = json.loads((approved / ".secretary/update-ledger.json").read_text())
+    check("bootstrap台帳はschema2・edition・確認済み2件", ledger.get("schemaVersion") == 2 and ledger.get("edition") == "yasashii-secretary" and len(ledger.get("records", [])) == 2 and all(set(item) == {"path", "installedVersion", "baselineHash", "templateVariables"} and item["installedVersion"] == release_version for item in ledger["records"]))
     check("migrationは更新安全性sectionと入口pointerだけを追加", "yasashii-secretary:update-safety:v1:start" in (approved / "secretary/AGENTS.md").read_text() and "yasashii-secretary:update-entry:v1:start" in (approved / "secretary/CLAUDE.md").read_text())
     first_hash = hashlib.sha256((approved / "secretary/AGENTS.md").read_bytes()).hexdigest()
     again = cli("resume", approved)
@@ -242,7 +244,7 @@ raise SystemExit(0)
     plan_hash = parse(dry).get("plan", {}).get("planHash")
     applied = cli("resume", customized, extra=["--apply", "--plan-hash", plan_hash])
     check("unknown-baselineの無応答は現状維持", result.returncode == 0 and applied.returncode == 0 and (customized / "secretary/AGENTS.md").read_text() == custom_before)
-    check("確認できない保持fileを台帳へ決めつけない", not (customized / ".yasashii-secretary/update-ledger.json").exists())
+    check("確認できない保持fileを台帳へ決めつけない", not (customized / ".secretary/update-ledger.json").exists())
 
     diff_ws = make_workspace(root, "diff", custom_text)
     before = snapshot(diff_ws, include_git=True)
@@ -262,15 +264,17 @@ raise SystemExit(0)
     before_head = head(secret_ws)
     result = cli("start", secret_ws, current020, extra=["--consent", "update-approved"])
     check("secret疑いはcommit前に停止", result.returncode != 0 and head(secret_ws) == before_head)
-    check("secretをstdout/stderr/台帳/logへ出さない", secret_value not in result.stdout + result.stderr and secret_value not in (log.read_text() if log.exists() else "") and not (secret_ws / ".yasashii-secretary/update-ledger.json").exists())
+    check("secretをstdout/stderr/台帳/logへ出さない", secret_value not in result.stdout + result.stderr and secret_value not in (log.read_text() if log.exists() else "") and not (secret_ws / ".secretary/update-ledger.json").exists())
 
     secret_ledger = make_workspace(root, "secret-ledger", old_agents)
     seed_ledger(secret_ledger)
     ledger_secret = "SYNTHETIC-LEDGER-SECRET-987654321"
-    secret_records = json.loads((secret_ledger / ".yasashii-secretary/update-ledger.json").read_text())
+    secret_ledger_path = secret_ledger / ".secretary/update-ledger.json"
+    secret_ledger_value = json.loads(secret_ledger_path.read_text())
+    secret_records = secret_ledger_value["records"]
     secret_records[0]["secret"] = ledger_secret
-    (secret_ledger / ".yasashii-secretary/update-ledger.json").write_text(json.dumps(secret_records, indent=2) + "\n")
-    run(["git", "add", ".yasashii-secretary/update-ledger.json"], cwd=secret_ledger)
+    secret_ledger_path.write_text(json.dumps(secret_ledger_value, indent=2) + "\n")
+    run(["git", "add", ".secretary/update-ledger.json"], cwd=secret_ledger)
     run(["git", "commit", "-qm", "不正台帳fixture"], cwd=secret_ledger)
     before_head = head(secret_ledger)
     result = cli("start", secret_ledger, current030, extra=["--consent", "update-approved"])

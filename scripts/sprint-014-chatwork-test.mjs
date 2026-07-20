@@ -7,13 +7,13 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
 import { runInNewContext } from "node:vm";
-import { applyChatworkConfig } from "../plugins/yasashii-secretary/skills/chatwork/scripts/config-transaction.mjs";
-import { INTERVALS } from "../plugins/yasashii-secretary/skills/chatwork/scripts/schedule.mjs";
-import { chatworkInitialResultModel } from "../plugins/yasashii-secretary/skills/chatwork/assets/wizard/result-model.js";
+import { applyChatworkConfig } from "../plugins/secretary/skills/chatwork/scripts/config-transaction.mjs";
+import { INTERVALS } from "../plugins/secretary/skills/chatwork/scripts/schedule.mjs";
+import { chatworkInitialResultModel } from "../plugins/secretary/skills/chatwork/assets/wizard/result-model.js";
 
 const exec = promisify(execFile);
 const repo = resolve(import.meta.dirname, "..");
-const plugin = join(repo, "plugins", "yasashii-secretary");
+const plugin = join(repo, "plugins", "secretary");
 const template = join(plugin, "workspace-templates");
 const syncScript = join(template, "chatwork", "scripts", "chatwork-sync.mjs");
 const searchFlow = join(plugin, "skills", "chatwork", "scripts", "search-flow.mjs");

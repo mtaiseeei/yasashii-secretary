@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "surfaces": {
+    "conversation": {
+      "decisionConfirmation": "この内容を決定として残しますね: <そのターンのユーザー入力全文>",
+      "topicConfirmation": "要点を案件メモに残しますね: <確認済みの要点>",
+      "projectSuggestion": "この内容は今後も続きそうです。プロジェクトとしてまとめますか？"
+    },
+    "diagnosis": {
+      "unverifiedConnection": "接続状態は未確認",
+      "failureOrder": [
+        "何が起きたか",
+        "影響",
+        "次にすること"
+      ],
+      "latestUnverified": "最新版は確認できませんでした"
+    },
+    "report": {
+      "shortLines": [
+        "やったこと: <何をしたか>",
+        "結果: <どうなったか。場所やファイル名は具体的に>",
+        "次に何が起きるか: <次の一手・次にできること>"
+      ],
+      "detailedSuffix": "補足: <追加情報>"
+    },
+    "developerHandoff": {
+      "order": [
+        "何が起きたか",
+        "影響",
+        "次にすること",
+        "正式名称"
+      ],
+      "guidance": "正式名称を残しつつ利用者が渡せる短い形"
+    }
+  }
+}

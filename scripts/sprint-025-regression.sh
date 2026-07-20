@@ -5,6 +5,30 @@ set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+# Sprint 025 is the immutable public 0.7.0 history gate.  Once the current
+# candidate moves past 0.7.0, execute the exact test and release tree from the
+# nearest Git revision whose marketplace still declares 0.7.0.
+CURRENT_VERSION="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["plugins"][0]["version"])' "$REPO/.claude-plugin/marketplace.json")"
+if [ "$CURRENT_VERSION" != "0.7.0" ]; then
+  HISTORICAL_REV="$(git -C "$REPO" rev-list HEAD | while IFS= read -r rev; do
+    if git -C "$REPO" show "$rev:.claude-plugin/marketplace.json" 2>/dev/null \
+      | python3 -c 'import json,sys; raise SystemExit(0 if json.load(sys.stdin)["plugins"][0]["version"] == "0.7.0" else 1)' 2>/dev/null; then
+      printf '%s\n' "$rev"
+      break
+    fi
+  done)"
+  if [ -z "$HISTORICAL_REV" ]; then
+    printf 'SPRINT025_PASS=0 SPRINT025_FAIL=1\n' >&2
+    exit 1
+  fi
+  HISTORICAL_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/sprint025-history.XXXXXX")"
+  git -C "$REPO" archive "$HISTORICAL_REV" | tar -x -C "$HISTORICAL_ROOT"
+  bash "$HISTORICAL_ROOT/scripts/sprint-025-regression.sh"
+  STATUS=$?
+  rm -rf "$HISTORICAL_ROOT"
+  exit "$STATUS"
+fi
+
 python3 - "$REPO" <<'PY'
 import hashlib
 import json
@@ -17,7 +41,7 @@ import tempfile
 from pathlib import Path
 
 repo = Path(sys.argv[1])
-plugin = repo / "plugins/yasashii-secretary"
+plugin = repo / "plugins/secretary"
 apply_cli = plugin / "scripts/update-apply.mjs"
 diagnose_cli = plugin / "scripts/update-diagnose.mjs"
 manifest = repo / ".claude-plugin/marketplace.json"
@@ -82,11 +106,11 @@ def make_workspace(root, name, customize=False):
     (workspace / "secretary/projects/sample/PROJECT.md").write_text("status: active\ncustomer customization\n")
     (workspace / "chatwork/history/2026-07-19.md").write_text("chatwork sentinel\n")
     (workspace / "google-chat/history/2026-07-19.md").write_text("google chat sentinel\n")
-    (workspace / ".yasashii-secretary").mkdir()
+    (workspace / ".secretary").mkdir()
     records = []
     for rel in ("secretary/AGENTS.md", "secretary/CLAUDE.md"):
         records.append({"path": rel, "installedVersion": "0.6.0", "baselineHash": f"sha256:{digest(workspace / rel)}", "templateVariables": {}})
-    (workspace / ".yasashii-secretary/update-ledger.json").write_text(json.dumps(records, ensure_ascii=False, indent=2) + "\n")
+    (workspace / ".secretary/update-ledger.json").write_text(json.dumps({"schemaVersion": 2, "edition": "yasashii-secretary", "records": records}, ensure_ascii=False, indent=2) + "\n")
     if customize:
         (workspace / "secretary/AGENTS.md").write_text("# workspace rules\n# user customization\n")
     run(["git", "init", "-q"], cwd=workspace)
@@ -112,9 +136,11 @@ def cli(command, workspace, current=None, target=None, extra=None):
 
 def release_fixture(root):
     (root / ".claude-plugin").mkdir(parents=True)
-    (root / "plugins/yasashii-secretary/.claude-plugin").mkdir(parents=True)
+    (root / "plugins/secretary/.claude-plugin").mkdir(parents=True)
+    (root / "plugins/yasashii-secretary").mkdir(parents=True)
     shutil.copy2(manifest, root / ".claude-plugin/marketplace.json")
-    shutil.copy2(plugin / ".claude-plugin/plugin.json", root / "plugins/yasashii-secretary/.claude-plugin/plugin.json")
+    shutil.copy2(plugin / ".claude-plugin/plugin.json", root / "plugins/secretary/.claude-plugin/plugin.json")
+    shutil.copy2(changelog, root / "plugins/secretary/CHANGELOG.md")
     shutil.copy2(changelog, root / "plugins/yasashii-secretary/CHANGELOG.md")
     shutil.copy2(repo / "LICENSE", root / "LICENSE")
 
@@ -154,7 +180,7 @@ raise SystemExit(0)
         fixture = root / f"invalid-{index}"
         release_fixture(fixture)
         mpath = fixture / ".claude-plugin/marketplace.json"
-        ppath = fixture / "plugins/yasashii-secretary/.claude-plugin/plugin.json"
+        ppath = fixture / "plugins/secretary/.claude-plugin/plugin.json"
         mdata, pdata = json.loads(mpath.read_text()), json.loads(ppath.read_text())
         mutate(mdata, pdata)
         mpath.write_text(json.dumps(mdata, ensure_ascii=False, indent=2) + "\n")
@@ -175,14 +201,14 @@ raise SystemExit(0)
     start = cli("start", workspace, current060, extra=["--consent", "update-approved", "--scope", "project"])
     start_data = parse(start)
     check("明示確認後だけ保護commitとplugin更新", start.returncode == 0 and start_data.get("protectionCommit") and log.read_text().splitlines()[-2:] == ["plugin marketplace update yasashii-secretary", "plugin update yasashii-secretary@yasashii-secretary --scope project"])
-    backup = workspace / ".git/yasashii-secretary-update/plugin-backup"
+    backup = workspace / ".git/secretary-update/plugin-backup"
     check("plugin 0.6.0をGit管理外へ退避", json.loads((backup / ".claude-plugin/plugin.json").read_text())["version"] == "0.6.0" and (backup / "skills/secretary/SKILL.md").is_file())
     dry = cli("resume", workspace)
     dry_data = parse(dry)
     plan_hash = dry_data.get("plan", {}).get("planHash")
     check("0.6.0 migration dry-runは追加・変更0で記憶等を対象外化", dry.returncode == 0 and plan_hash and dry_data["plan"]["add"] == [] and dry_data["plan"]["change"] == [])
     applied = cli("resume", workspace, extra=["--apply", "--plan-hash", plan_hash])
-    records = json.loads((workspace / ".yasashii-secretary/update-ledger.json").read_text())
+    records = json.loads((workspace / ".secretary/update-ledger.json").read_text())["records"]
     check("適用後に台帳と主要導線を0.7.0として検証", applied.returncode == 0 and parse(applied).get("verification", {}).get("ok") is True and all(record["installedVersion"] == "0.7.0" for record in records))
     check("記憶・PJ・両チャット履歴を不変で保護", unrelated_before == {rel: digest(workspace / rel) for rel in unrelated_before})
     after_first = snapshot(workspace)
@@ -192,11 +218,11 @@ raise SystemExit(0)
     legacy_ws = make_workspace(root, "legacy-session")
     legacy_current = make_plugin(root, "0.6.0")
     cli("start", legacy_ws, legacy_current, extra=["--consent", "update-approved"])
-    legacy_state_path = legacy_ws / ".git/yasashii-secretary-update/session.json"
+    legacy_state_path = legacy_ws / ".git/secretary-update/session.json"
     legacy_state = json.loads(legacy_state_path.read_text())
     legacy_state.pop("pluginBackup", None)
     legacy_state_path.write_text(json.dumps(legacy_state, ensure_ascii=False, indent=2) + "\n")
-    shutil.rmtree(legacy_ws / ".git/yasashii-secretary-update/plugin-backup")
+    shutil.rmtree(legacy_ws / ".git/secretary-update/plugin-backup")
     cache = root / "legacy-cache"
     old_cache = cache / "0.6.0"
     new_cache = cache / "0.7.0"
@@ -204,7 +230,7 @@ raise SystemExit(0)
     shutil.copytree(plugin, new_cache)
     legacy_resume = run(["node", str(apply_cli), "resume", "--workspace", str(legacy_ws), "--plugin-root", str(new_cache), "--json"], cwd=legacy_ws, env={"YASASHII_UPDATE_TEST_MODE": "fixture"})
     recovered = json.loads(legacy_state_path.read_text()).get("pluginBackup", {})
-    check("0.6.0旧sessionでもreload後の旧cacheから復元物を回収", legacy_resume.returncode == 0 and recovered.get("version") == "0.6.0" and recovered.get("recoveredAfterReload") is True and (legacy_ws / ".git/yasashii-secretary-update/plugin-backup/skills/update/SKILL.md").is_file())
+    check("0.6.0 canonical sessionでreload後の旧cacheから復元物を回収", legacy_resume.returncode == 0 and recovered.get("version") == "0.6.0" and recovered.get("recoveredAfterReload") is True and (legacy_ws / ".git/secretary-update/plugin-backup/skills/update/SKILL.md").is_file())
 
     print("== plugin and workspace rollback ==")
     rollback_ws = make_workspace(root, "rollback")

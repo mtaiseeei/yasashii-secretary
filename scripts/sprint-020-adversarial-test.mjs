@@ -4,8 +4,8 @@ import { execFileSync } from "node:child_process";
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
-import { createGoogleChatClient } from "../plugins/yasashii-secretary/skills/google-chat/scripts/client.mjs";
-import { applyGoogleChatConfig } from "../plugins/yasashii-secretary/skills/google-chat/scripts/config-transaction.mjs";
+import { createGoogleChatClient } from "../plugins/secretary/skills/google-chat/scripts/client.mjs";
+import { applyGoogleChatConfig } from "../plugins/secretary/skills/google-chat/scripts/config-transaction.mjs";
 
 const roots = [];
 const testTmp = realpathSync(tmpdir());
@@ -171,7 +171,7 @@ try {
   check(adminBlocked === "admin-blocked", "ErrorInfo管理者policyを管理者blockへ分類", String(adminBlocked));
   check(unknown === "permission-denied", "未知の403をscope／管理者問題と断定しない", String(unknown));
 
-  const searchFlow = resolve("plugins/yasashii-secretary/skills/google-chat/scripts/search-flow.mjs");
+  const searchFlow = resolve("plugins/secretary/skills/google-chat/scripts/search-flow.mjs");
   const stale = makeSearchFixture({ candidateMode: "none" });
   const staleResult = JSON.parse(runOutput(process.execPath, [searchFlow, "--root", stale.root, "--query", "今回runで見つかった語", "--choice", "sync", "--timeout-ms", "500", "--run-discovery-timeout-ms", "300", "--run-poll-ms", "50"], {
     env: { ...process.env, YASASHII_GIT_BIN: stale.fakeGit, YASASHII_GH_BIN: stale.fakeGh, FAKE_FLOW_ROOT: stale.root },

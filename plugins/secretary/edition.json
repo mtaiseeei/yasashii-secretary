@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "edition": "yasashii-secretary",
+  "distribution": {
+    "pluginId": "yasashii-secretary@yasashii-secretary",
+    "marketplaceId": "yasashii-secretary",
+    "repository": "https://github.com/mtaiseeei/yasashii-secretary",
+    "marketplaceUrl": "https://raw.githubusercontent.com/mtaiseeei/yasashii-secretary/main/.claude-plugin/marketplace.json",
+    "changelogUrl": "https://raw.githubusercontent.com/mtaiseeei/yasashii-secretary/main/plugins/yasashii-secretary/CHANGELOG.md"
+  },
+  "update": {
+    "ledgerPath": ".secretary/update-ledger.json",
+    "legacyLedgerPaths": [
+      ".yasashii-secretary/update-ledger.json"
+    ],
+    "sessionDirectory": "secretary-update",
+    "legacySessionDirectories": [
+      "yasashii-secretary-update"
+    ],
+    "protectionCommitPrefix": "[secretary]"
+  },
+  "workspaceProtection": {
+    "canonicalMarker": ".secretary/workspace-edition.json",
+    "markerSchemaVersion": 1,
+    "legacyMarkerFiles": [
+      "secretary/AGENTS.md",
+      "secretary/CLAUDE.md"
+    ],
+    "legacyMarkerPrefixes": [
+      "yasashii-secretary:update-entry:v1:start",
+      "yasashii-secretary:update-safety:v1:start"
+    ],
+    "legacyFingerprint": [
+      {
+        "path": "secretary/AGENTS.md",
+        "includes": "# 秘書への指示（AGENTS.md）"
+      },
+      {
+        "path": "secretary/CLAUDE.md",
+        "includes": "指示の正本は、同じフォルダの `AGENTS.md` です。"
+      }
+    ]
+  },
+  "harness": {
+    "marketplace": "yasashii-harness",
+    "plugin": "harness",
+    "installId": "harness@yasashii-harness"
+  },
+  "copy": {
+    "path": "rules/copy/yasashii.json",
+    "surfaces": [
+      "conversation",
+      "diagnosis",
+      "report",
+      "developerHandoff"
+    ]
+  },
+  "newWorkspace": {
+    "botName": "secretary[bot]",
+    "botEmail": "secretary[bot]@users.noreply.github.com"
+  }
+}

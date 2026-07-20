@@ -9,7 +9,7 @@ import { createTestOnlyDesktopClientFile } from "./create-sprint-020-patch-001-g
 
 const root = realpathSync(mkdtempSync(join(tmpdir(), "yasashii-google-chat-new-")));
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const server = resolve(repo, "plugins/yasashii-secretary/skills/google-chat/scripts/wizard-server.mjs");
+const server = resolve(repo, "plugins/secretary/skills/google-chat/scripts/wizard-server.mjs");
 const fixture = resolve(repo, "scripts/fixtures/google-chat-wizard/google-chat.json");
 const testClient = createTestOnlyDesktopClientFile();
 const port = process.argv[2] || "18783";

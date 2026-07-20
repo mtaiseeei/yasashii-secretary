@@ -39,7 +39,7 @@ TARGET_PREFIXES = {
     "docs/spec/": "current specification",
     "docs/evidence/sprint-016/": "current sprint evidence",
     "docs/evidence/sprint-020-patch-001/": "current sprint evidence",
-    "plugins/yasashii-secretary/": "distributed plugin",
+    "plugins/secretary/": "distributed plugin",
 }
 
 EXCLUDE_PREFIXES = {
@@ -188,7 +188,7 @@ def preservation_errors(root: Path) -> list[str]:
     license_text = (root / "LICENSE").read_text()
     market = json.loads((root / ".claude-plugin/marketplace.json").read_text())
     plugin = json.loads(
-        (root / "plugins/yasashii-secretary/.claude-plugin/plugin.json").read_text()
+        (root / "plugins/secretary/.claude-plugin/plugin.json").read_text()
     )
     entry = market.get("plugins", [{}])[0]
 
@@ -205,21 +205,29 @@ def preservation_errors(root: Path) -> list[str]:
         errors.append("marketplace identity changed")
     if entry.get("name") != "yasashii-secretary" or plugin.get("name") != "yasashii-secretary":
         errors.append("plugin identity changed")
-    if entry.get("source") != "./plugins/yasashii-secretary":
+    if entry.get("source") != "./plugins/secretary":
         errors.append("plugin source changed")
     release_version = entry.get("version")
     if release_version != plugin.get("version") or not re.fullmatch(r"\d+\.\d+\.\d+", str(release_version or "")):
         errors.append("release version is not a matching semver on both manifests")
-    if not (root / "plugins/yasashii-secretary/CHANGELOG.md").is_file():
+    if not (root / "plugins/secretary/CHANGELOG.md").is_file():
         errors.append("distributed CHANGELOG is missing")
-    if not (root / "plugins/yasashii-secretary/skills/update/SKILL.md").is_file():
+    legacy_root = root / "plugins/yasashii-secretary"
+    legacy_changelog = legacy_root / "CHANGELOG.md"
+    if not legacy_changelog.is_file():
+        errors.append("legacy CHANGELOG compatibility file is missing")
+    elif sorted(path.name for path in legacy_root.iterdir()) != ["CHANGELOG.md"]:
+        errors.append("legacy plugin path contains implementation files")
+    elif legacy_changelog.read_bytes() != (root / "plugins/secretary/CHANGELOG.md").read_bytes():
+        errors.append("legacy CHANGELOG differs from the canonical CHANGELOG")
+    if not (root / "plugins/secretary/skills/update/SKILL.md").is_file():
         errors.append("read-only update skill is missing")
     for required in ("update-diagnose.mjs", "update-ledger.mjs", "update-apply.mjs"):
-        if not (root / "plugins/yasashii-secretary/scripts" / required).is_file():
+        if not (root / "plugins/secretary/scripts" / required).is_file():
             errors.append(f"update support script is missing: {required}")
-    if not (root / "plugins/yasashii-secretary/migrations/0.3.0-to-0.4.0.json").is_file():
+    if not (root / "plugins/secretary/migrations/0.3.0-to-0.4.0.json").is_file():
         errors.append("version-specific workspace migration is missing")
-    if not (root / "plugins/yasashii-secretary/migrations/0.4.0-to-0.5.0.json").is_file():
+    if not (root / "plugins/secretary/migrations/0.4.0-to-0.5.0.json").is_file():
         errors.append("current release workspace migration boundary is missing")
 
     errors.extend(f"protected record changed:{path}" for path in protected_history_changes(root))

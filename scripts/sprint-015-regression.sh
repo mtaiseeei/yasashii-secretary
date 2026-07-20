@@ -2,7 +2,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PLUGIN="$ROOT/plugins/yasashii-secretary"
+PLUGIN="$ROOT/plugins/secretary"
 PROJECTS="$PLUGIN/skills/projects/SKILL.md"
 ROUTER="$PLUGIN/skills/secretary/SKILL.md"
 DAILY="$PLUGIN/skills/daily/SKILL.md"

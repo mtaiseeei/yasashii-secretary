@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate that plain-language.md is the only normal-report schema owner."""
+"""Validate that the yasashii style is the only normal-report schema owner."""
 
 from __future__ import annotations
 
@@ -9,7 +9,8 @@ import sys
 from pathlib import Path
 
 
-OWNER_REL = Path("rules/plain-language.md")
+OWNER_REL = Path("rules/styles/yasashii.md")
+ENTRYPOINT_REL = Path("rules/plain-language.md")
 PREFIX_GROUPS = {
     "done": ("やったこと", "実施内容", "実施したこと", "行ったこと", "対応内容"),
     "result": ("結果", "確認結果", "実行結果", "状態の要約", "どうなったか"),
@@ -109,8 +110,11 @@ def blockquote_runs(lines: list[str]) -> list[int]:
 def validate(plugin: Path) -> list[str]:
     errors: list[str] = []
     owner = plugin / OWNER_REL
+    entrypoint = plugin / ENTRYPOINT_REL
     if not owner.is_file():
         return [f"serializer owner missing: {owner}"]
+    if not entrypoint.is_file():
+        return [f"communication entrypoint missing: {entrypoint}"]
 
     owner_text = owner.read_text(encoding="utf-8")
     required_owner_lines = ("やったこと:", "結果:", "次に何が起きるか:", "補足:")
@@ -161,7 +165,7 @@ def main() -> int:
         for error in errors:
             print(f"SCHEMA_ERROR {error}", file=sys.stderr)
         return 1
-    print("SCHEMA_OK owner=rules/plain-language.md surfaces=19 conflicts=0")
+    print("SCHEMA_OK owner=rules/styles/yasashii.md entrypoint=rules/plain-language.md surfaces=20 conflicts=0")
     return 0
 
 
