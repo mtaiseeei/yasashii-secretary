@@ -27,6 +27,7 @@ const SESSION_NAME = "session.json";
 const SEMVER = /^\d+\.\d+\.\d+$/;
 const HASH = /^sha256:[a-f0-9]{64}$/;
 const ALLOWED_SCOPES = new Set(["user", "project", "local"]);
+const UPDATE_HOSTS = new Set(["claude-code", "codex"]);
 const ALLOWED_SELECTIONS = new Set(["keep", "replace", "diff", "cancel"]);
 const ALLOWED_MANAGED_PATHS = new Set(["secretary/AGENTS.md", "secretary/CLAUDE.md"]);
 const ALLOWED_LEDGER_FIELDS = new Set(["path", "installedVersion", "baselineHash", "templateVariables"]);
@@ -58,6 +59,24 @@ const KNOWN_020_BASELINES = new Map([
 function fail(message, code = EXIT_USAGE) {
   process.stderr.write(`${message}\n`);
   process.exit(code);
+}
+
+function updateHost(args) {
+  const requested = args.values.get("--host");
+  // Sprint 018以前のClaude Code呼び出しとの互換性を保つ。新しい案内は常に--hostを明示する。
+  if (!requested) return "claude-code";
+  if (!UPDATE_HOSTS.has(requested)) {
+    fail("更新hostを確認できないため、workspace・Git・session・backup・pluginを変更せず停止しました。", EXIT_REFUSED);
+  }
+  return requested;
+}
+
+function requireClaudePluginUpdater(args) {
+  const host = updateHost(args);
+  if (host === "codex") {
+    fail("CodexではClaude Code用のplugin updaterを実行しません。workspace・Git・session・backup・pluginは変更していません。CodexのPlugins Directoryまたは現在のCodex CLI plugin操作を使ってください。", EXIT_REFUSED);
+  }
+  return host;
 }
 
 function parseArgs(argv) {
@@ -535,6 +554,7 @@ function guardEdition(workspace, pluginRoot, entry) {
 }
 
 function start(args, scriptDir) {
+  requireClaudePluginUpdater(args);
   const { workspace, gitDir } = safeWorkspace(args.values.get("--workspace"));
   const currentPluginRoot = args.values.get("--current-plugin-root") ?? resolve(scriptDir, "..");
   const { config, editionState } = guardEdition(workspace, currentPluginRoot, "update");
@@ -625,6 +645,7 @@ function start(args, scriptDir) {
 }
 
 function retryPlugin(args) {
+  requireClaudePluginUpdater(args);
   const { workspace, gitDir } = safeWorkspace(args.values.get("--workspace"));
   const pluginRoot = args.values.get("--plugin-root") ?? resolve(dirname(fileURLToPath(import.meta.url)), "..");
   const { config } = guardEdition(workspace, pluginRoot, "update");
@@ -1061,6 +1082,7 @@ function rollback(args) {
 }
 
 const args = parseArgs(process.argv.slice(2));
+updateHost(args);
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 if (args.command === "start") start(args, scriptDir);
 else if (args.command === "retry-plugin") retryPlugin(args);

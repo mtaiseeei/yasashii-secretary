@@ -2,6 +2,7 @@
 
 import assert from "node:assert/strict";
 import {
+  chmodSync,
   cpSync,
   existsSync,
   mkdtempSync,
@@ -38,6 +39,13 @@ function check(label, fn) {
   }
 }
 const json = (path) => JSON.parse(readFileSync(path, "utf8"));
+const section = (source, start, end) => {
+  const from = source.indexOf(start);
+  assert(from >= 0, `section start is missing: ${start}`);
+  const to = source.indexOf(end, from + start.length);
+  assert(to > from, `section end is missing: ${end}`);
+  return source.slice(from, to);
+};
 const runResolver = (skillFile, cwd = tmpdir()) => spawnSync(
   process.execPath,
   [resolver, "--skill-file", skillFile],
@@ -104,6 +112,57 @@ try {
     assert.equal(runResolver(wrong, temp).status, 2);
     assert.equal(readFileSync(sentinel, "utf8"), "unchanged\n");
   });
+
+  check("Codex update stops before Claude commands Git session and backup side effects", () => {
+    const edition = json(join(plugin, "edition.json"));
+    const workspace = join(temp, "codex-update-workspace");
+    const marker = join(workspace, ".secretary/workspace-edition.json");
+    const sentinel = join(workspace, "sentinel.txt");
+    const fakeBin = join(temp, "fake-bin");
+    const claudeLog = join(temp, "claude-command.log");
+    const claudeFixture = join(fakeBin, "claude");
+    mkdirSync(dirname(marker), { recursive: true });
+    mkdirSync(fakeBin, { recursive: true });
+    writeFileSync(marker, `${JSON.stringify({ schemaVersion: 1, edition: edition.edition })}\n`);
+    writeFileSync(sentinel, "unchanged\n");
+    writeFileSync(claudeFixture, `#!/bin/sh\nprintf '%s\\n' "$*" >> "${claudeLog}"\n`);
+    chmodSync(claudeFixture, 0o755);
+    for (const args of [
+      ["init", "-q"],
+      ["config", "user.email", "fixture@example.com"],
+      ["config", "user.name", "Sprint 035 fixture"],
+      ["add", "."],
+      ["commit", "-qm", "fixture"],
+    ]) {
+      const result = spawnSync("git", args, { cwd: workspace, encoding: "utf8" });
+      assert.equal(result.status, 0, result.stderr);
+    }
+    const beforeHead = spawnSync("git", ["rev-parse", "HEAD"], { cwd: workspace, encoding: "utf8" }).stdout.trim();
+    const updateApply = join(plugin, "scripts/update-apply.mjs");
+    const result = spawnSync(process.execPath, [
+      updateApply, "start", "--host", "codex", "--workspace", workspace,
+      "--current-plugin-root", plugin, "--consent", "update-approved", "--scope", "user",
+    ], {
+      cwd: workspace,
+      encoding: "utf8",
+      env: { ...process.env, PATH: `${fakeBin}:${process.env.PATH || ""}` },
+    });
+    const afterHead = spawnSync("git", ["rev-parse", "HEAD"], { cwd: workspace, encoding: "utf8" }).stdout.trim();
+    const status = spawnSync("git", ["status", "--porcelain=v1", "--untracked-files=all"], { cwd: workspace, encoding: "utf8" });
+    assert.equal(result.status, 3, result.stderr);
+    assert(result.stderr.includes("CodexではClaude Code用のplugin updaterを実行しません"));
+    assert.equal(afterHead, beforeHead);
+    assert.equal(status.stdout, "");
+    assert.equal(readFileSync(sentinel, "utf8"), "unchanged\n");
+    assert(!existsSync(join(workspace, ".git", edition.update.sessionDirectory)));
+    assert(!existsSync(claudeLog));
+
+    const source = readFileSync(updateApply, "utf8");
+    const startBody = section(source, "function start(args, scriptDir) {", "function retryPlugin(args) {");
+    const retryBody = section(source, "function retryPlugin(args) {", "function migrationFiles(");
+    assert(startBody.indexOf("requireClaudePluginUpdater(args)") < startBody.indexOf("safeWorkspace("));
+    assert(retryBody.indexOf("requireClaudePluginUpdater(args)") < retryBody.indexOf("safeWorkspace("));
+  });
 } finally {
   rmSync(temp, { recursive: true, force: true });
 }
@@ -132,6 +191,43 @@ check("Codex and Claude formal manifests share the same 15 skills", () => {
   assert.equal(codexMarket.name, edition.distribution.marketplaceId);
   assert(!existsSync(join(root, "adapters", "codex-app", "skills")));
   assert(!existsSync(join(root, "adapters", "codex-cli", "skills")));
+});
+
+check("update skill separates Codex official update surfaces from the Claude updater", () => {
+  const edition = json(join(plugin, "edition.json"));
+  const source = readFileSync(join(plugin, "skills/update/SKILL.md"), "utf8");
+  const resumePhrase = edition.edition === "agentic-secretary"
+    ? "「agentic-secretaryの更新を再開」"
+    : "「やさしい秘書の更新を再開」";
+  const codex = section(source, "### Codexでpluginを更新する", resumePhrase);
+  for (const phrase of [
+    "Plugins Directory",
+    "codex plugin marketplace upgrade <marketplace-name>",
+    "codex plugin remove <plugin@marketplace>",
+    "codex plugin add <plugin@marketplace>",
+    "workspaceの保護commit、session、backupを作る前に変更0件で安全停止",
+    "未確認",
+  ]) assert(codex.includes(phrase), phrase);
+  assert(!codex.includes("claude plugin"));
+  assert(!codex.includes("/reload-plugins"));
+  assert(source.includes("start --host claude-code"));
+  assert(source.includes("retry-plugin --host claude-code"));
+});
+
+check("three setup skills keep Codex authorization and read-only smoke free of Claude follow-up steps", () => {
+  for (const name of ["setup-google", "setup-microsoft", "setup-notion"]) {
+    const source = readFileSync(join(plugin, `skills/${name}/SKILL.md`), "utf8");
+    const codex = section(source, "### Codex App／Codex CLI", "## ステップ2");
+    for (const phrase of ["現在のhost", "公式", "connector", "認可", "未確認", "停止", "read-only smoke"]) {
+      assert(codex.includes(phrase), `${name}: ${phrase}`);
+    }
+    assert(!codex.includes("Claude の**設定画面"), name);
+    assert(!codex.includes("Claude Codeを再起動"), name);
+    assert(!codex.includes("/reload-plugins"), name);
+    const claude = section(source, "### Claude Code", "### Codex App／Codex CLI");
+    assert(claude.includes("設定画面"), name);
+    assert(claude.includes("コネクタ（Connectors）"), name);
+  }
 });
 
 check("edition declares Harness 0.5.0 with distinct host IDs", () => {

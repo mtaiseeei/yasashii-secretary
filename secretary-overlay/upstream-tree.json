@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "baseCommit": "f1fddea77db823c2b1826ac11c1d3eedf6770cf9",
+  "baseCommit": "b32cb33db5f2bd0e5a9ca4a98e30276c92bfb36c",
   "files": [
     {
       "path": ".agents/plugins/marketplace.json",
@@ -45,7 +45,7 @@
     {
       "path": "adapters/agentic-overlay.json",
       "classification": "upstream-only",
-      "sha256": "3ab62ce47335ec2b1aedfa61fa8d70fdbdb761feb749f2aa9bf470d8a0e3e7b3"
+      "sha256": "6b575b380eab7c156d390d1e65f6998f5c57091cd97091886076a8edc8aa6157"
     },
     {
       "path": "adapters/claude-code-cli/README.md",
@@ -2085,7 +2085,7 @@
     {
       "path": "plugins/secretary/scripts/update-apply.mjs",
       "classification": "common",
-      "sha256": "cfea57485399bb2f4e6bb9b5580b73c540a4ade43af338af2b734449c5751fa4"
+      "sha256": "55dc1a7d3fd5996be3c5b12066f7ad6adcfca86cbbe1041e66ec563960025ece"
     },
     {
       "path": "plugins/secretary/scripts/update-diagnose.mjs",
@@ -2290,22 +2290,22 @@
     {
       "path": "plugins/secretary/skills/setup-google/SKILL.md",
       "classification": "common",
-      "sha256": "8c616008274e5af603c6ccf8512f5215e2e823b938b6846c65c4f2475ef431ce"
+      "sha256": "786ca55dd05881af114d2dd7e6b995d8d3959260722482c3bf93ba75cd8af830"
     },
     {
       "path": "plugins/secretary/skills/setup-microsoft/SKILL.md",
       "classification": "common",
-      "sha256": "96cddaa034a8355ee0392123a40561b62ea6fd2eb77a0867ee5b8a9dee2af124"
+      "sha256": "a376122064be3183ff46440ee8a261727c6fb51626718e28d7f2e02477735b90"
     },
     {
       "path": "plugins/secretary/skills/setup-notion/SKILL.md",
       "classification": "common",
-      "sha256": "1dbfe11e37fc5feb51fc403be2c9158ff715ef26afe464466c19b45b59e20c3e"
+      "sha256": "eb5eb0aa58f07f1a6751b2ad41212a4dd9103e3a8de37aa22dcce6bdc16fb7ec"
     },
     {
       "path": "plugins/secretary/skills/update/SKILL.md",
       "classification": "anchor-overlay",
-      "sha256": "45ecb287129ded2b57670954da77ffb2b9f47ac9809c98ce1e5bbd48bc488678"
+      "sha256": "58d20bb6ca59fd32a3c657b14d7a26418c22a6c9f749b86b04c2e4da7711c079"
     },
     {
       "path": "plugins/secretary/skills/weekly/SKILL.md",
@@ -3030,7 +3030,7 @@
     {
       "path": "scripts/sprint-035-test.mjs",
       "classification": "common",
-      "sha256": "d8063d5391e50b651e6e6ecfb230fb360b80735ae602534fe1881c4f288c1277"
+      "sha256": "0676f41653b076464d670b6afb36efa7c37baf5c64e389576ead6cd6ebd8b73a"
     },
     {
       "path": "scripts/start-sprint-013-wizard-fixture.sh",
