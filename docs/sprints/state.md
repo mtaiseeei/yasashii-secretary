@@ -5,7 +5,7 @@
 - Current ID: sprint-035
 - Retry Count: 1
 - Spec-Issue Count: 0
-- Lineage Dispatches: 3
+- Lineage Dispatches: 4
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
@@ -61,7 +61,7 @@
 | sprint-032-patch-002 | done | [contract](sprint-032-patch-002.md) | [progress](../progress/sprint-032-patch-002.md) | [feedback](../feedback/sprint-032-patch-002.md) |
 | sprint-033 | done | [contract](sprint-033.md) | [progress](../progress/sprint-033.md) | [feedback](../feedback/sprint-033.md) |
 | sprint-034 | done | [contract](sprint-034.md) | [progress](../progress/sprint-034.md) | [feedback](../feedback/sprint-034.md) |
-| sprint-035 | active | [contract](sprint-035.md) | [progress](../progress/sprint-035.md) | [feedback](../feedback/sprint-035.md) |
+| sprint-035 | awaiting-eval | [contract](sprint-035.md) | [progress](../progress/sprint-035.md) | [feedback](../feedback/sprint-035.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
@@ -233,3 +233,4 @@
 - 2026-07-21: sprint-034 fresh Evaluatorはlocal実装をHigh／Medium／Low 0でPASS。overlay 605/605、二回適用`secondChanged=0`、master localhost許可面340/340、全重点suite、archive、release、schema、Browser desktop／mobile、console error 0を確認。ユーザー個別承認後、Orchestratorが`upstream` fetchを`https://github.com/mtaiseeei/agentic-secretary.git`、pushを`DISABLED`へ設定し`git fetch upstream`を実行。fresh remote-gate Evaluatorは`upstream/main=4670438`、上流tree一致、共通基点`52016cf`、overlay HEAD`78f21d2`、origin不変、overlay check managed=218、upstream変更0、push0を確認しC13 5/5・Sprint総合PASS。sprint-034をdone、Current IDをsprint-035、Next PlannedをTBDへ進める。併せてユーザー依頼により、GitHub正本でagentic-harness／yasashii-harnessがともに0.5.0であることをread-only確認。Sprint035へ、各Secretaryのruntime設定／AGENTS／guidance／回帰を対応Harness 0.5.0へ追随させ、Harness本体を同梱・Git mergeしない最終整合をPlannerが追加する。
 - 2026-07-21: sprint-035 fresh Generatorが、Agentic commit `f1fddea`、Yasashii overlay commit `f010812`、progress commit `8b0811b`で実装を完了。共通15 skillsをSKILL実path起点のhost-neutral root解決へ統一し、未解決`CLAUDE_PLUGIN_ROOT`を除去。両editionのCodex正式manifest／marketplace、対応Harness 0.5.0のhost別ID、repo内Harness 0.5.0運用規則を整合し、Harness本体は非同梱を維持した。Agentic Sprint033 20/20・Sprint035 12/12、Yasashii Sprint034 11/11・Sprint035 12/12・project pointer 68/68、合計123 assertions、overlay managed 225・二回適用`secondChanged=0`、両Harness online互換、diff／shell構文が0 FAIL。push、release、実plugin install、OAuth、Secret、workflow dispatchは0件。sprint-035をawaiting-evalへ更新し、fresh独立Evaluatorへ渡す。
 - 2026-07-21: sprint-035初回fresh独立評価は`implementation-issue`でFAIL。root解決、両Codex manifest、Harness 0.5.0、overlay、専用・重点123 assertionsは0 FAILだったが、HighとしてCodexの更新承認後も`update-apply.mjs`がClaude CLI更新を実行し得ること、MediumとしてGoogle／Microsoft／NotionのsetupがCodex判定後もClaude設定画面へ進むことを実fileから確認。旧masterのidentity固定期待とsandbox localhost制約は製品FAILへ混ぜず中断を記録。Retry Countを1、Lineage Dispatchesを次Generator分の3へ更新し、修正範囲をupdateと3 setupのhost分岐・負回帰へ限定してfresh Generatorへ差し戻す。
+- 2026-07-22: sprint-035 Retry 1 fresh GeneratorがAgentic `b32cb33`、Yasashii overlay `38597d5`、progress `1257614`で限定修正を完了。Codex更新はClaude updaterへ進まず、Git／session／backup作成前にexit 3で停止し、現行Codex CLIで実在するmarketplace upgradeと確認付きremove／addだけを案内。Google／Microsoft／NotionはClaude CodeとCodex App／CLIの後続手順を分離した。Agentic Sprint035 15/15・Sprint033 20/20・Codex4/4・archive6 suites、Yasashii Sprint035 15/15・overlay11/11・Claude updater41/41・update config10/10・project pointer68/68、overlay managed225・二回適用`secondChanged=0`、両Harness online互換が0 FAIL。外部操作0件。Lineage Dispatchesを4へ更新し、sprint-035をawaiting-evalへ戻してfresh独立Evaluatorへ再提出する。
