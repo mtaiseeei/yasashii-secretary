@@ -3,10 +3,10 @@
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
 - Current ID: sprint-035
-- Retry Count: 1
+- Retry Count: 0
 - Spec-Issue Count: 0
 - Lineage Dispatches: 4
-- Model Tier: strong
+- Model Tier: standard
 - Rotate: none
 - Next Planned: TBD
 
@@ -61,12 +61,14 @@
 | sprint-032-patch-002 | done | [contract](sprint-032-patch-002.md) | [progress](../progress/sprint-032-patch-002.md) | [feedback](../feedback/sprint-032-patch-002.md) |
 | sprint-033 | done | [contract](sprint-033.md) | [progress](../progress/sprint-033.md) | [feedback](../feedback/sprint-033.md) |
 | sprint-034 | done | [contract](sprint-034.md) | [progress](../progress/sprint-034.md) | [feedback](../feedback/sprint-034.md) |
-| sprint-035 | active | [contract](sprint-035.md) | [progress](../progress/sprint-035.md) | [feedback](../feedback/sprint-035.md) |
+| sprint-035 | done-by-user-decision | [contract](sprint-035.md) | [progress](../progress/sprint-035.md) | [feedback](../feedback/sprint-035.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 
 ## Completion
+- 2026-07-22: 最終main `1558dfc`で0.8.0の両manifest、host-neutral root、Codex host分岐、Sprint 035を重点再確認。Agenticの製品merge `95247b6`は記録済みbase `b32cb33`とtree hashが完全一致し、完了記録を整合した最終main `891eabc`をoverlay基準として再評価する。
+- 2026-07-22: ユーザーが実OAuth・Google／Microsoft／Notion connector認証をRelease必須から外し、軽量確認での出荷を明示選択した。内部独立評価72/75 PASSと今回の重点回帰を採用し、未実施項目をfeedbackのexternal live gate記録に保持したままSprint 035を `done-by-user-decision` とする。
 - 2026-07-16: sprint-008〜012 と `sprint-012-patch-001` はすべて独立Evaluator評価に合格。Next Planned は `TBD`。
 - 2026-07-16: single-repo Git-first + Chatwork 方針を承認。sprint-013を開始し、sprint-014を次に計画。
 - 2026-07-16: sprint-013 初回評価はimplementation-issueで不合格。wizardがBufferをJSON化して配信する欠陥と回帰不足をGeneratorへ差し戻し（Retry 1）。

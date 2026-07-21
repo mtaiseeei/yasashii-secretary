@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "baseCommit": "b32cb33db5f2bd0e5a9ca4a98e30276c92bfb36c",
+  "baseCommit": "891eabcc03315d1a1b5c6dbff3a44d2eb0a8be20",
   "files": [
     {
       "path": ".agents/plugins/marketplace.json",
@@ -45,7 +45,7 @@
     {
       "path": "adapters/agentic-overlay.json",
       "classification": "upstream-only",
-      "sha256": "6b575b380eab7c156d390d1e65f6998f5c57091cd97091886076a8edc8aa6157"
+      "sha256": "264b294cd90b402f213fb31098c21e1dd078a0b52cc317492a98a3720ea701a0"
     },
     {
       "path": "adapters/claude-code-cli/README.md",
@@ -1363,6 +1363,16 @@
       "sha256": "8393843ade372ecbcb1c6703f51d528e01708c274f74f2582a199c049b7e34f1"
     },
     {
+      "path": "docs/feedback/sprint-033.md",
+      "classification": "repo-owned",
+      "sha256": "a19891b3a2cf015757381aa043affdde951034e7823975cf0408f8343b07f812"
+    },
+    {
+      "path": "docs/feedback/sprint-035.md",
+      "classification": "repo-owned",
+      "sha256": "8a0e55615aa5217608ef9ebab01082d7eafc038fd7a9d2b4074fbf0d7ff0af21"
+    },
+    {
       "path": "docs/guide/README.md",
       "classification": "repo-owned",
       "sha256": "f9ee14bc17d6f2f64a0f134f5c9e57c51f307d5f72df16e5fdb30ea7e37dfc64"
@@ -1601,6 +1611,16 @@
       "path": "docs/progress/sprint-032.md",
       "classification": "repo-owned",
       "sha256": "65e3efd537573c5f44029e62e905fe878917e96bbe1f7dea7444d9b26371ac36"
+    },
+    {
+      "path": "docs/progress/sprint-033.md",
+      "classification": "repo-owned",
+      "sha256": "2704f0991d21c06347eb6efd484796ddfe110ed1950164262ffb54bf7bd07f61"
+    },
+    {
+      "path": "docs/progress/sprint-035.md",
+      "classification": "repo-owned",
+      "sha256": "30a6b339236b7960cbd73149a288602251a08edd91315f4d8bffd6d5e3546d08"
     },
     {
       "path": "docs/proposal-2026-07-15-realignment.md",
@@ -1870,7 +1890,7 @@
     {
       "path": "docs/sprints/state.md",
       "classification": "repo-owned",
-      "sha256": "e124c5d23af5bea0f0a60133374208dfd58af9d88fb9430b99cfcd1e4909b4b4"
+      "sha256": "3fe8c37755d55a69d2668fb8c455984ef6d659910b36861cec355bb15f249760"
     },
     {
       "path": "plugins/secretary/.claude-plugin/plugin.json",
