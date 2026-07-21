@@ -1,166 +1,257 @@
 # Sprint 033 — 4環境対応のagentic-secretary完成品
 
-- Type: main
-- Risk: high（別directory／GitHub repo、remote、push、4環境への実導入）
-- 主眼: 共通祖先と全Git履歴を持つ別repo `agentic-secretary` を、技術者向けにそのまま配布できる
-  完成品として成立させる。正式対象4環境（Claude Code Desktop App / Claude Code CLI /
-  Codex App / Codex CLI）それぞれで、共通本体＋host adapterの構成により導入・会話・安全境界を
-  検証する。
-- 依存: sprint-032-patch-002 done。neutralization commit、未配布段階の `0.8.0` release preparation、
-  会話可読性・Chatwork Secret入力案内・実会話回帰の安全化・ホスト非依存の共通会話／テスト層が
-  合格していること。
+## ゴール
 
-## 外から見える成果
+private `origin/main` のcommit `4670438` をSprint 033の完成候補として固定し、
+Claude Code Desktop App／Claude Code CLI／Codex App／Codex CLIの4環境で、
+正式配布面、Agentic identity、会話、wizard、安全性、更新手順、回帰が実用上出荷できる状態であることを受け入れる。
 
-エンジニア／AI活用に慣れた利用者が、自分の使うホスト（Claude Code Desktop App、
-Claude Code CLI、Codex App、Codex CLIのいずれでも）へ `agentic-secretary` を導入し、
-共通の安全性とwizardを保ったまま、技術的に直接的な会話・診断・報告・handoffを使える。
-どのホストが検証済みで、どれが未検証かを利用者が正確に読める。
+Sprint 033ではpublic化もRelease作成も行わない。公開可否の最終判断はSprint 035に残す。
 
-## 正式対象環境
+## 種別
 
-1. Claude Code Desktop App（Claude desktop app内のClaude Code実行面）
-2. Claude Code CLI
-3. Codex App（macOS）
-4. Codex CLI
+Main Sprint
 
-その他のコーディングエージェントは、共通本体を再利用しやすくする設計対象に含めるが、
-公式受入対象・配布保証・実環境検証必須対象には含めない（正本: `docs/spec/editions.md`）。
+## 含む機能
 
-## Scope
+F52、F53
 
-### Repo成立とGit系譜
+## 依存と対象
 
-- `/Users/taisei/workspace/agentic-secretary` の別directoryを、neutralization commitの
-  Git履歴から作る。全Git履歴を継承し、1 commitへ潰さない。
-- GitHubの別repoは `mtaiseeei/agentic-secretary`。yasashii内のmonorepo／subdirectoryにしない。
-- agentic用marketplace／external plugin ID／repository／update／ledger／session／
-  commit prefix／Harness設定。
-- README／mappingで上流関係、対象ユーザー、共通面、edition差分、4環境の対応状況、
-  MIT／単段クレジットを説明する。
+- 依存: sprint-032-patch-002 done。
+- Harness正本: `/Users/taisei/workspace/yasashii-secretary`。
+- target repo: `/Users/taisei/workspace/agentic-secretary`。
+- 完成候補: private `origin/main` の `4670438`。
+- `/Users/taisei/workspace/agentic-harness` は、存在確認、path列挙、read、write、Git操作、複製元利用、
+  コマンド対象化を含め一切対象にしない。
 
-### 技術者向け完成品
+## 2026-07-21の受入再整理
 
-- 会話、診断、報告、developer handoffのtechnical style。
-- Repo分割前に共通実装したMarkdown可読性、Chatwork Secret入力案内、serializer正本構造、
-  wizard進捗一貫性を、そのままagenticへ継承する。
-- 技術者が追加の手直しなしで導入・利用できる配布状態（3コマンド導入相当の明確な導入手順を
-  ホストごとに持つ）。
+### 決定
 
-### 共通本体とhost adapter
+4 hostの製品動作と安全性を確認する目的に対し、schema v2／v3のproduction collector／driver／attestor、
+期限つきapproval、challenge、二層artifact、12×8 exact resultまでを製品必須にしたことは過剰だった。
+Sprint 033の必須受入を、利用者が実際に使う面と出荷判断に直接必要な証拠へ戻す。
 
-- 共通本体（ホスト非依存）: skillsの意味内容、会話ルール、Markdown可読性、edition別style、
-  診断方針、完了報告契約、developer handoff契約、安全ルール、workspace境界、secret保護、
-  Chatwork／Google Chatデータ処理、wizard本体、OAuth scope、同期境界、
-  ホスト非依存fixture・validator。
-- host adapter（ホスト固有）: plugin manifest、marketplace／導入経路、plugin root解決、
-  skill発見方法、command／slash command、構造化質問UI、更新経路、reload／restart経路、
-  ブラウザ検証面、実会話runner、host metadata、インストール検証、official validator。
-- 同じ機能を4コピーしない。共通本体の二重実装を負テストで拒否する。
+これは品質を弱める変更ではない。次は引き続き必須である。
 
-### 4環境それぞれの検証
+- 4 hostそれぞれのcurrent-bytes実機smoke。
+- Claude／Codexの正式manifest／marketplace。
+- `0.8.0`、Agentic identity、正本skillの一意読込。
+- 実会話8面のMarkdown可読性とwizard導線。
+- 対象workspace変更0件、Secret露出0件。
+- 更新／再導入手順、全回帰、Gitなしarchive、利用可能な公式validator。
 
-hostごとに次を確認する。確認方式は正式配布形式（Claude系はplugin manifest／marketplace、
-Codex系はconfig.toml／AGENTS.md／skillsの公式面）に従い、公式に存在しない機構を
-推測実装しない。
+製品scopeから外すのは証明基盤であり、製品の動作・安全性・配布整合ではない。
 
-1. hostごとのmanifestまたは正式配布形式の整合（official validatorがあるhostはvalidator PASS）。
-2. 新規導入（未導入状態からの導入手順が実際に成立する）。
-3. skill／rules読込（共通本体のrules・skillsがそのhostで読まれる）。
-4. 基本会話、複雑な一般回答、完了報告、状態報告、診断、developer handoff。
-5. wizard起動（Chatwork／Google Chatの共通wizardへの導線）。
-6. workspace境界（許可root外への書込み0件）。
-7. secret非露出（会話・ログ・証跡への実値0件）。
-8. 更新経路の成立、または「このhostでは更新未対応」の安全な明示表示。
-9. ホスト固有回帰（そのhost用runner／検証scriptの0 FAIL）。
-10. 実環境証跡または公式validator証跡。
+### 完成候補へ含める修正
 
-### 集計と正直な表示
+`4670438` には少なくとも次のSprint 033修正が含まれる。
 
-- 4環境の検証結果を個別に集計する。1環境のPASSを他環境へ流用しない。
-- 1環境でも必須項目が未達ならSprint不合格とする（外部準備不足は
-  `external-live-gate-unavailable` として実装不具合と区別する）。
-- 未対応・未検証の環境を「対応済み」と表示した場合に失敗するnegative testを持つ。
+1. `1dfe276`: `update-ledger.mjs` の新規Agentic台帳edition誤判定修正。
+2. `1228d59`: Codex正式Plugin manifest／marketplaceと導入・更新面。
+3. `014680e`: read-only環境の `resume-check` 三値化とpath guard修正。
+4. `4670438`: Chatwork／Google Chat wizardのproduct identity修正。
 
-### 共通性の維持
+### 完成候補へ含めない修正
 
-- Chatwork・Google Chat wizardは4環境から同じ共通実装へ到達し、copy・flow・DOMを
-  edition・hostで分岐しない。
-- OAuth scope・同期境界は全hostで共通。hostによってscopeや同期条件を変えない。
-- edition差は会話・診断・報告・developer handoffの4表現面へ限定する既存方針を維持する。
-- 4環境すべてでMarkdown可読性（F51）の最低基準を維持する。
+- 未push commit `f285120` のschema v3 production collector／driver／attestor。
+- 未push commit `b9c0f3e` のschema v3 archive向け修正。
+- 上記2 commitにだけ存在するformal gate用schema、template、手順、集約器、回帰。
+
+targetの出荷候補treeは `4670438` と一致させる。schema v3実装を別の形で再同梱しない。
+
+## 製品構成
+
+### 共通本体
+
+次は `plugins/secretary/` の共通実装を4 hostで共有する。
+
+- skills、会話ルール、Markdown可読性、Agentic style。
+- 診断、完了報告、状態報告、developer handoff。
+- workspace境界、Secret保護、更新の安全性。
+- Chatwork／Google Chatのwizard、OAuth scope、同期境界。
+- ホスト非依存のfixture、validator、回帰。
+
+hostごとに共通機能を複製しない。
+
+### host adapter
+
+host adapterへ置いてよいのは次だけである。
+
+- plugin manifest、marketplace、導入経路、plugin root解決、skill発見。
+- command／slash command、構造化質問UI。
+- 更新／再導入、reload／restart、新しいchat／sessionへの反映。
+- 実会話runner、browser／CLI検証面、host metadata、利用可能な公式validator。
+
+## 正式配布面
+
+### Claude Code
+
+- repo rootの `.claude-plugin/marketplace.json` と
+  `plugins/secretary/.claude-plugin/plugin.json` を維持する。
+- Claude Code Desktop App／CLIから同じ `plugins/secretary/skills/` を利用する。
+
+### Codex
+
+- `plugins/secretary/.codex-plugin/plugin.json` を正式manifestとする。
+- repo rootの `.agents/plugins/marketplace.json` を正式marketplaceとする。
+- manifestのskillsは `./skills/`、marketplaceの `source.path` はrepo root基準の
+  `./plugins/secretary` とする。
+- plugin／marketplace nameは `agentic-secretary` とする。
+- Claude marketplaceのlegacy-compatible読込、`.agents/skills`、`AGENTS.md`、`config.toml`、
+  skills手動コピーは互換／authoring／test補助／fallbackであり、正式Codex配布の代替にしない。
+- Claude／Codexの両manifestは同じ正本skillsを参照し、15 skillを重複discoverさせない。
+
+## 4 hostの実用smoke
+
+4 hostは別々に確認し、1 hostの結果を別hostへ流用しない。ホストの性質に合う証拠を使う。
+
+| host | 主な証拠面 | 必須smoke |
+|---|---|---|
+| Claude Code Desktop App | 実UI、AX tree、screenshot、host-owned session | current bytes、0.8.0、Agentic identity、skill、会話8面、wizard |
+| Claude Code CLI | 実command、session output、cache／install確認 | current bytes、0.8.0、Agentic identity、skill、会話8面、wizard、更新／再導入 |
+| Codex App | 実UI、task／session record、screenshot | current bytes、0.8.0、Agentic identity、skill、会話8面、wizard |
+| Codex CLI | 実command、session output、cache／install確認 | current bytes、0.8.0、Agentic identity、skill、会話8面、wizard、更新／再導入 |
+
+会話8面は次を対象にする。
+
+1. `basic-answer`
+2. `complex-answer`
+3. `completion-report`
+4. `status-report`
+5. `diagnosis`
+6. `developer-handoff`
+7. `partial-failure`
+8. `markdown-rendering`
+
+一般回答へ固定3項目を強制しない。完了・状態報告は既存契約どおり、必要項目と順序を維持する。
+
+## 既取得証拠の再利用
+
+`4670438` と同じcurrent bytesについて、既に次の4 host固有証拠が取得済みである。
+
+- 4 hostすべての `0.8.0`、Agentic identity、正本skill。
+- 4 hostすべての実会話8面のMarkdown。
+- Codex App固有task／session record。CLI結果の流用ではない。
+- Claude Code Desktop Appのcurrent bytes再導入後の実UI／AX tree。
+- 更新済みcacheからのChatwork／Google Chat wizard実起動とAgentic identity。
+- 対象workspace変更0件、Secret露出0件。
+
+fresh Evaluatorは、証拠を無条件に信頼するのではなく、次の整合を確認したうえで再利用する。
+
+1. target commit／treeが `4670438` と一致する。
+2. manifest、marketplace、version、identity、skillが証拠取得時のcurrent bytesと一致する。
+3. host名、App／CLI実行面、sessionが区別され、App証拠がCLI結果だけで作られていない。
+4. 証拠内にSecret実値、不要なaccount／workspace識別子、無関係taskが残っていない。
+5. 証拠と現行実装に矛盾がない。
+
+上記が満たされる場合、4 hostのinstall・8会話・wizardをすべて再実行する必要はない。
+不一致、証拠欠落、対象bytesの違いがある面だけ、fresh Evaluatorが軽量に再確認する。
+
+## 自動runnerを使う場合の安全条件
+
+実会話runnerを新たに自動実行する場合は、Sprint 032 Patch 002で確定した次の安全条件を維持する。
+
+- runner所有の合成HOMEを使い、実HOMEを子processへ渡さない。
+- sourceとdigest一致のread-only plugin copyを使い、source／copyの前後不変を確認する。
+- env allowlist、最小tool、workspace内fixtureだけを使う。
+- OS sandboxまたはhostのpath-scoped permissionで書込み範囲を限定する。
+- 制御されたworkspace外canaryへのWrite／Editが実際に拒否されることを確認する。
+- 合成credentialを子processへ伝播させず、成功・失敗の両方で一時物をcleanupする。
+- 保持証拠をサニタイズし、Secret実値、実HOME、不要な絶対path、account／workspace識別子を残さない。
+
+このrunner安全条件をGUI Appの手動smokeへ同じ形で強制しない。GUI Appは実UIのread-only smoke、
+workspace前後不変、Secret非露出で評価できる。
+
+## 更新／再導入
+
+- source、marketplace snapshot、installed cache、新しいchat／sessionを区別する。
+- Codex CLIはGit marketplace refreshと、現行hostで成立する再install手順を案内する。
+- Codex AppはPlugins Directoryの実際の更新／再導入操作に従う。
+- Claude Code Desktop App／CLIも、current bytesへ更新した後の新しいchat／sessionで確認する。
+- cache directoryを直接編集する手順を利用者へ案内しない。
+- `update-ledger.mjs` は新規Agentic台帳をyasashii editionと誤判定しない。
+- read-onlyの `resume-check` は、しおり有り=0、無し=1、guard拒否=3を区別する。
+- wizardはChatwork／Google Chatとも `agentic-secretary` identityを表示する。
+
+## 必須のローカル検査
+
+target `4670438` で、少なくとも次を0 FAILで完走する。
+
+1. Sprint 033専用回帰。
+2. Codex正式Plugin／marketplace回帰。
+3. 全Agentic回帰。
+4. Gitなしarchive gate。
+5. release integrity／version整合。
+6. Claude公式validator。
+7. 利用可能なCodex validator。利用不能なvalidatorは、未実行理由と代替検査を明記し、
+   実行していないものをPASSと表示しない。
+8. `git diff --check`。
 
 ## Non-scope
 
-- wizard copy／flow／OAuth scope／同期、skill／command名、workspace root、
-  migration filenameのagentic分岐。
-- yasashii overlayの実装（Sprint 034）、edition switching、co-installation。
-- `forkedFrom` の推測変更。
-- same-version bootstrap bridge、公開済み `0.7.0` のin-place差替え、version downgrade／equal update。
-- 旧0.7.0利用者向けexternal recovery／bootstrapと、未検証の標準live update互換の主張。
-- 4環境以外のコーディングエージェントの受入検証・配布保証。
-- 公開release（Sprint 035まで行わない）。
+- schema v2／v3のproduction collector／driver／attestor。
+- production approval／result schema、期限つきapproval、challenge、二層artifact、12×8 exact result。
+- formal resultの4件集約、専用operator手順、配布Pluginへのformal QA基盤同梱。
+- 未push `f285120`、`b9c0f3e` の製品採用。
+- public設定、Release作成、tag、公開案内。Sprint 035まで行わない。
+- OAuth認可、Repository Secret作成／変更、Chatwork／Google Chat実API送信。
+- 旧0.7.0利用者向けexternal recovery／bootstrap、same-version bridge、downgrade更新。
+- 4 host以外のコーディングエージェントの正式保証。
+- Chatwork／Google Chat wizard本体、OAuth scope、同期境界、edition思想の変更。
 
-## 受入基準
+schema v2／v3の証明基盤は将来のoptional internal QAとして別に検討できるが、
+Sprint 033の受入、不合格理由、配布Pluginの必須構成へ戻さない。
 
-1. agenticは指定の別directory／別repoで、neutralization commitが両repoのmerge-baseとして
-   到達可能。履歴を1 commitへ潰していない。
-2. 共通plugin pathは `plugins/secretary/`、外部IDはagentic固有で、yasashii IDの漏れを
-   allowlist外で検出する。
-3. 技術差分は4表現面だけ。wizard file／DOM／copy、OAuth scope、同期、安全ruleのdigestが
-   neutral baseと一致する。
-4. technical styleは正式名称、command、path、error、証拠、残課題を示すが、
-   確認・secret・根拠規律を弱めない。
-5. 共通本体とhost adapterが分離され、manifest・導入・更新・plugin root・実会話runner等の
-   host固有部分だけがadapterにある。共通機能の4コピー・二重実装が0件である。
-6. 4環境それぞれで「4環境それぞれの検証」1〜10が個別に確認され、hostごとの結果が
-   host名・runner名・実行面つきで別集計される。1環境でも必須未達なら不合格。
-7. 未対応・未検証環境を「対応済み」と表示しないことがnegative testで確認できる。
-8. Chatwork・Google Chat wizardの共通性、OAuth scope・同期境界の共通性が4環境で維持される。
-9. agenticの全回帰、archive、official validator（存在するhost分）が0 FAIL。
-   LICENSEと単段クレジットが存在する。
-10. 外部操作は明示許可されたものだけで、無許可のrepo作成／remote／push／導入／公開が0件。
-11. agentic側のcandidate／latest／manifest／CHANGELOG／ledgerが `0.8.0` で整合し、
-    旧 `0.7.0` の記録・fixture・履歴を変更していない。同一版とdowngradeは副作用0件で停止する。
-12. 全会話面のMarkdown可読性とChatwork wizardの `Name`／`Secret` 入力案内が共通baseから
-    継承され、technical styleを保ったまま改行なし平文へ戻っていない。4環境すべてで
-    表示崩れなく読める。
+## 受け入れ基準（Evaluatorが検証する）
 
-## 回帰保護
+- [ ] targetの完成候補がprivate `origin/main` の `4670438` であり、target treeに
+      `f285120`／`b9c0f3e` のschema v3製品実装が含まれない。
+- [ ] `1dfe276`、`1228d59`、`014680e`、`4670438` の4修正がcandidate履歴に含まれる。
+- [ ] Claude／Codexの正式manifest／marketplaceが存在し、`0.8.0`、`agentic-secretary`、
+      共通skills参照、Codex `source.path=./plugins/secretary` が整合する。
+- [ ] 正本skill 15件が各hostで一意に発見され、legacy／manual-only経路や重複discoverで合格を作っていない。
+- [ ] 4 hostそれぞれにcurrent-bytesのhost固有実機smoke証拠があり、AppとCLIを区別できる。
+- [ ] 4 hostすべてで `0.8.0`、Agentic identity、正本skill、会話8面のMarkdownが確認できる。
+- [ ] Chatwork／Google Chat wizardがcurrent bytesで起動し、`agentic-secretary` identityを表示する。
+- [ ] 対象workspaceの変更が0件であり、Secret実値が会話、ログ、repo、保持証拠へ0件である。
+- [ ] 更新／再導入の手順がhost別に実用可能で、source／snapshot／cache／新sessionの違いを誤説明しない。
+- [ ] 新規Agentic台帳のedition判定、read-only `resume-check` 三値、wizard identityが専用回帰で保護される。
+- [ ] Sprint 033専用、Codex Plugin、全Agentic回帰、Gitなしarchive、release integrity、
+      Claude公式validator、利用可能なCodex validator、`git diff --check` が0 FAILである。
+- [ ] 既取得証拠を再利用する場合、fresh Evaluatorがcommit／version／identity／skill／sessionとの整合を確認する。
+- [ ] 新たに自動runnerを使った場合だけ、合成HOME、read-only copy、env allowlist、最小tool、
+      sandbox／path-scoped permission、workspace外canary拒否、Secret非伝播、cleanupを確認する。
+- [ ] schema v2／v3 attestationの欠落を不合格理由にせず、optional internal QAとして製品scope外に扱う。
+- [ ] public／release／OAuth／Repository Secret／実API送信が0件である。
+- [ ] Chatwork／Google Chat wizard、OAuth scope、同期境界、安全rule、editionの4表現面に不要な変更がない。
 
-- neutral baseとagentic treeの差分allowlistを検査する。
-- common master suiteとagentic edition suiteを実行し、yasashii用fixtureの反対edition停止も確認する。
-- wizard assets、copy inventory、OAuth scope、safety ruleのdigest parityを検査する。
-- 共通本体の二重実装検出と、未検証host誤表示のnegative testを実行する。
-- host別runner／検証scriptを4環境分実行し、実行できない環境は `unverified`／
-  `external-live-gate-unavailable` として集計する。
+## Generator handoff
 
-## 手動・browser証跡
+1. target repoの現在HEADとprivate `origin/main` を確認し、出荷候補treeを `4670438` に揃える。
+   未push `f285120`／`b9c0f3e` は完成候補へ含めない。既存履歴を破壊する方法を既定にしない。
+2. schema v3実装を削除した結果、回帰一覧、archive gate、README／guide、progress handoffに
+   存在しないformal gateを必須として残さない。
+3. `4670438` の製品修正と正式配布面を変えず、必要なローカル検査だけを再実行する。
+4. progressにはcandidate commit、実行command／結果、既取得4 host証拠の場所と対応、
+   workspace変更0件、Secret露出0件、禁止外部操作0件を記録する。
+5. target実装の変更が不要なら、不要であることと根拠を記録し、証明基盤を作り直さない。
 
-- agenticの会話、diagnose、報告、developer handoffを各hostで少なくとも1件実行し、
-  段落・改行・必要な箇条書きのレンダリングとhost・runner記録を確認する。
-- Chatwork／Google Chat wizardをdesktop／mobile／200%で操作し、neutral／yasashii基準との
-  可視差分0件を記録する。
-- 4環境の導入手順を実環境screenshotまたはコマンド証跡で記録する（秘密情報・アカウント名・
-  固有IDは伏せ字化する）。
+## Evaluator handoff
 
-## External live gate
+1. Generatorとは別のfresh Evaluatorが、target `4670438`、manifest／marketplace、version／identity／skill、
+   専用・全回帰・archive・validatorを独立確認する。
+2. 既取得の4 host固有証拠を、host、App／CLI実行面、session、current bytesとの対応で確認する。
+   証拠が整合すれば再利用し、全smokeのやり直しを要求しない。
+3. GUI Appは実UI証拠、CLIはcommand／session証拠で評価する。同一approval、challenge、digest、
+   二層artifact、exact schemaを要求しない。
+4. 必要な軽量再確認だけを実施し、公開、Release、OAuth、Secret、実API送信は行わない。
+5. C15は `docs/spec/rubric.md` の現実的な5/5定義で採点する。schema v2／v3 attestationの欠落を
+   機能完全性、回帰なし、C15の減点理由にしない。
 
-次の各操作は、それぞれ**実行直前**に対象と副作用を示してユーザーへ個別に再確認する。
-過去の包括承認だけで実行しない。一部だけ許可された場合はその範囲だけ実行し、
-残りは `external-live-gate-unavailable` とする。
+## External gate
 
-1. 別directory `/Users/taisei/workspace/agentic-secretary` の作成
-2. GitHub repo `mtaiseeei/agentic-secretary` の作成
-3. remote追加
-4. remote変更
-5. push
-6. plugin install（配布形式の実導入全般）
-7. Claude Code Desktop Appへの導入
-8. Claude Code CLIへの導入
-9. Codex Appへの導入
-10. Codex CLIへの導入
-11. public設定
-12. release公開
-
-公開releaseはSprint 035まで行わない。
+既に許可・実施済みのprivate repo、push、plugin install／再導入、read-only会話確認の証拠は再利用できる。
+それを超えるexternal writeは本Sprintの受入に不要であり、行わない。
+public化とRelease作成はSprint 035の明示許可まで禁止する。

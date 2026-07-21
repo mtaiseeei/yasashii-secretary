@@ -265,6 +265,7 @@
 9. 新規生成bot名の第一候補は `secretary[bot]`。既存workspaceのbot名やworkflowは強制改名しない。
 10. LICENSEとShin-sibainu/cc-company単段クレジットを両editionで保持する。`forkedFrom` は公式validatorまたはlive gateの証拠なしに推測変更しない。
 11. yasashii overlayは共通plugin、共通安全回帰、必要な互換／release checkだけを対象とする。spec、Sprint、progress、feedback、evidenceは各repoが所有し、同期しない。
+12. Claude用 `.claude-plugin` とCodex用 `.codex-plugin` は同じ `plugins/secretary/skills/` を参照する。ホスト別のskill本文コピー、生成後に別々に保守するmirror、片方だけに安全修正が入る構造を作らない。
 
 ## 16. ホスト対応・検証表示と実会話回帰の安全境界
 
@@ -279,6 +280,18 @@
 9. 会話回帰の合否判定は共通契約を正本とする。完了・状態報告は固定3項目の存在と順序を必須にし、固定schemaなしの応答を行数だけで合格にしない。一般回答には固定3項目を要求せず、圧縮された改行なし平文を不合格にする。誤合格を作る緩和は禁止し、必要な緩和は理由つきで明示する。
 10. 公式仕様の裏づけがないホスト機構を推測実装しない。公式ドキュメント・正式schemaで確認できない事項は `unverified` として記録する。
 11. 実会話出力の回帰確認は、offline回帰・構文チェック・master gateから分離した明示的なlive conversation gateとして扱い、未実行・未認証・隔離未実証は「未完了（incomplete）」として集計・表示する。offline検証の合格・runnerの構文チェックを実会話の回帰保証として数えない。「解消済み」「回帰保証」という主張は実際に実行された検証に限定する。過去のfeedback・progress・stateの記述は遡って書き換えず、訂正は新しい記録で行う。
+12. Codex App／Codex CLIの正式共有配布は `plugins/secretary/.codex-plugin/plugin.json` とrepo rootの `.agents/plugins/marketplace.json` を必須とする。manifestのskills参照は `./skills/`、marketplaceの `source.path` はrepo root基準の `./plugins/secretary` とし、`./` 始まり・marketplace root内というpath規則を守る。
+13. Claude用 `.claude-plugin/marketplace.json` は削除・置換せずCodex marketplaceと共存させる。CodexによるClaude marketplaceのlegacy-compatible読込は互換経路であり、それだけでCodex正式配布をPASSにしない。
+14. Codexの `.agents/skills`、`AGENTS.md`、`config.toml`、skills手動コピーはauthoring・repo-local利用・test補助・fallbackに限る。これらを正式plugin／marketplaceの代替、4ホスト配布完成の証拠、利用者の主導線にしない。
+15. Codex install後は新しいchat／CLI sessionでbundled skillsを確認する。Git marketplace更新はsnapshot refresh、plugin install cache、version、新しいsessionへの反映を分けて検証し、`~/.codex/plugins/cache/` を直接編集しない。現在のhostに存在しない自動updateを主張しない。
+16. Codex App／Codex CLIでは正式配布面からの新規導入、plugin／skill発見、`$secretary` 等の明示呼出または自然言語trigger、会話8面、wizard導線、安全境界、更新、ホスト別証跡を個別に確認する。一方のCodex hostのPASSを他方へ流用しない。
+17. Codexのbundled skillsは正本15件を各1回だけdiscoverする。同名skillがplugin経路、repo-local経路、legacy marketplace経路等から二重列挙される構成を正式配布のPASSにしない。
+18. 4ホストは個別に実機smokeを確認する。GUI Appは実UI、host-owned session record、AX tree、screenshot等のApp固有証拠、CLIは実commandとsessionの証拠でよい。同一の証明機構や同一artifact schemaを4ホストへ強制せず、1ホストの結果を他ホストへ流用しない。
+19. private `origin/main` のcommit `4670438` と同じcurrent bytesについて既に取得済みの4 host固有証拠は、対象commit／version／identity／skill／sessionが一致し、改変されていないことをfresh Evaluatorが確認できる場合、再利用してよい。証拠をすべて取り直すこと自体を品質要件にしない。
+20. 実会話を自動runnerで取得する場合は、runner所有の合成HOME、digest一致のread-only plugin copy、env allowlist、最小tool、workspace内fixture、OS sandboxまたはpath-scoped permission、workspace外canary拒否、成功・失敗時cleanupを維持する。実HOME、実credential、無関係workspaceをrunnerへ渡さない。この安全条件は自動runnerへ適用し、GUI Appの手動smokeへ同一構成を強制しない。
+21. 出荷証拠は、4 hostのcurrent-bytes実会話、正式manifest／marketplace、`0.8.0`、`agentic-secretary` identity、正本skillの一意読込、会話8面のMarkdown、Chatwork／Google Chat wizard、workspace変更0件、Secret露出0件、更新／再導入手順、全回帰・archive・利用可能な公式validatorで構成する。未実行項目や利用不能validatorは、別の証拠で代替した事実と残余を明記する。
+22. schema v2／v3のproduction collector／driver／attestor、期限つきapproval、challenge、digest束縛、二層artifact、12×8 exact resultは、将来のoptional internal QAであり、製品scope・Sprint 033の必須受入・配布Pluginの同梱要件にしない。採用する場合も、通常の製品動作やSecret安全性の証拠を置き換えない。
+23. public設定とrelease公開はSprint 035まで禁止する。Sprint 033の受入ではOAuth認可、Repository Secret作成／変更、Chatwork／Google Chat実API送信を行わない。既に許可されたprivate repo、install／再導入、read-only会話確認を超える外部変更は、別の明示許可なしに実行しない。
 
 ## 17. 全ユーザー会話の可読性
 
