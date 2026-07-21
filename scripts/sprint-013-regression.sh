@@ -24,24 +24,22 @@ check "workspace templateにworkflow・設定・同期script" test -f "$TEMPLATE
 check_eval "workflowはprivate gate・手動dispatch・scheduleなし" "grep -q 'workflow_dispatch:' '$TEMPLATES/.github/workflows/chatwork-sync.yml' && grep -q 'repository.private == true' '$TEMPLATES/.github/workflows/chatwork-sync.yml' && ! grep -qE '^  schedule:|^    - cron:' '$TEMPLATES/.github/workflows/chatwork-sync.yml'"
 check_eval "workflowは結果を同じrepoへpush" "grep -q 'chatwork/scripts/chatwork-sync.mjs' '$TEMPLATES/.github/workflows/chatwork-sync.yml' && grep -q 'git add chatwork/' '$TEMPLATES/.github/workflows/chatwork-sync.yml' && grep -q 'git push' '$TEMPLATES/.github/workflows/chatwork-sync.yml'"
 
+# fake-ghはPOSIX標準のheredocで生成する（特定ホスト付属のapply_patchコマンドへ依存しない）。
 FAKE_GH="$WORK/fake-gh"
-apply_patch <<PATCH
-*** Begin Patch
-*** Add File: $FAKE_GH
-+#!/usr/bin/env bash
-+set -eu
-+if [ "\${1:-}" = repo ] && [ "\${2:-}" = create ]; then
-+  shift 2; name="\$1"; shift; source=""
-+  while [ "\$#" -gt 0 ]; do case "\$1" in --source) source="\$2"; shift 2;; *) shift;; esac; done
-+  git init -q --bare "\$FAKE_REMOTE"
-+  git -C "\$source" remote add origin "\$FAKE_REMOTE"
-+  git -C "\$source" push -q -u origin HEAD
-+  printf 'https://example.invalid/%s\n' "\$name"
-+elif [ "\${1:-}" = repo ] && [ "\${2:-}" = view ]; then
-+  printf '{"visibility":"%s","url":"https://example.invalid/existing"}\n' "\${FAKE_VISIBILITY:-PRIVATE}"
-+else exit 2; fi
-*** End Patch
-PATCH
+cat > "$FAKE_GH" <<'FAKEGH'
+#!/usr/bin/env bash
+set -eu
+if [ "${1:-}" = repo ] && [ "${2:-}" = create ]; then
+  shift 2; name="$1"; shift; source=""
+  while [ "$#" -gt 0 ]; do case "$1" in --source) source="$2"; shift 2;; *) shift;; esac; done
+  git init -q --bare "$FAKE_REMOTE"
+  git -C "$source" remote add origin "$FAKE_REMOTE"
+  git -C "$source" push -q -u origin HEAD
+  printf 'https://example.invalid/%s\n' "$name"
+elif [ "${1:-}" = repo ] && [ "${2:-}" = view ]; then
+  printf '{"visibility":"%s","url":"https://example.invalid/existing"}\n' "${FAKE_VISIBILITY:-PRIVATE}"
+else exit 2; fi
+FAKEGH
 chmod +x "$FAKE_GH"
 make_workspace(){ local target="$1"; mkdir -p "$target/secretary/memory" "$target/project"; printf '# workspace\n' > "$target/README.md"; printf '# memory\n' > "$target/secretary/memory/MEMORY.md"; printf 'export const ready = true;\n' > "$target/project/app.js"; }
 
@@ -83,16 +81,15 @@ check_eval "6頻度・既定3時間・run数を挙動データで定義" "node -
 check_eval "wizardはprivate repoを検証し確定後だけ設定commit・push" "grep -q 'verifyPrivateRepo' '$CHATWORK/scripts/wizard-server.mjs' && grep -q 'applyChatworkConfig' '$CHATWORK/scripts/wizard-server.mjs' && grep -q 'commitOwnedChanges' '$CHATWORK/scripts/config-transaction.mjs' && grep -q 'pushOwnedCommit' '$CHATWORK/scripts/config-transaction.mjs'"
 
 cp "$TEMPLATES/.github/workflows/chatwork-sync.yml" "$WORK/workflow-invalid.yml"
-apply_patch <<PATCH
-*** Begin Patch
-*** Update File: $WORK/workflow-invalid.yml
-@@
--  workflow_dispatch:
-+  schedule:
-+    - cron: '17 * * * *'
-+  workflow_dispatch:
-*** End Patch
-PATCH
+# schedule混入の負fixtureもPOSIX標準のawkで生成する（apply_patchコマンドへ依存しない）。
+awk '{
+  if ($0 == "  workflow_dispatch:" && !inserted) {
+    print "  schedule:"
+    print "    - cron: '\''17 * * * *'\''"
+    inserted = 1
+  }
+  print
+}' "$WORK/workflow-invalid.yml" > "$WORK/workflow-invalid.yml.tmp" && mv "$WORK/workflow-invalid.yml.tmp" "$WORK/workflow-invalid.yml"
 check_eval "意図的失敗fixture: Sprint 013のschedule混入を検出" "grep -q 'schedule:' '$WORK/workflow-invalid.yml' && ! grep -q 'schedule:' '$TEMPLATES/.github/workflows/chatwork-sync.yml'"
 for script in "$PUBLISH" "$TEMPLATES/chatwork/scripts/chatwork-sync.mjs" "$CHATWORK/scripts/search.mjs" "$CHATWORK/scripts/wizard-server.mjs" "$REPO/scripts/sprint-013-chatwork-test.mjs"; do check "Node構文: $(basename "$script")" node --check "$script"; done
 check_eval "合成wizard fixtureに実token・credentialが無い" "! grep -RqiE '(token|password|credential)[[:space:]]*[:=][[:space:]]*[A-Za-z0-9_-]{8,}' '$REPO/scripts/fixtures/chatwork-wizard'"

@@ -18,6 +18,8 @@ check "通常報告schemaの唯一owner" python3 "$ROOT/scripts/check-report-sch
 check "Chatwork/Google Chat wizard copy・flow・focus静的回帰" node "$ROOT/scripts/sprint-027-copy-test.mjs"
 check "Chatwork Secret画面browser回帰scriptの構文" node --check "$ROOT/scripts/sprint-032-patch-001-chatwork-browser.mjs"
 check "専用testの構文" node --check "$ROOT/scripts/sprint-032-patch-001-readability-test.mjs"
+check "会話契約libの構文" node --check "$ROOT/scripts/lib/sprint-032-patch-001-conversation.mjs"
+check "実pluginセッションsmoke scriptの構文" node --check "$ROOT/scripts/sprint-032-patch-001-conversation-smoke.mjs"
 
 printf 'SPRINT032_PATCH001_PASS=%s SPRINT032_PATCH001_FAIL=%s\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ]

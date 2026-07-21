@@ -14,7 +14,7 @@ description: >
 
 `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
 `secretary/memory/preferences.md` を読む。内容・口調・安全条件だけをrouterへ返し、
-通常報告を独自に包装しない。最終出力形は同ruleの「最終応答serializer」だけを正本とする。
+通常報告を独自に包装しない。最終出力形は同rule入口から解決される「最終応答serializer」だけを正本とする。
 
 ## 1. 導入状態を確認する
 

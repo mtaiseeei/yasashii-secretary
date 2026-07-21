@@ -1,9 +1,21 @@
 #!/usr/bin/env node
 
+// Sprint 032 Patch 001: 会話可読性の回帰テスト。
+// 層A: 配布されるrules／styles／skills／templatesの静的な契約検査。
+// 層B: 実際のplugin指示経路（rule-manifest → rules → copy）から導出した契約で、
+//      会話fixtureのMarkdown構造を検査する。模範Markdownをテスト内で生成しない。
+// 層C（実pluginセッション）は scripts/sprint-032-patch-001-conversation-smoke.mjs が担う。
+
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  loadConversationContract,
+  scenarioScene,
+  usesFixedThreeSchema,
+  validateScenario,
+} from "./lib/sprint-032-patch-001-conversation.mjs";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const plugin = join(repo, "plugins", "secretary");
@@ -46,24 +58,18 @@ const compressionPatterns = [
   /(?:2|二)行目(?:を)?足さない/,
 ];
 
+// 一般回答をserializer／固定3項目へ結合する指示の再混入を検出する。
+const generalAnswerForcingPatterns = [
+  /作業後の提案・回答.{0,80}serializer/s,
+  /完了・状態報告と作業後の提案・回答/,
+  /(?:一般(?:的な)?(?:質問|回答)|提案・回答).{0,40}(?:3項目|shortLines)へ(?:まとめる|押し込む|変換する)/s,
+];
+
 function forbiddenInstructions(text) {
   return text.split(/\r?\n/).flatMap((line, index) => {
     const hits = compressionPatterns.filter((pattern) => pattern.test(line));
     return hits.map((pattern) => ({ line: index + 1, pattern: pattern.source, text: line.trim() }));
   });
-}
-
-function renderItems(items) {
-  assert(items.length > 0);
-  if (items.length === 1) return items[0];
-  return items.map((item) => `- ${item}`).join("\n");
-}
-
-function assertStructured(label, output, count) {
-  const lines = output.split("\n");
-  assert.equal(lines.length, count, `${label}: physical item count`);
-  assert(lines.every((line) => line.startsWith("- ")), `${label}: Markdown bullets`);
-  assert(!lines.some((line) => /^#{1,6}\s/.test(line)), `${label}: decorative heading`);
 }
 
 let pass = 0;
@@ -75,8 +81,11 @@ function check(label, test) {
 
 const inventory = JSON.parse(read(join(fixtureRoot, "conversation-surface-inventory.json")));
 const surfaces = conversationSurfaces();
+const contract = loadConversationContract(repo);
 
-check("inventory covers the four required user-facing categories", () => {
+// ----- 層A: 配布物の静的な契約検査 -----
+
+check("A: inventory covers the four required user-facing categories", () => {
   assert.equal(inventory.schemaVersion, 1);
   assert.deepEqual(inventory.userFacing.map((entry) => entry.category), [
     "rules-and-edition-copy", "skills-and-commands", "workspace-guidance", "wizard",
@@ -89,69 +98,129 @@ check("inventory covers the four required user-facing categories", () => {
   assert(surfaces.some((path) => path.endsWith("google-chat/assets/wizard/app.js")));
 });
 
-check("distributed conversation surfaces have zero compression instructions", () => {
+check("A: distributed conversation surfaces have zero compression instructions", () => {
   const failures = surfaces.flatMap((path) => forbiddenInstructions(read(path)).map((hit) => ({ path: relative(repo, path), ...hit })));
   assert.deepEqual(failures, []);
 });
 
-check("negative fixture catches one-line compression regression", () => {
+check("A: negative fixture catches one-line compression regression", () => {
   const failures = forbiddenInstructions(read(join(fixtureRoot, "bad-compression.md")));
   assert(failures.length >= 1);
 });
 
-const common = readRelative("plugins/secretary/rules/common-language.md");
-const style = readRelative("plugins/secretary/rules/styles/yasashii.md");
-const yasashiiCopy = JSON.parse(readRelative("plugins/secretary/rules/copy/yasashii.json"));
-const editions = readRelative("docs/spec/editions.md");
+check("A: serializer scope is limited to completion/status/handoff reports", () => {
+  for (const scene of ["作業完了報告", "状態報告", "実行結果の短いhandoff"]) {
+    assert(contract.applyScenes.some((entry) => entry.includes(scene)), `apply scene missing: ${scene}`);
+  }
+  for (const scene of [
+    "一般的な質問への回答", "複雑な説明", "設計相談", "複数原因の診断", "検索結果",
+    "比較", "選択肢の提示", "部分失敗", "developer handoff",
+  ]) {
+    assert(contract.generalScenes.some((entry) => entry.includes(scene)), `general scene missing: ${scene}`);
+  }
+  const style = contract.ruleText["yasashii-style"];
+  assert(style.includes("serializerを適用しない場面"), "non-application section missing");
+  assert(style.includes("common-language.md"), "general answers must defer to common-language");
+});
 
-check("shared rule requires readable Markdown without a preference toggle", () => {
-  for (const phrase of ["短い1要点", "空行で分けた段落", "箇条書き", "好みとして質問せず", "無効にしません", "内部recordとの境界"]) {
+check("A: no surface couples general answers to the fixed three-item schema", () => {
+  const failures = surfaces.flatMap((path) => {
+    const text = read(path);
+    return generalAnswerForcingPatterns.filter((pattern) => pattern.test(text)).map((pattern) => ({
+      path: relative(repo, path), pattern: pattern.source,
+    }));
+  });
+  assert.deepEqual(failures, []);
+});
+
+check("A: shared rule keeps readable Markdown without a preference toggle", () => {
+  const common = contract.ruleText["common-language"];
+  for (const phrase of ["短い1要点", "空行で分けた段落", "ネストした箇条書き", "好みとして質問せず", "無効にしません", "内部recordとの境界"]) {
     assert(common.includes(phrase), `missing common readability phrase: ${phrase}`);
   }
   assert(!readRelative("plugins/secretary/templates/memory/preferences.md").includes("改行"));
+  const style = contract.ruleText["yasashii-style"];
+  assert(style.includes("くわしく"), "preference may only switch 3<->4 items");
+  assert(!/preferences.{0,40}(?:1行|一行|平文)/s.test(style));
 });
 
-check("one short confirmation remains one natural paragraph", () => {
-  const output = renderItems([yasashiiCopy.surfaces.conversation.decisionConfirmation]);
-  assert(!output.includes("\n"));
-  assert(!output.startsWith("- "));
+check("A: machine-readable internal records stay out of scope", () => {
+  assert(contract.ruleText["common-language"].includes("内部形式を複数行へ変えず"));
 });
 
-check("yasashii default report is three physical Markdown items", () => {
-  const output = renderItems(yasashiiCopy.surfaces.report.shortLines);
-  assertStructured("yasashii report", output, 3);
-  assert(output.includes("やったこと:") && output.includes("結果:") && output.includes("次に何が起きるか:"));
-  assert(style.includes("Markdown箇条書きとして物理的に分けます"));
+// ----- 層B: 実plugin指示経路から導出した契約での会話構造検査 -----
+
+const SCENARIOS = [
+  "short-answer",
+  "complex-question",
+  "diagnosis",
+  "search-results",
+  "partial-failure",
+  "completion-report",
+];
+
+check("B: copy schema provides three physically separate report items", () => {
+  assert.equal(contract.labels.length, 3);
+  assert.deepEqual(contract.labels, ["やったこと", "結果", "次に何が起きるか"]);
+  assert.equal(contract.detailLabel, "補足");
+  for (const line of contract.copy.surfaces.report.shortLines) assert(!line.includes("\n"));
 });
 
-check("multi-step, diagnosis, partial failure, completion, and handoff are structured", () => {
-  const scenarios = [
-    ["Chatwork公式画面でAPI Tokenを取得します", "GitHubのName欄を設定します", "Secret欄へ本人が直接入力します"],
-    ["何が起きたか: 同期に失敗しました", "影響: 保存済み履歴は残っています", "次にすること: 接続を確認します"],
-    ["完了: 2ルームを保存しました", "未完了: 1ルームはrate limitでした", "次にすること: 時間を置いて再実行します"],
-    ["完了: 設定を保存しました", "結果: 次回から3時間ごとに取得します"],
-    ["何が起きたか: update-apply.mjsがexit 3", "影響: workspaceは不変", "次にすること: path guardを確認", "正式名称: EXIT_REFUSED"],
-  ];
-  scenarios.forEach((items, index) => assertStructured(`scenario ${index + 1}`, renderItems(items), items.length));
+check("B: one short confirmation copy remains one natural paragraph", () => {
+  const confirmation = contract.copy.surfaces.conversation.decisionConfirmation;
+  assert(!confirmation.includes("\n"));
+  assert(!confirmation.startsWith("- "));
 });
 
-check("agentic and yasashii keep distinct content while sharing structure", () => {
-  const yasashii = renderItems([
-    "何が起きたか: 更新を開始できませんでした",
-    "影響: ファイルは変わっていません",
-    "次にすること: 接続を確認します",
-  ]);
-  const agentic = renderItems([
-    "error: EXIT_REFUSED",
-    "command: node scripts/update-apply.mjs start",
-    "path: .git/secretary-update",
-    "evidence: workspace digest unchanged",
-  ]);
-  assertStructured("yasashii edition", yasashii, 3);
-  assertStructured("agentic edition", agentic, 4);
-  assert.notEqual(yasashii, agentic);
+check("B: every scenario is classified by the actual rule text", () => {
+  for (const kind of SCENARIOS) {
+    const need = scenarioScene(kind);
+    const pool = need.scope === "apply" ? contract.applyScenes : contract.generalScenes;
+    assert(pool.some((entry) => entry.includes(need.scene)), `${kind}: scene "${need.scene}" not in ${need.scope} list`);
+  }
+});
+
+for (const kind of SCENARIOS) {
+  check(`B: scenario ${kind} — conforming conversation passes the derived contract`, () => {
+    const good = read(join(fixtureRoot, "conversations", `${kind}.good.md`));
+    const verdict = validateScenario(kind, good, contract);
+    assert.deepEqual(verdict.problems, [], `${kind} good fixture rejected`);
+  });
+  check(`B: scenario ${kind} — compressed conversation is rejected`, () => {
+    const bad = read(join(fixtureRoot, "conversations", `${kind}.bad.md`));
+    const verdict = validateScenario(kind, bad, contract);
+    assert(verdict.problems.length >= 1, `${kind} bad fixture was not rejected`);
+  });
+}
+
+check("B: completion report without fixed labels is rejected (fixed === false)", () => {
+  const bad = read(join(fixtureRoot, "conversations", "completion-report.unlabeled.bad.md"));
+  assert.equal(usesFixedThreeSchema(bad, contract.labels), false, "unlabeled fixture must not count as fixed schema");
+  const verdict = validateScenario("completion-report", bad, contract);
+  assert(verdict.problems.some((problem) => problem.includes("固定3項目schema")), "missing fixed-schema rejection");
+});
+
+check("B: completion report with out-of-order labels is rejected", () => {
+  const bad = read(join(fixtureRoot, "conversations", "completion-report.out-of-order.bad.md"));
+  const verdict = validateScenario("completion-report", bad, contract);
+  assert(verdict.problems.some((problem) => problem.includes("順序")), "missing label-order rejection");
+});
+
+check("B: general answers are not required to use the fixed three-item schema", () => {
+  const good = read(join(fixtureRoot, "conversations", "complex-question.good.md"));
+  assert.equal(usesFixedThreeSchema(good, contract.labels), false);
+  assert.deepEqual(validateScenario("complex-question", good, contract).problems, []);
+});
+
+check("B: agentic and yasashii keep distinct audiences while sharing structure", () => {
+  const editions = readRelative("docs/spec/editions.md");
   for (const phrase of ["技術的に直接的", "何が起きたか、影響、次にすること", "developer handoff"]) assert(editions.includes(phrase));
+  const style = contract.ruleText["yasashii-style"];
+  assert(style.includes("Markdown箇条書きとして物理的に分けます"));
+  assert(style.includes("何が起きているか、利用者への影響、次に何をすればよいか"));
 });
+
+// ----- Chatwork Secret案内の無回帰 -----
 
 const chatwork = readRelative("plugins/secretary/skills/chatwork/assets/wizard/app.js");
 const chatworkSkill = readRelative("plugins/secretary/skills/chatwork/SKILL.md");
@@ -176,4 +245,4 @@ check("Chatwork wizard never receives or displays a Token value", () => {
 
 process.stdout.write(`SPRINT032_PATCH001_READABILITY_PASS=${pass} SPRINT032_PATCH001_READABILITY_FAIL=0 SURFACES=${surfaces.length}\n`);
 
-export { conversationSurfaces, forbiddenInstructions, renderItems };
+export { conversationSurfaces, forbiddenInstructions };

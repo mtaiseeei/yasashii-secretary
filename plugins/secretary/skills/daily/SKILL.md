@@ -12,7 +12,7 @@ description: >
 
 `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
 `secretary/memory/preferences.md` を読む。整理した内容と安全条件だけをrouterへ返し、
-通常報告を独自に包装しない。最終出力形は同ruleの「最終応答serializer」だけを正本とする。
+通常報告を独自に包装しない。最終出力形は同rule入口から解決される「最終応答serializer」だけを正本とする。
 
 ## モードを見分ける
 
@@ -74,7 +74,7 @@ description: >
 - ユーザーが選べる次の行動を1つまで。
 
 ここでは内容と安全条件だけをrouterへ返す。通常報告の項目数、prefix、Markdown構造、前後の包装は定義せず、
-`plain-language.md` の「最終応答serializer」に任せる。長い一覧は、ユーザーが求めたときだけ内容として返す。
+`plain-language.md` から解決される「最終応答serializer」に任せる。長い一覧は、ユーザーが求めたときだけ内容として返す。
 
 ## evening: 今日の締め
 

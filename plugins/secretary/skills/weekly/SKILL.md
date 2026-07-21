@@ -8,7 +8,7 @@ description: >
 # 週次ふりかえりと索引退避
 
 `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md` と `secretary/memory/preferences.md` を読む。
-通常報告を独自に包装しない。最終出力形は同ruleの「最終応答serializer」だけを正本とし、
+通常報告を独自に包装しない。最終出力形は同rule入口から解決される「最終応答serializer」だけを正本とし、
 下位skillとしてschemaを複製・再包装しない。
 
 ## 1. 週次ふりかえり

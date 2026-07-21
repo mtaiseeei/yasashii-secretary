@@ -11,7 +11,7 @@ trigger: /secretary
 あなた専属のAI秘書の入口です。この SKILL.md 自身は薄く保ち、用件に応じて必要な機能だけを
 あとから読み込みます（起動時に全機能を読み込みません）。
 
-ユーザー向け出力の唯一の正本は `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md` の
+ユーザー向け出力の唯一の正本は `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md` から解決される
 「最終応答serializer」節である。最初に同ruleと、2回目以降は
 `secretary/memory/preferences.md` を読み、明示された内容・口調・安全条件を集める。
 通常報告のRead、しおり確認、preferences再読、ルーティング、段階ロードは無言で行い、
@@ -51,7 +51,7 @@ trigger: /secretary
 | 「Google につなぎたい」「Gmail／カレンダーを見て」 | Google 接続ガイド（setup-google） | `${CLAUDE_PLUGIN_ROOT}/skills/setup-google/SKILL.md` |
 | 「Microsoft につなぎたい」「Outlook／Teams を見て」 | Microsoft 接続ガイド（setup-microsoft） | `${CLAUDE_PLUGIN_ROOT}/skills/setup-microsoft/SKILL.md` |
 | 「Notion につなぎたい」 | Notion 接続ガイド（任意・setup-notion） | `${CLAUDE_PLUGIN_ROOT}/skills/setup-notion/SKILL.md` |
-| 「Chatworkにつなぎたい」「roomを選びたい」「Chatworkで探して」「/chatwork」 | Chatwork接続・room設定・履歴検索（chatwork） | `${CLAUDE_PLUGIN_ROOT}/skills/chatwork/SKILL.md` |
+| 「Chatworkにつなぎたい」「ルームを選びたい」「Chatworkで探して」「/chatwork」 | Chatwork接続・ルーム設定・履歴検索（chatwork） | `${CLAUDE_PLUGIN_ROOT}/skills/chatwork/SKILL.md` |
 | 「Google Chatを設定したい」「Google Chatにつなぎたい」「GChatで探して」「/google-chat」 | Google Chat高度接続・通常スペース履歴検索（google-chat） | `${CLAUDE_PLUGIN_ROOT}/skills/google-chat/SKILL.md` |
 | 「繋がってる？」「接続の調子」「診断して」「どれが使える？」 | 接続診断（connections） | `${CLAUDE_PLUGIN_ROOT}/skills/connections/SKILL.md` |
 | 「設定変えたい」「もっとフランクに」「専門用語そのままで」「呼び方を変えて」 | 個人設定（settings） | `${CLAUDE_PLUGIN_ROOT}/skills/settings/SKILL.md` |

@@ -8,7 +8,7 @@ description: >
 # 継続する仕事を整理する（projects）
 
 `${CLAUDE_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
-`secretary/memory/preferences.md` を先に読む。通常報告は独自に包装せず、最終出力形は同ruleの
+`secretary/memory/preferences.md` を先に読む。通常報告は独自に包装せず、最終出力形は同rule入口から解決される
 「最終応答serializer」だけを正本とする。
 
 ## 1. 候補と作成を分ける

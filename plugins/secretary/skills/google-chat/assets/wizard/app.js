@@ -31,7 +31,7 @@ async function json(url, options = {}) {
 
 function renderPrepareFile() {
   progress(0);
-  show("prepare-file", `<p class="eyebrow">接続 1 / 4</p><h1>Google Cloudから取得した接続用ファイルを選びます。</h1>
+  show("prepare-file", `<p class="eyebrow">接続 1 / 3</p><h1>Google Cloudから取得した接続用ファイルを選びます。</h1>
     ${nowCopy("AIと一緒に準備した接続用JSONを、このPCから選びます。")}
     <div class="panel"><label class="search-label" for="client-json">Google Cloudから取得した接続用ファイル</label><input id="client-json" type="file" accept="application/json,.json"><p class="hint">ファイルの内容は外部へ送らず、この画面にも表示しません。</p>
     ${technicalDetails("管理者向け: ファイルの正式名称と安全な扱い", "<p>正式名称は <strong>OAuth client JSON</strong> です。内容はこのPCのloopback内だけで読み、外部へuploadしません。client secretやclient IDを画面、ログ、リポジトリへ残しません。</p>", "admin")}</div>
@@ -55,7 +55,7 @@ function renderPrepareFile() {
 function renderAuthorize() {
   oauthPollGeneration += 1;
   progress(0);
-  show("authorize", `<p class="eyebrow">接続 2 / 4</p><h1>Googleアカウントで接続を許可します。</h1>
+  show("authorize", `<p class="eyebrow">接続 2 / 3</p><h1>Googleアカウントで接続を許可します。</h1>
     ${nowCopy("Googleの確認画面を開き、Google Chatを読むことを許可します。")}
     <div class="panel"><p class="panel-title">許可すること</p><ul><li>参加中の通常スペースを確認する</li><li>選んだ通常スペースのメッセージを読む</li><li>発言者名を確認する</li></ul><p class="hint">メッセージの投稿、編集、削除は行いません。</p>
     ${technicalDetails("管理者向け: 認証と安全機構", "<p>Googleのパスワードを渡さず、許可した範囲だけ読む仕組み（OAuth）を使います。read-only scope、PKCE、state検証、loopbackを使い、認可コードとtokenは記録しません。membership権限や書き込み権限は求めません。</p>", "admin")}</div>
@@ -88,7 +88,7 @@ async function startOAuth() {
 
 function renderOAuthWaiting({ authWindow = null, generation = ++oauthPollGeneration, popupBlocked = false } = {}) {
   progress(0);
-  show(popupBlocked ? "authorize-popup-failure" : "authorize-waiting", `<p class="eyebrow">接続 2 / 4</p><h1>${popupBlocked ? "Googleの確認画面を開けませんでした。" : "Googleの許可を待っています。"}</h1>
+  show(popupBlocked ? "authorize-popup-failure" : "authorize-waiting", `<p class="eyebrow">接続 2 / 3</p><h1>${popupBlocked ? "Googleの確認画面を開けませんでした。" : "Googleの許可を待っています。"}</h1>
     <p class="lead ${popupBlocked ? "error" : ""}" data-copy-role="${popupBlocked ? "error" : "status"}" data-oauth-status>${popupBlocked ? "ブラウザで新しい画面を開けませんでした。" : "新しい画面でGoogle Chatへの接続を許可してください。"}</p>
     <p class="notice">${popupBlocked ? "ブラウザのポップアップを許可して、もう一度開いてください。" : "許可が終わると、通常スペースの選択へ自動で進みます。"}</p>
     ${technicalDetails("詳しい説明: 新しい画面を閉じた場合", "<p>確認画面を閉じても、この設定画面は残ります。許可の途中で閉じた場合は、もう一度開いてやり直せます。</p>")}
@@ -135,8 +135,8 @@ function renderOAuthFailure(message = state.oauth?.message) {
 }
 
 async function discoverSpaces() {
-  progress(1);
-  show("discover-loading", '<p class="eyebrow">接続 3 / 4</p><h1>Google Chatの通常スペースを確認しています。</h1><p class="lead" data-copy-role="status">参加している通常スペースの一覧を取得しています。</p><p class="notice">ダイレクトメッセージとグループDMは読みません。</p>', "loading");
+  progress(0);
+  show("discover-loading", '<p class="eyebrow">接続 3 / 3</p><h1>Google Chatの通常スペースを確認しています。</h1><p class="lead" data-copy-role="status">参加している通常スペースの一覧を取得しています。</p><p class="notice">ダイレクトメッセージとグループDMは読みません。</p>', "loading");
   try {
     const result = await json("/api/spaces", { method: "POST" });
     state.spaces = result.spaces;
@@ -148,7 +148,7 @@ async function discoverSpaces() {
 }
 
 function renderDiscoverFailure(error) {
-  progress(1);
+  progress(0);
   const code = error.code ? `<p>エラー種別: <code>${escape(error.code)}</code></p>` : "";
   show("discover-failure", `<p class="eyebrow">接続を確認できません</p><h1>Google Chatの通常スペースを確認できませんでした。</h1><p class="lead error" data-copy-role="error" role="alert">参加している通常スペースの一覧を取得できませんでした。</p><p class="notice">通信やGoogle Chatの設定を確認して、もう一度お試しください。</p>${technicalDetails("管理者向け: エラーの詳しい内容", `<p>${escape(error.message || "詳しい原因を確認できませんでした。")}</p>${code}`, "admin")}<div class="actions" data-copy-role="actions"><button class="button button-secondary" data-action="back" aria-label="Google Chatの接続を後始末して設定を終了する">設定を終了する</button><button class="button button-primary" data-action="retry" aria-label="Google Chatの通常スペースをもう一度確認する">通常スペースをもう一度確認する</button></div>`, "error");
   app.querySelector('[data-action="back"]').onclick = cancel;
@@ -156,9 +156,9 @@ function renderDiscoverFailure(error) {
 }
 
 function renderNoSpaces(cleanup) {
-  progress(1);
+  progress(0);
   const detail = cleanupDescription(cleanup);
-  show("discover-empty", `<p class="eyebrow">接続 3 / 4</p><h1>選べるGoogle Chatスペースはまだありません。</h1><p class="lead" data-copy-role="result">通常スペースが0件でも、接続の失敗ではありません。</p><p class="notice">参加状況と管理者の設定を確認してから、もう一度接続できます。</p><p class="${detail.kind === "manual" ? "error" : "notice"}" role="${detail.kind === "manual" ? "alert" : "status"}">${escape(detail.text)}</p>${technicalDetails("管理者向け: 接続の後始末", `<p>${escape(detail.technical || "接続情報の後始末結果を確認してください。")}</p><p>${externalLink(links.permissions, "Googleのアプリ権限を確認する")}</p>`, "admin")}<div class="actions" data-copy-role="actions"><button class="button button-secondary" data-action="back" aria-label="Google Chatの設定を終了する">設定を終了する</button><button class="button button-primary" data-action="retry" aria-label="${detail.kind === "manual" ? "Google Chatの接続情報の後始末をもう一度試す" : "Google Chatの接続を最初から確認する"}">${detail.kind === "manual" ? "後始末をもう一度試す" : "接続を最初から確認する"}</button></div>`, detail.kind === "manual" ? "error" : "empty");
+  show("discover-empty", `<p class="eyebrow">接続 3 / 3</p><h1>選べるGoogle Chatスペースはまだありません。</h1><p class="lead" data-copy-role="result">通常スペースが0件でも、接続の失敗ではありません。</p><p class="notice">参加状況と管理者の設定を確認してから、もう一度接続できます。</p><p class="${detail.kind === "manual" ? "error" : "notice"}" role="${detail.kind === "manual" ? "alert" : "status"}">${escape(detail.text)}</p>${technicalDetails("管理者向け: 接続の後始末", `<p>${escape(detail.technical || "接続情報の後始末結果を確認してください。")}</p><p>${externalLink(links.permissions, "Googleのアプリ権限を確認する")}</p>`, "admin")}<div class="actions" data-copy-role="actions"><button class="button button-secondary" data-action="back" aria-label="Google Chatの設定を終了する">設定を終了する</button><button class="button button-primary" data-action="retry" aria-label="${detail.kind === "manual" ? "Google Chatの接続情報の後始末をもう一度試す" : "Google Chatの接続を最初から確認する"}">${detail.kind === "manual" ? "後始末をもう一度試す" : "接続を最初から確認する"}</button></div>`, detail.kind === "manual" ? "error" : "empty");
   app.querySelector('[data-action="back"]').onclick = () => renderCancelled(cleanup);
   app.querySelector('[data-action="retry"]').onclick = detail.kind === "manual" ? cancel : renderPrepareFile;
 }
@@ -166,7 +166,7 @@ function renderNoSpaces(cleanup) {
 function renderSpaces() {
   progress(1);
   const shown = state.spaces.filter((space) => `${space.displayName} ${space.name}`.toLocaleLowerCase("ja").includes(state.query.toLocaleLowerCase("ja")));
-  show("select-spaces", `<p class="eyebrow">STEP 1 / 4</p><h1>保存するGoogle Chatスペースを選びます。</h1>${nowCopy("保存したい通常スペースにチェックを入れます。")}
+  show("select-spaces", `<p class="eyebrow">設定 1 / 4</p><h1>保存するGoogle Chatスペースを選びます。</h1>${nowCopy("保存したい通常スペースにチェックを入れます。")}
     <div class="panel"><label class="search-label" for="space-search">通常スペースを検索</label><input class="search" id="space-search" type="search" value="${escape(state.query)}" placeholder="スペース名"><button class="text-button" data-action="clear" type="button" aria-label="Google Chatスペースの選択をすべて外す">選択をすべて外す</button><ul class="room-list">${shown.map((space) => `<li><label class="choice"><input data-focus-key="space-${escape(space.name)}" type="checkbox" value="${escape(space.name)}" ${state.selected.has(space.name) ? "checked" : ""}><span class="choice-copy"><span class="choice-title">${escape(space.displayName)}</span></span></label></li>`).join("")}</ul><p class="hint" role="status">選択中: ${state.selected.size}スペース</p>${technicalDetails("管理者向け: スペースの識別子", `<ul>${shown.map((space) => `<li>${escape(space.displayName)}: <code>${escape(space.name)}</code></li>`).join("")}</ul>`, "admin")}</div><p class="notice">選んだ通常スペースだけを読みます。ダイレクトメッセージとグループDMは対象外です。</p>${actions("Google Chatの取得間隔を選ぶ", "Google Chatの設定をキャンセル")}`);
   app.querySelector("#space-search").oninput = (event) => { state.query = event.target.value; renderSpaces(); app.querySelector("#space-search").focus(); };
   app.querySelector('[data-action="clear"]').onclick = () => { state.selected.clear(); renderSpaces(); };
@@ -177,7 +177,7 @@ function renderSpaces() {
 
 function renderFrequency() {
   progress(2);
-  show("select-interval", `<p class="eyebrow">STEP 2 / 4</p><h1>Google Chatの取得間隔を選びます。</h1>${nowCopy("新しいメッセージを自動で確認する間隔を選びます。")}
+  show("select-interval", `<p class="eyebrow">設定 2 / 4</p><h1>Google Chatの取得間隔を選びます。</h1>${nowCopy("新しいメッセージを自動で確認する間隔を選びます。")}
     <div class="panel"><ul class="frequency-list">${frequencies.map(([value, label]) => `<li><label class="choice"><input type="radio" name="interval" value="${value}" ${state.interval === value ? "checked" : ""}><span class="choice-copy"><span class="choice-title">${label}</span></span></label></li>`).join("")}</ul>${technicalDetails("詳しい説明: 自動取得の仕組み", "<p>定期取得はGitHub Actionsで動きます。初回の取得だけは、接続情報をこのPCのメモリに保持している間に行います。</p>")}</div><p class="notice">3時間ごとは、負担と新しさのバランスを取りやすいおすすめ設定です。</p>${actions("Google Chatの保存内容を確認する")}`);
   app.querySelectorAll('input[name="interval"]').forEach((input) => input.onchange = () => { state.interval = input.value; });
   app.querySelector('[data-action="next"]').onclick = renderReview;
@@ -188,7 +188,7 @@ function renderReview() {
   progress(3);
   const names = state.spaces.filter((space) => state.selected.has(space.name)).map((space) => escape(space.displayName)).join("、");
   const frequency = frequencies.find(([value]) => value === state.interval)?.[1];
-  show("review", `<p class="eyebrow">STEP 3 / 4</p><h1>Google Chatの保存内容を確認します。</h1>${nowCopy("読むスペース、保存先、自動取得の設定を確認します。")}
+  show("review", `<p class="eyebrow">設定 3 / 4</p><h1>Google Chatの保存内容を確認します。</h1>${nowCopy("読むスペース、保存先、自動取得の設定を確認します。")}
     <dl class="summary"><div class="summary-row"><dt>選んだスペース</dt><dd>${names}</dd></div><div class="summary-row"><dt>取得間隔</dt><dd>${escape(frequency)}</dd></div><div class="summary-row"><dt>保存内容</dt><dd>本文、スレッド、発言者、添付情報。添付ファイルの中身は保存しません。</dd></div></dl>
     ${safetyList([
       { label: "読む対象", text: `選んだGoogle Chat通常スペース（${state.spaces.filter((space) => state.selected.has(space.name)).map((space) => space.displayName).join("、")}）だけです。` },
@@ -212,7 +212,7 @@ function renderReview() {
 
 async function initialSync() {
   progress(4);
-  show("initial-sync-loading", '<p class="eyebrow">STEP 4 / 4</p><h1>Google Chatの最初の取得を進めています。</h1><p class="lead" data-copy-role="status">選んだ通常スペースのメッセージを確認しています。</p><p class="notice">取得できる範囲を最後まで確認するため、この画面を開いたままお待ちください。</p>', "loading");
+  show("initial-sync-loading", '<p class="eyebrow">設定 4 / 4</p><h1>Google Chatの最初の取得を進めています。</h1><p class="lead" data-copy-role="status">選んだ通常スペースのメッセージを確認しています。</p><p class="notice">取得できる範囲を最後まで確認するため、この画面を開いたままお待ちください。</p>', "loading");
   try {
     const result = await json("/api/initial-sync", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ selectedSpaceNames: [...state.selected], interval: state.interval, saveConsent: state.saveConsent, commitPushConsent: state.commitPushConsent, automaticPushConsent: state.automaticPushConsent }) });
     renderResult(result);
@@ -243,7 +243,7 @@ function renderResult(result) {
   const automatic = state.config?.scheduleEnabled === true;
   const scheduleText = scheduleFailed ? "自動取得の設定は完了していません。接続先を確認し、設定変更からもう一度お試しください。" : automatic ? `${frequencies.find(([value]) => value === state.config.interval)?.[1]}の自動取得も有効にしました。` : "手動のみのため、自動取得は行いません。";
   const resultState = scheduleFailed || failed ? "error" : zero ? "empty" : "success";
-  show(failed ? "initial-result-failure" : partial || scheduleFailed ? "initial-result-partial" : zero ? "initial-result-empty" : "initial-result", `<p class="eyebrow">STEP 4 / 4</p><h1>${scheduleFailed ? "最初の取得は保存しましたが、自動取得を設定できませんでした。" : failed ? "Google Chatの最初の取得を完了できませんでした。" : partial ? "一部のGoogle Chatスペースを取得できませんでした。" : "Google Chatの設定が完了しました。"}</h1><p class="lead" data-copy-role="result">${failed ? "接続を確認してください。自動取得は次の実行時にもう一度取得します。" : partial ? "取得できた内容は保存しました。失敗したスペースは次の取得で再試行します。" : zero ? "まだ保存するメッセージはありません。" : "取得したメッセージを保存しました。"}</p><p class="notice" data-schedule-result>${escape(scheduleText)}</p><ul class="result-list">${rows}</ul>${zero ? '<p class="empty">次回以降の取得で、新しい内容を保存します。</p>' : ""}${technicalDetails("詳しい説明: 取得結果と接続情報", "<p>接続に使ったtokenはセッションのメモリから破棄しました。組織の保持設定やAPIが返せる範囲により、過去履歴が含まれないことがあります。</p>")}<div class="actions" data-copy-role="actions"><button class="button button-primary" data-action="close" aria-label="Google Chatの設定を終了する">設定を終了する</button></div>`, resultState);
+  show(failed ? "initial-result-failure" : partial || scheduleFailed ? "initial-result-partial" : zero ? "initial-result-empty" : "initial-result", `<p class="eyebrow">設定 4 / 4</p><h1>${scheduleFailed ? "最初の取得は保存しましたが、自動取得を設定できませんでした。" : failed ? "Google Chatの最初の取得を完了できませんでした。" : partial ? "一部のGoogle Chatスペースを取得できませんでした。" : "Google Chatの設定が完了しました。"}</h1><p class="lead" data-copy-role="result">${failed ? "接続を確認してください。自動取得は次の実行時にもう一度取得します。" : partial ? "取得できた内容は保存しました。失敗したスペースは次の取得で再試行します。" : zero ? "まだ保存するメッセージはありません。" : "取得したメッセージを保存しました。"}</p><p class="notice" data-schedule-result>${escape(scheduleText)}</p><ul class="result-list">${rows}</ul>${zero ? '<p class="empty">次回以降の取得で、新しい内容を保存します。</p>' : ""}${technicalDetails("詳しい説明: 取得結果と接続情報", "<p>接続に使ったtokenはセッションのメモリから破棄しました。組織の保持設定やAPIが返せる範囲により、過去履歴が含まれないことがあります。</p>")}<div class="actions" data-copy-role="actions"><button class="button button-primary" data-action="close" aria-label="Google Chatの設定を終了する">設定を終了する</button></div>`, resultState);
   app.querySelector('[data-action="close"]').onclick = renderComplete;
 }
 

@@ -1142,7 +1142,7 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-section "33. Harness v0.4.5 runtime運用"
+section "33. Harness v0.4.6 runtime運用"
 # ---------------------------------------------------------------------------
 HARNESS_CONFIG="$REPO/.harness/config.toml"
 HARNESS_IGNORE="$REPO/.harness/.gitignore"
@@ -1179,6 +1179,9 @@ HARNESS_CONFIG_RC=$?
 check "config.tomlが解析でき、Claude継承・Codex role・強化条件が正しい" \
   "[ $HARNESS_CONFIG_RC -eq 0 ]"
 
+check "v0.4.6 configが設定値と説明を分離し、AI編集時の公式確認規則を保持" \
+  "grep -q '^# SETTINGS / 設定値$' '$HARNESS_CONFIG' && grep -q '^# REFERENCE / 設定方法・動作説明$' '$HARNESS_CONFIG' && grep -q 'AI editing contract' '$HARNESS_CONFIG' && grep -q 'AI編集規則' '$HARNESS_CONFIG' && grep -q 'Never guess, fuzzy-match, translate between hosts' '$HARNESS_CONFIG'"
+
 check "個人runtime overrideがTOML/JSONともgit管理外" \
   "grep -qx 'config.local.toml' '$HARNESS_IGNORE' && grep -qx 'config.local.json' '$HARNESS_IGNORE' && git -C '$REPO' check-ignore --no-index -q .harness/config.local.toml && git -C '$REPO' check-ignore --no-index -q .harness/config.local.json"
 
@@ -1194,7 +1197,7 @@ check "既存CLAUDE.mdの製品固有境界・secret・3項目報告を維持" \
 check "stateが完了履歴と有効なruntime状態を保持" \
   "grep -q '^| sprint-020-patch-002 | done |' '$HARNESS_STATE' && grep -qE '^- Model Tier: (standard|strong)$' '$HARNESS_STATE' && grep -qE '^- Rotate: (none|runtime-migration|model-escalation|model-availability)$' '$HARNESS_STATE' && grep -qE '^- Current ID: sprint-[0-9]{3}(-patch-[0-9]{3})?$' '$HARNESS_STATE' && ! grep -q 'Model Tier: unknown' '$HARNESS_STATE'"
 
-check "guidanceがv0.4.5 runtime運用とno-overwriteを案内" \
+check "guidanceがv0.4.6互換runtime運用とno-overwriteを案内" \
   "grep -q '.harness/config.local.toml' '$HARNESS_GUIDANCE' && grep -q 'dispatch-ready or dispatch-attempt, not launch-verified' '$HARNESS_GUIDANCE' && grep -q 'Rotate: model-escalation' '$HARNESS_GUIDANCE' && grep -q 'Rotate: model-availability' '$HARNESS_GUIDANCE' && grep -q 'never persist.*unknown' '$HARNESS_GUIDANCE' && grep -q 'Do not overwrite existing guidance' '$HARNESS_GUIDANCE'"
 
 check "candidate version 0.8.0とHarness/agents非同梱を維持" \
