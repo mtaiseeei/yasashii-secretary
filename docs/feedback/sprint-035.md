@@ -221,3 +221,134 @@ C1、C3、C12、C15が閾値未達のためFAIL。
 - verification-infra findingを製品findingへ混ぜず、製品findingを検証基盤だけの問題へも読み替えていない。
 - master未完走をPASS／FAILのどちらにも偽装していない。
 - 禁止されたローカルHarness checkoutには接触していない。
+
+---
+
+# Retry 1 独立再評価（2026-07-22）
+
+## 判定
+
+**PASS — internal acceptance**
+
+初回のHigh／Medium／Low findingはすべて解消した。Sprint 035の内部受け入れ条件とRubric閾値は満たしている。
+
+ただし、実際のCodex App／CLIへのplugin更新・再installと、Google／Microsoft／Notionの実connector認証は実施していない。このため公開・release-readyの外部live gateは **`external-live-gate-unavailable`** のまま分離する。これは内部実装のFAILではない。
+
+## 初回findingの解消確認
+
+| 初回finding | Retry 1 | 独立確認 |
+|---|---|---|
+| High: Codex更新がClaude updaterを実行し、先にlocal副作用を起こす | **RESOLVED** | 独立fixtureでfake `claude` canaryを置き、`update-apply.mjs start --host codex` を実行。exit 3で安全停止し、Claude呼出し0、workspace HEAD／tree／status／tracked file不変、session／backup生成0を確認した。host guardは `safeWorkspace()`、Git操作、commit、session、backup、plugin変更より前にある。未知hostも同様にexit 3で無変更だった。 |
+| Medium: 3 setup skillがCodex利用者をClaude画面へ案内する | **RESOLVED** | Google／Microsoft／Notionの各skillはClaudeとCodexの節を分離した。Codex節は現在hostの公式connector／認証導線を確認できた場合だけ進み、未提供・未確認なら `未確認` として停止する。Claude Settings／Connectors、Claude再起動／reload、manual token／独自OAuthへの誘導はCodex節にない。認証後はread-only smokeだけを案内する。 |
+| Low: Sprint 035検査がhost名の記載だけを確認していた | **RESOLVED** | 専用検査は実Git workspaceとfake Claude canaryを使用し、副作用なしの早期停止、guard順序、Codex更新command、3 setup skillのhost別禁止事項まで検査するようになった。15/15 PASSを独立再実行した。 |
+
+## Codex更新経路の確認
+
+現在の `codex-cli 0.144.6` の実helpと公式Codex manualを照合した。
+
+- 通常更新: `codex plugin marketplace upgrade [MARKETPLACE_NAME]`
+- 明示的な再install: `codex plugin remove PLUGIN@MARKETPLACE` の後に `codex plugin add PLUGIN@MARKETPLACE`
+- `codex plugin update` は存在しないため使用していない
+- 再installは通常更新で解決しない場合に、別途明示同意を得て行う
+- Plugins Directoryや実導線を確認できないCodex Appでは推測せず停止する
+- Codex節にClaude commandやreload案内はない
+
+## 完了済みの独立回帰証跡
+
+長時間の追加suiteは再評価指示に従って中止した。以下は中断前に完了し、exit 0／0 FAILを確認できたものだけである。中断したsuiteはPASS数へ含めていない。
+
+### agentic-secretary
+
+| 検査 | 結果 |
+|---|---:|
+| `node scripts/sprint-035-test.mjs` | 15 PASS / 0 FAIL |
+| `node scripts/sprint-033-test.mjs` | 20 PASS / 0 FAIL |
+| `node scripts/agentic-codex-plugin-test.mjs` | 4 PASS / 0 FAIL |
+| `node scripts/agentic-archive-gate.mjs` | 6 suites PASS / 0 FAIL |
+
+archive gate内のoffline host gateは0/4 verifiedで `external-live-gate-unavailable` を返したため、外部live PASSへは数えていない。
+
+### yasashii-secretary
+
+| 検査 | 結果 |
+|---|---:|
+| `node scripts/sprint-035-test.mjs` | 15 PASS / 0 FAIL |
+| `TMPDIR=/private/tmp bash scripts/sprint-018-regression.sh` | 41 PASS / 0 FAIL |
+| `TMPDIR=/private/tmp node scripts/sprint-030-update-config-test.mjs` | 10 PASS / 0 FAIL |
+| `TMPDIR=/private/tmp bash scripts/sprint-015-regression.sh` | 68 PASS / 0 FAIL |
+| `node scripts/sprint-034-test.mjs /Users/taisei/workspace/agentic-secretary` | 11 PASS / 0 FAIL |
+
+完了済みの直接assertionは合計184件、archive gateは6 suitesで、いずれも0 FAILだった。Sprint 018はhost未指定の既存Claude更新経路も通しており、今回のhost guard追加による互換性低下がないことを確認した。
+
+### overlayとedition差分
+
+- `sync-secretary-overlay.mjs --check`: `OVERLAY_CHECK_PASS`、candidate `b32cb33db5f2bd0e5a9ca4a98e30276c92bfb36c`
+- `sync-secretary-overlay.mjs --reapply`: `OVERLAY_REAPPLY_PASS`、2回目の変更 `secondChanged=0`
+- update runner、3 setup skill、Sprint 035検査は両editionでbyte一致
+- update skillの差分はedition description、Claude配布ID、再開時の製品名だけで、Codex更新ロジックは一致
+- 実装候補はoverlay確認後もcleanだった
+
+## 公式remoteとsafe harbor
+
+直接のonline checkerはsandbox DNS拒否、その後の実行はGitHub API 403となったため、その実行自体をPASSへ数えていない。代替のread-only `gh api` で、公式remoteのmain SHAが初回評価時と不変であることを確認した。
+
+| edition | main SHA | version |
+|---|---|---:|
+| agentic Harness | `aafdf97d1f673a856c5a2a2fe72f87f1a4b57e89` | 0.5.0 |
+| yasashii Harness | `8f9eb4c1d9e14414a7e94051ca6f4c34da282784` | 0.5.0 |
+
+このremote commitと配布surfaceはRetry 1差分で変更されていないため、初回に記録済みの公式remote snapshot、README、manifest、配布ID証跡をsafe harborとして再利用した。追加の旧master suiteや不要な外部証明は要求していない。禁止されたローカルHarness checkoutには接触していない。
+
+## Acceptance Criteria再判定
+
+| AC | 判定 | Retry 1根拠 |
+|---|---|---|
+| 1 | PASS（internal） | 2 editionとClaude／Codex配布面、Codex更新の安全停止と正式commandを確認。実install／更新は外部gateへ分離 |
+| 2–10 | PASS | 初回PASS証跡を再利用し、変更面回帰とoverlayを再実行 |
+| 11 | PASS | 3 setup skillのClaude／Codex分離、未確認時の停止、read-only smokeを確認 |
+| 12–14 | PASS | 配布identity、Harness 0.5.0 remote snapshot、edition overlay／差分保持を確認 |
+| 15 | PASS（internal） | High／Medium／Low finding 0、内部release候補として必要な回帰0 FAIL。外部live gateは別記 |
+
+## Rubric再採点
+
+| 基準 | スコア | 閾値 | 判定 | Retry 1根拠 |
+|---|---:|---:|---|---|
+| C1 完成度 | 4/5 | 4 | PASS | Codex更新と3 connector setupの内部経路が完成。実外部操作だけを別gateに残した |
+| C2 構文・整合 | 5/5 | 5 | PASS | manifest、ID、version、root、remote snapshotが整合 |
+| C3 機能の実証 | 5/5 | 4 | PASS | 独立canaryと変更面回帰184件、archive 6 suitesが0 FAIL |
+| C4 非エンジニア体験 | 4/5 | 4 | PASS | host別に実際の次操作と安全停止を明示 |
+| C5 安全・規律 | 5/5 | 5 | PASS | 外部書込み、Secret、install、release、pushは0件 |
+| C6 無回帰 | 5/5 | 5 | PASS | 完了済み変更面suiteはすべてgreen。中断suiteは根拠に不使用 |
+| C7 やさしさ | 4/5 | 4 | PASS | Codex利用者をClaude画面へ誤誘導しない |
+| C8 wizard体験・デザイン | 5/5 | 4 | PASS | asset差分なし。同一候補の記録済み証跡をsafe harborとして再利用 |
+| C9 配布チャネル非依存 | 5/5 | 5 | PASS | 2 editionとClaude／Codex正式配布面を分離 |
+| C10 同意・安全停止 | 5/5 | 5 | PASS | 未対応hostは副作用前に停止し、再installは別同意 |
+| C11 Secret・OAuth | 5/5 | 5 | PASS | Secret値露出・外部OAuth実行なし。既存安全回帰68/68 |
+| C12 リリース品質 | 5/5 | 5 | PASS | 初回High／Medium／Lowを解消し、内部候補のfinding 0 |
+| C13 変更影響管理 | 5/5 | 5 | PASS | overlay、byte一致、edition固有差分、clean treeを確認 |
+| C14 Harness 0.5.0整合 | 5/5 | 5 | PASS | 不変の公式remote SHAと配布metadataを確認 |
+| C15 host adapter完全性 | 5/5 | 5 | PASS | Codex更新とGoogle／Microsoft／Notion setupのadapterを独立検証 |
+
+**合計: 72 / 75 — PASS**
+
+すべてのRubric閾値を満たした。
+
+## 外部live gate
+
+内部PASSに含めていない残作業は次のとおり。
+
+1. 実Codex App／CLIでのplugin marketplace更新、必要時の明示同意付き再install
+2. 実Codex hostでのGoogle／Microsoft／Notion connector提供状況と認証導線の確認
+3. ユーザー承認後の実認証とread-only smoke
+4. 公開、release、push
+
+外部操作は0件。plugin install／upgrade／remove、OAuth、Secret、push、公開、release、workflow dispatchは実施していない。
+
+## Retry 1 Evaluator self-review
+
+- 実装、spec、progress、stateは編集していない。編集対象はこのfeedbackだけである。
+- Generatorの自己評価をverdictへ流用せず、独立canary、実CLI help、実ファイル、完了済み回帰で確認した。
+- 中断した長時間suiteをPASS件数へ含めていない。
+- 内部PASSと `external-live-gate-unavailable` を混同していない。
+- 初回findingの解消だけを変更面として再評価し、不変surfaceは記録済みsafe harborを使用した。
+- 禁止されたローカルHarness checkoutには接触していない。
