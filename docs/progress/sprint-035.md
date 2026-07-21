@@ -130,3 +130,85 @@ TMPDIR=/private/tmp bash scripts/sprint-015-regression.sh
 
 受入対象の2版、2host、15 skills、Harness 0.5.0、overlay冪等性は専用回帰とremote読取で確認した。
 実hostへのinstall／discoveryは外部gateとして残す。完了判定はfresh独立EvaluatorとOrchestratorへ委ねる。
+
+---
+
+## Retry 1 — Codex更新・接続設定のhost分離
+
+初回EvaluatorのHigh 1件、Medium 1件、検査不足1件だけを修正した。新機能、公開処理、実host install、
+OAuth／Secret、workflow dispatch、Harness本体は対象にしていない。
+
+### 修正内容
+
+1. `update-apply.mjs` に `--host claude-code|codex` を追加した。`start` と `retry-plugin` はCodexなら
+   `safeWorkspace()`、保護commit、session、backup、Claude binaryより前にexit 3で停止する。
+   host未指定はSprint 018以前のClaude Code呼び出し互換として `claude-code` を維持し、不明なhostは変更0件で拒否する。
+2. `update/SKILL.md` はClaude Codeの既存updaterとCodexの正式面を分離した。Codex CLI 0.144.6の
+   current helpで確認した `codex plugin marketplace upgrade`、必要時の明示確認後の
+   `codex plugin remove`／`codex plugin add` だけを案内し、存在しない `codex plugin update` は作っていない。
+   Codex Appは現在のPlugins Directoryに実際に表示される更新／再導入操作が確認できる場合だけ案内し、
+   確認できなければ `未確認` で停止する。
+3. Google／Microsoft／Notionのsetup skillを、共通のしおり・安全条件・read-only smokeを維持したまま
+   `Claude Code` と `Codex App／Codex CLI` の後続節へ分けた。ClaudeのSettings／Connectors／再起動は
+   Claude節だけに置き、Codexは現在hostで利用できる公式App／connectorの存在、認可入口、本人許可を確認できた場合だけ進む。
+4. Sprint 035検査はhost名の記載だけで通さず、Codex updateのexit 3、Git HEAD／worktree、session／backup、
+   Claude fixture logの全不変と、3 setupのCodex節に公式connector、認可、未確認停止、read-only smokeが揃うことを検査する。
+
+### Retry 1実装commit
+
+- Agentic共通正本: `b32cb33db5f2bd0e5a9ca4a98e30276c92bfb36c`
+  (`[sprint-035] Codex更新と接続案内をhost分離`)
+- Yasashii overlay実装: `38597d5d893303c78544dea06debe2a6deedbc60`
+  (`[sprint-035] Codex host分岐をやさしい版へ同期`)
+
+Yasashiiは上流baseをAgentic commit `b32cb33...` へ更新し、610 filesを再記録した。
+edition固有のClaude marketplace／plugin ID、製品名、再開文言は既存anchor overlayで再適用した。
+
+### Retry 1の主な変更file
+
+- 共通実装: `plugins/secretary/scripts/update-apply.mjs`
+- 共通skill: `plugins/secretary/skills/{update,setup-google,setup-microsoft,setup-notion}/SKILL.md`
+- 負回帰: `scripts/sprint-035-test.mjs`
+- Agentic変更宣言: `adapters/agentic-overlay.json`
+- Yasashii同期記録: `secretary-overlay/{upstream-base,upstream-tree}.json`
+
+### Retry 1回帰結果
+
+| 対象 | コマンド | 結果 |
+|---|---|---:|
+| Agentic Sprint 035 | `node scripts/sprint-035-test.mjs` | 15 PASS / 0 FAIL |
+| Agentic Sprint 033 | `node scripts/sprint-033-test.mjs` | 20 PASS / 0 FAIL |
+| Agentic Codex配布 | `node scripts/agentic-codex-plugin-test.mjs` | 4 PASS / 0 FAIL |
+| Agentic archive | `node scripts/agentic-archive-gate.mjs` | 6 suites PASS / 0 FAIL |
+| Yasashii Sprint 035 | `node scripts/sprint-035-test.mjs` | 15 PASS / 0 FAIL |
+| Yasashii overlay | `node scripts/sprint-034-test.mjs /Users/taisei/workspace/agentic-secretary` | 11 PASS / 0 FAIL |
+| Claude updater互換 | `TMPDIR=/private/tmp bash scripts/sprint-018-regression.sh` | 41 PASS / 0 FAIL |
+| edition更新設定 | `TMPDIR=/private/tmp node scripts/sprint-030-update-config-test.mjs` | 10 PASS / 0 FAIL |
+| project pointer／一般PJ | `TMPDIR=/private/tmp bash scripts/sprint-015-regression.sh` | 68 PASS / 0 FAIL |
+| overlay exact check | `node scripts/sync-secretary-overlay.mjs --check --candidate /Users/taisei/workspace/agentic-secretary` | PASS、managed 225 |
+| overlay二回適用 | `node scripts/sync-secretary-overlay.mjs --reapply --candidate /Users/taisei/workspace/agentic-secretary` | PASS、`secondChanged=0` |
+| Agentic Harness remote | `node scripts/check-harness-compat-online.mjs` | PASS、`aafdf97d...`、0.5.0 |
+| Yasashii Harness remote | `node scripts/check-harness-compat-online.mjs` | PASS、`8f9eb4c1...`、0.5.0 |
+| 構文・差分 | `node --check ...`、`git diff --check` | PASS |
+
+online互換はsandbox内ではDNS拒否を `UNVERIFIED` として保持し、許可面のread-only再実行で上表のPASSを得た。
+ローカル `/Users/taisei/workspace/agentic-harness` にはread／list／statusを含め接触していない。
+
+### 既知の旧master条件との分離
+
+- Agentic `scripts/agentic-regression.sh` は先頭側の既存localhost fixtureがrestricted sandboxで
+  `listen EPERM 127.0.0.1` となり、全体完走していない。
+- Agenticの旧Sprint 030／032更新fixtureはYasashii固定identityを期待する既知前提で失敗する。
+- これらは今回の変更面PASSへ加算せず、製品FAILにも読み替えていない。Claude updaterの既存挙動は
+  Yasashii側のSprint 018 41件とupdate config 10件で直接確認した。
+
+### Retry 1の外部gateとEvaluator確認事項
+
+- push、public化、release、実ユーザーplugin install／update、OAuth、Secret、workflow dispatchは0件。
+- Codex App／CLIでの実plugin更新、Google／Microsoft／Notion connectorの実認可は
+  `external-live-gate-unavailable` のまま。現在hostで正式面を確認できない場合の安全停止はinternal回帰済み。
+- UI asset変更はないため新しいBrowser／screenshot／test URLはない。
+- Evaluatorは、Codex update負例の副作用0、setup 3件のCodex節、Claude updater 41件、overlay `secondChanged=0`、
+  両online Harness 0.5.0互換を増分確認する。
+
+Retry 1の実装と自己評価は完了した。Sprint完了判定はfresh独立EvaluatorとOrchestratorへ委ねる。
