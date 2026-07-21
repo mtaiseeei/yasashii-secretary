@@ -2,11 +2,11 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-034
+- Current ID: sprint-035
 - Retry Count: 0
 - Model Tier: strong
 - Rotate: none
-- Next Planned: sprint-035
+- Next Planned: TBD
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
      ユーザー確認で単段クレジットに正本改訂、回帰assert強化のうえ合格）。
@@ -58,8 +58,8 @@
 | sprint-032-patch-001 | done | [contract](sprint-032-patch-001.md) | [progress](../progress/sprint-032-patch-001.md) | [feedback](../feedback/sprint-032-patch-001.md) |
 | sprint-032-patch-002 | done | [contract](sprint-032-patch-002.md) | [progress](../progress/sprint-032-patch-002.md) | [feedback](../feedback/sprint-032-patch-002.md) |
 | sprint-033 | done | [contract](sprint-033.md) | [progress](../progress/sprint-033.md) | [feedback](../feedback/sprint-033.md) |
-| sprint-034 | active | [contract](sprint-034.md) | - | - |
-| sprint-035 | planned | [contract](sprint-035.md) | - | - |
+| sprint-034 | done | [contract](sprint-034.md) | [progress](../progress/sprint-034.md) | [feedback](../feedback/sprint-034.md) |
+| sprint-035 | active | [contract](sprint-035.md) | - | - |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
@@ -227,3 +227,5 @@
 - 2026-07-21: targetの未pushv3作業をlocal `codex/archive-sprint-033-formal-v3`へ退避し、mainを完成候補`4670438`へ復帰。fresh Generatorが`HEAD == main == origin/main == 4670438`、clean、private、Release 0、必要4修正`1dfe276`／`1228d59`／`014680e`／`4670438`包含、v3 code非包含を確認。Sprint 033 20/20、Codex 4/4、全Agentic 13 suites、Gitなしarchive 6 suites、release integrity、Claude validator、diff checkが0 FAIL。update-ledger新規Agentic初期化／真正legacy混在停止、read-only resume-check 0/1/3、両wizard identityも合格。コード追加・push・再導入・App・OAuth・Secret・実API・public・release 0件。sprint-033をawaiting-evalへ更新し、既取得4 host current-bytes証拠と`4670438`の整合をfresh独立Evaluatorへ渡す。
 - 2026-07-21: fresh最終Evaluatorは完成候補`4670438`をPASS、Finding High／Medium／Low 0、C15 5/5と判定。target `HEAD == main == origin/main == 4670438`、clean、private、Release 0。fresh Sprint 033 20/20、Codex formal 4/4、全Agentic 13 suites、archive 6 suites、release integrity、Claude validator、diff checkが0 FAIL。4 hostのcurrent-bytes証拠をhost別にcandidate／cache／manifest／installed／session時系列と照合し、全4面で0.8.0、agentic identity、skill、会話8面Markdown、変更0、Secret actual value 0を確認。退役v3とoffline formal 0/4は現行contractどおり非採点。sprint-033をdone、Retry Count 0、Current IDをsprint-034、Next Plannedをsprint-035へ進める。public／releaseはSprint 035まで禁止を維持する。
 - 2026-07-21: ユーザーがsprint-034／035の継続を承認し、Agentic Harness本体の改善は別Plugin／別Repoでユーザー側が行う方針を確認。SecretaryはHarness本体を同梱せず参照導線だけを持つため、HarnessのGit履歴をSecretaryへmergeせず、将来必要なversion／案内／互換確認だけを独立Patchで同期する。sprint-034をactiveへ更新し、local overlay実装をfresh Generatorで開始する。`agentic-harness` local checkoutは一切対象にせず、agentic-secretary上流のremote追加／変更／fetch、push URL無効化、GitHub参照、pushは各操作直前の個別承認まで行わない。
+- 2026-07-21: sprint-034 fresh Generatorがcommit `78f21d2`（`[sprint-034] やさしい版の下流オーバーレイを実装`）で、agentic `4670438`の605 filesをcommon／metadata／anchor／repo-owned／upstream-onlyへ宣言分類し、offline `--check`／`--apply`／`--reapply`／`--record`、未分類追加・削除・anchor欠落・metadata逸脱・upstream advance拒否、repo-owned byte保護を実装。二回適用`secondChanged=0`。yasashii設定確認を正式key保持・値／Secret非露出の読みやすい箇条書きへ変更し、agenticの直接表示は不変。専用11/11、settings69/69、0.7履歴25/25、rule/copy4/4、反対edition wrapper7/7・内部54/54、新規0.8/equal/downgrade5/5・15/15、可読性7/7・28/28、host-neutral8/8・32/32、wizard5/5、archive11/11、release／schema／diffが0 FAIL。master初回338/340の旧assertion2件は対象Sprint025/029を更新して個別0 FAIL、master全体再実行はEvaluatorへ委ねる。worktree clean、push・remote追加／変更／fetch・push URL変更・GitHub参照・公開0件。sprint-034をawaiting-evalへ更新しfresh独立Evaluatorへ渡す。
+- 2026-07-21: sprint-034 fresh Evaluatorはlocal実装をHigh／Medium／Low 0でPASS。overlay 605/605、二回適用`secondChanged=0`、master localhost許可面340/340、全重点suite、archive、release、schema、Browser desktop／mobile、console error 0を確認。ユーザー個別承認後、Orchestratorが`upstream` fetchを`https://github.com/mtaiseeei/agentic-secretary.git`、pushを`DISABLED`へ設定し`git fetch upstream`を実行。fresh remote-gate Evaluatorは`upstream/main=4670438`、上流tree一致、共通基点`52016cf`、overlay HEAD`78f21d2`、origin不変、overlay check managed=218、upstream変更0、push0を確認しC13 5/5・Sprint総合PASS。sprint-034をdone、Current IDをsprint-035、Next PlannedをTBDへ進める。併せてユーザー依頼により、GitHub正本でagentic-harness／yasashii-harnessがともに0.5.0であることをread-only確認。Sprint035へ、各Secretaryのruntime設定／AGENTS／guidance／回帰を対応Harness 0.5.0へ追随させ、Harness本体を同梱・Git mergeしない最終整合をPlannerが追加する。
