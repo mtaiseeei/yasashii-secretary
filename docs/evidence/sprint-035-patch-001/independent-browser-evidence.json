@@ -1,0 +1,2059 @@
+{
+  "evaluatedAt": "2026-07-22T07:47:39.169Z",
+  "downstreamCandidate": "44066b9b4b834c4b5bfa24fa59fb08ebd2719b68",
+  "upstreamCandidate": "1cf2ae690a39ef822d204624d53ee183b386f715",
+  "surfaces": [
+    {
+      "service": "Chatwork",
+      "mode": "desktop",
+      "scenario": {
+        "screen": "chatwork-select-rooms",
+        "allInitialIds": [
+          "101",
+          "102",
+          "103",
+          "104"
+        ],
+        "selectionClicks": [
+          {
+            "id": "101",
+            "action": "uncheck",
+            "checked": false
+          },
+          {
+            "id": "101",
+            "action": "check",
+            "checked": true
+          },
+          {
+            "id": "102",
+            "action": "uncheck",
+            "checked": false
+          },
+          {
+            "id": "102",
+            "action": "check",
+            "checked": true
+          }
+        ],
+        "selectedAtStart": [
+          "101",
+          "102"
+        ],
+        "composingStates": [
+          {
+            "label": "さ",
+            "value": "さ",
+            "activeId": "room-search",
+            "selectionStart": 1,
+            "selectionEnd": 1,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "visibleCheckedIds": [
+              "101",
+              "102"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          },
+          {
+            "label": "さい",
+            "value": "さい",
+            "activeId": "room-search",
+            "selectionStart": 2,
+            "selectionEnd": 2,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "visibleCheckedIds": [
+              "101",
+              "102"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          },
+          {
+            "label": "採用",
+            "value": "採用",
+            "activeId": "room-search",
+            "selectionStart": 2,
+            "selectionEnd": 2,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "visibleCheckedIds": [
+              "101",
+              "102"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          }
+        ],
+        "duringComposition": {
+          "label": "during-composition",
+          "value": "採用",
+          "activeId": "room-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "101",
+            "102",
+            "103",
+            "104"
+          ],
+          "visibleCheckedIds": [
+            "101",
+            "102"
+          ],
+          "resultMutations": 0,
+          "fullScreenMutations": 0
+        },
+        "afterComposition": {
+          "label": "after-composition",
+          "value": "採用",
+          "activeId": "room-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "104"
+          ],
+          "visibleCheckedIds": [],
+          "resultMutations": 1,
+          "fullScreenMutations": 0
+        },
+        "resultMutationsAfterCommit": 1,
+        "afterFollowupInput": {
+          "label": "after-followup-input",
+          "value": "採用",
+          "activeId": "room-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "104"
+          ],
+          "visibleCheckedIds": [],
+          "resultMutations": 1,
+          "fullScreenMutations": 0
+        },
+        "afterJapaneseClear": {
+          "label": "",
+          "value": "",
+          "activeId": "room-search",
+          "selectionStart": 0,
+          "selectionEnd": 0,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "101",
+            "102",
+            "103",
+            "104"
+          ],
+          "visibleCheckedIds": [
+            "101",
+            "102"
+          ],
+          "resultMutations": 2,
+          "fullScreenMutations": 0
+        },
+        "alphaStates": [
+          {
+            "value": "14",
+            "caret": 1,
+            "expected": [],
+            "observed": {
+              "label": "14",
+              "value": "14",
+              "activeId": "room-search",
+              "selectionStart": 1,
+              "selectionEnd": 1,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [],
+              "visibleCheckedIds": [],
+              "resultMutations": 3,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "104",
+            "caret": 2,
+            "expected": [
+              "104"
+            ],
+            "observed": {
+              "label": "104",
+              "value": "104",
+              "activeId": "room-search",
+              "selectionStart": 2,
+              "selectionEnd": 2,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "104"
+              ],
+              "visibleCheckedIds": [],
+              "resultMutations": 4,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "14",
+            "caret": 1,
+            "expected": [],
+            "observed": {
+              "label": "14",
+              "value": "14",
+              "activeId": "room-search",
+              "selectionStart": 1,
+              "selectionEnd": 1,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [],
+              "visibleCheckedIds": [],
+              "resultMutations": 5,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "10",
+            "caret": 2,
+            "expected": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "observed": {
+              "label": "10",
+              "value": "10",
+              "activeId": "room-search",
+              "selectionStart": 2,
+              "selectionEnd": 2,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "101",
+                "102",
+                "103",
+                "104"
+              ],
+              "visibleCheckedIds": [
+                "101",
+                "102"
+              ],
+              "resultMutations": 6,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "",
+            "caret": 0,
+            "expected": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "observed": {
+              "label": "",
+              "value": "",
+              "activeId": "room-search",
+              "selectionStart": 0,
+              "selectionEnd": 0,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "101",
+                "102",
+                "103",
+                "104"
+              ],
+              "visibleCheckedIds": [
+                "101",
+                "102"
+              ],
+              "resultMutations": 7,
+              "fullScreenMutations": 0
+            }
+          }
+        ],
+        "selectedAfterHiddenRoundTrip": [
+          "101",
+          "102"
+        ],
+        "finalFullScreenMutations": 0
+      },
+      "layout": {
+        "url": "http://127.0.0.1:18935/?direct=rooms&independentEvaluator=1784706459174-desktop",
+        "screen": "chatwork-select-rooms",
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "dpr": 1
+        },
+        "scrollWidth": 1425,
+        "overflowX": false,
+        "minActionHeight": 48,
+        "activeId": "room-search",
+        "value": "",
+        "selectionStart": 0,
+        "selectionEnd": 0
+      },
+      "tabTarget": {
+        "tag": "INPUT",
+        "id": null,
+        "type": "checkbox",
+        "action": null
+      },
+      "roundTrip": {
+        "forwardScreen": "chatwork-select-interval",
+        "before": [
+          "101",
+          "102"
+        ],
+        "after": [
+          "101",
+          "102"
+        ]
+      },
+      "runtimeErrors": [],
+      "networkErrors": [],
+      "screenshot": {
+        "file": "chatwork-desktop.png",
+        "sha256": "6aef6ca59920df19204d632334de5de31fec1aa95e7e66e47cc3e666cd51797b",
+        "bytes": 84833
+      },
+      "passed": true
+    },
+    {
+      "service": "Chatwork",
+      "mode": "mobile",
+      "scenario": {
+        "screen": "chatwork-select-rooms",
+        "allInitialIds": [
+          "101",
+          "102",
+          "103",
+          "104"
+        ],
+        "selectionClicks": [
+          {
+            "id": "101",
+            "action": "uncheck",
+            "checked": false
+          },
+          {
+            "id": "101",
+            "action": "check",
+            "checked": true
+          },
+          {
+            "id": "102",
+            "action": "uncheck",
+            "checked": false
+          },
+          {
+            "id": "102",
+            "action": "check",
+            "checked": true
+          }
+        ],
+        "selectedAtStart": [
+          "101",
+          "102"
+        ],
+        "composingStates": [
+          {
+            "label": "さ",
+            "value": "さ",
+            "activeId": "room-search",
+            "selectionStart": 1,
+            "selectionEnd": 1,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "visibleCheckedIds": [
+              "101",
+              "102"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          },
+          {
+            "label": "さい",
+            "value": "さい",
+            "activeId": "room-search",
+            "selectionStart": 2,
+            "selectionEnd": 2,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "visibleCheckedIds": [
+              "101",
+              "102"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          },
+          {
+            "label": "採用",
+            "value": "採用",
+            "activeId": "room-search",
+            "selectionStart": 2,
+            "selectionEnd": 2,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "visibleCheckedIds": [
+              "101",
+              "102"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          }
+        ],
+        "duringComposition": {
+          "label": "during-composition",
+          "value": "採用",
+          "activeId": "room-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "101",
+            "102",
+            "103",
+            "104"
+          ],
+          "visibleCheckedIds": [
+            "101",
+            "102"
+          ],
+          "resultMutations": 0,
+          "fullScreenMutations": 0
+        },
+        "afterComposition": {
+          "label": "after-composition",
+          "value": "採用",
+          "activeId": "room-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "104"
+          ],
+          "visibleCheckedIds": [],
+          "resultMutations": 1,
+          "fullScreenMutations": 0
+        },
+        "resultMutationsAfterCommit": 1,
+        "afterFollowupInput": {
+          "label": "after-followup-input",
+          "value": "採用",
+          "activeId": "room-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "104"
+          ],
+          "visibleCheckedIds": [],
+          "resultMutations": 1,
+          "fullScreenMutations": 0
+        },
+        "afterJapaneseClear": {
+          "label": "",
+          "value": "",
+          "activeId": "room-search",
+          "selectionStart": 0,
+          "selectionEnd": 0,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "101",
+            "102",
+            "103",
+            "104"
+          ],
+          "visibleCheckedIds": [
+            "101",
+            "102"
+          ],
+          "resultMutations": 2,
+          "fullScreenMutations": 0
+        },
+        "alphaStates": [
+          {
+            "value": "14",
+            "caret": 1,
+            "expected": [],
+            "observed": {
+              "label": "14",
+              "value": "14",
+              "activeId": "room-search",
+              "selectionStart": 1,
+              "selectionEnd": 1,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [],
+              "visibleCheckedIds": [],
+              "resultMutations": 3,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "104",
+            "caret": 2,
+            "expected": [
+              "104"
+            ],
+            "observed": {
+              "label": "104",
+              "value": "104",
+              "activeId": "room-search",
+              "selectionStart": 2,
+              "selectionEnd": 2,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "104"
+              ],
+              "visibleCheckedIds": [],
+              "resultMutations": 4,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "14",
+            "caret": 1,
+            "expected": [],
+            "observed": {
+              "label": "14",
+              "value": "14",
+              "activeId": "room-search",
+              "selectionStart": 1,
+              "selectionEnd": 1,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [],
+              "visibleCheckedIds": [],
+              "resultMutations": 5,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "10",
+            "caret": 2,
+            "expected": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "observed": {
+              "label": "10",
+              "value": "10",
+              "activeId": "room-search",
+              "selectionStart": 2,
+              "selectionEnd": 2,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "101",
+                "102",
+                "103",
+                "104"
+              ],
+              "visibleCheckedIds": [
+                "101",
+                "102"
+              ],
+              "resultMutations": 6,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "",
+            "caret": 0,
+            "expected": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "observed": {
+              "label": "",
+              "value": "",
+              "activeId": "room-search",
+              "selectionStart": 0,
+              "selectionEnd": 0,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "101",
+                "102",
+                "103",
+                "104"
+              ],
+              "visibleCheckedIds": [
+                "101",
+                "102"
+              ],
+              "resultMutations": 7,
+              "fullScreenMutations": 0
+            }
+          }
+        ],
+        "selectedAfterHiddenRoundTrip": [
+          "101",
+          "102"
+        ],
+        "finalFullScreenMutations": 0
+      },
+      "layout": {
+        "url": "http://127.0.0.1:18935/?direct=rooms&independentEvaluator=1784706459335-mobile",
+        "screen": "chatwork-select-rooms",
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "dpr": 1
+        },
+        "scrollWidth": 390,
+        "overflowX": false,
+        "minActionHeight": 48,
+        "activeId": "room-search",
+        "value": "",
+        "selectionStart": 0,
+        "selectionEnd": 0
+      },
+      "tabTarget": {
+        "tag": "INPUT",
+        "id": null,
+        "type": "checkbox",
+        "action": null
+      },
+      "roundTrip": {
+        "forwardScreen": "chatwork-select-interval",
+        "before": [
+          "101",
+          "102"
+        ],
+        "after": [
+          "101",
+          "102"
+        ]
+      },
+      "runtimeErrors": [],
+      "networkErrors": [],
+      "screenshot": {
+        "file": "chatwork-mobile.png",
+        "sha256": "bb5ae5b0d34c13bd0d61d24b864db7016cca8ca01f3e674e433e2c0a50775bc6",
+        "bytes": 66950
+      },
+      "passed": true
+    },
+    {
+      "service": "Chatwork",
+      "mode": "200pct",
+      "scenario": {
+        "screen": "chatwork-select-rooms",
+        "allInitialIds": [
+          "101",
+          "102",
+          "103",
+          "104"
+        ],
+        "selectionClicks": [
+          {
+            "id": "101",
+            "action": "uncheck",
+            "checked": false
+          },
+          {
+            "id": "101",
+            "action": "check",
+            "checked": true
+          },
+          {
+            "id": "102",
+            "action": "uncheck",
+            "checked": false
+          },
+          {
+            "id": "102",
+            "action": "check",
+            "checked": true
+          }
+        ],
+        "selectedAtStart": [
+          "101",
+          "102"
+        ],
+        "composingStates": [
+          {
+            "label": "さ",
+            "value": "さ",
+            "activeId": "room-search",
+            "selectionStart": 1,
+            "selectionEnd": 1,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "visibleCheckedIds": [
+              "101",
+              "102"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          },
+          {
+            "label": "さい",
+            "value": "さい",
+            "activeId": "room-search",
+            "selectionStart": 2,
+            "selectionEnd": 2,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "visibleCheckedIds": [
+              "101",
+              "102"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          },
+          {
+            "label": "採用",
+            "value": "採用",
+            "activeId": "room-search",
+            "selectionStart": 2,
+            "selectionEnd": 2,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "visibleCheckedIds": [
+              "101",
+              "102"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          }
+        ],
+        "duringComposition": {
+          "label": "during-composition",
+          "value": "採用",
+          "activeId": "room-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "101",
+            "102",
+            "103",
+            "104"
+          ],
+          "visibleCheckedIds": [
+            "101",
+            "102"
+          ],
+          "resultMutations": 0,
+          "fullScreenMutations": 0
+        },
+        "afterComposition": {
+          "label": "after-composition",
+          "value": "採用",
+          "activeId": "room-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "104"
+          ],
+          "visibleCheckedIds": [],
+          "resultMutations": 1,
+          "fullScreenMutations": 0
+        },
+        "resultMutationsAfterCommit": 1,
+        "afterFollowupInput": {
+          "label": "after-followup-input",
+          "value": "採用",
+          "activeId": "room-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "104"
+          ],
+          "visibleCheckedIds": [],
+          "resultMutations": 1,
+          "fullScreenMutations": 0
+        },
+        "afterJapaneseClear": {
+          "label": "",
+          "value": "",
+          "activeId": "room-search",
+          "selectionStart": 0,
+          "selectionEnd": 0,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "101",
+            "102",
+            "103",
+            "104"
+          ],
+          "visibleCheckedIds": [
+            "101",
+            "102"
+          ],
+          "resultMutations": 2,
+          "fullScreenMutations": 0
+        },
+        "alphaStates": [
+          {
+            "value": "14",
+            "caret": 1,
+            "expected": [],
+            "observed": {
+              "label": "14",
+              "value": "14",
+              "activeId": "room-search",
+              "selectionStart": 1,
+              "selectionEnd": 1,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [],
+              "visibleCheckedIds": [],
+              "resultMutations": 3,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "104",
+            "caret": 2,
+            "expected": [
+              "104"
+            ],
+            "observed": {
+              "label": "104",
+              "value": "104",
+              "activeId": "room-search",
+              "selectionStart": 2,
+              "selectionEnd": 2,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "104"
+              ],
+              "visibleCheckedIds": [],
+              "resultMutations": 4,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "14",
+            "caret": 1,
+            "expected": [],
+            "observed": {
+              "label": "14",
+              "value": "14",
+              "activeId": "room-search",
+              "selectionStart": 1,
+              "selectionEnd": 1,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [],
+              "visibleCheckedIds": [],
+              "resultMutations": 5,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "10",
+            "caret": 2,
+            "expected": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "observed": {
+              "label": "10",
+              "value": "10",
+              "activeId": "room-search",
+              "selectionStart": 2,
+              "selectionEnd": 2,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "101",
+                "102",
+                "103",
+                "104"
+              ],
+              "visibleCheckedIds": [
+                "101",
+                "102"
+              ],
+              "resultMutations": 6,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "",
+            "caret": 0,
+            "expected": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "observed": {
+              "label": "",
+              "value": "",
+              "activeId": "room-search",
+              "selectionStart": 0,
+              "selectionEnd": 0,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "101",
+                "102",
+                "103",
+                "104"
+              ],
+              "visibleCheckedIds": [
+                "101",
+                "102"
+              ],
+              "resultMutations": 7,
+              "fullScreenMutations": 0
+            }
+          }
+        ],
+        "selectedAfterHiddenRoundTrip": [
+          "101",
+          "102"
+        ],
+        "finalFullScreenMutations": 0
+      },
+      "layout": {
+        "url": "http://127.0.0.1:18935/?direct=rooms&independentEvaluator=1784706459487-200pct",
+        "screen": "chatwork-select-rooms",
+        "viewport": {
+          "width": 720,
+          "height": 450,
+          "dpr": 1
+        },
+        "scrollWidth": 705,
+        "overflowX": false,
+        "minActionHeight": 48,
+        "activeId": "room-search",
+        "value": "",
+        "selectionStart": 0,
+        "selectionEnd": 0
+      },
+      "tabTarget": {
+        "tag": "INPUT",
+        "id": null,
+        "type": "checkbox",
+        "action": null
+      },
+      "roundTrip": {
+        "forwardScreen": "chatwork-select-interval",
+        "before": [
+          "101",
+          "102"
+        ],
+        "after": [
+          "101",
+          "102"
+        ]
+      },
+      "runtimeErrors": [],
+      "networkErrors": [],
+      "screenshot": {
+        "file": "chatwork-200pct.png",
+        "sha256": "be2c83232b0643e0eb95705b390de4e2c46653e33301674af2af5d62502ae34c",
+        "bytes": 70524
+      },
+      "passed": true
+    },
+    {
+      "service": "Google Chat",
+      "mode": "desktop",
+      "scenario": {
+        "screen": "google-chat-settings-select-spaces",
+        "allInitialIds": [
+          "spaces/space-a",
+          "spaces/space-b",
+          "spaces/space-c"
+        ],
+        "selectionClicks": [
+          {
+            "id": "spaces/space-a",
+            "action": "uncheck",
+            "checked": false
+          },
+          {
+            "id": "spaces/space-a",
+            "action": "check",
+            "checked": true
+          },
+          {
+            "id": "spaces/space-b",
+            "action": "uncheck",
+            "checked": false
+          },
+          {
+            "id": "spaces/space-b",
+            "action": "check",
+            "checked": true
+          }
+        ],
+        "selectedAtStart": [
+          "spaces/space-a",
+          "spaces/space-b"
+        ],
+        "composingStates": [
+          {
+            "label": "ぜ",
+            "value": "ぜ",
+            "activeId": "settings-space-search",
+            "selectionStart": 1,
+            "selectionEnd": 1,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "visibleCheckedIds": [
+              "spaces/space-a",
+              "spaces/space-b"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          },
+          {
+            "label": "ぜん",
+            "value": "ぜん",
+            "activeId": "settings-space-search",
+            "selectionStart": 2,
+            "selectionEnd": 2,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "visibleCheckedIds": [
+              "spaces/space-a",
+              "spaces/space-b"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          },
+          {
+            "label": "全社",
+            "value": "全社",
+            "activeId": "settings-space-search",
+            "selectionStart": 2,
+            "selectionEnd": 2,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "visibleCheckedIds": [
+              "spaces/space-a",
+              "spaces/space-b"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          }
+        ],
+        "duringComposition": {
+          "label": "during-composition",
+          "value": "全社",
+          "activeId": "settings-space-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "spaces/space-a",
+            "spaces/space-b",
+            "spaces/space-c"
+          ],
+          "visibleCheckedIds": [
+            "spaces/space-a",
+            "spaces/space-b"
+          ],
+          "resultMutations": 0,
+          "fullScreenMutations": 0
+        },
+        "afterComposition": {
+          "label": "after-composition",
+          "value": "全社",
+          "activeId": "settings-space-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "spaces/space-c"
+          ],
+          "visibleCheckedIds": [],
+          "resultMutations": 1,
+          "fullScreenMutations": 0
+        },
+        "resultMutationsAfterCommit": 1,
+        "afterFollowupInput": {
+          "label": "after-followup-input",
+          "value": "全社",
+          "activeId": "settings-space-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "spaces/space-c"
+          ],
+          "visibleCheckedIds": [],
+          "resultMutations": 1,
+          "fullScreenMutations": 0
+        },
+        "afterJapaneseClear": {
+          "label": "",
+          "value": "",
+          "activeId": "settings-space-search",
+          "selectionStart": 0,
+          "selectionEnd": 0,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "spaces/space-a",
+            "spaces/space-b",
+            "spaces/space-c"
+          ],
+          "visibleCheckedIds": [
+            "spaces/space-a",
+            "spaces/space-b"
+          ],
+          "resultMutations": 2,
+          "fullScreenMutations": 0
+        },
+        "alphaStates": [
+          {
+            "value": "spacec",
+            "caret": 5,
+            "expected": [],
+            "observed": {
+              "label": "spacec",
+              "value": "spacec",
+              "activeId": "settings-space-search",
+              "selectionStart": 5,
+              "selectionEnd": 5,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [],
+              "visibleCheckedIds": [],
+              "resultMutations": 3,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "space-c",
+            "caret": 6,
+            "expected": [
+              "spaces/space-c"
+            ],
+            "observed": {
+              "label": "space-c",
+              "value": "space-c",
+              "activeId": "settings-space-search",
+              "selectionStart": 6,
+              "selectionEnd": 6,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "spaces/space-c"
+              ],
+              "visibleCheckedIds": [],
+              "resultMutations": 4,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "spacec",
+            "caret": 5,
+            "expected": [],
+            "observed": {
+              "label": "spacec",
+              "value": "spacec",
+              "activeId": "settings-space-search",
+              "selectionStart": 5,
+              "selectionEnd": 5,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [],
+              "visibleCheckedIds": [],
+              "resultMutations": 5,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "space-",
+            "caret": 6,
+            "expected": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "observed": {
+              "label": "space-",
+              "value": "space-",
+              "activeId": "settings-space-search",
+              "selectionStart": 6,
+              "selectionEnd": 6,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "spaces/space-a",
+                "spaces/space-b",
+                "spaces/space-c"
+              ],
+              "visibleCheckedIds": [
+                "spaces/space-a",
+                "spaces/space-b"
+              ],
+              "resultMutations": 6,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "",
+            "caret": 0,
+            "expected": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "observed": {
+              "label": "",
+              "value": "",
+              "activeId": "settings-space-search",
+              "selectionStart": 0,
+              "selectionEnd": 0,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "spaces/space-a",
+                "spaces/space-b",
+                "spaces/space-c"
+              ],
+              "visibleCheckedIds": [
+                "spaces/space-a",
+                "spaces/space-b"
+              ],
+              "resultMutations": 7,
+              "fullScreenMutations": 0
+            }
+          }
+        ],
+        "selectedAfterHiddenRoundTrip": [
+          "spaces/space-a",
+          "spaces/space-b"
+        ],
+        "finalFullScreenMutations": 0
+      },
+      "layout": {
+        "url": "http://127.0.0.1:18936/?direct=settings-spaces&independentEvaluator=1784706459641-desktop",
+        "screen": "google-chat-settings-select-spaces",
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "dpr": 1
+        },
+        "scrollWidth": 1425,
+        "overflowX": false,
+        "minActionHeight": 44,
+        "activeId": "settings-space-search",
+        "value": "",
+        "selectionStart": 0,
+        "selectionEnd": 0
+      },
+      "tabTarget": {
+        "tag": "BUTTON",
+        "id": null,
+        "type": "button",
+        "action": "clear"
+      },
+      "roundTrip": {
+        "forwardScreen": "google-chat-settings-select-interval",
+        "before": [
+          "spaces/space-a",
+          "spaces/space-b"
+        ],
+        "after": [
+          "spaces/space-a",
+          "spaces/space-b"
+        ]
+      },
+      "runtimeErrors": [],
+      "networkErrors": [],
+      "screenshot": {
+        "file": "google-chat-desktop.png",
+        "sha256": "d080db7e41f431643ef1dd68129ec7007412a98cdeb39ea63fbac0b93b72661d",
+        "bytes": 91205
+      },
+      "passed": true
+    },
+    {
+      "service": "Google Chat",
+      "mode": "mobile",
+      "scenario": {
+        "screen": "google-chat-settings-select-spaces",
+        "allInitialIds": [
+          "spaces/space-a",
+          "spaces/space-b",
+          "spaces/space-c"
+        ],
+        "selectionClicks": [
+          {
+            "id": "spaces/space-a",
+            "action": "uncheck",
+            "checked": false
+          },
+          {
+            "id": "spaces/space-a",
+            "action": "check",
+            "checked": true
+          },
+          {
+            "id": "spaces/space-b",
+            "action": "uncheck",
+            "checked": false
+          },
+          {
+            "id": "spaces/space-b",
+            "action": "check",
+            "checked": true
+          }
+        ],
+        "selectedAtStart": [
+          "spaces/space-a",
+          "spaces/space-b"
+        ],
+        "composingStates": [
+          {
+            "label": "ぜ",
+            "value": "ぜ",
+            "activeId": "settings-space-search",
+            "selectionStart": 1,
+            "selectionEnd": 1,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "visibleCheckedIds": [
+              "spaces/space-a",
+              "spaces/space-b"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          },
+          {
+            "label": "ぜん",
+            "value": "ぜん",
+            "activeId": "settings-space-search",
+            "selectionStart": 2,
+            "selectionEnd": 2,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "visibleCheckedIds": [
+              "spaces/space-a",
+              "spaces/space-b"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          },
+          {
+            "label": "全社",
+            "value": "全社",
+            "activeId": "settings-space-search",
+            "selectionStart": 2,
+            "selectionEnd": 2,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "visibleCheckedIds": [
+              "spaces/space-a",
+              "spaces/space-b"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          }
+        ],
+        "duringComposition": {
+          "label": "during-composition",
+          "value": "全社",
+          "activeId": "settings-space-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "spaces/space-a",
+            "spaces/space-b",
+            "spaces/space-c"
+          ],
+          "visibleCheckedIds": [
+            "spaces/space-a",
+            "spaces/space-b"
+          ],
+          "resultMutations": 0,
+          "fullScreenMutations": 0
+        },
+        "afterComposition": {
+          "label": "after-composition",
+          "value": "全社",
+          "activeId": "settings-space-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "spaces/space-c"
+          ],
+          "visibleCheckedIds": [],
+          "resultMutations": 1,
+          "fullScreenMutations": 0
+        },
+        "resultMutationsAfterCommit": 1,
+        "afterFollowupInput": {
+          "label": "after-followup-input",
+          "value": "全社",
+          "activeId": "settings-space-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "spaces/space-c"
+          ],
+          "visibleCheckedIds": [],
+          "resultMutations": 1,
+          "fullScreenMutations": 0
+        },
+        "afterJapaneseClear": {
+          "label": "",
+          "value": "",
+          "activeId": "settings-space-search",
+          "selectionStart": 0,
+          "selectionEnd": 0,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "spaces/space-a",
+            "spaces/space-b",
+            "spaces/space-c"
+          ],
+          "visibleCheckedIds": [
+            "spaces/space-a",
+            "spaces/space-b"
+          ],
+          "resultMutations": 2,
+          "fullScreenMutations": 0
+        },
+        "alphaStates": [
+          {
+            "value": "spacec",
+            "caret": 5,
+            "expected": [],
+            "observed": {
+              "label": "spacec",
+              "value": "spacec",
+              "activeId": "settings-space-search",
+              "selectionStart": 5,
+              "selectionEnd": 5,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [],
+              "visibleCheckedIds": [],
+              "resultMutations": 3,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "space-c",
+            "caret": 6,
+            "expected": [
+              "spaces/space-c"
+            ],
+            "observed": {
+              "label": "space-c",
+              "value": "space-c",
+              "activeId": "settings-space-search",
+              "selectionStart": 6,
+              "selectionEnd": 6,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "spaces/space-c"
+              ],
+              "visibleCheckedIds": [],
+              "resultMutations": 4,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "spacec",
+            "caret": 5,
+            "expected": [],
+            "observed": {
+              "label": "spacec",
+              "value": "spacec",
+              "activeId": "settings-space-search",
+              "selectionStart": 5,
+              "selectionEnd": 5,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [],
+              "visibleCheckedIds": [],
+              "resultMutations": 5,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "space-",
+            "caret": 6,
+            "expected": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "observed": {
+              "label": "space-",
+              "value": "space-",
+              "activeId": "settings-space-search",
+              "selectionStart": 6,
+              "selectionEnd": 6,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "spaces/space-a",
+                "spaces/space-b",
+                "spaces/space-c"
+              ],
+              "visibleCheckedIds": [
+                "spaces/space-a",
+                "spaces/space-b"
+              ],
+              "resultMutations": 6,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "",
+            "caret": 0,
+            "expected": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "observed": {
+              "label": "",
+              "value": "",
+              "activeId": "settings-space-search",
+              "selectionStart": 0,
+              "selectionEnd": 0,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "spaces/space-a",
+                "spaces/space-b",
+                "spaces/space-c"
+              ],
+              "visibleCheckedIds": [
+                "spaces/space-a",
+                "spaces/space-b"
+              ],
+              "resultMutations": 7,
+              "fullScreenMutations": 0
+            }
+          }
+        ],
+        "selectedAfterHiddenRoundTrip": [
+          "spaces/space-a",
+          "spaces/space-b"
+        ],
+        "finalFullScreenMutations": 0
+      },
+      "layout": {
+        "url": "http://127.0.0.1:18936/?direct=settings-spaces&independentEvaluator=1784706459798-mobile",
+        "screen": "google-chat-settings-select-spaces",
+        "viewport": {
+          "width": 390,
+          "height": 844,
+          "dpr": 1
+        },
+        "scrollWidth": 390,
+        "overflowX": false,
+        "minActionHeight": 44,
+        "activeId": "settings-space-search",
+        "value": "",
+        "selectionStart": 0,
+        "selectionEnd": 0
+      },
+      "tabTarget": {
+        "tag": "BUTTON",
+        "id": null,
+        "type": "button",
+        "action": "clear"
+      },
+      "roundTrip": {
+        "forwardScreen": "google-chat-settings-select-interval",
+        "before": [
+          "spaces/space-a",
+          "spaces/space-b"
+        ],
+        "after": [
+          "spaces/space-a",
+          "spaces/space-b"
+        ]
+      },
+      "runtimeErrors": [],
+      "networkErrors": [],
+      "screenshot": {
+        "file": "google-chat-mobile.png",
+        "sha256": "13d1cab7ddd27dac202e2c27f76490c67cb626cb79c57f760cc680d7a311eb12",
+        "bytes": 71482
+      },
+      "passed": true
+    },
+    {
+      "service": "Google Chat",
+      "mode": "200pct",
+      "scenario": {
+        "screen": "google-chat-settings-select-spaces",
+        "allInitialIds": [
+          "spaces/space-a",
+          "spaces/space-b",
+          "spaces/space-c"
+        ],
+        "selectionClicks": [
+          {
+            "id": "spaces/space-a",
+            "action": "uncheck",
+            "checked": false
+          },
+          {
+            "id": "spaces/space-a",
+            "action": "check",
+            "checked": true
+          },
+          {
+            "id": "spaces/space-b",
+            "action": "uncheck",
+            "checked": false
+          },
+          {
+            "id": "spaces/space-b",
+            "action": "check",
+            "checked": true
+          }
+        ],
+        "selectedAtStart": [
+          "spaces/space-a",
+          "spaces/space-b"
+        ],
+        "composingStates": [
+          {
+            "label": "ぜ",
+            "value": "ぜ",
+            "activeId": "settings-space-search",
+            "selectionStart": 1,
+            "selectionEnd": 1,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "visibleCheckedIds": [
+              "spaces/space-a",
+              "spaces/space-b"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          },
+          {
+            "label": "ぜん",
+            "value": "ぜん",
+            "activeId": "settings-space-search",
+            "selectionStart": 2,
+            "selectionEnd": 2,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "visibleCheckedIds": [
+              "spaces/space-a",
+              "spaces/space-b"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          },
+          {
+            "label": "全社",
+            "value": "全社",
+            "activeId": "settings-space-search",
+            "selectionStart": 2,
+            "selectionEnd": 2,
+            "sameInputNode": true,
+            "sameScreen": true,
+            "displayedIds": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "visibleCheckedIds": [
+              "spaces/space-a",
+              "spaces/space-b"
+            ],
+            "resultMutations": 0,
+            "fullScreenMutations": 0
+          }
+        ],
+        "duringComposition": {
+          "label": "during-composition",
+          "value": "全社",
+          "activeId": "settings-space-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "spaces/space-a",
+            "spaces/space-b",
+            "spaces/space-c"
+          ],
+          "visibleCheckedIds": [
+            "spaces/space-a",
+            "spaces/space-b"
+          ],
+          "resultMutations": 0,
+          "fullScreenMutations": 0
+        },
+        "afterComposition": {
+          "label": "after-composition",
+          "value": "全社",
+          "activeId": "settings-space-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "spaces/space-c"
+          ],
+          "visibleCheckedIds": [],
+          "resultMutations": 1,
+          "fullScreenMutations": 0
+        },
+        "resultMutationsAfterCommit": 1,
+        "afterFollowupInput": {
+          "label": "after-followup-input",
+          "value": "全社",
+          "activeId": "settings-space-search",
+          "selectionStart": 2,
+          "selectionEnd": 2,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "spaces/space-c"
+          ],
+          "visibleCheckedIds": [],
+          "resultMutations": 1,
+          "fullScreenMutations": 0
+        },
+        "afterJapaneseClear": {
+          "label": "",
+          "value": "",
+          "activeId": "settings-space-search",
+          "selectionStart": 0,
+          "selectionEnd": 0,
+          "sameInputNode": true,
+          "sameScreen": true,
+          "displayedIds": [
+            "spaces/space-a",
+            "spaces/space-b",
+            "spaces/space-c"
+          ],
+          "visibleCheckedIds": [
+            "spaces/space-a",
+            "spaces/space-b"
+          ],
+          "resultMutations": 2,
+          "fullScreenMutations": 0
+        },
+        "alphaStates": [
+          {
+            "value": "spacec",
+            "caret": 5,
+            "expected": [],
+            "observed": {
+              "label": "spacec",
+              "value": "spacec",
+              "activeId": "settings-space-search",
+              "selectionStart": 5,
+              "selectionEnd": 5,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [],
+              "visibleCheckedIds": [],
+              "resultMutations": 3,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "space-c",
+            "caret": 6,
+            "expected": [
+              "spaces/space-c"
+            ],
+            "observed": {
+              "label": "space-c",
+              "value": "space-c",
+              "activeId": "settings-space-search",
+              "selectionStart": 6,
+              "selectionEnd": 6,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "spaces/space-c"
+              ],
+              "visibleCheckedIds": [],
+              "resultMutations": 4,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "spacec",
+            "caret": 5,
+            "expected": [],
+            "observed": {
+              "label": "spacec",
+              "value": "spacec",
+              "activeId": "settings-space-search",
+              "selectionStart": 5,
+              "selectionEnd": 5,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [],
+              "visibleCheckedIds": [],
+              "resultMutations": 5,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "space-",
+            "caret": 6,
+            "expected": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "observed": {
+              "label": "space-",
+              "value": "space-",
+              "activeId": "settings-space-search",
+              "selectionStart": 6,
+              "selectionEnd": 6,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "spaces/space-a",
+                "spaces/space-b",
+                "spaces/space-c"
+              ],
+              "visibleCheckedIds": [
+                "spaces/space-a",
+                "spaces/space-b"
+              ],
+              "resultMutations": 6,
+              "fullScreenMutations": 0
+            }
+          },
+          {
+            "value": "",
+            "caret": 0,
+            "expected": [
+              "spaces/space-a",
+              "spaces/space-b",
+              "spaces/space-c"
+            ],
+            "observed": {
+              "label": "",
+              "value": "",
+              "activeId": "settings-space-search",
+              "selectionStart": 0,
+              "selectionEnd": 0,
+              "sameInputNode": true,
+              "sameScreen": true,
+              "displayedIds": [
+                "spaces/space-a",
+                "spaces/space-b",
+                "spaces/space-c"
+              ],
+              "visibleCheckedIds": [
+                "spaces/space-a",
+                "spaces/space-b"
+              ],
+              "resultMutations": 7,
+              "fullScreenMutations": 0
+            }
+          }
+        ],
+        "selectedAfterHiddenRoundTrip": [
+          "spaces/space-a",
+          "spaces/space-b"
+        ],
+        "finalFullScreenMutations": 0
+      },
+      "layout": {
+        "url": "http://127.0.0.1:18936/?direct=settings-spaces&independentEvaluator=1784706459951-200pct",
+        "screen": "google-chat-settings-select-spaces",
+        "viewport": {
+          "width": 720,
+          "height": 450,
+          "dpr": 1
+        },
+        "scrollWidth": 705,
+        "overflowX": false,
+        "minActionHeight": 44,
+        "activeId": "settings-space-search",
+        "value": "",
+        "selectionStart": 0,
+        "selectionEnd": 0
+      },
+      "tabTarget": {
+        "tag": "BUTTON",
+        "id": null,
+        "type": "button",
+        "action": "clear"
+      },
+      "roundTrip": {
+        "forwardScreen": "google-chat-settings-select-interval",
+        "before": [
+          "spaces/space-a",
+          "spaces/space-b"
+        ],
+        "after": [
+          "spaces/space-a",
+          "spaces/space-b"
+        ]
+      },
+      "runtimeErrors": [],
+      "networkErrors": [],
+      "screenshot": {
+        "file": "google-chat-200pct.png",
+        "sha256": "4e750885c095b7e4c060b9ea64813bcf002b1d8a5ef16bd26b6c6474de98ef59",
+        "bytes": 74603
+      },
+      "passed": true
+    }
+  ],
+  "externalLive": {
+    "chatworkApi": "not-run",
+    "googleChatApi": "not-run",
+    "oauth": "not-run",
+    "repositorySecret": "not-run",
+    "githubActions": "not-run",
+    "upstreamRemoteWrite": "not-run",
+    "originRemoteWrite": "not-run"
+  },
+  "runtimeErrors": [],
+  "networkErrors": [],
+  "passed": true
+}

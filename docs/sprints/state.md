@@ -2,12 +2,12 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-035
+- Current ID: sprint-035-patch-001
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 4
-- Model Tier: standard
-- Rotate: none
+- Lineage Dispatches: 6
+- Model Tier: strong
+- Rotate: model-availability
 - Next Planned: TBD
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
@@ -62,11 +62,15 @@
 | sprint-033 | done | [contract](sprint-033.md) | [progress](../progress/sprint-033.md) | [feedback](../feedback/sprint-033.md) |
 | sprint-034 | done | [contract](sprint-034.md) | [progress](../progress/sprint-034.md) | [feedback](../feedback/sprint-034.md) |
 | sprint-035 | done-by-user-decision | [contract](sprint-035.md) | [progress](../progress/sprint-035.md) | [feedback](../feedback/sprint-035.md) |
+| sprint-035-patch-001 | done | [contract](sprint-035-patch-001.md) | [progress](../progress/sprint-035-patch-001.md) | [feedback](../feedback/sprint-035-patch-001.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 
 ## Completion
+- 2026-07-22: sprint-035-patch-001はfresh独立Evaluatorで75/75 PASS。固定同期元`1cf2ae6`、Yasashii candidate `44066b9`、managed 229、未分類0、共有3 asset byte一致、apply／reapply差分0、実DOM 6/6、統合11/11、Yasashii固有面digest不変を確認し、product finding 0件でdone。実API／OAuth／Secrets／Actions／remote writeはnot-run。verification-infra Minor 2件はfeedbackへ分離記録した。
+- 2026-07-22: sprint-035-patch-001 GeneratorがAgentic合格candidate `1cf2ae6` を宣言済みoverlayで同期し、Yasashii candidate `44066b9` を作成。managed 229 path、未分類0、再適用差分0、共有wizard 3 asset byte一致、Yasashii固有面不変、統合11/11と実browser 6条件PASSで引き渡したため、statusをawaiting-eval、Lineage Dispatchesを6としてfresh Evaluatorへ進める。
+- 2026-07-22: Agentic正本のsprint-035-patch-001がcandidate `1cf2ae6` で独立評価PASS。Yasashii下流同期Patchを開始する。標準Generator `gpt-5.6-luna` は同一hostで子Agent作成前に拒否済みのため、resolver指定の可用性fallback `gpt-5.6-sol`／high、Model Tier strong、Rotate model-availability、Lineage Dispatches 5としてfresh Generatorへ引き渡す。
 - 2026-07-22: 最終main `1558dfc`で0.8.0の両manifest、host-neutral root、Codex host分岐、Sprint 035を重点再確認。Agenticの製品merge `95247b6`は記録済みbase `b32cb33`とtree hashが完全一致し、完了記録を整合した最終main `891eabc`をoverlay基準として再評価する。
 - 2026-07-22: ユーザーが実OAuth・Google／Microsoft／Notion connector認証をRelease必須から外し、軽量確認での出荷を明示選択した。内部独立評価72/75 PASSと今回の重点回帰を採用し、未実施項目をfeedbackのexternal live gate記録に保持したままSprint 035を `done-by-user-decision` とする。
 - 2026-07-16: sprint-008〜012 と `sprint-012-patch-001` はすべて独立Evaluator評価に合格。Next Planned は `TBD`。

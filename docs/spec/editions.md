@@ -53,6 +53,9 @@ edition差分は次の4面に限定する。
 
 Chatwork／Google Chat wizardはcommon by design、つまり意図的に共通である。wizardの文言をedition可変copyへ入れない。
 4面の内容差は維持するが、どちらのeditionも複数要素を改行なしの平文へ連結しない。可読性はedition差分ではない。
+共通wizardの挙動修正は `agentic-secretary` を正本として先に成立させ、`yasashii-secretary` は宣言済みの
+overlay同期で取り込む。下流だけの手修正でwizardを分岐させず、同期後もyasashii固有の会話copy、identity、
+配布metadata、repo-owned docsを上流値で置換しない。
 
 ## 正式対象ホストとhost adapter
 
@@ -268,6 +271,8 @@ Git、設定、ledger、migrationへ副作用0件で停止する。
 
 同期は宣言されたfileとfieldだけを合成する。上流fileの未分類追加・削除、anchor不在、allowlist外変更、
 二回適用で差分が出る非冪等性、つまり同じ同期を繰り返すと結果が変わる状態は失敗にする。
+Chatwork／Google Chatの共有wizard assetを同期した場合は、DOM、copy、検索・選択挙動、OAuth／session境界の
+一致を確認し、edition固有surfaceの開始前後digestが変わらないことを下流側の独立回帰で証明する。
 
 ## 公開gate
 

@@ -318,6 +318,9 @@ Chatworkと同じ共通wizard骨格を使い、全画面の可視見出しとacc
 - cross-origin、session不一致、Content-Type不一致は「設定画面を開き直してください」のように、何が起きたかと次の操作を示す。内部のsession値、OAuth state、callback URLは表示しない。
 - 画面遷移、非同期成功、失敗、キャンセル、再試行後は、新しい画面の見出しまたは主領域へfocusを移す。スクリーンリーダーには現在の画面名と結果が伝わり、keyboard利用者はTabを最初から巡回し直さなくてよい。
 - 検索欄への入力、checkbox／radioの選択、details開閉等、同じ画面内の再描画では現在の操作focusを保つ。毎回先頭へ戻して入力を妨げない。
+- Chatwork／Google Chatの検索欄は、日本語IMEの `compositionstart` から `compositionend` まで変換中の文字列を保持し、
+  `input` のたびに検索欄を含む画面全体を作り直さない。確定後に一覧を絞り込み、英数字入力、連続編集、途中挿入、
+  Backspaceでもfocus、caret位置、既存checkbox選択を保つ。検索で一時的に非表示になった選択を解除しない。
 
 ### 操作領域
 
