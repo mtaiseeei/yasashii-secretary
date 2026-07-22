@@ -178,10 +178,15 @@ try {
     const anchorPath = join(fixtureDownstream, "secretary-overlay/anchors.json");
     const original = readFileSync(anchorPath, "utf8");
     const altered = JSON.parse(original);
-    altered.anchors[0].match = "missing anchor text";
-    writeFileSync(anchorPath, `${JSON.stringify(altered, null, 2)}\n`);
-    assert.match(run(["--check", "--root", fixtureDownstream, "--candidate", fixtureCandidate], 1), /anchor plain-language-active-style expected once, found 0/);
-    writeFileSync(anchorPath, original);
+    const target = altered.anchors.find((entry) => entry.id === "plain-language-active-style");
+    assert.ok(target, "plain-language anchor must be declared");
+    target.match = "missing anchor text";
+    try {
+      writeFileSync(anchorPath, `${JSON.stringify(altered, null, 2)}\n`);
+      assert.match(run(["--check", "--root", fixtureDownstream, "--candidate", fixtureCandidate], 1), /anchor plain-language-active-style expected once, found 0/);
+    } finally {
+      writeFileSync(anchorPath, original);
+    }
   });
 
   check("metadata change outside the allowlist result is rejected", () => {
@@ -189,9 +194,12 @@ try {
     const original = readFileSync(manifestPath, "utf8");
     const changed = JSON.parse(original);
     changed.version = "9.9.9";
-    writeFileSync(manifestPath, `${JSON.stringify(changed, null, 2)}\n`);
-    assert.match(run(["--check", "--root", fixtureDownstream, "--candidate", fixtureCandidate], 1), /plugin\.json:bytes/);
-    writeFileSync(manifestPath, original);
+    try {
+      writeFileSync(manifestPath, `${JSON.stringify(changed, null, 2)}\n`);
+      assert.match(run(["--check", "--root", fixtureDownstream, "--candidate", fixtureCandidate], 1), /plugin\.json:bytes/);
+    } finally {
+      writeFileSync(manifestPath, original);
+    }
   });
 
   check("upstream advance is a distinct exit 2 warning", () => {

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "repository": "https://github.com/mtaiseeei/agentic-secretary.git",
   "fetchRemoteName": "upstream",
-  "baseCommit": "891eabcc03315d1a1b5c6dbff3a44d2eb0a8be20",
+  "baseCommit": "1cf2ae690a39ef822d204624d53ee183b386f715",
   "neutralizationCommit": "52016cf10c1c5587fbd83ff2faf3888e29282d5e",
   "releaseCandidate": "0.8.0",
   "externalLiveGate": "external-live-gate-unavailable",

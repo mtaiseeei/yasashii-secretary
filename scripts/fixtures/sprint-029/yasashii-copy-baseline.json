@@ -35,9 +35,9 @@
     }
   },
   "wizardAssets": {
-    "plugins/secretary/skills/chatwork/assets/wizard/app.js": "4b0d5350569516044fd5cd89c62d7b9a734a10dc009db455dc40bfe143e070a1",
-    "plugins/secretary/skills/google-chat/assets/wizard/app.js": "de6d6a95e46910e4f1e52bbc8df60d4bb5f4beda3b56a6e1a19bbf5b3d6e90d1",
-    "plugins/secretary/skills/chatwork/assets/wizard/common.js": "beda14d03d611af725c46ac1e3d9f4fad9af924aef30d2db69dfe118ccc2cb41",
+    "plugins/secretary/skills/chatwork/assets/wizard/app.js": "e8e31880b67953b0acdb364c74d18728938867c42c69a43b725874b4d5b83d3e",
+    "plugins/secretary/skills/google-chat/assets/wizard/app.js": "c8d71dac2faca9caad5eaa63b7d63370bc6f368f7bf3dcf7cb5a86c84b2a185f",
+    "plugins/secretary/skills/chatwork/assets/wizard/common.js": "486479597dd497ffce85a41005ec4f6173c5da2ffaa51fa2df128fd83b762908",
     "plugins/secretary/skills/chatwork/assets/wizard/result-model.js": "9adffbc1a8b94213cc7ee7b756dd0db68b4f7b96212b5a10af24b1a489710e0d",
     "plugins/secretary/skills/chatwork/assets/wizard/style.css": "37172c51374e94fc92d0c7d0aac48434eaa06a22e2a83bc30f6bc790ea30c207"
   }

@@ -1,4 +1,4 @@
-import { installWizardShell, nowCopy, renderWizardScreen, safetyList, technicalDetails } from "/common.js";
+import { bindWizardSearch, installWizardShell, nowCopy, renderWizardScreen, safetyList, technicalDetails } from "/common.js";
 import { chatworkInitialResultModel } from "/result-model.js";
 
 const { app } = installWizardShell("chatwork");
@@ -139,16 +139,44 @@ async function discoverRooms() {
 
 function renderRooms() {
   state.step = 1; progress(1);
-  const shown = state.rooms.filter((room) => room.name.toLocaleLowerCase("ja").includes(state.query.toLocaleLowerCase("ja")) || room.roomId.includes(state.query));
+  const shown = filteredRooms();
   show("select-rooms", `<p class="eyebrow">設定 1 / 4</p><h1>保存するChatworkルームを選びます。</h1>${nowCopy("保存したいChatworkルームにチェックを入れます。")}
     <div class="panel"><label class="search-label" for="room-search">ルームを検索</label><input class="search" id="room-search" type="search" value="${escape(state.query)}" placeholder="ルーム名またはルームID">
-    <ul class="room-list">${shown.map((room) => `<li><label class="choice"><input data-focus-key="room-${escape(room.roomId)}" type="checkbox" value="${escape(room.roomId)}" ${state.selected.has(room.roomId) ? "checked" : ""}><span class="choice-copy"><span class="choice-title">${escape(room.name)}</span></span></label></li>`).join("")}</ul>
-    <p class="hint" role="status">選択中: ${state.selected.size}ルーム</p>${technicalDetails("管理者向け: ルームを識別する番号", `<ul>${shown.map((room) => `<li>${escape(room.name)}: <code>${escape(room.roomId)}</code></li>`).join("")}</ul>`, "admin")}</div><p class="notice">選んだルームだけを読みます。選んでいないルームは読みません。</p>${actions("Chatworkの取得間隔を選ぶ", "Chatworkの設定をキャンセル")}`);
-  app.querySelector("#room-search").addEventListener("input", (event) => { state.query = event.target.value; renderRooms(); app.querySelector("#room-search").focus(); });
-  app.querySelectorAll('input[type="checkbox"]').forEach((input) => input.addEventListener("change", () => { input.checked ? state.selected.add(input.value) : state.selected.delete(input.value); renderRooms(); }));
+    <ul class="room-list" data-search-results>${roomResultsHtml(shown)}</ul>
+    <p class="hint" data-selected-count role="status">選択中: ${state.selected.size}ルーム</p>${technicalDetails("管理者向け: ルームを識別する番号", `<ul data-search-identifiers>${roomIdentifiersHtml(shown)}</ul>`, "admin")}</div><p class="notice">選んだルームだけを読みます。選んでいないルームは読みません。</p>${actions("Chatworkの取得間隔を選ぶ", "Chatworkの設定をキャンセル")}`);
+  bindWizardSearch(app.querySelector("#room-search"), { setQuery: (value) => { state.query = value; }, renderResults: renderRoomResults });
+  bindRoomCheckboxes();
   app.querySelector('[data-action="next"]').disabled = state.selected.size === 0;
   app.querySelector('[data-action="next"]').onclick = renderFrequency;
   app.querySelector('[data-action="back"]').onclick = renderCancelled;
+}
+
+function filteredRooms() {
+  const query = state.query.toLocaleLowerCase("ja");
+  return state.rooms.filter((room) => room.name.toLocaleLowerCase("ja").includes(query) || room.roomId.includes(state.query));
+}
+
+function roomResultsHtml(rooms) {
+  return rooms.map((room) => `<li><label class="choice"><input data-focus-key="room-${escape(room.roomId)}" type="checkbox" value="${escape(room.roomId)}" ${state.selected.has(room.roomId) ? "checked" : ""}><span class="choice-copy"><span class="choice-title">${escape(room.name)}</span></span></label></li>`).join("");
+}
+
+function roomIdentifiersHtml(rooms) {
+  return rooms.map((room) => `<li>${escape(room.name)}: <code>${escape(room.roomId)}</code></li>`).join("");
+}
+
+function bindRoomCheckboxes() {
+  app.querySelectorAll('[data-search-results] input[type="checkbox"]').forEach((input) => input.addEventListener("change", () => {
+    input.checked ? state.selected.add(input.value) : state.selected.delete(input.value);
+    app.querySelector("[data-selected-count]").textContent = `選択中: ${state.selected.size}ルーム`;
+    app.querySelector('[data-action="next"]').disabled = state.selected.size === 0;
+  }));
+}
+
+function renderRoomResults() {
+  const shown = filteredRooms();
+  app.querySelector("[data-search-results]").innerHTML = roomResultsHtml(shown);
+  app.querySelector("[data-search-identifiers]").innerHTML = roomIdentifiersHtml(shown);
+  bindRoomCheckboxes();
 }
 
 function renderFrequency() {

@@ -65,6 +65,7 @@ const matchesAny = (path, patterns) => patterns.some((pattern) => globRegex(patt
 
 function classify(path) {
   if (matchesAny(path, downstreamOwned.patterns)) return "repo-owned";
+  if ((mapping.common || []).includes(path)) return "common";
   if (mapping.metadataOverlay.includes(path)) return "metadata-overlay";
   if (mapping.anchorOverlay.includes(path)) return "anchor-overlay";
   if (matchesAny(path, mapping.upstreamOnly)) return "upstream-only";

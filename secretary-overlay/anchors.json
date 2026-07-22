@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "anchors": [
     {
+      "id": "sprint-035-patch-001-yasashii-regression-routing",
+      "path": "scripts/sprint-035-patch-001-regression.sh",
+      "match": "check \"edition境界回帰\" node \"$ROOT/scripts/sprint-033-test.mjs\"",
+      "replacement": "check \"Yasashii overlay／edition境界回帰\" node \"$ROOT/scripts/sprint-034-test.mjs\" \"${AGENTIC_SECRETARY_CANDIDATE:-/Users/taisei/workspace/agentic-secretary}\"\ncheck \"Yasashii会話可読性回帰\" bash \"$ROOT/scripts/sprint-032-patch-001-regression.sh\"\ncheck \"Yasashii host-neutral会話回帰\" bash \"$ROOT/scripts/sprint-032-patch-002-regression.sh\""
+    },
+    {
       "id": "plain-language-active-style",
       "path": "plugins/secretary/rules/plain-language.md",
       "match": "4. [`styles/agentic.md`](styles/agentic.md) — agenticの技術的に直接的な会話、診断、報告\n5. [`copy/agentic.json`](copy/agentic.json) — 会話、診断、報告、developer handoffの可変copy\n\n`secretary/memory/preferences.md` は最後に読み、agentic styleが許可した口調だけへ適用します。\n設定が無い、空、一部欠損の場合はagenticの既定値へ戻ります。",

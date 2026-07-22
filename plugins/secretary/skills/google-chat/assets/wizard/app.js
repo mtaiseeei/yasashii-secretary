@@ -1,4 +1,4 @@
-import { escapeHtml as escape, externalLink, installWizardShell, nowCopy, renderWizardScreen, safetyList, setProgress as progress, technicalDetails, wizardActions as actions } from "/common.js";
+import { bindWizardSearch, escapeHtml as escape, externalLink, installWizardShell, nowCopy, renderWizardScreen, safetyList, setProgress as progress, technicalDetails, wizardActions as actions } from "/common.js";
 import { cleanupDescription } from "/cleanup.js";
 
 const { app } = installWizardShell("google-chat");
@@ -165,14 +165,62 @@ function renderNoSpaces(cleanup) {
 
 function renderSpaces() {
   progress(1);
-  const shown = state.spaces.filter((space) => `${space.displayName} ${space.name}`.toLocaleLowerCase("ja").includes(state.query.toLocaleLowerCase("ja")));
+  const shown = filteredSpaces();
   show("select-spaces", `<p class="eyebrow">設定 1 / 4</p><h1>保存するGoogle Chatスペースを選びます。</h1>${nowCopy("保存したい通常スペースにチェックを入れます。")}
-    <div class="panel"><label class="search-label" for="space-search">通常スペースを検索</label><input class="search" id="space-search" type="search" value="${escape(state.query)}" placeholder="スペース名"><button class="text-button" data-action="clear" type="button" aria-label="Google Chatスペースの選択をすべて外す">選択をすべて外す</button><ul class="room-list">${shown.map((space) => `<li><label class="choice"><input data-focus-key="space-${escape(space.name)}" type="checkbox" value="${escape(space.name)}" ${state.selected.has(space.name) ? "checked" : ""}><span class="choice-copy"><span class="choice-title">${escape(space.displayName)}</span></span></label></li>`).join("")}</ul><p class="hint" role="status">選択中: ${state.selected.size}スペース</p>${technicalDetails("管理者向け: スペースの識別子", `<ul>${shown.map((space) => `<li>${escape(space.displayName)}: <code>${escape(space.name)}</code></li>`).join("")}</ul>`, "admin")}</div><p class="notice">選んだ通常スペースだけを読みます。ダイレクトメッセージとグループDMは対象外です。</p>${actions("Google Chatの取得間隔を選ぶ", "Google Chatの設定をキャンセル")}`);
-  app.querySelector("#space-search").oninput = (event) => { state.query = event.target.value; renderSpaces(); app.querySelector("#space-search").focus(); };
-  app.querySelector('[data-action="clear"]').onclick = () => { state.selected.clear(); renderSpaces(); };
-  app.querySelectorAll('.room-list input[type="checkbox"]').forEach((input) => input.onchange = () => { input.checked ? state.selected.add(input.value) : state.selected.delete(input.value); renderSpaces(); });
+    <div class="panel"><label class="search-label" for="space-search">通常スペースを検索</label><input class="search" id="space-search" data-focus-key="space-search" type="search" value="${escape(state.query)}" placeholder="スペース名"><button class="text-button" data-action="clear" type="button" aria-label="Google Chatスペースの選択をすべて外す">選択をすべて外す</button><ul class="room-list" data-search-results>${spaceResultsHtml(shown, "space-")}</ul><p class="hint" data-selected-count role="status">選択中: ${state.selected.size}スペース</p>${technicalDetails("管理者向け: スペースの識別子", `<ul data-search-identifiers>${spaceIdentifiersHtml(shown)}</ul>`, "admin")}</div><p class="notice">選んだ通常スペースだけを読みます。ダイレクトメッセージとグループDMは対象外です。</p>${actions("Google Chatの取得間隔を選ぶ", "Google Chatの設定をキャンセル")}`);
+  bindSpaceSearch("#space-search", "space-");
+  app.querySelector('[data-action="clear"]').onclick = () => { state.selected.clear(); renderSpaceResults("space-"); };
   const next = app.querySelector('[data-action="next"]'); next.disabled = state.selected.size === 0; next.onclick = renderFrequency;
   app.querySelector('[data-action="back"]').onclick = cancel;
+}
+
+function filteredSpaces() {
+  const query = state.query.toLocaleLowerCase("ja");
+  return state.spaces.filter((space) => `${space.displayName} ${space.name}`.toLocaleLowerCase("ja").includes(query));
+}
+
+function spaceResultsHtml(spaces, focusPrefix) {
+  return spaces.map((space) => `<li><label class="choice"><input data-focus-key="${focusPrefix}${escape(space.name)}" type="checkbox" value="${escape(space.name)}" ${state.selected.has(space.name) ? "checked" : ""}><span class="choice-copy"><span class="choice-title">${escape(space.displayName)}</span></span></label></li>`).join("");
+}
+
+function spaceIdentifiersHtml(spaces) {
+  return spaces.map((space) => `<li>${escape(space.displayName)}: <code>${escape(space.name)}</code></li>`).join("");
+}
+
+function bindSpaceCheckboxes() {
+  app.querySelectorAll('[data-search-results] input[type="checkbox"]').forEach((input) => input.onchange = () => {
+    input.checked ? state.selected.add(input.value) : state.selected.delete(input.value);
+    updateSpaceSelectionState();
+  });
+}
+
+function updateSpaceSelectionState() {
+  app.querySelector("[data-selected-count]").textContent = `選択中: ${state.selected.size}スペース`;
+  const next = app.querySelector('[data-action="next"]');
+  if (next && app.dataset.screen === "google-chat-select-spaces") next.disabled = state.selected.size === 0;
+  if (next && app.dataset.screen === "google-chat-settings-select-spaces") {
+    const noSelection = state.selected.size === 0;
+    const label = noSelection ? "取得の停止方法を確認する" : "取得間隔を確認する";
+    next.textContent = label;
+    next.setAttribute("aria-label", `Google Chatの${label}`);
+    const notice = app.querySelector("[data-selection-notice]");
+    notice.textContent = noSelection
+      ? "0件のまま手動のみを選ぶと、今後の取得を止めます。取得済み履歴は削除しません。"
+      : "選択を外したスペースは今後読みません。取得済み履歴は削除しません。";
+  }
+}
+
+function renderSpaceResults(focusPrefix) {
+  const shown = filteredSpaces();
+  app.querySelector("[data-search-results]").innerHTML = spaceResultsHtml(shown, focusPrefix);
+  app.querySelector("[data-search-identifiers]").innerHTML = spaceIdentifiersHtml(shown);
+  updateSpaceSelectionState();
+  bindSpaceCheckboxes();
+}
+
+function bindSpaceSearch(selector, focusPrefix) {
+  bindWizardSearch(app.querySelector(selector), { setQuery: (value) => { state.query = value; }, renderResults: () => renderSpaceResults(focusPrefix) });
+  bindSpaceCheckboxes();
 }
 
 function renderFrequency() {
@@ -249,15 +297,14 @@ function renderResult(result) {
 
 function renderSettingsSpaces({ refreshed = false } = {}) {
   progress(1);
-  const shown = state.spaces.filter((space) => `${space.displayName} ${space.name}`.toLocaleLowerCase("ja").includes(state.query.toLocaleLowerCase("ja")));
+  const shown = filteredSpaces();
   const noSelection = state.selected.size === 0;
   show("settings-select-spaces", `<p class="eyebrow">設定変更 1 / 3</p><h1>取得するGoogle Chatスペースを見直します。</h1>${nowCopy("今後も取得する通常スペースだけにチェックを入れます。")}${refreshed ? '<p class="notice" role="status">Googleへ接続し直し、最新の通常スペースを確認しました。以前の選択と履歴は残しています。</p>' : ""}
-    <div class="panel"><label class="search-label" for="settings-space-search">通常スペースを検索</label><input class="search" id="settings-space-search" type="search" value="${escape(state.query)}" placeholder="スペース名"><button class="text-button" data-action="clear" type="button" aria-label="Google Chatスペースの選択をすべて外す">選択をすべて外す</button><ul class="room-list">${shown.map((space) => `<li><label class="choice"><input data-focus-key="settings-space-${escape(space.name)}" type="checkbox" value="${escape(space.name)}" ${state.selected.has(space.name) ? "checked" : ""}><span class="choice-copy"><span class="choice-title">${escape(space.displayName)}</span></span></label></li>`).join("")}</ul><p class="hint" role="status">選択中: ${state.selected.size}スペース</p>${technicalDetails("管理者向け: スペースの識別子と一覧更新", `<ul>${shown.map((space) => `<li>${escape(space.displayName)}: <code>${escape(space.name)}</code></li>`).join("")}</ul><p>新しいスペースが見えない場合は再認証して一覧を更新します。</p>`, "admin")}</div>
-    ${noSelection ? '<p class="notice" role="status">0件のまま手動のみを選ぶと、今後の取得を止めます。取得済み履歴は削除しません。</p>' : '<p class="notice">選択を外したスペースは今後読みません。取得済み履歴は削除しません。</p>'}
+    <div class="panel"><label class="search-label" for="settings-space-search">通常スペースを検索</label><input class="search" id="settings-space-search" data-focus-key="settings-space-search" type="search" value="${escape(state.query)}" placeholder="スペース名"><button class="text-button" data-action="clear" type="button" aria-label="Google Chatスペースの選択をすべて外す">選択をすべて外す</button><ul class="room-list" data-search-results>${spaceResultsHtml(shown, "settings-space-")}</ul><p class="hint" data-selected-count role="status">選択中: ${state.selected.size}スペース</p>${technicalDetails("管理者向け: スペースの識別子と一覧更新", `<ul data-search-identifiers>${spaceIdentifiersHtml(shown)}</ul><p>新しいスペースが見えない場合は再認証して一覧を更新します。</p>`, "admin")}</div>
+    <p class="notice" data-selection-notice role="status">${noSelection ? "0件のまま手動のみを選ぶと、今後の取得を止めます。取得済み履歴は削除しません。" : "選択を外したスペースは今後読みません。取得済み履歴は削除しません。"}</p>
     <div class="actions" data-copy-role="actions"><button class="button button-secondary" data-action="reauthorize" aria-label="Googleへ接続し直して通常スペース一覧を更新する">Googleへ接続し直す</button><button class="button button-primary" data-action="next" aria-label="${noSelection ? "Google Chatの取得停止方法を確認する" : "Google Chatの取得間隔を確認する"}">${noSelection ? "取得の停止方法を確認する" : "取得間隔を確認する"}</button></div>`);
-  app.querySelector("#settings-space-search").oninput = (event) => { state.query = event.target.value; renderSettingsSpaces(); app.querySelector("#settings-space-search").focus(); };
-  app.querySelector('[data-action="clear"]').onclick = () => { state.selected.clear(); renderSettingsSpaces(); };
-  app.querySelectorAll('.room-list input[type="checkbox"]').forEach((input) => input.onchange = () => { input.checked ? state.selected.add(input.value) : state.selected.delete(input.value); renderSettingsSpaces(); });
+  bindSpaceSearch("#settings-space-search", "settings-space-");
+  app.querySelector('[data-action="clear"]').onclick = () => { state.selected.clear(); renderSpaceResults("settings-space-"); };
   const next = app.querySelector('[data-action="next"]');
   next.onclick = renderSettingsFrequency;
   app.querySelector('[data-action="reauthorize"]').onclick = renderPrepareFile;

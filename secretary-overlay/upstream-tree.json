@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "baseCommit": "891eabcc03315d1a1b5c6dbff3a44d2eb0a8be20",
+  "baseCommit": "1cf2ae690a39ef822d204624d53ee183b386f715",
   "files": [
     {
       "path": ".agents/plugins/marketplace.json",
@@ -40,17 +40,17 @@
     {
       "path": "README.md",
       "classification": "repo-owned",
-      "sha256": "3ce8027c5be58c83fc36857b86eae59d4c2daa54fc41723e5055ddcd400df5ac"
+      "sha256": "c1cebbf273023ea77a6dcc9c258c4089dcb8a945873fecd57b88060d389e5c89"
     },
     {
       "path": "adapters/agentic-overlay.json",
       "classification": "upstream-only",
-      "sha256": "264b294cd90b402f213fb31098c21e1dd078a0b52cc317492a98a3720ea701a0"
+      "sha256": "a71d1540f4d4daa5f32307197366d781efdff0a71639aac821ca38e756676012"
     },
     {
       "path": "adapters/claude-code-cli/README.md",
       "classification": "upstream-only",
-      "sha256": "6f0b856300094389036b5acb8f8612ccdea4750514faaa275bde1876159a4a6b"
+      "sha256": "5902009ebe2dea2877c8474f28b89439f9aad83f36ca91afec8b98fc3f06cd31"
     },
     {
       "path": "adapters/claude-code-cli/adapter.json",
@@ -60,7 +60,7 @@
     {
       "path": "adapters/claude-code-desktop-app/README.md",
       "classification": "upstream-only",
-      "sha256": "5ede275ca0488a7426a9157200454956c00b9d0405a26f64a52a08980af3c7b2"
+      "sha256": "351c9a66702a812516dfaf42541417ef163ff6de49a06462306e1ef9d3d42861"
     },
     {
       "path": "adapters/claude-code-desktop-app/adapter.json",
@@ -70,7 +70,7 @@
     {
       "path": "adapters/codex-app/README.md",
       "classification": "upstream-only",
-      "sha256": "7a72224006dd996cab305ef85295a0a5374897d7c3b1984ea7f38d1f441a8e2d"
+      "sha256": "8fb70d4e307abc681d11d576e16eb39fb36209b22e909b56840fa4c0c49752e8"
     },
     {
       "path": "adapters/codex-app/adapter.json",
@@ -80,7 +80,7 @@
     {
       "path": "adapters/codex-cli/README.md",
       "classification": "upstream-only",
-      "sha256": "dde1f6a2951023a282a54a188300cfedc843c0dd6594583ea0209e721e54602f"
+      "sha256": "0a7782b2c09bf3dc023b4d1137f8638bf57c6e34dd66e46996f65dac23f52725"
     },
     {
       "path": "adapters/codex-cli/adapter.json",
@@ -104,8 +104,8 @@
     },
     {
       "path": "adapters/neutral-base.json",
-      "classification": "upstream-only",
-      "sha256": "4643d28972f66e29f184dbea74a5f2a27a2d1f4e765d2a023e83fc7fd98d5bc1"
+      "classification": "common",
+      "sha256": "bb8ba03cbacfd406d48510e327cb38016ff6844603e579da916773c524229353"
     },
     {
       "path": "docs/DESIGN.md",
@@ -115,7 +115,7 @@
     {
       "path": "docs/agentic-upstream-mapping.md",
       "classification": "repo-owned",
-      "sha256": "62d51486b8e758d3e34ef5585dfe468293144bc093c760eaed5e065d9fe1d429"
+      "sha256": "b6af26b4dea36a7c9717b53e0dd4f6a86d608c1a84477802960dbb83a0703024"
     },
     {
       "path": "docs/assets/chatwork-settings-review.png",
@@ -1158,6 +1158,46 @@
       "sha256": "8d975b1ddd204727802c523854e4dd80c31b7e4bd1566a203f0d545924f6d4c4"
     },
     {
+      "path": "docs/evidence/sprint-035-patch-001/browser-evidence.json",
+      "classification": "repo-owned",
+      "sha256": "06e5e396ae66340302449566b6689489903525002daa927d91f42e8eb6eec4ac"
+    },
+    {
+      "path": "docs/evidence/sprint-035-patch-001/chatwork-200pct.png",
+      "classification": "repo-owned",
+      "sha256": "a9421ce06e512e29f7d88e6537d1831f2f8433d26ab7338838ac06a98b0aef36"
+    },
+    {
+      "path": "docs/evidence/sprint-035-patch-001/chatwork-desktop.png",
+      "classification": "repo-owned",
+      "sha256": "fbfcb27793d2f785a13900c30c2036e55d78ce01b93219b63d5756586fea3b30"
+    },
+    {
+      "path": "docs/evidence/sprint-035-patch-001/chatwork-mobile.png",
+      "classification": "repo-owned",
+      "sha256": "d21f73f2119a36d394eec11edc0186e154d5aaa9b10c451d631dc5ab5fdcd0e1"
+    },
+    {
+      "path": "docs/evidence/sprint-035-patch-001/evaluator-browser-check.mjs",
+      "classification": "repo-owned",
+      "sha256": "cafd02fb20db4bd0e3fc917fc66e272ed0ae4a43fddc69718b52fc2adf700f3e"
+    },
+    {
+      "path": "docs/evidence/sprint-035-patch-001/google-chat-200pct.png",
+      "classification": "repo-owned",
+      "sha256": "5c361e3f1523442c57645f04210e46b33785b42e81c537ea6c79a64ffa4976df"
+    },
+    {
+      "path": "docs/evidence/sprint-035-patch-001/google-chat-desktop.png",
+      "classification": "repo-owned",
+      "sha256": "f06720465eecc5aebb61fdda98a64f7bc8714bca5e32f0fa1dbc61ea447ba976"
+    },
+    {
+      "path": "docs/evidence/sprint-035-patch-001/google-chat-mobile.png",
+      "classification": "repo-owned",
+      "sha256": "ea3b878429f8a74208e7e03b1ddc9601372d68991cc44cbd6066ec6f41f79df1"
+    },
+    {
       "path": "docs/feedback/sprint-001-patch-001.md",
       "classification": "repo-owned",
       "sha256": "ddbdeb27dd53c2a9f6ca0ee53e2a0d6d1403c499629f64ede057cfc058330c2f"
@@ -1366,6 +1406,11 @@
       "path": "docs/feedback/sprint-033.md",
       "classification": "repo-owned",
       "sha256": "a19891b3a2cf015757381aa043affdde951034e7823975cf0408f8343b07f812"
+    },
+    {
+      "path": "docs/feedback/sprint-035-patch-001.md",
+      "classification": "repo-owned",
+      "sha256": "874618722fbbcbedce148a8663cb188f84cd89c9de7304126b6bf08714559aed"
     },
     {
       "path": "docs/feedback/sprint-035.md",
@@ -1618,6 +1663,11 @@
       "sha256": "2704f0991d21c06347eb6efd484796ddfe110ed1950164262ffb54bf7bd07f61"
     },
     {
+      "path": "docs/progress/sprint-035-patch-001.md",
+      "classification": "repo-owned",
+      "sha256": "c4b92bc95e7106f993666885cead087cde3661cd98b76cad72937a604bf6b938"
+    },
+    {
       "path": "docs/progress/sprint-035.md",
       "classification": "repo-owned",
       "sha256": "30a6b339236b7960cbd73149a288602251a08edd91315f4d8bffd6d5e3546d08"
@@ -1630,7 +1680,7 @@
     {
       "path": "docs/spec.md",
       "classification": "repo-owned",
-      "sha256": "5cc983affbc64db95c9932efd281fc5b20a6064f7f457edfc1fe746287a8dab0"
+      "sha256": "2ef77919524cd2fb6034ab920d170b34ea008845f6d9100e62bb1a3b5026ca9b"
     },
     {
       "path": "docs/spec/constraints.md",
@@ -1645,7 +1695,7 @@
     {
       "path": "docs/spec/editions.md",
       "classification": "repo-owned",
-      "sha256": "fe86ccb16d410a8ef8be46a5f392394ee34a2de9e2be5537a4bf2407d022b3bd"
+      "sha256": "a99d4a0f7437b75e92659a3ed860578a84db40dd839a0b49a64752aa1cdacc88"
     },
     {
       "path": "docs/spec/features.md",
@@ -1665,7 +1715,7 @@
     {
       "path": "docs/spec/ui.md",
       "classification": "repo-owned",
-      "sha256": "15f6872f55f838d1977a0f8adbe4bbc0dab4e5fff2bfe2b6a96af53035c7339b"
+      "sha256": "3851dc913220d8d028dd225cc330b60a6ccf398b4e69b206e5d6a580eaf5a499"
     },
     {
       "path": "docs/sprints/sprint-001-patch-001.md",
@@ -1883,6 +1933,11 @@
       "sha256": "6013bda379d6d3a11790652d9b2a5752d600d603f207c52ec20c0a4c35aeaf45"
     },
     {
+      "path": "docs/sprints/sprint-035-patch-001.md",
+      "classification": "repo-owned",
+      "sha256": "02b9a57fed7c41bd4afb3d3a51dfe9aca4c676c672c717d996ba3229a9599ddf"
+    },
+    {
       "path": "docs/sprints/sprint-035.md",
       "classification": "repo-owned",
       "sha256": "b4d0b83925f73870b676c92800ae475b99560264d359063ce27152b311aa1d18"
@@ -1890,7 +1945,7 @@
     {
       "path": "docs/sprints/state.md",
       "classification": "repo-owned",
-      "sha256": "3fe8c37755d55a69d2668fb8c455984ef6d659910b36861cec355bb15f249760"
+      "sha256": "73f4bbb1d95203dfa5dc68c9c453faa64c0312e4a76a4d281465a5fbe170ba85"
     },
     {
       "path": "plugins/secretary/.claude-plugin/plugin.json",
@@ -2140,12 +2195,12 @@
     {
       "path": "plugins/secretary/skills/chatwork/assets/wizard/app.js",
       "classification": "common",
-      "sha256": "4b0d5350569516044fd5cd89c62d7b9a734a10dc009db455dc40bfe143e070a1"
+      "sha256": "e8e31880b67953b0acdb364c74d18728938867c42c69a43b725874b4d5b83d3e"
     },
     {
       "path": "plugins/secretary/skills/chatwork/assets/wizard/common.js",
       "classification": "common",
-      "sha256": "beda14d03d611af725c46ac1e3d9f4fad9af924aef30d2db69dfe118ccc2cb41"
+      "sha256": "486479597dd497ffce85a41005ec4f6173c5da2ffaa51fa2df128fd83b762908"
     },
     {
       "path": "plugins/secretary/skills/chatwork/assets/wizard/index.html",
@@ -2205,7 +2260,7 @@
     {
       "path": "plugins/secretary/skills/google-chat/assets/wizard/app.js",
       "classification": "common",
-      "sha256": "de6d6a95e46910e4f1e52bbc8df60d4bb5f4beda3b56a6e1a19bbf5b3d6e90d1"
+      "sha256": "c8d71dac2faca9caad5eaa63b7d63370bc6f368f7bf3dcf7cb5a86c84b2a185f"
     },
     {
       "path": "plugins/secretary/skills/google-chat/assets/wizard/cleanup.mjs",
@@ -2545,7 +2600,7 @@
     {
       "path": "scripts/fixtures/sprint-029/yasashii-copy-baseline.json",
       "classification": "common",
-      "sha256": "b5d3ddabc556fa884f88cd13fb56ce1d24ec8a4af821a77e990d443d8a960769"
+      "sha256": "431f16286d0f0e5c56ae2beca6c42f97c47abd364e2706b4ae51a051b786bc75"
     },
     {
       "path": "scripts/fixtures/sprint-032-patch-001/bad-compression.md",
@@ -3048,6 +3103,16 @@
       "sha256": "bd7da21d29c2954ded2caf416ce5d095645db081aa42d120e24daa72f4c7f5b0"
     },
     {
+      "path": "scripts/sprint-035-patch-001-ime-test.mjs",
+      "classification": "common",
+      "sha256": "244a53276faa26f01a6972f6459a2663d8ef9cecd4390bd057ed67f3bb575f22"
+    },
+    {
+      "path": "scripts/sprint-035-patch-001-regression.sh",
+      "classification": "anchor-overlay",
+      "sha256": "fafeb1fc7507db9da657b0e6c215bf88fc61479d4dabcbf4cc5a58775a7a7037"
+    },
+    {
       "path": "scripts/sprint-035-test.mjs",
       "classification": "common",
       "sha256": "0676f41653b076464d670b6afb36efa7c37baf5c64e389576ead6cd6ebd8b73a"
@@ -3071,6 +3136,11 @@
       "path": "scripts/start-sprint-020-wizard-fixture.mjs",
       "classification": "common",
       "sha256": "cc89a14e15bed32fefe1984d0bab7d840229e970f1b08871ed5dd56beddc9619"
+    },
+    {
+      "path": "scripts/start-sprint-035-patch-001-chatwork-fixture.mjs",
+      "classification": "common",
+      "sha256": "87f0374cf1505a2240016cf08618c14269584eaddaf1f8cdf6905fff6165c98d"
     }
   ]
 }

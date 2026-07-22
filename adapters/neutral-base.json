@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "neutralizationCommit": "52016cf10c1c5587fbd83ff2faf3888e29282d5e",
+  "minimumHistoryCommitCount": 129,
+  "digests": {
+    "plugins/secretary/rules/safety.md": "fa098672a314a66f377cbe7ce4d2ee612aee4d3b6c4777f7873c27a319944362",
+    "plugins/secretary/skills/chatwork/assets/wizard/app.js": "e8e31880b67953b0acdb364c74d18728938867c42c69a43b725874b4d5b83d3e",
+    "plugins/secretary/skills/chatwork/assets/wizard/index.html": "f12f2c2a24cddc4156360b20b639776d887b89679c4e45045aa43aed04964d61",
+    "plugins/secretary/skills/chatwork/assets/wizard/style.css": "37172c51374e94fc92d0c7d0aac48434eaa06a22e2a83bc30f6bc790ea30c207",
+    "plugins/secretary/skills/google-chat/assets/wizard/app.js": "c8d71dac2faca9caad5eaa63b7d63370bc6f368f7bf3dcf7cb5a86c84b2a185f",
+    "plugins/secretary/skills/google-chat/scripts/oauth-session.mjs": "15d35113b325dfa10f279367038898c27c2524b8fb7bdfe5b93320ee75111a23",
+    "plugins/secretary/skills/google-chat/scripts/client.mjs": "1e9c42047dffb34218c74ef5cd2f25dbf1fdeb25e796cf49598f93da964ade41",
+    "plugins/secretary/skills/google-chat/scripts/sync.mjs": "01cb043774e6f83d92cdb000930d1587bd9a7352a9eee7128eeed4394c7cde3a"
+  }
+}

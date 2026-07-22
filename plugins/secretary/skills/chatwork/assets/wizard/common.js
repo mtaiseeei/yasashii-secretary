@@ -53,6 +53,38 @@ export function renderWizardScreen(app, { id, state = "ready", html }) {
   restoreFocus(app, previousFocus, previousScreen === id);
 }
 
+export function bindWizardSearch(input, { setQuery, renderResults }) {
+  if (!input || typeof input.addEventListener !== "function") throw new Error("検索入力を初期化できませんでした。");
+  let composing = false;
+  let lastRenderedValue = String(input.value || "");
+
+  const rememberValue = () => {
+    const value = String(input.value || "");
+    setQuery(value);
+    return value;
+  };
+  const commit = () => {
+    const value = rememberValue();
+    if (value === lastRenderedValue) return;
+    lastRenderedValue = value;
+    renderResults();
+  };
+
+  input.addEventListener("compositionstart", () => {
+    composing = true;
+    rememberValue();
+  });
+  input.addEventListener("input", (event) => {
+    rememberValue();
+    if (composing || event.isComposing) return;
+    commit();
+  });
+  input.addEventListener("compositionend", () => {
+    composing = false;
+    commit();
+  });
+}
+
 function captureFocus(app) {
   if (typeof document === "undefined" || !app?.contains || !app.contains(document.activeElement)) return null;
   const element = document.activeElement;

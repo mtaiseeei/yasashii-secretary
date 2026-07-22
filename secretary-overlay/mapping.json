@@ -1,6 +1,9 @@
 {
   "schemaVersion": 1,
   "defaultUpstreamClassification": "common",
+  "common": [
+    "adapters/neutral-base.json"
+  ],
   "metadataOverlay": [
     ".agents/plugins/marketplace.json",
     ".claude-plugin/marketplace.json",
@@ -18,6 +21,7 @@
     "plugins/secretary/skills/settings/SKILL.md",
     "plugins/secretary/skills/update/SKILL.md",
     "scripts/regression-check.sh",
+    "scripts/sprint-035-patch-001-regression.sh",
     "scripts/sprint-011-regression.sh",
     "scripts/sprint-025-regression.sh",
     "scripts/sprint-029-rule-boundary-test.mjs"
