@@ -26,6 +26,9 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 
 ## 1. 週次ふりかえり
 
+通常の週次ふりかえりはopen PJとjournalだけを対象にし、`projects/closed/`は存在確認も探索もしない。
+closed、完了、終了、過去案件を利用者が明示した場合だけ、指定範囲を`projects` Skillへ委譲する。
+
 1. 「今週」は`CC_SECRETARY_NOW`（未指定時は現在日）を含む**月曜〜日曜**を対象にする。
    「先週」は先週内の日付を`--week YYYY-MM-DD`へ渡す。相対語をコマンドへ直接渡さない。
 2. `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.sh weekly <secretary> [--week YYYY-MM-DD]`

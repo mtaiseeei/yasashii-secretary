@@ -86,8 +86,28 @@ function safePath(root, rel) {
   catch { refuse(`symlink経由で秘書ディレクトリの外は操作できません: ${rel}`); }
 }
 
-function projectPath(root, name) {
-  return safePath(root, `projects/${validateName(name)}`);
+function projectRoots(root) {
+  return {
+    projects: safePath(root, "projects"),
+    open: safePath(root, "projects/open"),
+    legacy: safePath(root, "projects"),
+  };
+}
+
+function closedRoot(root) {
+  return safePath(root, "projects/closed");
+}
+
+function projectRel(scope, name) {
+  const safeName = validateName(name);
+  if (scope === "open") return `projects/open/${safeName}`;
+  if (scope === "closed") return `projects/closed/${safeName}`;
+  if (scope === "legacy") return `projects/${safeName}`;
+  refuse(`未対応のプロジェクトscopeです: ${scope}`);
+}
+
+function projectPath(root, name, scope = "open") {
+  return safePath(root, projectRel(scope, name));
 }
 
 function parseOptions(argv) {
@@ -99,7 +119,7 @@ function parseOptions(argv) {
       positional.push(item);
       continue;
     }
-    if (["--confirm", "--all", "--multiple-actions", "--multiple-sessions", "--deadline", "--waiting", "--stakeholders", "--growing-decisions", "--repeated-topic", "--hard-to-read", "--guardrail-needed"].includes(item)) {
+    if (["--confirm", "--all", "--include-closed", "--closed", "--multiple-actions", "--multiple-sessions", "--deadline", "--waiting", "--stakeholders", "--growing-decisions", "--repeated-topic", "--hard-to-read", "--guardrail-needed"].includes(item)) {
       options.set(item, true);
       continue;
     }
@@ -116,11 +136,43 @@ function requireConfirm(options, action) {
   }
 }
 
-function readProject(root, name) {
-  const dir = projectPath(root, name);
-  const file = safePath(root, `projects/${validateName(name)}/PROJECT.md`);
-  if (!existsSync(dir) || !lstatSync(dir).isDirectory() || !existsSync(file)) refuse(`プロジェクトが見つかりません: ${name}`);
-  return { dir, file, markdown: readFileSync(file, "utf8") };
+function inspectProject(root, name, scope) {
+  const rel = projectRel(scope, name);
+  const dir = safePath(root, rel);
+  const file = safePath(root, `${rel}/PROJECT.md`);
+  if (!existsSync(dir)) return null;
+  const dirStat = lstatSync(dir);
+  if (!dirStat.isDirectory() || dirStat.isSymbolicLink()) refuse(`プロジェクトが通常のdirectoryではありません: ${name}`);
+  if (!existsSync(file)) refuse(`PROJECT.md が見つかりません: ${rel}/PROJECT.md`);
+  const fileStat = lstatSync(file);
+  if (!fileStat.isFile() || fileStat.isSymbolicLink()) refuse(`PROJECT.md が通常のfileではありません: ${rel}/PROJECT.md`);
+  return { dir, file, rel, scope, markdown: readFileSync(file, "utf8") };
+}
+
+function readProject(root, name, { includeClosed = false, closedOnly = false } = {}) {
+  const safeName = validateName(name);
+  if (closedOnly) {
+    const closed = inspectProject(root, safeName, "closed");
+    if (!closed) refuse(`closedプロジェクトが見つかりません: ${safeName}`);
+    return closed;
+  }
+  const open = inspectProject(root, safeName, "open");
+  if (open) return open;
+  const legacy = inspectProject(root, safeName, "legacy");
+  if (legacy) return legacy;
+  if (includeClosed) {
+    const closed = inspectProject(root, safeName, "closed");
+    if (closed) return closed;
+  }
+  refuse(`プロジェクトが見つかりません: ${safeName}`);
+}
+
+function readOpenProject(root, name) {
+  const project = readProject(root, name);
+  if (project.scope !== "open") {
+    refuse(`legacy-openは読み取り専用です。更新前に projects/open/ へ明示移行してください: ${project.rel}`);
+  }
+  return project;
 }
 
 function frontmatterValue(markdown, key) {
@@ -187,9 +239,11 @@ function runJournal(root, type, message) {
 }
 
 function mutateProject(root, name, { create = false, journalType = "did", journalMessage }, mutate) {
-  const target = projectPath(root, name);
+  const target = projectPath(root, name, "open");
   const parent = safePath(root, "projects");
+  const openParent = safePath(root, "projects/open");
   mkdirSync(parent, { recursive: true });
+  mkdirSync(openParent, { recursive: true });
   if (create && existsSync(target)) refuse(`同名のプロジェクトが既にあります。上書きしません: ${name}`);
   if (!create && (!existsSync(target) || !lstatSync(target).isDirectory())) refuse(`プロジェクトが見つかりません: ${name}`);
   if (!create) assertNoSymlinks(target);
@@ -216,6 +270,41 @@ function mutateProject(root, name, { create = false, journalType = "did", journa
         renameSync(backup, target);
         throw error;
       }
+    }
+  } finally {
+    rmSync(stage, { recursive: true, force: true });
+    rmSync(backup, { recursive: true, force: true });
+  }
+}
+
+function moveProject(root, name, fromScope, toScope, { journalType = "did", journalMessage }, mutate) {
+  const source = projectPath(root, name, fromScope);
+  const destination = projectPath(root, name, toScope);
+  const projects = safePath(root, "projects");
+  const destinationParent = safePath(root, `projects/${toScope}`);
+  if (!existsSync(source) || !lstatSync(source).isDirectory() || lstatSync(source).isSymbolicLink()) {
+    refuse(`${fromScope}プロジェクトが見つかりません: ${name}`);
+  }
+  assertNoSymlinks(source);
+  if (existsSync(destination)) refuse(`移動先に同名プロジェクトがあります。変更しません: projects/${toScope}/${name}`);
+  mkdirSync(projects, { recursive: true });
+  mkdirSync(destinationParent, { recursive: true });
+  const nonce = `${process.pid}-${Date.now()}`;
+  const stage = safePath(root, `projects/.project-stage-${nonce}`);
+  const backup = safePath(root, `projects/.project-backup-${nonce}`);
+  try {
+    cpSync(source, stage, { recursive: true, dereference: false, errorOnExist: true });
+    mutate(stage);
+    if (!existsSync(join(stage, "PROJECT.md"))) refuse("PROJECT.md が生成されませんでした。変更を中止します。");
+    renameSync(source, backup);
+    try {
+      renameSync(stage, destination);
+      runJournal(root, journalType, journalMessage);
+      rmSync(backup, { recursive: true, force: true });
+    } catch (error) {
+      rmSync(destination, { recursive: true, force: true });
+      renameSync(backup, source);
+      throw error;
     }
   } finally {
     rmSync(stage, { recursive: true, force: true });
@@ -287,7 +376,7 @@ function indexEntries(dir) {
 }
 
 function renderAgents(name, dir, guardrail = "資格情報を保存しない。判断・状態・事実・タスクの正本を混ぜない。") {
-  return `# ${name} プロジェクトの指示\n\n## Start here\n\n1. \`PROJECT.md\` で現在の状態と次の入口を確認する。\n2. 判断の経緯は \`DECISIONS.md\`、恒久的な事実は \`MEMORY.md\` を確認する。\n3. 実行タスクはこのフォルダへ複製せず、\`../../inbox/todo.md\` または接続済みサービスを正本にする。\n\n## ガードレール\n\n- ${guardrail}\n- 未確定事項を \`DECISIONS.md\` に入れない。\n- 確定成果物は \`outputs/\`、旧版は \`archive/\` に置く。最新版を判断できないときは移動前に確認する。\n\n## ファイル索引\n\n<!-- project-index:start -->\n${indexEntries(dir).join("\n")}\n<!-- project-index:end -->\n`;
+  return `# ${name} プロジェクトの指示\n\n## Start here\n\n1. \`PROJECT.md\` で現在の状態と次の入口を確認する。\n2. 判断の経緯は \`DECISIONS.md\`、恒久的な事実は \`MEMORY.md\` を確認する。\n3. 実行タスクはこのフォルダへ複製せず、\`../../../inbox/todo.md\` または接続済みサービスを正本にする。\n\n## ガードレール\n\n- ${guardrail}\n- 未確定事項を \`DECISIONS.md\` に入れない。\n- 確定成果物は \`outputs/\`、旧版は \`archive/\` に置く。最新版を判断できないときは移動前に確認する。\n\n## ファイル索引\n\n<!-- project-index:start -->\n${indexEntries(dir).join("\n")}\n<!-- project-index:end -->\n`;
 }
 
 function refreshIndex(dir) {
@@ -326,16 +415,23 @@ function cmdCandidate(argv) {
   const signalEligible = Boolean(signals.length >= 2 && primary);
   if (positional.length === 2) {
     const [sec, rawName] = positional;
-    const root = secretaryRoot(sec), name = validateName(rawName), dir = projectPath(root, name), projectFile = safePath(root, `projects/${name}/PROJECT.md`);
-    if (existsSync(dir)) {
-      if (!lstatSync(dir).isDirectory() || !existsSync(projectFile)) refuse(`既存プロジェクトの構造を確認できません: ${name}`);
-      const markdown = readFileSync(projectFile, "utf8"), status = projectStatus(markdown);
+    const root = secretaryRoot(sec), name = validateName(rawName);
+    const existing = inspectProject(root, name, "open") || inspectProject(root, name, "legacy");
+    if (existing) {
+      const status = projectStatus(existing.markdown);
       if (status === "completed") {
-        console.log(JSON.stringify({ eligible: false, route: "reopen", signals, existingProject: { name, status, path: `projects/${name}/PROJECT.md` }, reason: "同じ案件の完了済みプロジェクトがあるため、新規作成ではなく再開確認へ進む", question: "このプロジェクトを再開しますか？" }, null, 2));
+        console.log(JSON.stringify({ eligible: false, route: "existing-project", signals, existingProject: { name, status, path: `${existing.rel}/PROJECT.md` }, reason: "openに完了状態のPROJECTがあります。自動変更せず状態を確認してください。", question: null }, null, 2));
         return;
       }
-      console.log(JSON.stringify({ eligible: false, route: "existing-project", signals, existingProject: { name, status, path: `projects/${name}/PROJECT.md` }, reason: "同じ案件の進行中プロジェクトがあるため、新規作成せず既存PJへ続ける", question: null }, null, 2));
+      console.log(JSON.stringify({ eligible: false, route: "existing-project", signals, existingProject: { name, status, path: `${existing.rel}/PROJECT.md` }, reason: "同じ案件の進行中プロジェクトがあるため、新規作成せず既存PJへ続ける", question: null }, null, 2));
       return;
+    }
+    if (options.get("--closed") || options.get("--include-closed")) {
+      const closed = inspectProject(root, name, "closed");
+      if (closed) {
+        console.log(JSON.stringify({ eligible: false, route: "reopen", signals, existingProject: { name, status: projectStatus(closed.markdown), path: `${closed.rel}/PROJECT.md` }, reason: "明示指定されたclosedプロジェクトがあるため、新規作成ではなく再開確認へ進む", question: "このプロジェクトを再開しますか？" }, null, 2));
+        return;
+      }
     }
   }
   console.log(JSON.stringify({ eligible: signalEligible, route: signalEligible ? "create-project" : "none", signals, reason: signalEligible ? signals.slice(0, 2).join("、") : "候補シグナルが基準未達", question: signalEligible ? "この内容は今後も続きそうです。プロジェクトとしてまとめますか？" : null }, null, 2));
@@ -346,8 +442,10 @@ function cmdCreateLight(argv) {
   const [sec, rawName] = positional;
   if (!sec || !rawName) usage("create-light <secretary> <project> --overview ... --goal ... --success ... --current ... --next ... [--questions ...] --confirm");
   requireConfirm(options, `「${rawName}」を一般プロジェクトとして作成します。`);
+  if (options.get("--closed") || options.get("--include-closed")) refuse("新規プロジェクトは必ずopenへ作ります。closedへの直接作成はできません。");
   const root = secretaryRoot(sec);
   const name = validateName(rawName);
+  if (inspectProject(root, name, "legacy")) refuse(`legacy-openに同名プロジェクトがあります。新規作成せず明示移行してください: projects/${name}`);
   const values = {
     name,
     day: dateNow(),
@@ -358,37 +456,49 @@ function cmdCreateLight(argv) {
     next: text(options.get("--next"), "次の入口"),
     questions: options.has("--questions") ? text(options.get("--questions"), "要確認事項") : ""
   };
-  mutateProject(root, name, { create: true, journalMessage: `プロジェクト「${name}」をライト運用で作成（参照: projects/${name}/PROJECT.md）` }, (stage) => {
+  mutateProject(root, name, { create: true, journalMessage: `プロジェクト「${name}」をライト運用で作成（参照: projects/open/${name}/PROJECT.md）` }, (stage) => {
     writeMarkdown(join(stage, "PROJECT.md"), renderLight(values));
   });
-  console.log(`一般プロジェクトを作成しました: projects/${name}/PROJECT.md`);
+  console.log(`一般プロジェクトを作成しました: projects/open/${name}/PROJECT.md`);
 }
 
 function cmdList(argv) {
   const { positional, options } = parseOptions(argv);
   const [sec] = positional;
-  if (!sec) usage("list <secretary> [--all]");
+  if (!sec) usage("list <secretary> [--all] [--include-closed]");
   const root = secretaryRoot(sec);
-  const projects = safePath(root, "projects");
-  if (!existsSync(projects)) return console.log("プロジェクトはまだありません。");
   const rows = [];
-  for (const entry of readdirSync(projects, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name, "ja"))) {
-    if (!entry.isDirectory() || entry.name.startsWith(".")) continue;
-    try {
-      const md = readProject(root, entry.name).markdown;
-      const status = projectStatus(md);
-      if (!options.get("--all") && status !== "active") continue;
-      rows.push(`- ${entry.name} [${status}] — projects/${entry.name}/PROJECT.md`);
-    } catch { /* 壊れた項目は一覧へ混ぜない。明示参照時にエラーを返す。 */ }
+  const seen = new Set();
+  const collect = (scope) => {
+    const roots = projectRoots(root);
+    const dir = scope === "closed" ? closedRoot(root) : roots[scope];
+    if (!existsSync(dir)) return;
+    if (!lstatSync(dir).isDirectory() || lstatSync(dir).isSymbolicLink()) refuse(`プロジェクトrootが通常のdirectoryではありません: projects/${scope}`);
+    for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name, "ja"))) {
+      if (!entry.isDirectory() || entry.isSymbolicLink() || entry.name.startsWith(".") || (scope === "legacy" && ["open", "closed"].includes(entry.name)) || seen.has(entry.name)) continue;
+      try {
+        const project = inspectProject(root, entry.name, scope);
+        if (!project) continue;
+        const status = projectStatus(project.markdown);
+        if (!options.get("--all") && status !== "active" && scope !== "closed") continue;
+        rows.push(`- ${entry.name} [${status}] — ${project.rel}/PROJECT.md`);
+        seen.add(entry.name);
+      } catch { /* 壊れた項目は一覧へ混ぜない。明示参照時にエラーを返す。 */ }
+    }
+  };
+  collect("open");
+  collect("legacy");
+  if (options.get("--include-closed") || options.get("--closed")) {
+    collect("closed");
   }
   console.log(rows.length ? rows.join("\n") : options.get("--all") ? "プロジェクトはまだありません。" : "進行中のプロジェクトはありません。");
 }
 
 function cmdShow(argv) {
-  const { positional } = parseOptions(argv);
+  const { positional, options } = parseOptions(argv);
   const [sec, name] = positional;
-  if (!sec || !name) usage("show <secretary> <project>");
-  console.log(readProject(secretaryRoot(sec), name).markdown.trimEnd());
+  if (!sec || !name) usage("show <secretary> <project> [--closed]");
+  console.log(readProject(secretaryRoot(sec), name, { closedOnly: Boolean(options.get("--closed")) }).markdown.trimEnd());
 }
 
 function cmdAddDecision(argv) {
@@ -398,9 +508,9 @@ function cmdAddDecision(argv) {
   requireConfirm(options, `「${rawName}」の決定を記録し、現在の状況を更新します。`);
   const root = secretaryRoot(sec), name = validateName(rawName), day = dateNow();
   const decision = text(options.get("--decision"), "決定"), current = text(options.get("--current"), "現在の状況"), next = text(options.get("--next"), "次の入口");
-  const existing = readProject(root, name); ensureGeneral(existing.markdown); ensureActive(existing.markdown);
+  const existing = readOpenProject(root, name); ensureGeneral(existing.markdown); ensureActive(existing.markdown);
   const id = nextDecisionId(existing.markdown);
-  mutateProject(root, name, { journalType: "decided", journalMessage: `プロジェクト「${name}」の決定 ${id} を記録（参照: projects/${name}/PROJECT.md）` }, (stage) => {
+  mutateProject(root, name, { journalType: "decided", journalMessage: `プロジェクト「${name}」の決定 ${id} を記録（参照: projects/open/${name}/PROJECT.md）` }, (stage) => {
     const projectFile = join(stage, "PROJECT.md");
     let md = readFileSync(projectFile, "utf8");
     const summaries = bullets(md, /^## Decisions$/);
@@ -411,7 +521,7 @@ function cmdAddDecision(argv) {
     const full = join(stage, "DECISIONS.md");
     if (existsSync(full)) writeFileSync(full, `${readFileSync(full, "utf8").trimEnd()}\n\n## ${id} — ${day}\n\n- 結論: ${decision}\n- 背景・理由: PROJECT.mdの現在状況を参照\n- 影響範囲: このプロジェクト\n`, "utf8");
   });
-  console.log(`決定 ${id} と現在の状況を一組で更新しました: projects/${name}/PROJECT.md`);
+  console.log(`決定 ${id} と現在の状況を一組で更新しました: projects/open/${name}/PROJECT.md`);
 }
 
 function cmdAddNote(argv) {
@@ -420,8 +530,8 @@ function cmdAddNote(argv) {
   if (!sec || !rawName) usage("add-note <secretary> <project> --note ... --confirm");
   requireConfirm(options, `「${rawName}」の恒久的な事実を記録します。`);
   const root = secretaryRoot(sec), name = validateName(rawName), day = dateNow(), note = text(options.get("--note"), "メモ");
-  const existing = readProject(root, name); ensureGeneral(existing.markdown); ensureActive(existing.markdown);
-  mutateProject(root, name, { journalType: "note", journalMessage: `プロジェクト「${name}」の事実メモを更新（参照: projects/${name}/PROJECT.md）` }, (stage) => {
+  const existing = readOpenProject(root, name); ensureGeneral(existing.markdown); ensureActive(existing.markdown);
+  mutateProject(root, name, { journalType: "note", journalMessage: `プロジェクト「${name}」の事実メモを更新（参照: projects/open/${name}/PROJECT.md）` }, (stage) => {
     const projectFile = join(stage, "PROJECT.md"), memoryFile = join(stage, "MEMORY.md");
     if (existsSync(memoryFile)) {
       writeFileSync(memoryFile, `${readFileSync(memoryFile, "utf8").trimEnd()}\n- ${day}: ${note}\n`, "utf8");
@@ -436,14 +546,14 @@ function cmdAddNote(argv) {
       writeFileSync(projectFile, md, "utf8");
     }
   });
-  console.log(`事実メモを記録しました: projects/${name}/${existsSync(join(existing.dir, "MEMORY.md")) ? "MEMORY.md" : "PROJECT.md"}`);
+  console.log(`事実メモを記録しました: projects/open/${name}/${existsSync(join(existing.dir, "MEMORY.md")) ? "MEMORY.md" : "PROJECT.md"}`);
 }
 
 function cmdPromotionStatus(argv) {
   const { positional, options } = parseOptions(argv);
   const [sec, name] = positional;
   if (!sec || !name) usage("promotion-status <secretary> <project> [--hard-to-read] [--guardrail-needed]");
-  const project = readProject(secretaryRoot(sec), name); ensureGeneral(project.markdown);
+  const project = readOpenProject(secretaryRoot(sec), name); ensureGeneral(project.markdown);
   const result = promotionReasons(project.dir, project.markdown, options);
   console.log(JSON.stringify({ eligible: result.reasons.length > 0, ...result, question: result.reasons.length ? "情報が増え、状態・判断・事実を分けた方が探しやすいです。フル運用へ整理しますか？" : null }, null, 2));
 }
@@ -453,13 +563,13 @@ function cmdPromote(argv) {
   const [sec, rawName] = positional;
   if (!sec || !rawName) usage("promote-full <secretary> <project> [--hard-to-read|--guardrail ...] --confirm");
   requireConfirm(options, `「${rawName}」をフル運用へ整理します。`);
-  const root = secretaryRoot(sec), name = validateName(rawName), project = readProject(root, name); ensureGeneral(project.markdown); ensureActive(project.markdown);
+  const root = secretaryRoot(sec), name = validateName(rawName), project = readOpenProject(root, name); ensureGeneral(project.markdown); ensureActive(project.markdown);
   if (existsSync(join(project.dir, "AGENTS.md")) || existsSync(join(project.dir, "DECISIONS.md")) || existsSync(join(project.dir, "MEMORY.md"))) refuse("このプロジェクトは既にフル運用です。重ねて昇格しません。");
   if (existsSync(join(project.dir, "INDEX.md"))) refuse("INDEX.md が既にあります。自動削除せず、内容を確認してから整理してください。");
   const status = promotionReasons(project.dir, project.markdown, options);
   if (!status.reasons.length) refuse("フル運用の昇格トリガーに達していません。ライト運用を続けます。");
   const guardrail = options.has("--guardrail") ? text(options.get("--guardrail"), "ガードレール") : undefined;
-  mutateProject(root, name, { journalMessage: `プロジェクト「${name}」をフル運用へ整理（参照: projects/${name}/AGENTS.md）` }, (stage) => {
+  mutateProject(root, name, { journalMessage: `プロジェクト「${name}」をフル運用へ整理（参照: projects/open/${name}/AGENTS.md）` }, (stage) => {
     const projectFile = join(stage, "PROJECT.md");
     let md = readFileSync(projectFile, "utf8");
     const decisions = bullets(md, /^## Decisions$/), notes = bullets(md, /^## メモ$/);
@@ -472,7 +582,7 @@ function cmdPromote(argv) {
     writeMarkdown(join(stage, "AGENTS.md"), renderAgents(name, stage, guardrail));
     refreshIndex(stage);
   });
-  console.log(`フル運用へ整理しました: projects/${name}/AGENTS.md`);
+  console.log(`フル運用へ整理しました: projects/open/${name}/AGENTS.md`);
 }
 
 function cmdTodo(argv) {
@@ -483,7 +593,7 @@ function cmdTodo(argv) {
   const todo = text(options.get("--todo"), "TODO"), source = text(options.get("--source"), "根拠");
   const due = options.get("--due") ?? "";
   if (due && !/^\d{4}-\d{2}-\d{2}$/.test(due)) usage("--due は YYYY-MM-DD 形式で指定してください。");
-  const linked = `${todo} [PJ: ${name} / projects/${name}/PROJECT.md]`;
+  const linked = `${todo} [PJ: ${name} / ${project.rel}/PROJECT.md]`;
   let result;
   try {
     result = runExternalSync("bash", [workspaceTools, "todo-add", root, linked, source, due], {
@@ -508,10 +618,10 @@ function cmdSave(argv, output) {
   const { positional, options } = parseOptions(argv);
   const [sec, rawName] = positional;
   if (!sec || !rawName) usage(`${output ? "save-output" : "save-work"} <secretary> <project> --title ... [--tags ...] < 本文`);
-  const root = secretaryRoot(sec), name = validateName(rawName), project = readProject(root, name); ensureGeneral(project.markdown); ensureActive(project.markdown);
+  const root = secretaryRoot(sec), name = validateName(rawName), project = readOpenProject(root, name); ensureGeneral(project.markdown); ensureActive(project.markdown);
   const { title, slug } = slugTitle(options.get("--title")), body = readStdin(), day = dateNow(), tags = text(options.get("--tags") ?? (output ? "確定成果物" : "作業文書"), "タグ");
   const rel = `${output ? "outputs/" : ""}${day}_${slug}.md`;
-  mutateProject(root, name, { journalMessage: `プロジェクト「${name}」の${output ? "確定成果物" : "作業文書"}「${title}」を保存（参照: projects/${name}/${rel}）` }, (stage) => {
+  mutateProject(root, name, { journalMessage: `プロジェクト「${name}」の${output ? "確定成果物" : "作業文書"}「${title}」を保存（参照: projects/open/${name}/${rel}）` }, (stage) => {
     const target = join(stage, rel);
     if (existsSync(target)) refuse(`同名ファイルが既にあります。上書きしません: ${rel}`);
     mkdirSync(dirname(target), { recursive: true });
@@ -524,7 +634,7 @@ function cmdSave(argv, output) {
     md = setFrontmatter(md, "updatedAt", day);
     writeFileSync(pf, md, "utf8");
   });
-  console.log(`${output ? "確定成果物" : "作業文書"}を保存しました: projects/${name}/${rel}`);
+  console.log(`${output ? "確定成果物" : "作業文書"}を保存しました: projects/open/${name}/${rel}`);
 }
 
 function cmdArchive(argv) {
@@ -534,8 +644,8 @@ function cmdArchive(argv) {
   const safeRel = text(rel, "archive対象path");
   requireConfirm(options, `「${safeRel}」を旧版としてarchive/へ移動します。最新版か判断できない場合は実行しないでください。`);
   if (coreFiles.has(basename(safeRel)) || safeRel.startsWith("archive/") || safeRel.split(/[\\/]/).some((part) => !part || part === "." || part === "..")) refuse(`archiveへ移動できないpathです: ${safeRel}`);
-  const root = secretaryRoot(sec), name = validateName(rawName), project = readProject(root, name); ensureGeneral(project.markdown);
-  mutateProject(root, name, { journalMessage: `プロジェクト「${name}」の旧版「${safeRel}」をarchiveへ移動（参照: projects/${name}/archive/${basename(safeRel)}）` }, (stage) => {
+  const root = secretaryRoot(sec), name = validateName(rawName), project = readOpenProject(root, name); ensureGeneral(project.markdown);
+  mutateProject(root, name, { journalMessage: `プロジェクト「${name}」の旧版「${safeRel}」をarchiveへ移動（参照: projects/open/${name}/archive/${basename(safeRel)}）` }, (stage) => {
     const source = join(stage, safeRel), destination = join(stage, "archive", basename(safeRel));
     if (!existsSync(source) || !lstatSync(source).isFile()) refuse(`移動するファイルが見つかりません: ${safeRel}`);
     if (existsSync(destination)) refuse(`archiveに同名ファイルがあります。上書きしません: ${basename(safeRel)}`);
@@ -547,7 +657,7 @@ function cmdArchive(argv) {
     md = setFrontmatter(md, "updatedAt", dateNow());
     writeFileSync(pf, md, "utf8");
   });
-  console.log(`旧版を移動しました: projects/${name}/archive/${basename(safeRel)}`);
+  console.log(`旧版を移動しました: projects/open/${name}/archive/${basename(safeRel)}`);
 }
 
 function cmdDevPointer(argv) {
@@ -556,13 +666,15 @@ function cmdDevPointer(argv) {
   if (!sec || !rawName) usage("create-dev-pointer <secretary> <project> --repo ... --entry ... --overview ... --current ... --visibility private|public --confirm");
   const repo = text(options.get("--repo"), "正本repo"), entry = text(options.get("--entry"), "最初に読むファイル"), overview = text(options.get("--overview"), "概要"), current = text(options.get("--current"), "現在の状態"), visibility = options.get("--visibility");
   if (!visibility || !["private", "public"].includes(visibility)) usage("--visibility は private または public を指定してください。");
+  if (options.get("--closed") || options.get("--include-closed")) refuse("新規プロジェクトは必ずopenへ作ります。closedへの直接作成はできません。");
   requireConfirm(options, `別repo開発PJ「${rawName}」の参照ポインタを作ります。正本repo=${repo}、公開範囲=${visibility}。`);
   const root = secretaryRoot(sec), name = validateName(rawName), day = dateNow();
-  mutateProject(root, name, { create: true, journalMessage: `別repo開発プロジェクト「${name}」の参照ポインタを作成（参照: projects/${name}/PROJECT.md）` }, (stage) => {
+  if (inspectProject(root, name, "legacy")) refuse(`legacy-openに同名プロジェクトがあります。新規作成せず明示移行してください: projects/${name}`);
+  mutateProject(root, name, { create: true, journalMessage: `別repo開発プロジェクト「${name}」の参照ポインタを作成（参照: projects/open/${name}/PROJECT.md）` }, (stage) => {
     writeMarkdown(join(stage, "PROJECT.md"), `---\nstatus: active\nprojectType: development-pointer\ncreatedAt: ${day}\nupdatedAt: ${day}\n---\n\n# ${name}\n\n## 概要\n\n${overview}\n\n## 正本repo\n\n- 場所: ${repo}\n- 公開範囲: ${visibility}\n- 最初に読むファイル: ${entry}\n\n## 現在の状態（${day}確認）\n\n${current}\n\n> 実装仕様、判断ログ、Sprint状態、コード、成果物の正本は上記repoです。このworkspaceには複製しません。\n`);
     writeMarkdown(join(stage, "AGENTS.md"), `# ${name} 開発プロジェクト参照\n\n- 正本repo: ${repo}\n- 公開範囲: ${visibility}\n- 最初に読むファイル: ${entry}\n- workspace側では実装仕様、判断、進行状態、コード、成果物を編集・複製しない。\n- Claude Codeでは \`${harnessHosts.claudeCode.installId}\` の \`${harnessHosts.claudeCode.explicitEntry}\`、Codexでは \`${harnessHosts.codex.installId}\` の \`${harnessHosts.codex.explicitEntries.join("\` / \`")}\` を入口に、Planner → Generator → Evaluator に従う。\n`);
   });
-  console.log(`別repo開発PJの参照ポインタを作成しました: projects/${name}/PROJECT.md`);
+  console.log(`別repo開発PJの参照ポインタを作成しました: projects/open/${name}/PROJECT.md`);
 }
 
 function cmdComplete(argv) {
@@ -571,10 +683,10 @@ function cmdComplete(argv) {
   if (!sec || !rawName) usage("complete <secretary> <project> --result ... --remaining ... --confirm");
   const result = text(options.get("--result"), "達成した結果"), remaining = text(options.get("--remaining"), "残件");
   requireConfirm(options, `「${rawName}」を完了扱いにし、結果と残件を記録します。`);
-  const root = secretaryRoot(sec), name = validateName(rawName), project = readProject(root, name); ensureGeneral(project.markdown);
+  const root = secretaryRoot(sec), name = validateName(rawName), project = readOpenProject(root, name); ensureGeneral(project.markdown);
   if (projectStatus(project.markdown) === "completed") refuse("このプロジェクトは既に完了扱いです。");
   const day = dateNow();
-  mutateProject(root, name, { journalMessage: `プロジェクト「${name}」を完了（参照: projects/${name}/PROJECT.md）` }, (stage) => {
+  moveProject(root, name, "open", "closed", { journalMessage: `プロジェクト「${name}」を完了（参照: projects/closed/${name}/PROJECT.md）` }, (stage) => {
     const pf = join(stage, "PROJECT.md"); let md = readFileSync(pf, "utf8");
     md = setFrontmatter(md, "status", "completed"); md = setFrontmatter(md, "updatedAt", day);
     const records = bullets(md, /^## 完了記録$/); records.push(`${day}: 結果=${result} / 残件=${remaining}`);
@@ -582,7 +694,7 @@ function cmdComplete(argv) {
     md = replaceSection(md, /^## 現在の状況(?:（.*）)?$/, `## 現在の状況（${day}時点）`, ["- 現在: 完了", "- 待ち: なし", "- 次の入口: 明示的に再開するときに確認する", `- 要確認事項: 残件=${remaining}`]);
     writeFileSync(pf, md, "utf8");
   });
-  console.log(`完了扱いにしました。検索と明示参照は引き続き可能です: projects/${name}/PROJECT.md`);
+  console.log(`完了扱いにしてclosedへ移しました。明示参照時だけ読めます: projects/closed/${name}/PROJECT.md`);
 }
 
 function cmdReopen(argv) {
@@ -591,16 +703,16 @@ function cmdReopen(argv) {
   if (!sec || !rawName) usage("reopen <secretary> <project> --reason ... --next ... --confirm");
   const reason = text(options.get("--reason"), "再開理由"), next = text(options.get("--next"), "次の入口");
   requireConfirm(options, `完了済みの「${rawName}」を再開します。`);
-  const root = secretaryRoot(sec), name = validateName(rawName), project = readProject(root, name); ensureGeneral(project.markdown);
+  const root = secretaryRoot(sec), name = validateName(rawName), project = readProject(root, name, { closedOnly: true }); ensureGeneral(project.markdown);
   if (projectStatus(project.markdown) !== "completed") refuse("このプロジェクトは完了状態ではありません。自動再開しません。");
   const day = dateNow();
-  mutateProject(root, name, { journalMessage: `プロジェクト「${name}」を再開（参照: projects/${name}/PROJECT.md）` }, (stage) => {
+  moveProject(root, name, "closed", "open", { journalMessage: `プロジェクト「${name}」を再開（参照: projects/open/${name}/PROJECT.md）` }, (stage) => {
     const pf = join(stage, "PROJECT.md"); let md = readFileSync(pf, "utf8");
     md = setFrontmatter(md, "status", "active"); md = setFrontmatter(md, "updatedAt", day);
     md = replaceSection(md, /^## 現在の状況(?:（.*）)?$/, `## 現在の状況（${day}時点）`, [`- 現在: ${day}に再開（理由: ${reason}）`, "- 待ち: なし", `- 次の入口: ${next}`, "- 要確認事項: なし"]);
     writeFileSync(pf, md, "utf8");
   });
-  console.log(`プロジェクトを再開しました。過去の完了記録は保持しています: projects/${name}/PROJECT.md`);
+  console.log(`プロジェクトをopenへ戻しました。過去の完了記録は保持しています: projects/open/${name}/PROJECT.md`);
 }
 
 const [command, ...args] = process.argv.slice(2);

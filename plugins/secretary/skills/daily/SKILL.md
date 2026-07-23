@@ -41,7 +41,7 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 1. `memory-tools.sh resume-check <secretary>`を実行する。しおりがあれば`resume-read`で**中断点**を確認するが、自動で消さない。
 2. `memory-tools.sh timeline <secretary> --type journal`で直近の`next`（翌日以降への申し送り）を確認する。
 3. `workspace-tools.sh todo-list <secretary>`で未完TODOを確認する。
-4. `project-tools.mjs list <secretary>`で進行中PJを確認し、各`PROJECT.md`の状態・待ち・次の入口と、PJ参照つきTODOを分けて扱う。completed PJは通常一覧へ混ぜない。
+4. `project-tools.mjs list <secretary>`でopenの進行中PJだけを確認し、各`PROJECT.md`の状態・待ち・次の入口と、PJ参照つきTODOを分けて扱う。closedは明示依頼がない限り存在確認・探索・候補表示しない。
 5. 中断点、申し送り、PJ状態、待ち、TODOを混ぜずに、今日の入口として返す内容を整理する。外部予定も必要なら続けてdailyを1回だけ行う。
 
 `_resume.md`は中断した作業の文脈、journalの`next`は翌日以降への申し送り、TODOは実行項目である。

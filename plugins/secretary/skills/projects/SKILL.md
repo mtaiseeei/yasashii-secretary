@@ -43,6 +43,8 @@ node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs candidate-check --multip
 ```
 
 同じ案件名が分かっている場合は、通常の候補提案より先に既存PJを照合する。
+通常照合はopenとlegacy-openだけを対象にし、closedの存在確認はしない。利用者がclosed、完了、終了、
+過去案件を明示した場合だけ `--closed` を付けて照合し、再開確認へ進む。
 
 ```text
 node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs candidate-check <secretary> <project> \
@@ -63,7 +65,8 @@ commit、remoteを変更しない。`candidate-check`もファイルを変更し
 ## 2. 一般プロジェクトはライト運用から始める
 
 営業、マーケティング、新規事業、採用、研修、契約準備等は、了承後だけ同じprivate workspaceの
-`secretary/projects/<project>/PROJECT.md` を正本にする。作成前に、プロジェクト名、概要、ゴール、
+`secretary/projects/open/<project>/PROJECT.md` を正本にする。新規PJは一般PJ、ライトPJ、
+別repo参照PJを含め必ずopenへ作り、closedへの直接新規作成は拒否する。作成前に、プロジェクト名、概要、ゴール、
 成功の測り方、現在の状況、次の入口、要確認事項を短く確認する。
 
 ```text
@@ -75,8 +78,9 @@ node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs create-light <secretary>
 `--confirm`はユーザーが別ターンまたは構造化質問で明示了承した後だけ付ける。コマンドは安全な名前、
 既存同名PJ、空入力、資格情報、境界外path、symlinkを検査し、空テンプレや部分生成を残さない。
 
-進行中一覧は `project-tools.mjs list <secretary>`、完了済みを含む一覧は `list <secretary> --all`、
-再開時の状態確認は `show <secretary> <project>` を使う。`status`欠落はactiveとして扱う。
+進行中一覧は `project-tools.mjs list <secretary>`、closedを明示的に含む一覧は
+`list <secretary> --include-closed`、再開時の状態確認は `show <secretary> <project> --closed` を使う。
+`--all`だけではclosedを読まない。既存 `secretary/projects/<project>` はlegacy-openとしてread-onlyで扱う。
 
 ## 3. 状態・判断・事実・タスクを混ぜない
 
@@ -145,11 +149,13 @@ node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs complete <secretary> <pr
   --result "<達成した結果>" --remaining "<未完・保留・引継ぎ。なければ、なし>" --confirm
 ```
 
-完了後も同じディレクトリに残し、自動移動・archive・削除をしない。通常の進行中一覧と同一内容への
-候補提案からは外すが、検索、timeline、明示参照では見つけられる。
+完了はPROJECTのstatus／完了記録、journal、`projects/open`から`projects/closed`への移動を
+一つの原子的操作として行う。通常の一覧、検索、timeline、daily／weekly、候補提案はclosedを読まない。
+closed、完了、終了、過去案件の明示指定時だけ `--closed`／`--include-closed` を使う。
 
 完了済みPJに新しい作業が出ても自動再開しない。「このプロジェクトを再開しますか？」と確認し、
-了承後だけ `reopen ... --confirm` を使う。過去の完了記録は消さない。
+了承後だけ `reopen ... --reason "<再開理由>" --next "<次の入口>" --confirm` を使い、closedからopenへ戻す。
+過去の完了記録は消さない。
 
 ## 7. 開発プロジェクトはbuildを維持する
 

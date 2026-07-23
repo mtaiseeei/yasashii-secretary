@@ -20,7 +20,9 @@ secretary/
 ├── CLAUDE.md      ← AGENTS.md への案内だけ
 ├── inbox/         ← 走り書き・下書き・とりあえずメモ
 ├── docs/          ← できあがった文書の置き場（正本）
-├── projects/      ← 確認後に作る継続案件。一般PJと別repo開発PJの参照
+├── projects/
+│   ├── open/      ← 進行中PJ。新規PJは必ずここへ作る
+│   └── closed/    ← 完了・終了PJ。明示されたときだけ読む
 └── memory/        ← 秘書の記憶
     ├── MEMORY.md      ← 記憶の目次（1行ずつの索引）
     ├── decisions/     ← 決まったことの記録（日付ごと）
@@ -116,11 +118,12 @@ secretary/
 - 一つの成果に向けた複数行動や別の日への継続を含むシグナルが2つ以上揃ったときだけ、理由を添えてプロジェクト化を確認する。
 - 単発成果物、同じ会話で完了する作業、一つだけのTODOは形式的にPJ化しない。候補検出は完全自動ではない。
 - 確認前、拒否、キャンセルではプロジェクト、journal、commit、remoteを変更しない。
-- 一般PJは同じprivate workspaceの`projects/<project>/PROJECT.md` 1枚から始める。空テンプレだけを作らない。
+- 一般PJは同じprivate workspaceの`projects/open/<project>/PROJECT.md` 1枚から始める。新規PJは必ずopenへ作り、closedへ直接作らない。空テンプレだけを作らない。
 - 判断・事実・ファイル・PJ固有ルールが増えたら理由を示してフル運用を提案し、了承後だけ`AGENTS.md`、`PROJECT.md`、`DECISIONS.md`、`MEMORY.md`、`CLAUDE.md`へ分ける。`INDEX.md`は作らない。
 - PJ固有判断はPJのDecisions、恒久事実はPJのメモ／MEMORY、状態はPROJECTを正本にする。同じ本文を一般memoryへ複製しない。
 - 実行タスクの正本は`inbox/todo.md`または接続済みサービス。PJ内に生きた`TODO.md`を作らない。
-- 一般PJの完了と再開は確認後だけ行い、完了記録を残す。完了時もディレクトリを自動移動・archive・削除しない。
+- 一般PJの完了と再開は確認後だけ行い、完了記録を残す。完了はopenからclosed、再開はclosedからopenへ一組で移す。
+- 通常の相談、一覧、検索、daily、weekly、候補検出ではclosedの存在確認・探索・候補表示をしない。closed、完了、終了、過去案件を明示された場合だけ指定範囲を読む。
 - 開発依頼は既存buildへ進める。別repoを正本にするときは作成・接続・公開範囲を確認し、workspace側には参照ポインタだけを置く。仕様・判断・Sprint状態・コード・成果物を複製しない。
 
 ---
