@@ -23,8 +23,12 @@ export function loadConversationContract(repo) {
   const styleRule = manifest.rules[styleKey];
   const copy = JSON.parse(readFileSync(join(plugin, "rules", styleRule.copy), "utf8"));
 
-  const shortLines = copy.surfaces.report.shortLines;
-  const labels = shortLines.map((line) => line.split(/[:：]/)[0].trim());
+  const states = copy.surfaces.report.states;
+  if (!states || JSON.stringify(Object.keys(states).sort()) !== JSON.stringify(["answered", "error", "partial", "question", "saved"])) {
+    throw new Error("report states must define answered/question/saved/error/partial");
+  }
+  // 現役copyから固定labelを導出しない。旧shapeの再混入検出だけに歴史的labelを使う。
+  const labels = ["やったこと", "結果", "次に何が起きるか"];
   const detailLabel = copy.surfaces.report.detailedSuffix.split(/[:：]/)[0].trim();
 
   const style = ruleText[styleKey];
@@ -36,6 +40,7 @@ export function loadConversationContract(repo) {
     styleKey,
     styleRule,
     labels,
+    states,
     detailLabel,
     applyScenes: sectionBullets(style, "serializerを適用する場面"),
     generalScenes: sectionBullets(style, "serializerを適用しない場面"),
@@ -172,18 +177,10 @@ export function validateScenario(kind, markdown, contract) {
     }
     case "completion-report":
     case "status-report": {
-      const bulletPrefixes = topBulletLabels(markdown);
-      const expected = [...labels];
-      const allowed = [...labels, detailLabel];
-      if (!fixed) problems.push("完了報告が固定3項目schema（存在と順序）を使っていない");
-      if (bulletPrefixes.length < 3) problems.push("完了報告の3項目が物理的な別項目になっていない");
-      if (!expected.every((label, index) => bulletPrefixes[index] === label)) {
-        problems.push("完了報告の項目名または順序がcopyのschemaと一致しない");
-      }
-      if (!bulletPrefixes.every((prefix) => allowed.includes(prefix))) {
-        problems.push("完了報告にschema外の固定項目がある");
-      }
-      if (collapsed) problems.push("完了報告の3つの意味が1行へ連結されている");
+      if (fixed) problems.push("完了報告が旧固定3項目schemaを使っている");
+      if (collapsed) problems.push("完了報告の複数の意味が1行へ連結されている");
+      if (bullets + nested > 1 && blocks.length === 1) problems.push("単純な完了報告に不要な複数項目がある");
+      if (blocks.length === 0) problems.push("完了報告が空です");
       break;
     }
     case "developer-handoff": {

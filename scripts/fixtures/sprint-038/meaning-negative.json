@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {"id": "missing-date", "base": {"subject": "user", "date": "2026-08-05", "action": "save", "target": "見積", "negationCondition": null, "destination": "TaskDB"}, "candidate": {"subject": "user", "date": null, "action": "save", "target": "見積", "negationCondition": null, "destination": "TaskDB"}},
+    {"id": "reversed-negation", "base": {"subject": "user", "date": null, "action": "save", "target": "memo", "negationCondition": "if approved", "destination": "docs"}, "candidate": {"subject": "user", "date": null, "action": "save", "target": "memo", "negationCondition": "even if not approved", "destination": "docs"}},
+    {"id": "added-destination", "base": {"subject": "user", "date": null, "action": "answer", "target": "status", "negationCondition": null, "destination": null}, "candidate": {"subject": "user", "date": null, "action": "answer", "target": "status", "negationCondition": null, "destination": "Slack"}}
+  ]
+}

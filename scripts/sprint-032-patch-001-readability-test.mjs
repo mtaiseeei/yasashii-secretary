@@ -149,7 +149,7 @@ check("A: shared rule keeps readable Markdown without a preference toggle", () =
   }
   assert(!readRelative("plugins/secretary/templates/memory/preferences.md").includes("改行"));
   const style = contract.ruleText[contract.styleKey];
-  assert(style.includes("report.detailedSuffix"), "the active style must define the optional fourth detail item");
+  assert(style.includes("report.states") || style.includes("応答状態"), "the active style must route by response state");
   assert(!/preferences.{0,40}(?:1行|一行|平文)/s.test(style));
 });
 
@@ -168,11 +168,10 @@ const SCENARIOS = [
   "completion-report",
 ];
 
-check("B: copy schema provides three physically separate report items", () => {
-  assert.equal(contract.labels.length, 3);
-  assert(contract.labels.every((label) => typeof label === "string" && label.length > 0));
+check("B: copy schema provides all content-dependent response states", () => {
+  assert.deepEqual(Object.keys(contract.states).sort(), ["answered", "error", "partial", "question", "saved"]);
   assert(typeof contract.detailLabel === "string" && contract.detailLabel.length > 0);
-  for (const line of contract.copy.surfaces.report.shortLines) assert(!line.includes("\n"));
+  assert.equal(Object.hasOwn(contract.copy.surfaces.report, "shortLines"), false);
 });
 
 check("B: one short confirmation copy remains one natural paragraph", () => {
@@ -202,17 +201,17 @@ for (const kind of SCENARIOS) {
   });
 }
 
-check("B: completion report without fixed labels is rejected (fixed === false)", () => {
+check("B: completion report without fixed labels is content-dependent", () => {
   const bad = conversationFixture("completion-report.unlabeled.bad.md");
   assert.equal(usesFixedThreeSchema(bad, contract.labels), false, "unlabeled fixture must not count as fixed schema");
   const verdict = validateScenario("completion-report", bad, contract);
-  assert(verdict.problems.some((problem) => problem.includes("固定3項目schema")), "missing fixed-schema rejection");
+  assert(verdict.problems.some((problem) => problem.includes("不要な複数項目")), "unnecessary list was not rejected");
 });
 
-check("B: completion report with out-of-order labels is rejected", () => {
+check("B: completion report with old fixed labels is rejected regardless of order", () => {
   const bad = conversationFixture("completion-report.out-of-order.bad.md");
   const verdict = validateScenario("completion-report", bad, contract);
-  assert(verdict.problems.some((problem) => problem.includes("順序")), "missing label-order rejection");
+  assert(verdict.problems.some((problem) => problem.includes("旧固定3項目")), "old fixed schema was not rejected");
 });
 
 check("B: general answers are not required to use the fixed three-item schema", () => {

@@ -7,8 +7,9 @@
 1. [`safety.md`](safety.md) — 記憶、確認、資格情報、外部送信等の安全契約
 2. [`evidence.md`](evidence.md) — 外部事実、根拠、断定、エラーの証拠契約
 3. [`common-language.md`](common-language.md) — edition共通の語彙と説明順
-4. [`styles/yasashii.md`](styles/yasashii.md) — yasashiiの口調、報告、個人設定
-5. [`copy/yasashii.json`](copy/yasashii.json) — 会話、診断、報告、developer handoffの可変copy
+4. [`conversation-contract.md`](conversation-contract.md) — intent、実行許可、副作用回数、応答状態
+5. [`styles/yasashii.md`](styles/yasashii.md) — yasashiiの口調、報告、個人設定
+6. [`copy/yasashii.json`](copy/yasashii.json) — 会話、診断、報告、developer handoffの可変copy
 
 `secretary/memory/preferences.md` は最後に読み、yasashii styleが許可した項目だけへ適用します。
 設定が無い、空、一部欠損の場合はyasashiiの既定値へ戻ります。

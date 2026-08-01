@@ -2,7 +2,8 @@
   "schemaVersion": 1,
   "defaultUpstreamClassification": "common",
   "common": [
-    "adapters/neutral-base.json"
+    "adapters/neutral-base.json",
+    "plugins/secretary/rules/styles/yasashii.md"
   ],
   "metadataOverlay": [
     ".agents/plugins/marketplace.json",
@@ -14,7 +15,6 @@
   ],
   "anchorOverlay": [
     "plugins/secretary/rules/plain-language.md",
-    "plugins/secretary/rules/styles/yasashii.md",
     "plugins/secretary/skills/build/SKILL.md",
     "plugins/secretary/skills/projects/SKILL.md",
     "plugins/secretary/skills/secretary/SKILL.md",

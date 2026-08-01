@@ -8,7 +8,7 @@ PLUGIN="$ROOT/plugins/secretary"
 TOOLS="$PLUGIN/skills/memory-care/scripts/memory-tools.sh"
 SETTINGS="$PLUGIN/skills/settings/SKILL.md"
 RULES_ENTRY="$PLUGIN/rules/plain-language.md"
-RULES="$PLUGIN/rules/styles/yasashii.md"
+RULES="$PLUGIN/rules/styles/agentic.md"
 COMMON_RULES="$PLUGIN/rules/common-language.md"
 SAFETY_RULES="$PLUGIN/rules/safety.md"
 EVIDENCE_RULES="$PLUGIN/rules/evidence.md"
@@ -59,10 +59,8 @@ tree_digest(){
 serializer_contract_ok(){
   local file="$1"
   grep -q '最終応答serializer（通常報告の唯一の正本）' "$file" &&
-    grep -q '無言で完了する' "$file" && grep -q 'serializerを1回だけ適用する' "$file" &&
-    grep -q 'CLIの`result`はtool前後の途中メッセージも連結する' "$file" &&
-    grep -q 'Markdown箇条書きとして物理的に分けます' "$file" &&
-    grep -q '^- やったこと:' "$file" && grep -q '^- 結果:' "$file" && grep -q '^- 次に何が起きるか:' "$file"
+    grep -q '全tool call後にserializerを1回だけ適用' "$file" &&
+    grep -q '固定3項目' "$file" && grep -q '部分完了' "$file"
 }
 
 serializer_reference_ok(){
@@ -75,17 +73,14 @@ serializer_reference_ok(){
 }
 
 report_shape_ok(){ # $1=output file $2=short|detail
-  local file="$1" detail="$2" lines expected
+  local file="$1" detail="$2" lines
   [ -s "$file" ] || return 1
-  ! grep -q '^[[:space:]]*$' "$file" || return 1
   lines="$(wc -l < "$file" | tr -d ' ')"
-  expected=3; [ "$detail" = detail ] && expected=4
-  [ "$lines" -eq "$expected" ] || return 1
-  sed -n '1p' "$file" | grep -q '^- やったこと: .\+' || return 1
-  sed -n '2p' "$file" | grep -q '^- 結果: .\+' || return 1
-  sed -n '3p' "$file" | grep -q '^- 次に何が起きるか: .\+' || return 1
+  ! grep -Eq '^- (やったこと|結果|次に何が起きるか):' "$file" || return 1
   if [ "$detail" = detail ]; then
-    sed -n '4p' "$file" | grep -q '^- 補足: .\+' || return 1
+    [ "$lines" -ge 3 ] && grep -q '^実装メモ:' "$file" || return 1
+  else
+    [ "$lines" -eq 1 ] || return 1
   fi
 }
 
@@ -107,14 +102,14 @@ reference_bad=0
 for surface in "${REFERENCE_SURFACES[@]}"; do
   serializer_reference_ok "$surface" || { printf '  serializer参照不整合: %s\n' "$surface"; reference_bad=$((reference_bad+1)); }
 done
-check "yasashii styleのserializer唯一正本はI1-I3境界を満たす" "serializer_contract_ok '$RULES'"
+check "active styleの内容依存serializer唯一正本はI1-I3境界を満たす" "serializer_contract_ok '$RULES'"
 check "安全・証拠境界はstyleから分離" \
   "grep -q 'push.*明示的に指示' '$SAFETY_RULES' && grep -q '実コネクタ' '$EVIDENCE_RULES' && grep -q 'edition.json.*4面copy' '$EVIDENCE_RULES' && ! grep -q '実コネクタの証跡が無い' '$RULES'"
 check "templates/tones/全15スキルは正本参照だけでschema重複0" \
   "[ '${#REFERENCE_SURFACES[@]}' -eq 20 ] && [ '$reference_bad' -eq 0 ]"
 SCHEMA_OWNER_COUNT="$(grep -Rsl '^- やったこと:' "$PLUGIN/rules" "$PLUGIN/skills" "$PLUGIN/templates" --include='*.md' | wc -l | tr -d ' ')"
-check "固定schemaの所有ファイルはyasashii style 1件だけ" \
-  "[ '$SCHEMA_OWNER_COUNT' -eq 1 ] && grep -q '^- やったこと:' '$RULES'"
+check "現役固定schema所有ファイルは0件" \
+  "[ '$SCHEMA_OWNER_COUNT' -eq 0 ]"
 ROUTER="$PLUGIN/skills/secretary/SKILL.md"
 SERIALIZER_REF_LINE="$(grep -n -m1 '最終応答serializer.*節である' "$ROUTER" | cut -d: -f1)"
 SILENT_LINE="$(grep -n -m1 'ルーティング、段階ロードは無言' "$ROUTER" | cut -d: -f1)"
@@ -122,24 +117,24 @@ ROUTE_LINE="$(grep -n -m1 '^## まずやること' "$ROUTER" | cut -d: -f1)"
 check "routerはserializer読込→無言境界→routingの順" \
   "[ '$SERIALIZER_REF_LINE' -lt '$SILENT_LINE' ] && [ '$SILENT_LINE' -lt '$ROUTE_LINE' ]"
 check "共通表現とyasashii styleは同一turn read-onlyで途中出力しない" \
-  "grep -q '同じturn内のRead、routing、read-only確認では途中メッセージを出さず' '$COMMON_RULES' && grep -q 'tool実行を無言で完了' '$RULES'"
+  "grep -q '同じturn内のRead、routing、read-only確認では途中メッセージを出さず' '$COMMON_RULES' && grep -q '全tool call後にserializerを1回だけ適用' '$RULES'"
 check "routerの競合する旧予告と末尾schema複製は0" \
   "! grep -q 'ひとこと予告してから' '$ROUTER' && ! grep -q '^## 最終出力の絶対条件' '$ROUTER'"
 
 # 意図的失敗fixture: 正本欠落、schema重複、無言境界欠落、適用順逆転を必ず拒否する。
-cp "$RULES" "$WORK/bad-owner.md"; perl -pi -e 's/無言で完了する/完了する/g' "$WORK/bad-owner.md"
+cp "$RULES" "$WORK/bad-owner.md"; perl -pi -e 's/全tool call後にserializerを1回だけ適用/serializerを適用/g' "$WORK/bad-owner.md"
 cp "$SETTINGS" "$WORK/bad-duplicate.md"; printf '\nやったこと: 複製\n結果: 複製\n次に何が起きるか: 複製\n' >> "$WORK/bad-duplicate.md"
 cp "$ROUTER" "$WORK/bad-silent.md"; perl -pi -e 's/ルーティング、段階ロードは無言/ルーティング、段階ロードを実行/' "$WORK/bad-silent.md"
 check "意図的失敗fixtureはserializer無言境界の欠落を検出" "! serializer_contract_ok '$WORK/bad-owner.md'"
 check "意図的失敗fixtureは下位skillのschema重複を検出" "! serializer_reference_ok '$WORK/bad-duplicate.md'"
 check "意図的失敗fixtureはrouterの途中出力境界欠落を検出" "! grep -q 'ルーティング、段階ロードは無言' '$WORK/bad-silent.md'"
 
-printf -- '- やったこと: 商談メモを保存しました。\n- 結果: local commit済みで、pushはしていません。\n- 次に何が起きるか: 内容を確認できます。\n' > "$WORK/report-short-ok.txt"
-printf -- '青空みらいさん、完了しました。\n- やったこと: 商談メモを保存しました。\n- 結果: local commit済みです。\n- 次に何が起きるか: 内容を確認できます。\n' > "$WORK/report-greeting-ng.txt"
-printf -- '- やったこと: 商談メモを保存しました。\n- 結果: local commit済みで、pushはしていません。\n- 次に何が起きるか: 内容を確認できます。\n- 補足: 外部サービスの接続状態は未確認です。\n' > "$WORK/report-detail-ok.txt"
-check "Markdown 3項目validatorは正しい短い報告を許可" "report_shape_ok '$WORK/report-short-ok.txt' short"
-check "Markdown 3項目validatorは挨拶の独立行を拒否" "! report_shape_ok '$WORK/report-greeting-ng.txt' short"
-check "Markdown 4項目validatorは明示くわしい補足1項目だけ許可" "report_shape_ok '$WORK/report-detail-ok.txt' detail"
+printf -- '商談メモを保存し、local commitを作成しました。pushはしていません。\n' > "$WORK/report-short-ok.txt"
+printf -- '青空みらいさん、完了しました。\n商談メモを保存しました。\n' > "$WORK/report-greeting-ng.txt"
+printf -- '商談メモを保存し、local commitを作成しました。\n\n実装メモ: 外部サービスの接続状態は未確認です。\n' > "$WORK/report-detail-ok.txt"
+check "内容依存validatorは正しい短い報告を許可" "report_shape_ok '$WORK/report-short-ok.txt' short"
+check "内容依存validatorは不要な挨拶の独立行を拒否" "! report_shape_ok '$WORK/report-greeting-ng.txt' short"
+check "内容依存validatorは必要な詳細段落を許可" "report_shape_ok '$WORK/report-detail-ok.txt' detail"
 check "preferences v2は4セクション" \
   "grep -q '^## 基本$' '$TEMPLATES/memory/preferences.md' && grep -q '^## 言葉遣い$' '$TEMPLATES/memory/preferences.md' && grep -q '^## 口調のお手本$' '$TEMPLATES/memory/preferences.md' && grep -q '^## 秘書のメモ$' '$TEMPLATES/memory/preferences.md'"
 check "preferences v2は4つのcategorical項目" \
@@ -155,19 +150,17 @@ check "初回後に設定変更導線を案内" "grep -q '設定はいつでも.
 
 # settings規律とプリセット
 check "settings skillのfrontmatter name" "[ \"\$(awk '/^name:/{print \$2; exit}' '$SETTINGS')\" = settings ]"
-check "settingsは例文→確認→反映→宣言→journal→commitを定義" \
-  "grep -q '変更後の短い例文' '$SETTINGS' && grep -q '確認ターンではツールを呼ばない' '$SETTINGS' && grep -q 'pref-set' '$SETTINGS' && grep -q '変更した項目:' '$SETTINGS' && grep -q 'journal-add' '$SETTINGS' && grep -q 'commit' '$SETTINGS'"
-PREVIEW_LINE="$(grep -n -m1 '変更後の短い例文' "$SETTINGS" | cut -d: -f1)"
-CONFIRM_LINE="$(grep -n -m1 'この確認ターンではツールを呼ばない' "$SETTINGS" | cut -d: -f1)"
-APPLY_LINE="$(grep -n -m1 'シームを1回呼ぶ' "$SETTINGS" | cut -d: -f1)"
-DECLARE_LINE="$(grep -n -m1 '変更した項目:' "$SETTINGS" | cut -d: -f1)"
+check "settingsは明示reversible変更を同じturnで1回反映" \
+  "grep -q '単一のreversibleな部分更新' '$SETTINGS' && grep -q '同じturnで部分更新シームを1回呼ぶ' '$SETTINGS' && grep -q 'pref-set' '$SETTINGS'"
+PREVIEW_LINE="$(grep -n -m1 '現在のpreferencesを読み' "$SETTINGS" | cut -d: -f1)"
+CONFIRM_LINE="$(grep -n -m1 '同じturnで部分更新シームを1回呼ぶ' "$SETTINGS" | cut -d: -f1)"
+APPLY_LINE="$(grep -n -m1 'それ以外:' "$SETTINGS" | cut -d: -f1)"
+DECLARE_LINE="$(grep -n -m1 'こう覚えました' "$SETTINGS" | cut -d: -f1)"
 JOURNAL_LINE="$(grep -n -m1 '宣言後.*journal-add' "$SETTINGS" | cut -d: -f1)"
 COMMIT_LINE="$(grep -n -m1 '最後に.*commit' "$SETTINGS" | cut -d: -f1)"
-check "settingsの6段階は契約順に並ぶ" \
+check "settingsの実行・宣言・journal・commitは契約順" \
   "[ '$PREVIEW_LINE' -lt '$CONFIRM_LINE' ] && [ '$CONFIRM_LINE' -lt '$APPLY_LINE' ] && [ '$APPLY_LINE' -lt '$DECLARE_LINE' ] && [ '$DECLARE_LINE' -lt '$JOURNAL_LINE' ] && [ '$JOURNAL_LINE' -lt '$COMMIT_LINE' ]"
-check "settingsは値を会話・journal・commitへ再掲しない" \
-  "grep -q '値は表示しません' '$SETTINGS' && grep -q 'assistantの会話本文、journal、commit messageへ含めない' '$SETTINGS'"
-check "settingsはキャンセル副作用0" "grep -q 'キャンセル.*preferences、journal、git commitを一切変更しない' '$SETTINGS'"
+check "settingsは曖昧確認前の副作用0" "grep -q '1問だけ聞き、副作用0で止まる' '$SETTINGS'"
 check "settingsはpushしない" "grep -q 'pushしない' '$SETTINGS' && ! grep -qE 'git +push' '$SETTINGS'"
 check "3つの口調プリセットが存在" "[ -f '$TEMPLATES/tones/standard.md' ] && [ -f '$TEMPLATES/tones/friendly.md' ] && [ -f '$TEMPLATES/tones/formal.md' ]"
 check "濃いキャラクターを同梱しない" "grep -q '濃いキャラクターは使わない' '$SETTINGS' && [ \"\$(find '$TEMPLATES/tones' -type f | wc -l | tr -d ' ')\" -eq 3 ]"
@@ -265,8 +258,8 @@ bash "$TOOLS" pref-set "$FORMAL" "言葉遣い" "報告の詳しさ" "くわし�
 check "既定設定は丁寧・ふつう・みじかく" "grep -q '^- 口調: 丁寧（標準）$' '$DEFAULT/memory/preferences.md' && grep -q '^- 専門用語: ふつう$' '$DEFAULT/memory/preferences.md' && grep -q '^- 報告の詳しさ: みじかく$' '$DEFAULT/memory/preferences.md'"
 check "設定2はフランク＋そのままOKだけ変更" "grep -q '^- 口調: フランク$' '$FRIENDLY/memory/preferences.md' && grep -q '^- 専門用語: そのままOK$' '$FRIENDLY/memory/preferences.md' && grep -q '^- 報告の詳しさ: みじかく$' '$FRIENDLY/memory/preferences.md'"
 check "設定3は敬語＋ことば添え＋くわしく" "grep -q '^- 口調: きっちり敬語$' '$FORMAL/memory/preferences.md' && grep -q '^- 専門用語: ことば添え$' '$FORMAL/memory/preferences.md' && grep -q '^- 報告の詳しさ: くわしく$' '$FORMAL/memory/preferences.md'"
-check "役割写像は営業・講師・経営を具体化" "grep -q '営業.*商談メモ' '$RULES' && grep -q '講師.*講義資料' '$RULES' && grep -q '経営.*数字のまとめ' '$RULES'"
-check "役割から未設定事実を捏造しない" "grep -q 'preferences に無い職歴、案件、数値、顧客情報を作らない' '$RULES'"
+check "役割写像は営業・講師・経営を具体化" "grep -q '営業.*商談メモ' '$SETTINGS' && grep -q '講師.*講義資料' '$SETTINGS' && grep -q '経営.*数字のまとめ' '$SETTINGS'"
+check "役割から未設定事実を捏造しない" "grep -q '設定に無い事実は作らない' '$SETTINGS'"
 
 bash "$TOOLS" pref-set "$DEFAULT" "言葉遣い" "決定の確認" "まとめて" >/dev/null 2>&1
 check "決定確認をまとめてへ切替可能" "grep -q '^- 決定の確認: まとめて$' '$DEFAULT/memory/preferences.md'"

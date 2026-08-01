@@ -2,15 +2,16 @@
 
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
-import { chmodSync, cpSync, existsSync, lstatSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, cpSync, existsSync, lstatSync, mkdtempSync, mkdirSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const sourcePlugin = join(repo, "plugins/secretary");
+const activeEdition = JSON.parse(readFileSync(join(sourcePlugin, "edition.json"), "utf8")).edition;
 const applyCli = join(sourcePlugin, "scripts/update-apply.mjs");
-const temporaryRoot = mkdtempSync(join(process.env.TMPDIR || tmpdir(), "sprint030-update-config-"));
+const temporaryRoot = realpathSync(mkdtempSync(join(process.env.TMPDIR || tmpdir(), "sprint030-update-config-")));
 const configValues = {
   pluginId: "fixture-secretary@fixture-marketplace",
   marketplaceId: "fixture-marketplace",
@@ -69,7 +70,7 @@ function workspace(name, { ledger = true } = {}) {
   writeFileSync(join(root, "secretary/CLAUDE.md"), "@AGENTS.md\n");
   writeFileSync(join(root, "secretary/memory/MEMORY.md"), "# memory\n");
   writeFileSync(join(root, "secretary/memory/preferences.md"), "# preferences\n");
-  json(join(root, ".secretary/workspace-edition.json"), { schemaVersion: 1, edition: "yasashii-secretary" });
+  json(join(root, ".secretary/workspace-edition.json"), { schemaVersion: 1, edition: activeEdition });
   if (ledger) {
     const records = ["secretary/AGENTS.md", "secretary/CLAUDE.md"].map((path) => ({
       path,
@@ -77,7 +78,7 @@ function workspace(name, { ledger = true } = {}) {
       baselineHash: `sha256:${digest(join(root, path))}`,
       templateVariables: {},
     }));
-    json(join(root, configValues.ledgerPath), { schemaVersion: 2, edition: "yasashii-secretary", records });
+    json(join(root, configValues.ledgerPath), { schemaVersion: 2, edition: activeEdition, records });
   }
   execFileSync("git", ["init", "-q", "-b", "main"], { cwd: root });
   git(root, ["config", "user.name", "Sprint 030 config fixture"]);
@@ -131,7 +132,7 @@ try {
   const ledgerPath = join(updateWorkspace, configValues.ledgerPath);
   const ledgerValue = JSON.parse(readFileSync(ledgerPath, "utf8"));
   check("canonical-only sessionからresume", started.status === 0 && dry.status === 0 && applied.status === 0, `${started.stderr}${dry.stderr}${applied.stderr}`);
-  check("schema2 canonical ledgerを更新・検証", ledgerValue.schemaVersion === 2 && ledgerValue.edition === "yasashii-secretary" && ledgerValue.records.every((record) => record.installedVersion === "0.7.0") && JSON.parse(applied.stdout).verification?.checks?.ledger === true);
+  check("schema2 canonical ledgerを更新・検証", ledgerValue.schemaVersion === 2 && ledgerValue.edition === activeEdition && ledgerValue.records.every((record) => record.installedVersion === "0.7.0") && JSON.parse(applied.stdout).verification?.checks?.ledger === true);
   check("legacy ledger pathへの新規書込み0件", !existsSync(join(updateWorkspace, configValues.legacyLedgerPath)) && !existsSync(join(updateWorkspace, ".yasashii-secretary/update-ledger.json")));
   const rolledBack = apply("rollback", updateWorkspace, targetPlugin);
   const restoredLedger = JSON.parse(readFileSync(ledgerPath, "utf8"));
@@ -141,7 +142,7 @@ try {
   check("fixture固有distribution IDを全plugin commandへ反映", commands.some((line) => line === `plugin marketplace update ${configValues.marketplaceId}`) && commands.some((line) => line === `plugin update ${configValues.pluginId} --scope user`));
 
   const unsafeLedger = workspace("unsafe-ledger", { ledger: false });
-  json(join(unsafeLedger, configValues.ledgerPath), { schemaVersion: 9, edition: "yasashii-secretary", records: [] });
+  json(join(unsafeLedger, configValues.ledgerPath), { schemaVersion: 9, edition: activeEdition, records: [] });
   json(join(unsafeLedger, configValues.legacyLedgerPath), []);
   git(unsafeLedger, ["add", "."]); git(unsafeLedger, ["commit", "-qm", "unsafe ledgers"]);
   const unsafeBefore = `${digest(join(unsafeLedger, configValues.ledgerPath))}:${digest(join(unsafeLedger, configValues.legacyLedgerPath))}:${git(unsafeLedger, ["rev-parse", "HEAD"])}`;

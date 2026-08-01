@@ -10,26 +10,14 @@
     {
       "id": "plain-language-active-style",
       "path": "plugins/secretary/rules/plain-language.md",
-      "match": "4. [`styles/agentic.md`](styles/agentic.md) — agenticの技術的に直接的な会話、診断、報告\n5. [`copy/agentic.json`](copy/agentic.json) — 会話、診断、報告、developer handoffの可変copy\n\n`secretary/memory/preferences.md` は最後に読み、agentic styleが許可した口調だけへ適用します。\n設定が無い、空、一部欠損の場合はagenticの既定値へ戻ります。",
-      "replacement": "4. [`styles/yasashii.md`](styles/yasashii.md) — yasashiiの口調、報告、個人設定\n5. [`copy/yasashii.json`](copy/yasashii.json) — 会話、診断、報告、developer handoffの可変copy\n\n`secretary/memory/preferences.md` は最後に読み、yasashii styleが許可した項目だけへ適用します。\n設定が無い、空、一部欠損の場合はyasashiiの既定値へ戻ります。"
+      "match": "4. [`conversation-contract.md`](conversation-contract.md) — intent、実行許可、副作用回数、応答状態\n5. [`styles/agentic.md`](styles/agentic.md) — agenticの技術的に直接的な会話、診断、報告\n6. [`copy/agentic.json`](copy/agentic.json) — 会話、診断、報告、developer handoffの可変copy\n\n`secretary/memory/preferences.md` は最後に読み、agentic styleが許可した口調だけへ適用します。\n設定が無い、空、一部欠損の場合はagenticの既定値へ戻ります。",
+      "replacement": "4. [`conversation-contract.md`](conversation-contract.md) — intent、実行許可、副作用回数、応答状態\n5. [`styles/yasashii.md`](styles/yasashii.md) — yasashiiの口調、報告、個人設定\n6. [`copy/yasashii.json`](copy/yasashii.json) — 会話、診断、報告、developer handoffの可変copy\n\n`secretary/memory/preferences.md` は最後に読み、yasashii styleが許可した項目だけへ適用します。\n設定が無い、空、一部欠損の場合はyasashiiの既定値へ戻ります。"
     },
     {
       "id": "plain-language-serializer",
       "path": "plugins/secretary/rules/plain-language.md",
       "match": "`styles/agentic.md` の「最終応答serializer」",
       "replacement": "`styles/yasashii.md` の「最終応答serializer」"
-    },
-    {
-      "id": "yasashii-style-declarative-report-copy",
-      "path": "plugins/secretary/rules/styles/yasashii.md",
-      "match": "`preferences.md` の「報告の詳しさ」が明示的に「くわしく」でなければ、copyにある3項目を\nMarkdown箇条書きとして物理的に分けます。",
-      "replacement": "`preferences.md` の「報告の詳しさ」が明示的に「くわしく」でなければ、copyの `report.shortLines` にある3項目を\nMarkdown箇条書きとして物理的に分けます。"
-    },
-    {
-      "id": "yasashii-style-declarative-detail-copy",
-      "path": "plugins/secretary/rules/styles/yasashii.md",
-      "match": "明示的に「くわしく」の場合だけ、同じ一覧へ `- 補足: <追加情報>` を1項目足します。",
-      "replacement": "明示的に「くわしく」の場合だけ、同じ一覧へcopyの `report.detailedSuffix` を4項目目として足します。\nyasashii copyでは `- 補足: <追加情報>` と表示します。"
     },
     {
       "id": "build-product-name",
@@ -98,22 +86,10 @@
       "replacement": "- 開発の入口（やさしいハーネス）:"
     },
     {
-      "id": "settings-confirmation-display",
-      "path": "plugins/secretary/skills/settings/SKILL.md",
-      "match": "2. 変更後の短い例文を見せ、最後に `この設定で反映しますか: <変更項目>=<値>` と確認する。\n3. **この確認ターンではツールを呼ばない。** キャンセル、訂正、別の話題なら終了し、preferences、journal、git commitを一切変更しない。\n4. 次の別ターンで明示了承された後だけ、部分更新シームまたは呼び方同期シームを1回呼ぶ。\n   - 呼び方:\n     `node \"${SECRETARY_PLUGIN_ROOT}/scripts/owner-name-transaction.mjs\" <secretary> \"<確認済みの値>\"`\n   - それ以外:\n     `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.sh pref-set <secretary> \"<セクション>\" \"<キー>\" \"<値>\"`\n5. `こう覚えました: <変更項目>=<値>` と宣言する。他項目を変えていないことも短く伝える。\n6. 呼び方以外は、宣言後に `journal-add <secretary> did \"設定を変更: <変更項目>=<値>\"` を1回だけ呼ぶ。\n7. 呼び方以外は、最後に `commit <secretary> \"設定を変更（<変更項目>: <値>）\"` を呼ぶ。\n   呼び方の更新シームは `preferences.md`、`AGENTS.md`、`MEMORY.md` の現役表示、journal 1件、\n   local commit 1件を一つのtransaction、つまり途中失敗時に全変更を元へ戻す一組の処理として完了する。\n   初回decisionは変更しない。どちらの経路もpushしない。",
-      "replacement": "2. 変更後の短い例文を見せ、`key=value` の1行へ連結せず、次のMarkdown箇条書きで確認する。設定値やSecret実値は会話へ再掲しない。\n\n   - 変更する項目: <日本語の項目名>\n   - 変更内容: ご指定の内容へ更新します（値は表示しません）\n   - 内部の正式key: `<セクション>.<キー>`\n\n3. **この確認ターンではツールを呼ばない。** キャンセル、訂正、別の話題なら終了し、preferences、journal、git commitを一切変更しない。\n4. 次の別ターンで明示了承された後だけ、部分更新シームまたは呼び方同期シームを1回呼ぶ。値はこの内部呼出だけへ渡し、assistantの会話本文、journal、commit messageへ含めない。\n   - 呼び方:\n     `node \"${SECRETARY_PLUGIN_ROOT}/scripts/owner-name-transaction.mjs\" <secretary> \"<確認済みの値>\"`\n   - それ以外:\n     `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.sh pref-set <secretary> \"<セクション>\" \"<キー>\" \"<値>\"`\n5. 更新後も1行へ圧縮せず、次の箇条書きで宣言する。\n\n   - 変更した項目: <日本語の項目名>\n   - 結果: ご指定の内容へ更新しました（値は表示しません）\n   - 内部の正式key: `<セクション>.<キー>`\n   - そのほかの設定: 変更していません\n\n6. 呼び方以外は、宣言後に `journal-add <secretary> did \"設定を変更: <変更項目>\"` を1回だけ呼ぶ。\n7. 呼び方以外は、最後に `commit <secretary> \"設定を変更（<変更項目>）\"` を呼ぶ。\n   呼び方の更新シームは `preferences.md`、`AGENTS.md`、`MEMORY.md` の現役表示、journal 1件、\n   local commit 1件を一つのtransaction、つまり途中失敗時に全変更を元へ戻す一組の処理として完了する。\n   初回decisionは変更しない。どちらの経路もpushしない。"
-    },
-    {
       "id": "settings-key-table",
       "path": "plugins/secretary/skills/settings/SKILL.md",
       "match": "| セクション | キー | 値 |\n|---|---|---|\n| 基本 | 呼び方 | 短い自由入力（内部設定は1件1record） |\n| 基本 | お仕事・役割 | 短い自由入力（内部設定は1件1record） |\n| 基本 | 主に使うサービス | 短い自由入力（内部設定は1件1record） |\n| 言葉遣い | 口調 | 丁寧（標準）／フランク／きっちり敬語 |\n| 言葉遣い | 専門用語 | ふつう／ことば添え／そのままOK |\n| 言葉遣い | 報告の詳しさ | みじかく／くわしく |\n| 言葉遣い | 決定の確認 | 都度／まとめて |\n| 口調のお手本 | NG / OK | 短い例文（内部設定は1件1record） |",
       "replacement": "| セクション | 日本語の項目名 | 内部の正式key | 入力の種類 |\n|---|---|---|---|\n| 基本 | 呼び方 | `基本.呼び方` | 短い自由入力 |\n| 基本 | お仕事・役割 | `基本.お仕事・役割` | 短い自由入力 |\n| 基本 | 主に使うサービス | `基本.主に使うサービス` | 短い自由入力 |\n| 言葉遣い | 口調 | `言葉遣い.口調` | 定義済みの選択肢 |\n| 言葉遣い | 専門用語 | `言葉遣い.専門用語` | 定義済みの選択肢 |\n| 言葉遣い | 報告の詳しさ | `言葉遣い.報告の詳しさ` | 定義済みの選択肢 |\n| 言葉遣い | 決定の確認 | `言葉遣い.決定の確認` | 定義済みの選択肢 |\n| 口調のお手本 | NG / OK | `口調のお手本.NG` / `口調のお手本.OK` | 短い例文 |"
-    },
-    {
-      "id": "settings-result-label",
-      "path": "plugins/secretary/skills/settings/SKILL.md",
-      "match": "- 結果: ご指定の内容へ更新しました（値は表示しません）",
-      "replacement": "- 更新の状態: ご指定の内容へ更新しました（値は表示しません）"
     },
     {
       "id": "update-description",
@@ -154,8 +130,8 @@
     {
       "id": "sprint-011-readable-settings-contract",
       "path": "scripts/sprint-011-regression.sh",
-      "match": "check \"settingsは例文→確認→反映→宣言→journal→commitを定義\" \\\n  \"grep -q '変更後の短い例文' '$SETTINGS' && grep -q '確認ターンではツールを呼ばない' '$SETTINGS' && grep -q 'pref-set' '$SETTINGS' && grep -q 'こう覚えました' '$SETTINGS' && grep -q 'journal-add' '$SETTINGS' && grep -q 'commit' '$SETTINGS'\"\nPREVIEW_LINE=\"$(grep -n -m1 '変更後の短い例文' \"$SETTINGS\" | cut -d: -f1)\"\nCONFIRM_LINE=\"$(grep -n -m1 'この確認ターンではツールを呼ばない' \"$SETTINGS\" | cut -d: -f1)\"\nAPPLY_LINE=\"$(grep -n -m1 'シームを1回呼ぶ' \"$SETTINGS\" | cut -d: -f1)\"\nDECLARE_LINE=\"$(grep -n -m1 'こう覚えました' \"$SETTINGS\" | cut -d: -f1)\"\nJOURNAL_LINE=\"$(grep -n -m1 '宣言後.*journal-add' \"$SETTINGS\" | cut -d: -f1)\"\nCOMMIT_LINE=\"$(grep -n -m1 '最後に.*commit' \"$SETTINGS\" | cut -d: -f1)\"\ncheck \"settingsの6段階は契約順に並ぶ\" \\\n  \"[ '$PREVIEW_LINE' -lt '$CONFIRM_LINE' ] && [ '$CONFIRM_LINE' -lt '$APPLY_LINE' ] && [ '$APPLY_LINE' -lt '$DECLARE_LINE' ] && [ '$DECLARE_LINE' -lt '$JOURNAL_LINE' ] && [ '$JOURNAL_LINE' -lt '$COMMIT_LINE' ]\"",
-      "replacement": "check \"settingsは例文→確認→反映→宣言→journal→commitを定義\" \\\n  \"grep -q '変更後の短い例文' '$SETTINGS' && grep -q '確認ターンではツールを呼ばない' '$SETTINGS' && grep -q 'pref-set' '$SETTINGS' && grep -q '変更した項目:' '$SETTINGS' && grep -q 'journal-add' '$SETTINGS' && grep -q 'commit' '$SETTINGS'\"\nPREVIEW_LINE=\"$(grep -n -m1 '変更後の短い例文' \"$SETTINGS\" | cut -d: -f1)\"\nCONFIRM_LINE=\"$(grep -n -m1 'この確認ターンではツールを呼ばない' \"$SETTINGS\" | cut -d: -f1)\"\nAPPLY_LINE=\"$(grep -n -m1 'シームを1回呼ぶ' \"$SETTINGS\" | cut -d: -f1)\"\nDECLARE_LINE=\"$(grep -n -m1 '変更した項目:' \"$SETTINGS\" | cut -d: -f1)\"\nJOURNAL_LINE=\"$(grep -n -m1 '宣言後.*journal-add' \"$SETTINGS\" | cut -d: -f1)\"\nCOMMIT_LINE=\"$(grep -n -m1 '最後に.*commit' \"$SETTINGS\" | cut -d: -f1)\"\ncheck \"settingsの6段階は契約順に並ぶ\" \\\n  \"[ '$PREVIEW_LINE' -lt '$CONFIRM_LINE' ] && [ '$CONFIRM_LINE' -lt '$APPLY_LINE' ] && [ '$APPLY_LINE' -lt '$DECLARE_LINE' ] && [ '$DECLARE_LINE' -lt '$JOURNAL_LINE' ] && [ '$JOURNAL_LINE' -lt '$COMMIT_LINE' ]\"\ncheck \"settingsは値を会話・journal・commitへ再掲しない\" \\\n  \"grep -q '値は表示しません' '$SETTINGS' && grep -q 'assistantの会話本文、journal、commit messageへ含めない' '$SETTINGS'\""
+      "match": "check \"settingsは明示reversible変更を同じturnで1回反映\" \\\n  \"grep -q '単一のreversibleな部分更新' '$SETTINGS' && grep -q '同じturnで部分更新シームを1回呼ぶ' '$SETTINGS' && grep -q 'pref-set' '$SETTINGS'\"\nPREVIEW_LINE=\"$(grep -n -m1 '現在のpreferencesを読み' \"$SETTINGS\" | cut -d: -f1)\"\nCONFIRM_LINE=\"$(grep -n -m1 '同じturnで部分更新シームを1回呼ぶ' \"$SETTINGS\" | cut -d: -f1)\"\nAPPLY_LINE=\"$(grep -n -m1 'それ以外:' \"$SETTINGS\" | cut -d: -f1)\"\nDECLARE_LINE=\"$(grep -n -m1 'こう覚えました' \"$SETTINGS\" | cut -d: -f1)\"\nJOURNAL_LINE=\"$(grep -n -m1 '宣言後.*journal-add' \"$SETTINGS\" | cut -d: -f1)\"\nCOMMIT_LINE=\"$(grep -n -m1 '最後に.*commit' \"$SETTINGS\" | cut -d: -f1)\"\ncheck \"settingsの実行・宣言・journal・commitは契約順\" \\\n  \"[ '$PREVIEW_LINE' -lt '$CONFIRM_LINE' ] && [ '$CONFIRM_LINE' -lt '$APPLY_LINE' ] && [ '$APPLY_LINE' -lt '$DECLARE_LINE' ] && [ '$DECLARE_LINE' -lt '$JOURNAL_LINE' ] && [ '$JOURNAL_LINE' -lt '$COMMIT_LINE' ]\"",
+      "replacement": "check \"settingsは明示reversible変更を同じturnで1回反映\" \\\n  \"grep -q '単一のreversibleな部分更新' '$SETTINGS' && grep -q '同じturnで部分更新シームを1回呼ぶ' '$SETTINGS' && grep -q 'pref-set' '$SETTINGS'\"\nPREVIEW_LINE=\"$(grep -n -m1 '現在のpreferencesを読み' \"$SETTINGS\" | cut -d: -f1)\"\nCONFIRM_LINE=\"$(grep -n -m1 '同じturnで部分更新シームを1回呼ぶ' \"$SETTINGS\" | cut -d: -f1)\"\nAPPLY_LINE=\"$(grep -n -m1 'それ以外:' \"$SETTINGS\" | cut -d: -f1)\"\nDECLARE_LINE=\"$(grep -n -m1 'こう覚えました' \"$SETTINGS\" | cut -d: -f1)\"\nJOURNAL_LINE=\"$(grep -n -m1 '宣言後.*journal-add' \"$SETTINGS\" | cut -d: -f1)\"\nCOMMIT_LINE=\"$(grep -n -m1 '最後に.*commit' \"$SETTINGS\" | cut -d: -f1)\"\ncheck \"settingsの実行・宣言・journal・commitは契約順\" \\\n  \"[ '$PREVIEW_LINE' -lt '$CONFIRM_LINE' ] && [ '$CONFIRM_LINE' -lt '$APPLY_LINE' ] && [ '$APPLY_LINE' -lt '$DECLARE_LINE' ] && [ '$DECLARE_LINE' -lt '$JOURNAL_LINE' ] && [ '$JOURNAL_LINE' -lt '$COMMIT_LINE' ]\""
     },
     {
       "id": "sprint-025-historical-root-realpath",
@@ -166,7 +142,7 @@
     {
       "id": "sprint-029-evidence-dynamic-copy",
       "path": "scripts/sprint-029-rule-boundary-test.mjs",
-      "match": "for (const phrase of [\"実コネクタ\", \"接続状態は未確認\", \"根拠\", \"推測で断定しません\"]) assert(evidence.includes(phrase), `証拠契約が不足しています: ${phrase}`);",
+      "match": "for (const phrase of [\"実コネクタ\", \"接続状態を未確認\", \"根拠\", \"推測で断定しません\"]) assert(evidence.includes(phrase), `証拠契約が不足しています: ${phrase}`);",
       "replacement": "for (const phrase of [\"実コネクタ\", \"edition.json\", \"4面copy\", \"根拠\", \"推測で断定しません\"]) assert(evidence.includes(phrase), `証拠契約が不足しています: ${phrase}`);"
     },
     {

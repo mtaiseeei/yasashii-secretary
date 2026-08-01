@@ -105,20 +105,20 @@ SECRETARY_SKILL="$PLUGIN/skills/secretary/SKILL.md"
 MEMCARE_SKILL="$PLUGIN/skills/memory-care/SKILL.md"
 DAILY_SKILL="$PLUGIN/skills/daily/SKILL.md"
 AGENTS_TEMPLATE="$PLUGIN/templates/AGENTS.md"
-assert "決定の異なる3表現を会話規律に定義" \
-  "grep -q '〜にしよう' '$MEMCARE_SKILL' && grep -q 'じゃあそれで' '$MEMCARE_SKILL' && grep -q 'それで決定' '$MEMCARE_SKILL'"
-assert "決定は原文の短い確認後だけ記録" \
-  "grep -q 'この内容を決定として残しますね' '$MEMCARE_SKILL' && grep -q '了承を得た後だけ.*remember-decision' '$MEMCARE_SKILL'"
-assert "確認ターンは短い確認文だけで停止" \
-  "grep -q '確認ターンでは次の短い確認文だけを返して、そこで止まる' '$SECRETARY_SKILL' && grep -q '確認ターンでは次の短い確認文だけを返して、そこで止まる' '$MEMCARE_SKILL' && grep -q '確認ターンでは次の短い確認文だけを返して、そこで止まる' '$AGENTS_TEMPLATE'"
-assert "決定確認は入力全文を無加工で保持" \
-  "grep -q '句読点・助詞・.*一字も削らず、並べ替えず、言い換えず' '$SECRETARY_SKILL' && grep -q '句読点・助詞・.*一字も削らず、並べ替えず、言い換えず' '$MEMCARE_SKILL' && grep -q '句読点・助詞・.*一字も削らず、並べ替えず、言い換えず' '$AGENTS_TEMPLATE'"
-assert "決定確認に挨拶・説明・再確認を混ぜない" \
-  "grep -q '挨拶、解釈、補足.*再確認.*足さない' '$SECRETARY_SKILL' && grep -q '挨拶、解釈、補足.*再確認.*混ぜない' '$MEMCARE_SKILL' && grep -q '挨拶、解釈、補足.*再確認.*混ぜない' '$AGENTS_TEMPLATE'"
-assert "確認ターンは無副作用で別ターン了承後だけ記録" \
-  "grep -q '確認ターンではツールを呼ばず' '$SECRETARY_SKILL' && grep -q '次の別ターンで明示的に了承した後だけ' '$SECRETARY_SKILL' && grep -q '確認ターンではツールを呼ばず' '$MEMCARE_SKILL' && grep -q '次の別ターンで明示的に了承した後だけ' '$MEMCARE_SKILL' && grep -q '確認ターンではツールを呼ばず' '$AGENTS_TEMPLATE' && grep -q '次の別ターンで明示的に了承した後だけ' '$AGENTS_TEMPLATE'"
-assert "決定3表現の厳密な出力例を配布" \
-  "grep -qF 'この内容を決定として残しますね: Zoomは対面開催にしよう' '$MEMCARE_SKILL' && grep -qF 'この内容を決定として残しますね: 候補AとBなら、じゃあそれで。' '$MEMCARE_SKILL' && grep -qF 'この内容を決定として残しますね: 配布日は7月25日。それで決定。' '$MEMCARE_SKILL'"
+assert "明示低リスク決定は同じturnで1回保存" \
+  "grep -q '同じturnで' '$MEMCARE_SKILL' && grep -q '1回' '$MEMCARE_SKILL' && grep -q 'remember-decision' '$MEMCARE_SKILL'"
+assert "自発提案と明示保存を分離" \
+  "grep -q 'inferred' '$REPO/plugins/secretary/rules/conversation-contract.md' && grep -q 'explicit' '$REPO/plugins/secretary/rules/conversation-contract.md'"
+assert "曖昧さは不足一点を質問" \
+  "grep -q '不足.*1点' '$MEMCARE_SKILL' || grep -q '不足.*1問' '$MEMCARE_SKILL'"
+assert "引用・伝聞・仮定を現在writeにしない" \
+  "grep -q '引用' '$MEMCARE_SKILL' && grep -q '伝聞' '$MEMCARE_SKILL' && grep -q '仮定' '$MEMCARE_SKILL'"
+assert "訂正は訂正後だけを扱う" \
+  "grep -q '訂正' '$MEMCARE_SKILL'"
+assert "取消は未保存と保存済みを分離" \
+  "grep -q '保存済み.*取り消し' '$REPO/plugins/secretary/rules/conversation-contract.md' && grep -q '副作用0' '$REPO/plugins/secretary/rules/conversation-contract.md'"
+assert "過去照会はread-only" \
+  "grep -q '過去の依頼についての質問' '$REPO/plugins/secretary/rules/conversation-contract.md' && grep -q 'answered' '$REPO/plugins/secretary/rules/conversation-contract.md'"
 assert "決定検出が完全自動でないことを明示" "grep -q '完全自動ではない' '$MEMCARE_SKILL'"
 assert "decidedゼロの締め確認を定義" \
   "grep -q '当日の.*decisions.*0件' '$MEMCARE_SKILL' && grep -q '会話を読み返' '$MEMCARE_SKILL'"
@@ -148,8 +148,8 @@ assert "生成AGENTSにも節目プロトコルを配布" \
   "grep -q '会話の節目と1日の流れ' '$AGENTS_TEMPLATE' && grep -q '都度＋締めの二段構え' '$AGENTS_TEMPLATE'"
 assert "生成AGENTSの専門用語規約が現行specと一致" \
   "grep -q '一般的な技術用語はそのまま使う' '$AGENTS_TEMPLATE' && grep -q '馴染みの薄い語だけ、初出時に短い補足を添える' '$AGENTS_TEMPLATE' && ! grep -q '専門用語には、やさしい言い換えをカッコで併記する' '$AGENTS_TEMPLATE'"
-assert "既定3項目のMarkdown報告を維持" \
-  "grep -q '最終応答serializer.*だけを正本' '$DAILY_SKILL' && grep -q '通常報告の唯一の正本は.*styles/yasashii.md' '$REPO/plugins/secretary/rules/plain-language.md' && grep -q '^## 最終応答serializer' '$REPO/plugins/secretary/rules/styles/yasashii.md' && grep -q 'Markdown箇条書きとして物理的に分けます' '$REPO/plugins/secretary/rules/styles/yasashii.md' && grep -q '明示的に「くわしく」の場合だけ' '$REPO/plugins/secretary/rules/styles/yasashii.md'"
+assert "内容依存の5応答状態を維持" \
+  "grep -q '最終応答serializer.*だけを正本' '$DAILY_SKILL' && grep -q 'styles/agentic.md' '$REPO/plugins/secretary/rules/plain-language.md' && node -e 'const c=require(\"./plugins/secretary/rules/copy/agentic.json\");const s=Object.keys(c.surfaces.report.states).sort().join(\",\");process.exit(s===\"answered,error,partial,question,saved\"&&!Object.hasOwn(c.surfaces.report,\"shortLines\")?0:1)'"
 
 # morning→daily→eveningで使う正規シームを一続きで実行し、閲覧による増分がないことを確認する。
 FLOW="$WORK/flow-secretary"; cp -R "$TEMPLATES/." "$FLOW/"

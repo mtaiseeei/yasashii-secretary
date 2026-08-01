@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "baseCommit": "d9a62755ff78db12c435f225cdd40e95f86a8055",
+  "overlaySha256": "f2100a8b9af138b7e9ccec77024d1e833e4e6579e05079f908886567bff6d090",
+  "snapshotExclusions": [
+    "docs/sprints/state.md",
+    "docs/progress/sprint-038.md",
+    "docs/feedback/sprint-038.md",
+    "scripts/fixtures/sprint-038/candidate-source-snapshot.json",
+    "scripts/fixtures/sprint-038/candidate-inputs.json"
+  ],
+  "seeds": {
+    "yasashii": {
+      "name": "yasashii-retry1-fixed-snapshot",
+      "files": 648,
+      "sha256": "24202f527f72ea9a5ab26fe81a6980d20166fa0d3875b8c7779c916534e26d96"
+    },
+    "private": {
+      "name": "private-retry1-fixed-snapshot",
+      "files": 774,
+      "sha256": "0b1d2d604dfdf48f260f28eca8a39f84a8ba093c7e36e2080bcf423ac8972f5c"
+    }
+  }
+}

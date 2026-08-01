@@ -1,5 +1,30 @@
 # 変更履歴
 
+## [0.9.0] - 2026-07-31
+
+### 対象者
+
+- 明示した低リスク操作を同じturnで完了し、曖昧・破壊的・外部操作だけを確認したい方。
+
+### 変わること
+
+- intentを`explicit / inferred / ambiguous / destructive / external`へ分け、低リスクの明示操作は正規シームを1回実行します。
+- 応答を`answered / question / saved / error / partial`へ分け、固定3項目やexact copyを廃止します。
+
+### 設定・ファイルへの影響
+
+- 新規workspaceの`AGENTS.md`は会話契約v2を含みます。既存workspaceはdry-runで対象を示した後、template-ownedの旧会話契約節だけをatomicに置換します。
+- 記憶、プロジェクト、Secret、チャット履歴、外部サービスはmigrationで変更しません。
+
+### 必要な操作
+
+- 更新診断、保護commit、plugin更新、reload、migration dry-run、plan hash付き確認の既存手順を使います。
+
+### 互換性上の注意
+
+- `0.7.0`／`0.8.0`のrelease記録、migration、fixture、tag、過去回帰は履歴として残します。
+- 削除、内容喪失、push、外部送信、bulk、Secret拒否の安全境界は緩めません。
+
 ## [0.8.0] - 2026-07-20
 
 ### 対象者

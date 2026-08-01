@@ -55,6 +55,7 @@ function copyDistribution(target) {
   mkdirSync(join(target, "plugins"), { recursive: true });
   mkdirSync(join(target, "scripts"), { recursive: true });
   cpSync(join(root, ".claude-plugin"), join(target, ".claude-plugin"), { recursive: true });
+  cpSync(join(root, ".agents"), join(target, ".agents"), { recursive: true });
   cpSync(pluginRoot, join(target, "plugins", "secretary"), { recursive: true });
   cpSync(legacyRoot, join(target, "plugins", "yasashii-secretary"), { recursive: true });
   cpSync(join(root, "scripts", "check-release-integrity.py"), join(target, "scripts", "check-release-integrity.py"));
@@ -104,9 +105,9 @@ try {
       && entry.source !== config.distribution.pluginId,
   );
   check(
-    "legacy raw CHANGELOG URL remains configured",
-    config.distribution.changelogUrl.endsWith("/plugins/yasashii-secretary/CHANGELOG.md")
-      && !config.distribution.changelogUrl.endsWith("/plugins/secretary/CHANGELOG.md"),
+    "current canonical CHANGELOG URL is configured",
+    config.distribution.changelogUrl.endsWith("/plugins/secretary/CHANGELOG.md")
+      && config.distribution.changelogUrl.includes("/agentic-secretary/"),
   );
 
   const fetchedUrls = [];
@@ -151,12 +152,12 @@ try {
   let diagnosisJson = {};
   try { diagnosisJson = JSON.parse(diagnosis.stdout); } catch { /* assertion reports malformed output */ }
   check(
-    "legacy raw URL style diagnose is read-only and complete",
+    "current raw URL diagnosis is read-only and keeps opposite-edition detection",
     diagnosis.status === 0
       && diagnosisJson.mode === "diagnosis-read-only"
       && diagnosisJson.currentVersion === entry.version
       && diagnosisJson.latestVersion === entry.version
-      && diagnosisJson.workspaceEdition?.state === "legacy-yasashii"
+      && diagnosisJson.workspaceEdition?.state === "opposite-edition"
       && diagnosisJson.latest?.sections?.["変わること"]?.length > 0
       && diagnosisJson.latest?.sections?.["設定・ファイルへの影響"]?.length > 0
       && Object.values(diagnosisJson.sideEffects || {}).every((value) => value === 0)
@@ -174,7 +175,7 @@ try {
   fixtureMarket.plugins[0].source = "./plugins/yasashii-secretary";
   json(fixtureMarketPath, fixtureMarket);
   const oldSource = runValidator(fixture);
-  check("validator rejects legacy implementation source", oldSource.status !== 0 && /plugin source/.test(oldSource.stdout));
+  check("validator rejects legacy implementation source", oldSource.status !== 0 && /plugin source|only CHANGELOG/.test(oldSource.stdout));
   json(fixtureMarketPath, market);
 
   const canonicalFixture = join(fixture, "plugins", "secretary");

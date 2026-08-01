@@ -285,8 +285,8 @@ check("Browser拡張を必要条件にしない", skill.includes("Browser Use、
 check("wizardはJSON選択から開始", app.includes('else renderPrepareFile();') && app.includes("まだ接続用JSONがない場合") && app.includes("Google Chatを設定したい"));
 check("wizardのCloud準備3画面を撤去", !app.includes('show("prepare-cloud"') && !app.includes('show("prepare-access"') && !app.includes("Google Cloud準備 1 / 3"));
 check("Cloud案内画像と配信参照を撤去", !existsSync(guidePath) && !app.includes("google-cloud-setup-guide") && !server.includes("google-cloud-setup-guide") && !readme.includes("google-cloud-setup-guide"));
-check("READMEはAI主導線と手動公式リンクを持つ", readme.includes("AIへ **「Google Chatを設定したい」**") && readme.includes("AIを使わずGoogle Cloudを準備する場合") && readme.includes("console.cloud.google.com/auth/clients"));
-check("READMEはBilling非接続とgcloud安心説明を持つ", readme.includes("Google公式の管理ツール") && readme.includes("インストール自体は無料") && readme.includes("Billing Accountを自動接続しません"));
+check("READMEはAI主導線とGoogle公式リンクを持つ", readme.includes("Google Chatを設定したい") && readme.includes("Google Cloudの準備から案内") && readme.includes("developers.google.com/workspace/chat/authenticate-authorize-chat-user"));
+check("READMEはCloud権限とOAuth安全境界を説明", readme.includes("Cloud project作成権限") && readme.includes("chat.spaces.readonly") && readme.includes("client secret") && readme.includes("保存しません"));
 check("OAuthはJSON後の明示ボタン・別タブ・SPACE自動選択を維持", app.includes("Googleの確認画面を開く") && app.includes('window.open("about:blank", "yasashii-google-chat-oauth")') && app.includes('await json("/api/oauth/authorize", { method: "POST" })') && app.includes('authWindow.location.replace("/api/oauth/authorize")') && app.includes("await discoverSpaces()"));
 check("一体型確定・3時間推奨・完了CTAを維持", app.includes('actions("この設定で始める")') && app.includes('interval: "3h"') && app.includes("設定を終了する") && !app.includes("自動取得を設定する"));
 check("Chatwork実装は本Patchで変更対象外", existsSync(join(repo, "plugins/secretary/skills/chatwork/assets/wizard/app.js")));

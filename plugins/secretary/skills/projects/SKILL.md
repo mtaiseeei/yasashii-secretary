@@ -59,12 +59,12 @@ node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs candidate-check <secreta
 
 > この内容は今後も続きそうです。プロジェクトとしてまとめますか？
 
-選択肢は「まとめる／今回はまとめない」。確認前、拒否、キャンセルではprojectファイル、journal、
+選択肢は「まとめる／今回はまとめない」。候補の提案だけではprojectファイル、journal、
 commit、remoteを変更しない。`candidate-check`もファイルを変更しない。
 
 ## 2. 一般プロジェクトはライト運用から始める
 
-営業、マーケティング、新規事業、採用、研修、契約準備等は、了承後だけ同じprivate workspaceの
+営業、マーケティング、新規事業、採用、研修、契約準備等は、作成操作と必要項目が現在の依頼で明示されたときだけ同じprivate workspaceの
 `secretary/projects/open/<project>/PROJECT.md` を正本にする。新規PJは一般PJ、ライトPJ、
 別repo参照PJを含め必ずopenへ作り、closedへの直接新規作成は拒否する。作成前に、プロジェクト名、概要、ゴール、
 成功の測り方、現在の状況、次の入口、要確認事項を短く確認する。
@@ -75,7 +75,7 @@ node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs create-light <secretary>
   --current "<現在の状況>" --next "<次の入口>" --questions "<要確認事項>" --confirm
 ```
 
-`--confirm`はユーザーが別ターンまたは構造化質問で明示了承した後だけ付ける。コマンドは安全な名前、
+`--confirm`は作成操作、対象、必要項目が現在の依頼で明示されている場合に付け、同じturnで1回だけ実行する。不足があれば副作用0で1問だけ聞く。コマンドは安全な名前、
 既存同名PJ、空入力、資格情報、境界外path、symlinkを検査し、空テンプレや部分生成を残さない。
 
 進行中一覧は `project-tools.mjs list <secretary>`、closedを明示的に含む一覧は
@@ -142,7 +142,8 @@ node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs promote-full <secretary>
 
 ## 6. 完了と再開
 
-完了前に対象、完了日、達成した結果、残件を示し、「完了扱いにする／まだ進行中」を確認する。
+対象、完了日、達成した結果、残件が現在の依頼で明示されていれば、同じturnで完了処理を1回実行する。
+不足がある場合だけ「完了扱いにする／まだ進行中」または不足項目を1問で確認する。
 
 ```text
 node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs complete <secretary> <project> \
@@ -153,8 +154,8 @@ node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs complete <secretary> <pr
 一つの原子的操作として行う。通常の一覧、検索、timeline、daily／weekly、候補提案はclosedを読まない。
 closed、完了、終了、過去案件の明示指定時だけ `--closed`／`--include-closed` を使う。
 
-完了済みPJに新しい作業が出ても自動再開しない。「このプロジェクトを再開しますか？」と確認し、
-了承後だけ `reopen ... --reason "<再開理由>" --next "<次の入口>" --confirm` を使い、closedからopenへ戻す。
+完了済みPJに新しい作業が出ても自動再開しない。再開操作、対象、理由、次の入口が現在の依頼で明示されていれば、
+`reopen ... --reason "<再開理由>" --next "<次の入口>" --confirm` を同じturnで1回使う。不足があれば1問だけ確認し、closedからopenへ戻す。
 過去の完了記録は消さない。
 
 ## 7. 開発プロジェクトはbuildを維持する

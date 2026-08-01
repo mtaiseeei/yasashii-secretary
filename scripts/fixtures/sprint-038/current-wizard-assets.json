@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "contract": "Sprint 038 accepted current wizard bytes; Sprint 029 historical baseline remains immutable",
+  "assets": {
+    "plugins/secretary/skills/chatwork/assets/wizard/app.js": "e8e31880b67953b0acdb364c74d18728938867c42c69a43b725874b4d5b83d3e",
+    "plugins/secretary/skills/google-chat/assets/wizard/app.js": "fcea246dc0b462f79647849bfffef9285d9fe9a1236d9afc264bf84ddc4ba1df",
+    "plugins/secretary/skills/chatwork/assets/wizard/common.js": "486479597dd497ffce85a41005ec4f6173c5da2ffaa51fa2df128fd83b762908",
+    "plugins/secretary/skills/chatwork/assets/wizard/result-model.js": "9adffbc1a8b94213cc7ee7b756dd0db68b4f7b96212b5a10af24b1a489710e0d",
+    "plugins/secretary/skills/chatwork/assets/wizard/style.css": "37172c51374e94fc92d0c7d0aac48434eaa06a22e2a83bc30f6bc790ea30c207"
+  }
+}
