@@ -1,7 +1,7 @@
 {
   "name": "yasashii-secretary",
   "description": "あなた専属のAI秘書。記憶、通常のプロジェクト、選択したChatwork／Google Chat履歴を1つのprivate GitHub repoで管理する。",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "author": {
     "name": "mtaiseeei"
   },

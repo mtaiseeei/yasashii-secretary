@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate that the yasashii style is the only normal-report schema owner."""
+"""Validate that the active edition owns a content-dependent response schema."""
 
 from __future__ import annotations
 
@@ -9,7 +9,6 @@ import sys
 from pathlib import Path
 
 
-OWNER_REL = Path("rules/styles/yasashii.md")
 ENTRYPOINT_REL = Path("rules/plain-language.md")
 PREFIX_GROUPS = {
     "done": ("やったこと", "実施内容", "実施したこと", "行ったこと", "対応内容"),
@@ -109,18 +108,28 @@ def blockquote_runs(lines: list[str]) -> list[int]:
 
 def validate(plugin: Path) -> list[str]:
     errors: list[str] = []
-    owner = plugin / OWNER_REL
     entrypoint = plugin / ENTRYPOINT_REL
-    if not owner.is_file():
-        return [f"serializer owner missing: {owner}"]
     if not entrypoint.is_file():
         return [f"communication entrypoint missing: {entrypoint}"]
 
+    try:
+        manifest = __import__("json").loads((plugin / "rules/rule-manifest.json").read_text(encoding="utf-8"))
+        style_names = [name for name in manifest.get("priority", []) if manifest.get("rules", {}).get(name, {}).get("copy")]
+        if len(style_names) != 1:
+            return [f"active serializer owner count is {len(style_names)} (expected 1)"]
+        style = manifest["rules"][style_names[0]]
+        owner = plugin / "rules" / style["path"]
+        copy_path = plugin / "rules" / style["copy"]
+        copy = __import__("json").loads(copy_path.read_text(encoding="utf-8"))
+    except Exception as error:
+        return [f"active serializer contract is unreadable: {error}"]
+
     owner_text = owner.read_text(encoding="utf-8")
-    required_owner_lines = ("やったこと:", "結果:", "次に何が起きるか:", "補足:")
-    for required in required_owner_lines:
-        if required not in owner_text:
-            errors.append(f"serializer owner lacks canonical field: {required}")
+    states = copy.get("surfaces", {}).get("report", {}).get("states", {})
+    if sorted(states) != ["answered", "error", "partial", "question", "saved"]:
+        errors.append("serializer copy lacks canonical response states")
+    if "shortLines" in copy.get("surfaces", {}).get("report", {}):
+        errors.append("serializer copy still owns legacy fixed shortLines")
     if "最終応答serializer（通常報告の唯一の正本）" not in owner_text:
         errors.append("serializer owner lacks unique-owner declaration")
 
@@ -165,7 +174,8 @@ def main() -> int:
         for error in errors:
             print(f"SCHEMA_ERROR {error}", file=sys.stderr)
         return 1
-    print("SCHEMA_OK owner=rules/styles/yasashii.md entrypoint=rules/plain-language.md surfaces=20 conflicts=0")
+    print("SCHEMA_OK owner=active-edition-style entrypoint=rules/plain-language.md surfaces=20 conflicts=0 states=5")
+    print("PASS=1 FAIL=0")
     return 0
 
 

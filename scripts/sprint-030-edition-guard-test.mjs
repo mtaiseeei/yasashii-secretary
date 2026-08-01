@@ -2,7 +2,7 @@
 
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -13,6 +13,7 @@ const guardCli = join(plugin, "scripts/edition-guard.mjs");
 const diagnoseCli = join(plugin, "scripts/update-diagnose.mjs");
 const applyCli = join(plugin, "scripts/update-apply.mjs");
 const ledgerCli = join(plugin, "scripts/update-ledger.mjs");
+const activeEdition = JSON.parse(readFileSync(join(plugin, "edition.json"), "utf8")).edition;
 const states = ["new", "same-edition", "legacy-yasashii", "opposite-edition", "mixed", "unknown"];
 const entries = ["onboarding", "diagnose", "update", "migration"];
 let pass = 0;
@@ -75,7 +76,7 @@ function snapshot(workspace) {
 }
 
 function seedState(state) {
-  const workspace = mkdtempSync(join(process.env.TMPDIR || tmpdir(), `yasashii-s030-${state}-`));
+  const workspace = realpathSync(mkdtempSync(join(process.env.TMPDIR || tmpdir(), `secretary-s030-${state}-`)));
   execFileSync("git", ["init", "-q", "-b", "main"], { cwd: workspace });
   git(workspace, ["config", "user.name", "Sprint 030 fixture"]);
   git(workspace, ["config", "user.email", "sprint030@example.invalid"]);
@@ -84,17 +85,17 @@ function seedState(state) {
   writeFileSync(join(workspace, "secretary/settings.json"), "{\"schedule\":\"3h\",\"bot\":\"existing-secretary[bot]\"}\n");
   writeFileSync(join(workspace, "secretary/history/2026-07-20.md"), "既存履歴は変更しない\n");
   if (state === "same-edition") {
-    writeJson(join(workspace, ".secretary/workspace-edition.json"), { schemaVersion: 1, edition: "yasashii-secretary" });
-    writeJson(join(workspace, ".secretary/update-ledger.json"), { schemaVersion: 2, edition: "yasashii-secretary", records: [] });
+    writeJson(join(workspace, ".secretary/workspace-edition.json"), { schemaVersion: 1, edition: activeEdition });
+    writeJson(join(workspace, ".secretary/update-ledger.json"), { schemaVersion: 2, edition: activeEdition, records: [] });
   } else if (state === "legacy-yasashii") {
     writeFileSync(join(workspace, "secretary/CLAUDE.md"), "<!-- yasashii-secretary:update-entry:v1:start -->\nlegacy\n");
     writeJson(join(workspace, ".yasashii-secretary/update-ledger.json"), []);
   } else if (state === "opposite-edition") {
-    writeJson(join(workspace, ".secretary/workspace-edition.json"), { schemaVersion: 1, edition: "agentic-secretary" });
-    writeJson(join(workspace, ".secretary/update-ledger.json"), { schemaVersion: 2, edition: "agentic-secretary", records: [] });
+    writeJson(join(workspace, ".secretary/workspace-edition.json"), { schemaVersion: 1, edition: activeEdition === "agentic-secretary" ? "yasashii-secretary" : "agentic-secretary" });
+    writeJson(join(workspace, ".secretary/update-ledger.json"), { schemaVersion: 2, edition: activeEdition === "agentic-secretary" ? "yasashii-secretary" : "agentic-secretary", records: [] });
   } else if (state === "mixed") {
-    writeJson(join(workspace, ".secretary/workspace-edition.json"), { schemaVersion: 1, edition: "yasashii-secretary" });
-    writeJson(join(workspace, ".secretary/update-ledger.json"), { schemaVersion: 2, edition: "agentic-secretary", records: [] });
+    writeJson(join(workspace, ".secretary/workspace-edition.json"), { schemaVersion: 1, edition: activeEdition });
+    writeJson(join(workspace, ".secretary/update-ledger.json"), { schemaVersion: 2, edition: activeEdition === "agentic-secretary" ? "yasashii-secretary" : "agentic-secretary", records: [] });
   } else if (state === "unknown") {
     writeJson(join(workspace, ".secretary/workspace-edition.json"), { schemaVersion: 1, edition: "future-secretary" });
   }
@@ -118,9 +119,10 @@ try {
       if (entry === "diagnose") {
         result = run(process.execPath, [diagnoseCli, "--workspace", workspace, "--plugin-root", plugin, "--no-network", "--json"], root);
         const output = parseLastJson(result.stdout);
-        check(`${state} × diagnose が状態を返す`, result.status === 0 && output?.workspaceEdition?.state === state, result.stderr);
+        const expectedState = state === "legacy-yasashii" && activeEdition === "agentic-secretary" ? "opposite-edition" : state;
+        check(`${state} × diagnose が状態を返す`, result.status === 0 && output?.workspaceEdition?.state === expectedState, result.stderr);
         check(`${state} × diagnose は完全なread-only`, JSON.stringify(snapshot(workspace)) === JSON.stringify(before));
-        if (state === "legacy-yasashii") check("legacy診断は予定migrationを明示", /neutral markerとedition付きledger/.test(output?.workspaceEdition?.plannedMigration || ""));
+        if (state === "legacy-yasashii" && activeEdition !== "agentic-secretary") check("legacy診断は予定migrationを明示", /neutral markerとedition付きledger/.test(output?.workspaceEdition?.plannedMigration || ""));
         if (["new", "opposite-edition", "mixed", "unknown"].includes(state)) check(`${state} 診断は実更新を利用不可にする`, output?.choices?.find((item) => item.id === "proceed-update")?.available === false);
         continue;
       }
@@ -128,7 +130,7 @@ try {
         result = run(process.execPath, [guardCli, "--workspace", workspace, "--plugin-root", plugin, "--entry", "onboarding", "--prepare-new", "--json"], root);
         if (state === "new") {
           const marker = JSON.parse(readFileSync(join(workspace, ".secretary/workspace-edition.json"), "utf8"));
-          check("new × onboarding だけneutral markerを作る", result.status === 0 && marker.schemaVersion === 1 && marker.edition === "yasashii-secretary");
+          check("new × onboarding だけneutral markerを作る", result.status === 0 && marker.schemaVersion === 1 && marker.edition === activeEdition);
         } else {
           check(`${state} × onboarding は書込み前に停止`, result.status === 3 && JSON.stringify(snapshot(workspace)) === JSON.stringify(before), result.stderr);
         }
@@ -136,13 +138,13 @@ try {
       }
       if (entry === "update") {
         result = run(process.execPath, [applyCli, "start", "--workspace", workspace, "--current-plugin-root", plugin, "--no-network", "--json"], root);
-        const blocked = ["new", "opposite-edition", "mixed", "unknown"].includes(state);
+        const blocked = ["new", "opposite-edition", "mixed", "unknown"].includes(state) || (state === "legacy-yasashii" && activeEdition === "agentic-secretary");
         check(`${state} × update のguard結果`, blocked ? result.status === 3 && /workspace edition guard/.test(result.stderr) : result.status === 0, result.stderr);
         check(`${state} × update は検査時点でbyte不変`, JSON.stringify(snapshot(workspace)) === JSON.stringify(before));
         continue;
       }
       result = run(process.execPath, [applyCli, "resume", "--workspace", workspace, "--plugin-root", plugin, "--json"], root);
-      const blocked = ["new", "opposite-edition", "mixed", "unknown"].includes(state);
+      const blocked = ["new", "opposite-edition", "mixed", "unknown"].includes(state) || (state === "legacy-yasashii" && activeEdition === "agentic-secretary");
       check(`${state} × migration のguard結果`, blocked ? result.status === 3 && /workspace edition guard/.test(result.stderr) : result.status === 3 && !/workspace edition guard/.test(result.stderr), result.stderr);
       check(`${state} × migration はsession前検査でbyte不変`, JSON.stringify(snapshot(workspace)) === JSON.stringify(before));
     }
@@ -155,7 +157,7 @@ try {
   writeFileSync(join(fresh, "secretary/AGENTS.md"), "# 新規秘書\n");
   const ledger = run(process.execPath, [ledgerCli, "init", "--workspace", fresh, "--plugin-root", plugin, "--managed-path", "secretary/AGENTS.md", "--new-install", "--confirm"], root);
   const ledgerValue = JSON.parse(readFileSync(join(fresh, ".secretary/update-ledger.json"), "utf8"));
-  check("new onboardingはedition付きledgerを作る", prepared.status === 0 && ledger.status === 0 && ledgerValue.schemaVersion === 2 && ledgerValue.edition === "yasashii-secretary" && ledgerValue.records.length === 1, ledger.stderr);
+  check("new onboardingはedition付きledgerを作る", prepared.status === 0 && ledger.status === 0 && ledgerValue.schemaVersion === 2 && ledgerValue.edition === activeEdition && ledgerValue.records.length === 1, ledger.stderr);
 
   const validConfig = JSON.parse(readFileSync(join(plugin, "edition.json"), "utf8"));
   for (const [name, mutate] of [

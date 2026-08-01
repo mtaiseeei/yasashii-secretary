@@ -19,6 +19,7 @@ import { fileURLToPath } from "node:url";
 import { removeSafe, safeWritePath, workingRoot, writeFileAtomicSafe } from "./lib/safe-fs.mjs";
 import { runExternalSync } from "./lib/external-ops.mjs";
 import { assertWorkspaceEdition, inspectWorkspaceEdition, loadEditionConfig } from "./lib/edition-guard.mjs";
+import { applyConversationMigration, planConversationMigration } from "./lib/conversation-migration.mjs";
 
 const EXIT_USAGE = 2;
 const EXIT_REFUSED = 3;
@@ -703,11 +704,17 @@ function loadMigration(pluginRoot, fromVersion, toVersion) {
     const expected = file.match(/^(\d+\.\d+\.\d+)-to-(\d+\.\d+\.\d+)\.json$/);
     if (manifest.schemaVersion !== 1 || manifest.fromVersion !== expected?.[1] || manifest.toVersion !== expected?.[2] || !Array.isArray(manifest.operations)) fail("migration定義が不正なため停止しました。", EXIT_REFUSED);
     for (const operation of manifest.operations) {
-      if (!ALLOWED_MANAGED_PATHS.has(operation.path) || operation.type !== "append-section" || typeof operation.marker !== "string" || typeof operation.asset !== "string") fail("migrationに許可外の操作があるため停止しました。", EXIT_REFUSED);
+      if (!ALLOWED_MANAGED_PATHS.has(operation.path) || !["append-section", "replace-section"].includes(operation.type) || typeof operation.marker !== "string" || typeof operation.asset !== "string") fail("migrationに許可外の操作があるため停止しました。", EXIT_REFUSED);
       const asset = realpathSync(join(pluginRoot, "migrations", operation.asset));
       const migrationRoot = realpathSync(join(pluginRoot, "migrations"));
       if (!asset.startsWith(`${migrationRoot}${sep}`)) fail("migration assetがplugin外を指すため停止しました。", EXIT_REFUSED);
-      operations.push({ ...operation, assetPath: asset });
+      let oldAssetPath = null;
+      if (operation.type === "replace-section") {
+        if (typeof operation.oldAsset !== "string" || typeof operation.endMarker !== "string" || typeof operation.templateFingerprint !== "string") fail("置換migration定義が不正なため停止しました。", EXIT_REFUSED);
+        oldAssetPath = realpathSync(join(pluginRoot, "migrations", operation.oldAsset));
+        if (!oldAssetPath.startsWith(`${migrationRoot}${sep}`)) fail("migration旧assetがplugin外を指すため停止しました。", EXIT_REFUSED);
+      }
+      operations.push({ ...operation, assetPath: asset, oldAssetPath });
     }
   }
   return operations;
@@ -721,6 +728,13 @@ function buildPlan(workspace, session, pluginRoot) {
     const managed = session.managed.find((item) => item.path === operation.path);
     const selection = session.selections[operation.path] ?? (["customized", "unknown-baseline"].includes(managed?.status) ? "keep" : "replace");
     if (selection === "keep") return { id: operation.id, path: operation.path, action: "keep", reason: "現状を残す選択", beforeHash: sha256Buffer(body) };
+    if (operation.type === "replace-section") {
+      const oldSection = readFileSync(operation.oldAssetPath, "utf8").trimEnd();
+      const newSection = readFileSync(operation.assetPath, "utf8").trimEnd();
+      const migrationPlan = planConversationMigration({ body, oldSection, newSection, marker: operation.marker, endMarker: operation.endMarker, templateFingerprint: operation.templateFingerprint });
+      if (migrationPlan.action === "conflict") return { id: operation.id, path: operation.path, action: "keep", reason: migrationPlan.conflict, conflict: migrationPlan.conflict, beforeHash: sha256Buffer(body), expectedOldHash: `sha256:${migrationPlan.oldHash}`, templateFingerprint: operation.templateFingerprint };
+      return { id: operation.id, path: operation.path, action: migrationPlan.action, reason: migrationPlan.action === "change" ? "template由来の旧会話契約節だけを置換" : "同じmigrationは適用済み", beforeHash: sha256Buffer(body), expectedOldHash: `sha256:${migrationPlan.oldHash}`, templateFingerprint: operation.templateFingerprint };
+    }
     if (body.includes(operation.marker)) return { id: operation.id, path: operation.path, action: "already-applied", reason: "同じmigrationは適用済み", beforeHash: sha256Buffer(body) };
     return { id: operation.id, path: operation.path, action: "change", reason: "確認後に更新安全性の固定セクションを追記", beforeHash: sha256Buffer(body), assetHash: sha256File(operation.assetPath) };
   });
@@ -773,7 +787,12 @@ function resume(args) {
     if (sha256Buffer(body) !== item.beforeHash) fail("dry-run後に対象ファイルが変わったため、本実行せず停止しました。", EXIT_REFUSED);
     if (SECRET_PATTERN.test(body)) fail("資格情報らしき内容を検出したため、migrationを止めました。", EXIT_REFUSED);
     const asset = readFileSync(operation.assetPath, "utf8").trimEnd();
-    writeFileAtomicSafe(workspace, target, `${body.trimEnd()}\n\n${asset}\n`, { encoding: "utf8" });
+    if (operation.type === "replace-section") {
+      const oldSection = readFileSync(operation.oldAssetPath, "utf8").trimEnd();
+      applyConversationMigration({ target, plan: { ...item, beforeHash: item.beforeHash.replace(/^sha256:/, "") }, oldSection, newSection: asset });
+    } else {
+      writeFileAtomicSafe(workspace, target, `${body.trimEnd()}\n\n${asset}\n`, { encoding: "utf8" });
+    }
     session.migration.changedPaths = [...new Set([...session.migration.changedPaths, item.path])];
     session.migration.appliedHashes = { ...(session.migration.appliedHashes ?? {}), [item.path]: sha256File(target) };
     session.phase = "migration-partial";

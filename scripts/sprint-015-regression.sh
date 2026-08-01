@@ -11,6 +11,10 @@ TEMPLATE="$PLUGIN/templates/AGENTS.md"
 TOOL="$PLUGIN/scripts/project-tools.mjs"
 MEMORY="$PLUGIN/skills/memory-care/scripts/memory-tools.sh"
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/yasashii-s015-regression.XXXXXX")"
+# macOS may expose the same temporary directory as /var and /private/var.
+# Canonicalize the fixture root so the path-guard test exercises the product
+# boundary rather than failing on the host's alias spelling.
+WORK="$(cd "$WORK" && pwd -P)"
 PASS=0; FAIL=0
 trap 'rm -rf "$WORK"' EXIT
 

@@ -358,14 +358,16 @@ check("serializer: 全surfaceの参照が実在正本へ解決でき、所在誤
 
 check("serializer: plain-language.mdは正本を複製しない明示的なshimで、内部linkが解決できる", () => {
   const shim = read(join(rulesRoot, "plain-language.md"));
+  const manifest = JSON.parse(read(join(rulesRoot, "rule-manifest.json")));
+  const styleRule = Object.values(manifest.rules).find((rule) => typeof rule.copy === "string");
   assert(shim.includes("互換入口"), "shim declaration missing");
   assert(shim.includes("正本を複製しない明示的な入口（shim）"), "explicit shim wording missing");
-  assert(shim.includes("styles/yasashii.md"), "shim must point to the serializer owner");
+  assert(styleRule && shim.includes(styleRule.path), "shim must point to the active serializer owner");
   assert(!shim.includes("やったこと:"), "shim must not duplicate the serializer schema");
   for (const match of shim.matchAll(/\]\(([^)]+\.md)\)/g)) {
     assert(existsSync(join(rulesRoot, match[1])), `shim link unresolved: ${match[1]}`);
   }
-  const style = read(join(rulesRoot, "styles", "yasashii.md"));
+  const style = read(join(rulesRoot, styleRule.path));
   assert(style.includes("最終応答serializer（通常報告の唯一の正本）"), "serializer owner declaration missing");
 });
 

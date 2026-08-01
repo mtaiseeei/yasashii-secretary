@@ -5,7 +5,8 @@
     "safety",
     "evidence",
     "common-language",
-    "yasashii-style"
+    "yasashii-style",
+    "agentic-style"
   ],
   "rules": {
     "evidence": {
@@ -28,6 +29,15 @@
       "protected": true,
       "dependencies": [
         "evidence"
+      ]
+    },
+    "conversation-contract": {
+      "path": "conversation-contract.md",
+      "owner": "common-core",
+      "protected": true,
+      "dependencies": [
+        "evidence",
+        "safety"
       ]
     },
     "yasashii-style": {

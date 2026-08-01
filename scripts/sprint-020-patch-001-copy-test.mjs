@@ -92,7 +92,7 @@ export function validateCopyFixture({ chatwork, google, common, style, resultMod
   if (!chatwork.includes("用意できたら、この設定画面へアクセスしてください") || /戻ってください/.test(chatwork)) errors.push("Chatworkの外部準備後が自然なアクセス案内ではありません");
   if (!style.includes("summary::after") || !style.includes("details[open] summary::after") || !style.includes("summary:focus-visible") || !style.includes("summary::-webkit-details-marker")) errors.push("全detailsのclosed／open表示またはvisible focusが不足しています");
   if (!google.includes("Google Cloudから取得した接続用ファイルを選びます") || !google.includes("Google Chatを設定したい") || google.includes("Google Cloud準備 1 / 3") || google.includes("google-cloud-setup-guide")) errors.push("Google Chat wizardが接続用JSON選択から始まりません");
-  if (!readme.includes("AIへ **「Google Chatを設定したい」**") || !readme.includes("この設定で始める") || !readme.includes("初回取得と自動取得の設定をまとめて行います")) errors.push("READMEのAI主導線または初回一体型説明が不足しています");
+  if (!readme.includes("Google Chatを設定したい") || !readme.includes("Google Cloudの準備から案内") || !readme.includes("同意後だけ初回取得と自動取得を設定")) errors.push("READMEのAI主導線または初回一体型説明が不足しています");
   if (!google.includes('id="automatic-consent"') || !google.includes('actions("この設定で始める")') || google.includes("自動取得を設定する")) errors.push("Google Chat初回の自動取得同意または一体型CTAが不正です");
   if (!googleServer.includes('input.automaticPushConsent !== true') || !googleServer.includes("applyGoogleChatConfig") || !googleServer.includes('status: input.interval === "manual" ? "manual" : "configured"')) errors.push("Google Chat初回APIが自動／手動設定を同じ確定処理で保存しません");
   if (!browserCheck.includes("DOM.setFileInputFiles") || !browserCheck.includes("createTestOnlyDesktopClientFile")) errors.push("Google Chat browser回帰がfile chooserへ合成fileを入力していません");

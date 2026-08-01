@@ -1,0 +1,212 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "caseId": "explicit-save-decision",
+      "edition": "common",
+      "input": "7月31日の決定として、会議は対面開催と記憶に保存して",
+      "precondition": "destinationと内容が一意",
+      "classifierInput": {"explicit": true, "operation": "save", "target": "会議は対面開催", "destination": "memory/decisions"},
+      "expected": {"intent": "explicit", "sideEffectCount": 1, "response": "saved"},
+      "requiredResponseElements": ["会議は対面開催", "memory/decisions", "保存しました"],
+      "forbiddenPhrases": ["よろしいですか", "次に何が起きるか"],
+      "meaning": {"subject": "user", "date": "2026-07-31", "action": "save", "target": "会議は対面開催", "negationCondition": null, "destination": "memory/decisions"},
+      "beforeSnapshot": {"decisionCount": 0},
+      "afterSnapshot": {"decisionCount": 1}
+    },
+    {
+      "caseId": "inferred-decision",
+      "edition": "common",
+      "input": "会議は対面にしよう",
+      "precondition": "保存操作の明示なし",
+      "classifierInput": {"operation": "save", "target": "会議は対面", "destination": "memory/decisions"},
+      "expected": {"intent": "inferred", "sideEffectCount": 0, "response": "question"},
+      "requiredResponseElements": ["記録しますか"],
+      "forbiddenPhrases": ["保存しました"],
+      "meaning": {"subject": "user", "date": null, "action": "decide", "target": "会議は対面", "negationCondition": null, "destination": null},
+      "beforeSnapshot": {"decisionCount": 0},
+      "afterSnapshot": {"decisionCount": 0}
+    },
+    {
+      "caseId": "quoted-request",
+      "edition": "common",
+      "input": "同僚が『会議は対面にして保存して』と言っていた",
+      "precondition": "伝聞引用",
+      "classifierInput": {"explicit": true, "operation": "save", "target": "会議は対面", "destination": "memory/decisions", "quote": true, "hearsay": true},
+      "execution": {"nonOperative": true},
+      "expected": {"intent": "inferred", "sideEffectCount": 0, "response": "answered"},
+      "requiredResponseElements": ["伝聞"],
+      "forbiddenPhrases": ["保存しました"],
+      "meaning": {"subject": "colleague", "date": null, "action": "said", "target": "会議は対面", "negationCondition": "quoted", "destination": null},
+      "beforeSnapshot": {"decisionCount": 0},
+      "afterSnapshot": {"decisionCount": 0}
+    },
+    {
+      "caseId": "hypothetical-request",
+      "edition": "common",
+      "input": "もし決まったら保存して",
+      "precondition": "条件未成立",
+      "classifierInput": {"explicit": true, "operation": "save", "target": "future decision", "destination": "memory/decisions", "hypothetical": true},
+      "execution": {"nonOperative": true},
+      "expected": {"intent": "inferred", "sideEffectCount": 0, "response": "answered"},
+      "requiredResponseElements": ["まだ保存しません"],
+      "forbiddenPhrases": ["保存しました"],
+      "meaning": {"subject": "user", "date": null, "action": "save", "target": "future decision", "negationCondition": "if decided", "destination": "memory/decisions"},
+      "beforeSnapshot": {"decisionCount": 0},
+      "afterSnapshot": {"decisionCount": 0}
+    },
+    {
+      "caseId": "reversible-setting",
+      "edition": "common",
+      "input": "口調をフランクに変えて",
+      "precondition": "単一部分更新",
+      "classifierInput": {"explicit": true, "operation": "pref-set", "target": "口調=フランク", "destination": "preferences.md"},
+      "expected": {"intent": "explicit", "sideEffectCount": 1, "response": "saved"},
+      "requiredResponseElements": ["フランク", "変更しました"],
+      "forbiddenPhrases": ["反映しますか"],
+      "meaning": {"subject": "user", "date": null, "action": "update", "target": "口調=フランク", "negationCondition": null, "destination": "preferences.md"},
+      "beforeSnapshot": {"tone": "丁寧"},
+      "afterSnapshot": {"tone": "フランク"}
+    },
+    {
+      "caseId": "destructive-delete",
+      "edition": "common",
+      "input": "7月の決定を全部消して",
+      "precondition": "保存済み内容の削除",
+      "classifierInput": {"explicit": true, "operation": "delete", "target": "7月の決定", "destination": "memory/decisions", "destructive": true, "bulkUnknown": true},
+      "expected": {"intent": "destructive", "sideEffectCount": 0, "response": "question"},
+      "requiredResponseElements": ["7月の決定", "元に戻せません"],
+      "forbiddenPhrases": ["削除しました"],
+      "meaning": {"subject": "user", "date": "2026-07", "action": "delete", "target": "decisions", "negationCondition": null, "destination": "memory/decisions"},
+      "beforeSnapshot": {"decisionCount": 4},
+      "afterSnapshot": {"decisionCount": 4}
+    },
+    {
+      "caseId": "external-push",
+      "edition": "common",
+      "input": "この変更をoriginへpushして",
+      "precondition": "外部送信",
+      "classifierInput": {"explicit": true, "operation": "push", "target": "current branch", "destination": "origin", "external": true},
+      "expected": {"intent": "external", "sideEffectCount": 0, "response": "question"},
+      "requiredResponseElements": ["origin", "push"],
+      "forbiddenPhrases": ["pushしました"],
+      "meaning": {"subject": "user", "date": null, "action": "push", "target": "current branch", "negationCondition": null, "destination": "origin"},
+      "beforeSnapshot": {"pushCount": 0},
+      "afterSnapshot": {"pushCount": 0}
+    },
+    {
+      "caseId": "ordered-partial",
+      "edition": "common",
+      "input": "メモを保存してからoriginへpushして",
+      "precondition": "独立操作、外部境界は2番目",
+      "classifierInput": {"explicit": true, "operation": "save", "target": "memo", "destination": "docs"},
+      "operations": [
+        {"id": "save-1", "intent": "explicit"},
+        {"id": "push-1", "intent": "external", "external": true}
+      ],
+      "expected": {"intent": "explicit", "sideEffectCount": "partial", "response": "partial", "executeIds": ["save-1"], "holdIds": ["push-1"]},
+      "requiredResponseElements": ["保存しました", "pushは未実行"],
+      "forbiddenPhrases": ["すべて完了"],
+      "meaning": {"subject": "user", "date": null, "action": "save then push", "target": "memo", "negationCondition": null, "destination": "docs then origin"},
+      "beforeSnapshot": {"fileCount": 0, "pushCount": 0},
+      "afterSnapshot": {"fileCount": 1, "pushCount": 0}
+    },
+    {
+      "caseId": "atomic-hold-all",
+      "edition": "common",
+      "input": "保存とpushを一括で実行して",
+      "precondition": "atomic batch",
+      "classifierInput": {"explicit": true, "operation": "batch", "target": "memo", "destination": "docs and origin"},
+      "operations": [
+        {"id": "save-1", "intent": "explicit"},
+        {"id": "push-1", "intent": "external", "external": true}
+      ],
+      "options": {"atomic": true, "batch": true},
+      "expected": {"intent": "explicit", "sideEffectCount": 0, "response": "question", "executeIds": [], "holdIds": ["save-1", "push-1"]},
+      "requiredResponseElements": ["一括", "push"],
+      "forbiddenPhrases": ["保存しました"],
+      "meaning": {"subject": "user", "date": null, "action": "atomic save and push", "target": "memo", "negationCondition": null, "destination": "docs and origin"},
+      "beforeSnapshot": {"fileCount": 0, "pushCount": 0},
+      "afterSnapshot": {"fileCount": 0, "pushCount": 0}
+    },
+    {
+      "caseId": "notion-future-task",
+      "edition": "private-notion",
+      "input": "8月5日に見積を送るタスクを保存して",
+      "precondition": "Notion接続済み、TaskDB一意",
+      "classifierInput": {"explicit": true, "operation": "create-task", "target": "見積を送る", "destination": "Notion TaskDB"},
+      "expected": {"intent": "explicit", "sideEffectCount": 1, "response": "saved"},
+      "requiredResponseElements": ["8月5日", "見積を送る", "Notion TaskDB"],
+      "forbiddenPhrases": ["local TODO", "もう一度確認"],
+      "meaning": {"subject": "user", "date": "2026-08-05", "action": "create task", "target": "見積を送る", "negationCondition": null, "destination": "Notion TaskDB"},
+      "beforeSnapshot": {"taskCount": 0},
+      "afterSnapshot": {"taskCount": 1}
+    },
+    {
+      "caseId": "ambiguous-destination", "edition": "common", "input": "これを保存して", "precondition": "行き先が複数", "classifierInput": {"operation": "save", "target": "これ", "destination": "未確定", "ambiguous": true}, "expected": {"intent": "ambiguous", "sideEffectCount": 0, "response": "question"}, "requiredResponseElements": ["どこへ保存するか"], "forbiddenPhrases": ["保存しました"], "observedResponse": "どこへ保存するか教えてください。", "meaning": {"subject": "user", "date": null, "action": "save", "target": "これ", "negationCondition": null, "destination": null}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 0}
+    },
+    {
+      "caseId": "error-write", "edition": "common", "input": "決定を保存して", "precondition": "atomic writeが失敗", "classifierInput": {"explicit": true, "operation": "save", "target": "決定", "destination": "memory/decisions"}, "execution": {"simulateError": true}, "expected": {"intent": "explicit", "sideEffectCount": 0, "response": "error"}, "requiredResponseElements": ["エラー", "保存していません"], "forbiddenPhrases": ["保存しました"], "observedResponse": "エラーが起きたため保存していません。", "meaning": {"subject": "user", "date": null, "action": "save", "target": "決定", "negationCondition": null, "destination": "memory/decisions"}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 0}
+    },
+    {
+      "caseId": "hearsay-only", "edition": "common", "input": "担当者が保存すると言っていた", "precondition": "伝聞", "classifierInput": {"operation": "save", "target": "担当者の発言", "destination": "memory", "hearsay": true}, "execution": {"nonOperative": true}, "expected": {"intent": "inferred", "sideEffectCount": 0, "response": "answered"}, "requiredResponseElements": ["伝聞として確認"], "forbiddenPhrases": ["保存しました"], "observedResponse": "伝聞として確認しました。変更はしていません。", "meaning": {"subject": "staff", "date": null, "action": "said", "target": "保存する", "negationCondition": "hearsay", "destination": null}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 0}
+    },
+    {
+      "caseId": "correction-latest-only", "edition": "common", "input": "明日ではなく金曜に訂正して保存して", "precondition": "訂正後だけ候補", "classifierInput": {"operation": "save", "target": "金曜", "destination": "memory", "correction": true}, "expected": {"intent": "inferred", "sideEffectCount": 0, "response": "question"}, "requiredResponseElements": ["金曜で保存しますか"], "forbiddenPhrases": ["明日を保存しました"], "observedResponse": "金曜で保存しますか？", "meaning": {"subject": "user", "date": "2026-08-07", "action": "save", "target": "予定", "negationCondition": "not tomorrow", "destination": "memory"}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 0}
+    },
+    {
+      "caseId": "cancel-unsaved", "edition": "common", "input": "さっきの保存は取り消して", "precondition": "未保存", "classifierInput": {"operation": "cancel", "target": "未保存候補", "destination": "memory", "cancellation": true}, "execution": {"nonOperative": true}, "expected": {"intent": "inferred", "sideEffectCount": 0, "response": "answered"}, "requiredResponseElements": ["未保存なので変更はありません"], "forbiddenPhrases": ["削除しました"], "observedResponse": "未保存なので変更はありません。", "meaning": {"subject": "user", "date": null, "action": "cancel", "target": "pending save", "negationCondition": "not saved", "destination": "memory"}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 0}
+    },
+    {
+      "caseId": "cancel-saved-delete-two-step", "edition": "common", "input": "保存済みの決定を取り消して", "precondition": "保存済み", "classifierInput": {"explicit": true, "operation": "delete", "target": "保存済みの決定", "destination": "memory", "destructive": true, "cancellation": true}, "expected": {"intent": "destructive", "sideEffectCount": 0, "response": "question"}, "requiredResponseElements": ["削除前に対象を確認"], "forbiddenPhrases": ["削除しました"], "observedResponse": "削除前に対象を確認してもよいですか？", "meaning": {"subject": "user", "date": null, "action": "delete", "target": "saved decision", "negationCondition": null, "destination": "memory"}, "beforeSnapshot": {"count": 1}, "afterSnapshot": {"count": 1}
+    },
+    {
+      "caseId": "past-inquiry-read-only", "edition": "common", "input": "前に保存してと頼んだ内容は何？", "precondition": "過去照会", "classifierInput": {"operation": "read", "target": "過去依頼", "destination": "memory", "pastInquiry": true}, "execution": {"readOnly": true}, "expected": {"intent": "inferred", "sideEffectCount": 0, "response": "answered"}, "requiredResponseElements": ["過去の記録を回答"], "forbiddenPhrases": ["保存しました"], "observedResponse": "過去の記録を回答しました。変更はしていません。", "meaning": {"subject": "user", "date": null, "action": "read", "target": "past request", "negationCondition": null, "destination": "memory"}, "beforeSnapshot": {"count": 1}, "afterSnapshot": {"count": 1}
+    },
+    {
+      "caseId": "duplicate-create", "edition": "common", "input": "同じTODOを追加して", "precondition": "同一operation id実行済み", "classifierInput": {"operation": "read", "target": "既存TODO", "destination": "inbox/todo.md", "explicit": true}, "execution": {"readOnly": true}, "expected": {"intent": "explicit", "sideEffectCount": 0, "response": "answered"}, "requiredResponseElements": ["重複のため追加しません"], "forbiddenPhrases": ["2件追加"], "observedResponse": "重複のため追加しません。既存1件を確認しました。", "meaning": {"subject": "user", "date": null, "action": "create", "target": "TODO", "negationCondition": "duplicate", "destination": "inbox/todo.md"}, "beforeSnapshot": {"count": 1}, "afterSnapshot": {"count": 1}
+    },
+    {
+      "caseId": "secret-save", "edition": "common", "input": "API tokenをメモへ保存して", "precondition": "Secret", "classifierInput": {"explicit": true, "operation": "save", "target": "Secret", "destination": "memo", "secret": true, "external": true}, "expected": {"intent": "external", "sideEffectCount": 0, "response": "question"}, "requiredResponseElements": ["Secretは保存しません"], "forbiddenPhrases": ["token-value"], "observedResponse": "Secretは保存しません。安全な保管先を確認してください。", "meaning": {"subject": "user", "date": null, "action": "save", "target": "Secret", "negationCondition": "prohibited", "destination": "Repository Secret"}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 0}
+    },
+    {
+      "caseId": "notify-other", "edition": "common", "input": "担当者へ通知して", "precondition": "他者通知", "classifierInput": {"explicit": true, "operation": "notify", "target": "担当者", "destination": "Chat", "external": true}, "expected": {"intent": "external", "sideEffectCount": 0, "response": "question"}, "requiredResponseElements": ["送信先と内容を確認"], "forbiddenPhrases": ["通知しました"], "observedResponse": "送信先と内容を確認してもよいですか？", "meaning": {"subject": "user", "date": null, "action": "notify", "target": "staff", "negationCondition": null, "destination": "Chat"}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 0}
+    },
+    {
+      "caseId": "todo-complete", "edition": "common", "input": "見積TODOを完了にして", "precondition": "対象一意", "classifierInput": {"explicit": true, "operation": "complete", "target": "見積TODO", "destination": "inbox/todo.md"}, "expected": {"intent": "explicit", "sideEffectCount": 1, "response": "saved"}, "requiredResponseElements": ["完了にしました"], "forbiddenPhrases": ["完了にしますか"], "observedResponse": "見積TODOを完了にしました。", "meaning": {"subject": "user", "date": null, "action": "complete", "target": "estimate TODO", "negationCondition": null, "destination": "inbox/todo.md"}, "beforeSnapshot": {"open": 1, "done": 0}, "afterSnapshot": {"open": 0, "done": 1}
+    },
+    {
+      "caseId": "todo-carry", "edition": "common", "input": "見積TODOを明日に持ち越して", "precondition": "対象一意", "classifierInput": {"explicit": true, "operation": "carry", "target": "見積TODO", "destination": "inbox/todo.md"}, "expected": {"intent": "explicit", "sideEffectCount": 1, "response": "saved"}, "requiredResponseElements": ["明日へ持ち越しました"], "forbiddenPhrases": ["持ち越しますか"], "observedResponse": "見積TODOを明日へ持ち越しました。", "meaning": {"subject": "user", "date": "2026-08-01", "action": "carry", "target": "estimate TODO", "negationCondition": null, "destination": "inbox/todo.md"}, "beforeSnapshot": {"date": "2026-07-31"}, "afterSnapshot": {"date": "2026-08-01"}
+    },
+    {
+      "caseId": "closed-project-read", "edition": "common", "input": "完了済みA案件を見せて", "precondition": "closed明示", "classifierInput": {"explicit": true, "operation": "read", "target": "A案件", "destination": "projects/closed"}, "execution": {"readOnly": true}, "expected": {"intent": "explicit", "sideEffectCount": 0, "response": "answered"}, "requiredResponseElements": ["closedを照合"], "forbiddenPhrases": ["再開しました"], "observedResponse": "projects/closedを照合してA案件を回答しました。", "meaning": {"subject": "user", "date": null, "action": "read", "target": "A project", "negationCondition": "closed", "destination": "projects/closed"}, "beforeSnapshot": {"count": 1}, "afterSnapshot": {"count": 1}
+    },
+    {
+      "caseId": "closing-zero-decisions", "edition": "common", "input": "今日はここまで", "precondition": "決定0件・拾い漏れなし", "classifierInput": {"operation": "read", "target": "会話の締め", "destination": "conversation"}, "execution": {"readOnly": true}, "expected": {"intent": "inferred", "sideEffectCount": 0, "response": "answered"}, "requiredResponseElements": ["お疲れさまでした"], "forbiddenPhrases": ["決定0件", "内部監査"], "observedResponse": "お疲れさまでした。", "meaning": {"subject": "user", "date": "2026-07-31", "action": "close conversation", "target": "today", "negationCondition": "no missed decision", "destination": null}, "beforeSnapshot": {"decisions": 0}, "afterSnapshot": {"decisions": 0}
+    },
+    {
+      "caseId": "setup-connected", "edition": "common", "input": "Gmailを使いたい", "precondition": "read-only診断で接続済み", "classifierInput": {"explicit": true, "operation": "read", "target": "Gmail", "destination": "connector"}, "execution": {"readOnly": true}, "expected": {"intent": "explicit", "sideEffectCount": 0, "response": "answered"}, "requiredResponseElements": ["接続済み"], "forbiddenPhrases": ["再認証してください"], "observedResponse": "Gmailは接続済みです。依頼内容を続けます。", "meaning": {"subject": "user", "date": null, "action": "use", "target": "Gmail", "negationCondition": "already connected", "destination": "connector"}, "beforeSnapshot": {"writes": 0}, "afterSnapshot": {"writes": 0}
+    },
+    {
+      "caseId": "setup-unknown", "edition": "common", "input": "Gmailを使いたい", "precondition": "接続状態を確認不能", "classifierInput": {"operation": "setup", "target": "Gmail", "destination": "connector", "ambiguous": true}, "expected": {"intent": "ambiguous", "sideEffectCount": 0, "response": "question"}, "requiredResponseElements": ["read-only診断を先に行いますか"], "forbiddenPhrases": ["未接続です"], "observedResponse": "接続状態は未確認です。read-only診断を先に行いますか？", "meaning": {"subject": "user", "date": null, "action": "use", "target": "Gmail", "negationCondition": "connection unknown", "destination": "connector"}, "beforeSnapshot": {"writes": 0}, "afterSnapshot": {"writes": 0}
+    },
+    {
+      "caseId": "resume-current-request", "edition": "common", "input": "今は見積を作って", "precondition": "古いresumeあり", "classifierInput": {"explicit": true, "operation": "create", "target": "見積", "destination": "docs"}, "expected": {"intent": "explicit", "sideEffectCount": 1, "response": "saved"}, "requiredResponseElements": ["見積を作成しました"], "forbiddenPhrases": ["古い作業を再開"], "observedResponse": "現在の依頼を優先して見積を作成しました。", "meaning": {"subject": "user", "date": null, "action": "create", "target": "estimate", "negationCondition": "ignore stale resume", "destination": "docs"}, "beforeSnapshot": {"docs": 0, "resume": 1}, "afterSnapshot": {"docs": 1, "resume": 1}
+    },
+    {
+      "caseId": "private-1-approved-triage", "edition": "private-notion", "input": "2番を起票して", "precondition": "内容不変で番号承認済み", "classifierInput": {"explicit": true, "operation": "create-task", "target": "candidate-2", "destination": "Notion TaskDB"}, "expected": {"intent": "explicit", "sideEffectCount": 1, "response": "saved"}, "requiredResponseElements": ["再確認なしで起票"], "forbiddenPhrases": ["もう一度承認"], "observedResponse": "内容不変の2番を再確認なしで起票しました。", "meaning": {"subject": "user", "date": null, "action": "create task", "target": "candidate-2", "negationCondition": "already approved", "destination": "Notion TaskDB"}, "beforeSnapshot": {"tasks": 0}, "afterSnapshot": {"tasks": 1}
+    },
+    {
+      "caseId": "private-2-explicit-save-question", "edition": "private-notion", "input": "この内容をタスクにして", "precondition": "対象一意", "classifierInput": {"explicit": true, "operation": "create-task", "target": "この内容", "destination": "Notion TaskDB"}, "expected": {"intent": "explicit", "sideEffectCount": 1, "response": "saved"}, "requiredResponseElements": ["タスクにしました"], "forbiddenPhrases": ["質問なしに停止"], "observedResponse": "この内容をNotion TaskDBのタスクにしました。", "meaning": {"subject": "user", "date": null, "action": "create task", "target": "this content", "negationCondition": null, "destination": "Notion TaskDB"}, "beforeSnapshot": {"tasks": 0}, "afterSnapshot": {"tasks": 1}
+    },
+    {
+      "caseId": "private-3-future-task", "edition": "private-notion", "input": "8月10日に請求する", "precondition": "将来行動", "classifierInput": {"explicit": true, "operation": "create-task", "target": "請求する", "destination": "Notion TaskDB"}, "expected": {"intent": "explicit", "sideEffectCount": 1, "response": "saved"}, "requiredResponseElements": ["Notion TaskDB"], "forbiddenPhrases": ["local TODO"], "observedResponse": "8月10日の請求タスクをNotion TaskDBへ保存しました。", "meaning": {"subject": "user", "date": "2026-08-10", "action": "create task", "target": "invoice", "negationCondition": null, "destination": "Notion TaskDB"}, "beforeSnapshot": {"tasks": 0}, "afterSnapshot": {"tasks": 1}
+    },
+    {
+      "caseId": "private-4-calendar-vault-merge", "edition": "private-notion", "input": "予定とvaultを一緒に調べて", "precondition": "read-only横断", "classifierInput": {"explicit": true, "operation": "read", "target": "Calendar and vault", "destination": "answer"}, "execution": {"readOnly": true}, "expected": {"intent": "explicit", "sideEffectCount": 0, "response": "answered"}, "requiredResponseElements": ["統合結果"], "forbiddenPhrases": ["保存しました"], "observedResponse": "Calendarとvaultを別々に読み、統合結果を返しました。", "meaning": {"subject": "user", "date": null, "action": "read", "target": "Calendar and vault", "negationCondition": "read-only", "destination": "answer"}, "beforeSnapshot": {"writes": 0}, "afterSnapshot": {"writes": 0}
+    },
+    {
+      "caseId": "private-5-one-missing-point", "edition": "private-notion", "input": "これを起票して", "precondition": "TaskDB候補だけ複数", "classifierInput": {"operation": "create-task", "target": "これ", "destination": "Notion TaskDB", "ambiguous": true}, "expected": {"intent": "ambiguous", "sideEffectCount": 0, "response": "question"}, "requiredResponseElements": ["どのTaskDBですか"], "forbiddenPhrases": ["relation解決不能"], "observedResponse": "どのTaskDBですか？", "meaning": {"subject": "user", "date": null, "action": "create task", "target": "this", "negationCondition": "destination ambiguous", "destination": null}, "beforeSnapshot": {"tasks": 0}, "afterSnapshot": {"tasks": 0}
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "0.8.0",
+  "toVersion": "0.9.0",
+  "operations": [
+    {
+      "id": "conversation-contract-v2",
+      "path": "secretary/AGENTS.md",
+      "type": "replace-section",
+      "marker": "<!-- agentic-secretary:conversation-contract:v2:start -->",
+      "endMarker": "<!-- agentic-secretary:conversation-contract:v2:end -->",
+      "oldAsset": "assets/conversation-contract-v1.md",
+      "templateFingerprint": "0e613e03e15ae54da6660a4f694aafb66d3a0f9e37238909bf6d649c532efff6",
+      "asset": "assets/conversation-contract-v2.md"
+    }
+  ],
+  "note": "template-owned AGENTS.mdの旧会話契約節だけを置換します。dry-runは期待旧値とtemplate fingerprintを示し、衝突時0変更、atomic write、rollback、再適用時0件を維持します。"
+}

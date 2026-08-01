@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "baseCommit": "d9a62755ff78db12c435f225cdd40e95f86a8055",
+  "baseCommit": "9f9d276ff0836f096a1dbf0a3eb77f1058d94170",
   "files": [
     {
       "path": ".agents/plugins/marketplace.json",
@@ -10,7 +10,7 @@
     {
       "path": ".claude-plugin/marketplace.json",
       "classification": "metadata-overlay",
-      "sha256": "d21b8d6781b79db6f8d64d8f2680fbcd0ce804a9299c2bed380f617d172be1c6"
+      "sha256": "d1fa7ed62ca723d04e0c10bff65ae20fae26276995c310768c943cc3f00e3b25"
     },
     {
       "path": ".harness/.gitignore",
@@ -1443,6 +1443,11 @@
       "sha256": "0f0f9c1c8c52eb5b768a8a29105e8c558291b0680cef976bb954c758d53b0b2c"
     },
     {
+      "path": "docs/feedback/sprint-038.md",
+      "classification": "repo-owned",
+      "sha256": "10cfd3fdc549c0c7092c93f5693f435defa133c6e595a498c3182015d28a676e"
+    },
+    {
       "path": "docs/guide/README.md",
       "classification": "repo-owned",
       "sha256": "f9ee14bc17d6f2f64a0f134f5c9e57c51f307d5f72df16e5fdb30ea7e37dfc64"
@@ -1723,49 +1728,64 @@
       "sha256": "484c6935d2f1f57304a74ec06d8882960e209162fe6ab1aea8d553401ab4d608"
     },
     {
+      "path": "docs/progress/sprint-038.md",
+      "classification": "repo-owned",
+      "sha256": "2aec15ad031f1bf2db3e10120a9b378ee8ac439c4fa3b2e25a787073f093d414"
+    },
+    {
       "path": "docs/proposal-2026-07-15-realignment.md",
       "classification": "repo-owned",
       "sha256": "90831aba6e681c88a0fe23d1eb166313761cec4902c19d3402beb28ecbea2699"
     },
     {
+      "path": "docs/proposal-2026-07-31-human-conversation-flow.md",
+      "classification": "repo-owned",
+      "sha256": "25859a4b6cdc241d6033b8be4c2e5f2a754ff975afbb978428a402f7b912bdf3"
+    },
+    {
+      "path": "docs/reviews/sprint-038-fable-planner-review.md",
+      "classification": "repo-owned",
+      "sha256": "e99aeea23d34ac065d43d161bcc5ee8dc65fc176cd560da1def548bafb06830a"
+    },
+    {
       "path": "docs/spec.md",
       "classification": "repo-owned",
-      "sha256": "74e6d8502e9ad321dd6bd500e55c7e2ab9f754e1127b5e4377badf4b6fa4d21c"
+      "sha256": "b387c5757d9905240efbca8180ec6fbabe12e595c436760b842ece32666a76f4"
     },
     {
       "path": "docs/spec/constraints.md",
       "classification": "repo-owned",
-      "sha256": "597ed709017e73e2f029a65981b82b2aab1ed826ff0a7ea6c44b9b3a2ade4699"
+      "sha256": "de34c838a2a551e4080204f5b967e5ac5b1141485960d151606917a76f70e4a4"
     },
     {
       "path": "docs/spec/domain.md",
       "classification": "repo-owned",
-      "sha256": "29984e10efc1bb3e1a737a26792e2de51074feb27e4175ad06a153ed57462191"
+      "sha256": "bcaf6e9886f21422774b35cc3beec24451c20b26bd6179d708711712fa53f019"
     },
     {
       "path": "docs/spec/editions.md",
       "classification": "repo-owned",
-      "sha256": "19e364d0fd62213a25932c460826b4de30e76aa6767673472f1a294eaed07367"
+      "sha256": "9addefc02f51903c2508a5392406727276801409fe3859c376e51ae05e1f1a8e"
     },
     {
       "path": "docs/spec/features.md",
       "classification": "repo-owned",
-      "sha256": "59ecd56305c2861896673db755b1a0de6bffd8f041cf690c6fd5c2b0a00afae7"
+      "sha256": "00ef17dbefc1145aa40633c0a2adb14e1fea88f9a08350c3947f87a3bca9bc0f"
     },
     {
       "path": "docs/spec/product.md",
       "classification": "repo-owned",
-      "sha256": "73690250503e06273f58fbec3524adabb552b97d2bb75390ebee3ce90364362c"
+      "sha256": "c414d9f45493b59dfcba88783df1e40dbc6f7c3ba8cc8d4b5e87b181066895bf"
     },
     {
       "path": "docs/spec/rubric.md",
       "classification": "repo-owned",
-      "sha256": "792f3c8dd7c9dc97e320875815de471cd7ba2f21b8bb0e6053d8aaa5dc286ee2"
+      "sha256": "8dd984345948b062a7a536f1fced946b912888b191542f354614eac2378114f6"
     },
     {
       "path": "docs/spec/ui.md",
       "classification": "repo-owned",
-      "sha256": "3910983599b317f01663f47926849e1aebc348b6bc9bb199b0e234b801a0563c"
+      "sha256": "f98bd9aa1022070ae4d1fb410cd5222a7085631d1dc788634f81275308188001"
     },
     {
       "path": "docs/sprints/sprint-001-patch-001.md",
@@ -2023,19 +2043,24 @@
       "sha256": "99e07566424b53a2f403055b818a5872ad2e63273aeadd23a4b7a3fa012a0df8"
     },
     {
+      "path": "docs/sprints/sprint-038.md",
+      "classification": "repo-owned",
+      "sha256": "3d23f3dfcf7c70fd7252b5496e84cccfb8a95eab7d49e2746ce26a7918a00cc5"
+    },
+    {
       "path": "docs/sprints/state.md",
       "classification": "repo-owned",
-      "sha256": "5fa784ad772c79de5f961f015bc0d2c43b4283545e45285ba23f52246183977f"
+      "sha256": "aed5c30110f3ca9295de7fe4adeec472719883d3a40f8835c1d8d83c47beedc1"
     },
     {
       "path": "plugins/secretary/.claude-plugin/plugin.json",
       "classification": "metadata-overlay",
-      "sha256": "4623dd9bff28ed75f9351106c1928c1e5f73dcd8966312679d0c0f900628a6f4"
+      "sha256": "ac5ebf885c41073c54423a57bda818b30035d592ed7dfc87f82d908b65d60af0"
     },
     {
       "path": "plugins/secretary/.codex-plugin/plugin.json",
       "classification": "metadata-overlay",
-      "sha256": "9d95c9d09f6f5ab93e0e7f0fdd1b49cedfcce8ac8f244501a1e9e32b8554a38e"
+      "sha256": "8ba5613c612ac15df28a6dc6b83b1e8e6a8ca639e37518859cdf57b4a7125464"
     },
     {
       "path": "plugins/secretary/.mcp.json",
@@ -2045,7 +2070,7 @@
     {
       "path": "plugins/secretary/CHANGELOG.md",
       "classification": "common",
-      "sha256": "943a505e3a2e2d45323461d5209eb7ec71107adc20cf21527c66ccd4f1fd014d"
+      "sha256": "84434099adfec110b5c4fb9b7a41c28907aa081c8fa8e9bbd258f14253f506bc"
     },
     {
       "path": "plugins/secretary/edition.json",
@@ -2088,6 +2113,21 @@
       "sha256": "43e476603629b830cdfe1fad30fb3ef7153dafa9fcf12c08531ea66fc51f7c8c"
     },
     {
+      "path": "plugins/secretary/migrations/0.8.0-to-0.9.0.json",
+      "classification": "common",
+      "sha256": "0aee2bcf721d163e3e2c5fb7ea9eeb03411f57823707468af064f07708b57809"
+    },
+    {
+      "path": "plugins/secretary/migrations/assets/conversation-contract-v1.md",
+      "classification": "common",
+      "sha256": "bed54afbd34eccd8bd15aa3677036bc9dc922bf7f64e5a7fe2d9e417589ceea1"
+    },
+    {
+      "path": "plugins/secretary/migrations/assets/conversation-contract-v2.md",
+      "classification": "common",
+      "sha256": "f4d6edb6e936974612863545712543ea95457d8b1f0efd34f473a32177453a34"
+    },
+    {
       "path": "plugins/secretary/migrations/assets/update-entry-pointer.md",
       "classification": "common",
       "sha256": "7713c0c95b626fd05c06bdaf169d50a8d008f4080b351bf73dc030d1d775a62a"
@@ -2100,17 +2140,22 @@
     {
       "path": "plugins/secretary/rules/common-language.md",
       "classification": "common",
-      "sha256": "8e263e9f636704852830a3ce379d9d1a83e509d082f7af8a1d8ac4a3e5abd357"
+      "sha256": "ad2690834858d00ed917c0acd0ec118531b64fb90e2f56d91b469bf02e8f57c3"
+    },
+    {
+      "path": "plugins/secretary/rules/conversation-contract.md",
+      "classification": "common",
+      "sha256": "a245870686096410c398d29d54493ef3fe4197d5797deb3f258654d8b6fbe761"
     },
     {
       "path": "plugins/secretary/rules/copy/agentic.json",
       "classification": "upstream-only",
-      "sha256": "5e8a80c40402f33fdcdab52d6457e856d0b0049ddd380e0016505c5be66b2a47"
+      "sha256": "34d595f8a48e76004a06ba54edfe61faf8ac4537dd68126a0e6c4079c39c116f"
     },
     {
       "path": "plugins/secretary/rules/copy/yasashii.json",
       "classification": "common",
-      "sha256": "628142e5e46d26440f72c8ae04aaa5a2c728a459be8e328bd8a30bad8bc2f909"
+      "sha256": "46bd8eee125924305be5aaf1c4f345190bea53b31680d170dedf67716bbffab4"
     },
     {
       "path": "plugins/secretary/rules/evidence.md",
@@ -2120,27 +2165,27 @@
     {
       "path": "plugins/secretary/rules/plain-language.md",
       "classification": "anchor-overlay",
-      "sha256": "d3962460e78d22206deeecbf15e08af6e61c1646a5a0eaabd7d79b89239e9902"
+      "sha256": "3132b31cced5771e4b0ccc43e33a3483bba67dc08e5b91bdc16ad23f23ef26fd"
     },
     {
       "path": "plugins/secretary/rules/rule-manifest.json",
       "classification": "metadata-overlay",
-      "sha256": "ae326beb869470b526c8d36c6fc93538a66add7b615cda063d380a37b1ca231f"
+      "sha256": "6f297b52884925bc7cf452e54d4d5cedacbecaf8de70a7cdf5eb204d380d9cdb"
     },
     {
       "path": "plugins/secretary/rules/safety.md",
       "classification": "common",
-      "sha256": "fa098672a314a66f377cbe7ce4d2ee612aee4d3b6c4777f7873c27a319944362"
+      "sha256": "d07eb28d35986f5e11ea244ca848bd34c2ce66fe5a433981d06a7f02f33607d1"
     },
     {
       "path": "plugins/secretary/rules/styles/agentic.md",
       "classification": "upstream-only",
-      "sha256": "777b825bb990c97b552fdd2b1141e3ad09b1cc2f2665ced9ae07e13f9146785b"
+      "sha256": "65602bdd3c8ec3071a4a6614d93f7b5c26ac0d98dade7642ff916b7f6b8d54fe"
     },
     {
       "path": "plugins/secretary/rules/styles/yasashii.md",
-      "classification": "anchor-overlay",
-      "sha256": "21b38314cf3044e78cf5a82c07712c678e4729117969037df3a0dec1811a12b9"
+      "classification": "common",
+      "sha256": "50c9df0ff79fb43d5e051eb0c42070e31393b210a7fb78076c6e7e6996b1699c"
     },
     {
       "path": "plugins/secretary/scripts/edition-guard.mjs",
@@ -2151,6 +2196,16 @@
       "path": "plugins/secretary/scripts/lib/actions-run.mjs",
       "classification": "common",
       "sha256": "7396a47d7b2a0dc782346bd94914a38f53b1c32f9dde042c0c641725159705e6"
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/conversation-contract.mjs",
+      "classification": "common",
+      "sha256": "07b5ec192a7ec17735905c2a987c6c13b0a36cdc2dd16bc8b5b7e886f722e9ea"
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/conversation-migration.mjs",
+      "classification": "common",
+      "sha256": "2422ddddfcdd4f0441c33a3cb64142621963a708e20d29ad73b5fc6805a432d8"
     },
     {
       "path": "plugins/secretary/scripts/lib/edition-guard.mjs",
@@ -2250,7 +2305,7 @@
     {
       "path": "plugins/secretary/scripts/update-apply.mjs",
       "classification": "common",
-      "sha256": "55dc1a7d3fd5996be3c5b12066f7ad6adcfca86cbbe1041e66ec563960025ece"
+      "sha256": "aacc28225116e3987f752666028e2e9a9f3dbe1c39f0b351118e88350a4de0d2"
     },
     {
       "path": "plugins/secretary/scripts/update-diagnose.mjs",
@@ -2340,7 +2395,7 @@
     {
       "path": "plugins/secretary/skills/daily/SKILL.md",
       "classification": "common",
-      "sha256": "a8d063d7487a22de27677153e061132b2422f883ba09afbf6c4fddd605f7179d"
+      "sha256": "85f432aa63660b14ec126f8054bfe5b399eff508a22589b99f0d20203885b345"
     },
     {
       "path": "plugins/secretary/skills/google-chat/SKILL.md",
@@ -2435,7 +2490,7 @@
     {
       "path": "plugins/secretary/skills/memory-care/SKILL.md",
       "classification": "common",
-      "sha256": "71e0968627d02bc1b65e3564426879c2903c26fe2b6b054d2324393cc30d48c0"
+      "sha256": "10cf69931f69cbf54d81f7c4bb55095620683128f457f9cd2fd27d1655cc420a"
     },
     {
       "path": "plugins/secretary/skills/memory-care/scripts/memory-tools.sh",
@@ -2445,22 +2500,22 @@
     {
       "path": "plugins/secretary/skills/onboarding/SKILL.md",
       "classification": "common",
-      "sha256": "35440f7cfb1b89525f11a5e8787e03e733621c1a35398f3537dfd30a4e38b3fd"
+      "sha256": "cebf379cc672388876d6290b2686ee94141af5596fac53e208d942ecfe14c130"
     },
     {
       "path": "plugins/secretary/skills/projects/SKILL.md",
       "classification": "anchor-overlay",
-      "sha256": "2a23aa48d90e101e763028abcff8fdf3734f2965bbbc68a89044f94bca3bd9b3"
+      "sha256": "f6853e0c0dd49ac4699bdae8c8e906cdf0644e8b81ddef4b3b084675289e7774"
     },
     {
       "path": "plugins/secretary/skills/secretary/SKILL.md",
       "classification": "anchor-overlay",
-      "sha256": "d5e57199094d6581efe421a6232bc208a4c8979caebb2ce066e39d96f1dd0047"
+      "sha256": "24beb4991ad12e392a0f3c4c0c665247365c02cb8bbebc6dd16f52d5c4da0365"
     },
     {
       "path": "plugins/secretary/skills/settings/SKILL.md",
       "classification": "anchor-overlay",
-      "sha256": "e499b9d79b8d04c3ff8a2398db42104245e367b40b6c2246bc7ab2d6a61ef164"
+      "sha256": "ed37da0f9aff4f05362bbc09ac20a3a0a6d663f083aca9a468eab205cdb83654"
     },
     {
       "path": "plugins/secretary/skills/setup-google/SKILL.md",
@@ -2490,7 +2545,7 @@
     {
       "path": "plugins/secretary/templates/AGENTS.md",
       "classification": "common",
-      "sha256": "c5dd0b2f53c72b13c77c3990dd7fca85efb48f6ea0dfd4dbf266105d20e0adb2"
+      "sha256": "409c7b7ddd67bafbda2aad5867e7b7f3713cc6caea7dee0cf85e71185fab5ae3"
     },
     {
       "path": "plugins/secretary/templates/CLAUDE.md",
@@ -2595,7 +2650,7 @@
     {
       "path": "plugins/yasashii-secretary/CHANGELOG.md",
       "classification": "common",
-      "sha256": "943a505e3a2e2d45323461d5209eb7ec71107adc20cf21527c66ccd4f1fd014d"
+      "sha256": "84434099adfec110b5c4fb9b7a41c28907aa081c8fa8e9bbd258f14253f506bc"
     },
     {
       "path": "scripts/agentic-archive-gate.mjs",
@@ -2635,7 +2690,7 @@
     {
       "path": "scripts/archive-release-gate.mjs",
       "classification": "repo-owned",
-      "sha256": "8602f4fc89ca793b507b7d63b1e26e1c8c65bc940f6654fbf13bcd17ac052c7b"
+      "sha256": "12d01aca57546c2d81e5b47bd75786094a8c8640b226e2bb4f698dbdd1465177"
     },
     {
       "path": "scripts/check-distribution-channel.py",
@@ -2650,12 +2705,12 @@
     {
       "path": "scripts/check-release-integrity.py",
       "classification": "repo-owned",
-      "sha256": "d565a63a1f2601cd4c0697d6371903e10d9efadacf3c624a32f848c818e45155"
+      "sha256": "7ff66647ced01d22e78998732cc34b68f2730777cd916201c5ec0887b152a3c6"
     },
     {
       "path": "scripts/check-report-schema.py",
       "classification": "common",
-      "sha256": "710dac0949e99d73286cdd5648fd4844bbcbf0330aa7516bf2ed0a55f159be4f"
+      "sha256": "f64c649bc8965caed086b544e1df5c8d3b2aa5d40de37d9cf83ca9b48d1f8455"
     },
     {
       "path": "scripts/check-yasashii-harness-online.sh",
@@ -2720,7 +2775,7 @@
     {
       "path": "scripts/fixtures/sprint-032-patch-001/conversations/completion-report.good.md",
       "classification": "common",
-      "sha256": "87cefd49001b1c4e6fec02f3d03dce3c77a88f6aa38574d844eae3903aeb300a"
+      "sha256": "151622d763ee6eafa5bdcf56a9d671e6bcb13f59efcc3fe88aa6f63d133112fd"
     },
     {
       "path": "scripts/fixtures/sprint-032-patch-001/conversations/completion-report.out-of-order.bad.md",
@@ -2808,6 +2863,46 @@
       "sha256": "03e235a6effd08779fdb4bf8f70e7c1632f3b1b10e149ae9c2bc4a15972b6b48"
     },
     {
+      "path": "scripts/fixtures/sprint-038/candidate-inputs.json",
+      "classification": "common",
+      "sha256": "39b140fb525aa4813e0ad8338796e1f21996571208fdf31d61f5c64658287324"
+    },
+    {
+      "path": "scripts/fixtures/sprint-038/candidate-source-snapshot.json",
+      "classification": "common",
+      "sha256": "53f9c21e2ff251953e0da7111356c63788fba3fdfac5193b4930c2f22b9d51ae"
+    },
+    {
+      "path": "scripts/fixtures/sprint-038/conversation-golden.json",
+      "classification": "common",
+      "sha256": "ac093c60891377c489110cf8da340d8a014a1c85ac69901d4440e8ab5a169caf"
+    },
+    {
+      "path": "scripts/fixtures/sprint-038/current-wizard-assets.json",
+      "classification": "common",
+      "sha256": "7722231a6498f9b7e3d18f2036648f207cbee9a2dee93b6e0e19c02f8b04298c"
+    },
+    {
+      "path": "scripts/fixtures/sprint-038/historical-classifier-cases.json",
+      "classification": "common",
+      "sha256": "6b2605e8675b701036687316962bcef8327084534a24d2ea87ea2d5093e5d870"
+    },
+    {
+      "path": "scripts/fixtures/sprint-038/historical-classifier-runner.mjs",
+      "classification": "common",
+      "sha256": "4006b688f1ed1975aa1a9a3d7985fde3957886bceb09b3c8541509bf2e95d944"
+    },
+    {
+      "path": "scripts/fixtures/sprint-038/historical-path-alias-probe.mjs",
+      "classification": "common",
+      "sha256": "aadd712a2132df916b3a453817505ec124da39f97c08103be53c1b2617eb7a8b"
+    },
+    {
+      "path": "scripts/fixtures/sprint-038/meaning-negative.json",
+      "classification": "common",
+      "sha256": "9f8a99ebb8f4ab59f1c3e7176973f41f4bf974d4197fcfd894c2a3968986163a"
+    },
+    {
       "path": "scripts/fixtures/yasashii-harness/claude-marketplace-good.json",
       "classification": "common",
       "sha256": "801040c1f47e85e945b1a83cf7a591391544bca456910967801e13413103e07f"
@@ -2865,7 +2960,7 @@
     {
       "path": "scripts/lib/sprint-032-patch-001-conversation.mjs",
       "classification": "common",
-      "sha256": "291bee7218945169bcad327c9c144f1d376d838efcf56a6b11dea33cb826a7ae"
+      "sha256": "d097d9fc5f1085bf4c6dded7d21b6d23a82b86725d2000b5516b3288124e8ce2"
     },
     {
       "path": "scripts/lib/sprint-032-patch-002-hosts.mjs",
@@ -2873,9 +2968,19 @@
       "sha256": "095fa226dafd22792615bd452542892b68da54ea636eb3c0e0e9f9e0d1611153"
     },
     {
+      "path": "scripts/lib/sprint-038-conversation-runner.mjs",
+      "classification": "common",
+      "sha256": "0307684893c7670daab26e787480fda9f95e431207f651cf328c95fb5c5eb18a"
+    },
+    {
+      "path": "scripts/lib/sprint-038-private-runner.mjs",
+      "classification": "common",
+      "sha256": "9ad74b1cac2a25d4e02f62bb506f866df1e67a7f7f97d7c9d76f866f7f3abebd"
+    },
+    {
       "path": "scripts/master-release-gate.mjs",
       "classification": "common",
-      "sha256": "d35a04e9807bea0ac6b78665d2f92728c18f96e6586a59362880dae2f4c2d878"
+      "sha256": "fb7f8bf17ac07e50b03033b620e4aaa4edea043b3bc3f70c430b28a0d8e8da6a"
     },
     {
       "path": "scripts/master-release-gate.sh",
@@ -2888,6 +2993,11 @@
       "sha256": "f5c5109c31003903636ad9f073e7c1888ba01aa36201a210e1a7ed8c45c62677"
     },
     {
+      "path": "scripts/run-historical-regression.mjs",
+      "classification": "common",
+      "sha256": "e5c1de39fc756f514ba81d0cbc97292253e0b8d03c9d5cbf954a811ac1e347ad"
+    },
+    {
       "path": "scripts/sprint-009-regression.sh",
       "classification": "common",
       "sha256": "8a0b2bce121dce4207fc7faef98550616bdac56d5a477489610dae672d84f9fb"
@@ -2895,7 +3005,7 @@
     {
       "path": "scripts/sprint-010-regression.sh",
       "classification": "common",
-      "sha256": "f373f8aae6ca8ead91cdd9899dcd2926239964d2b0df3ec93bd761b1ec024e34"
+      "sha256": "c4b653e9dd1e168e5ccf51a72935b76cf912e2b9089c8d1f4e690378b075ffca"
     },
     {
       "path": "scripts/sprint-011-live-dialogue.sh",
@@ -2905,7 +3015,7 @@
     {
       "path": "scripts/sprint-011-regression.sh",
       "classification": "anchor-overlay",
-      "sha256": "047769e28ac2c5cc5ed88869afc243835764dd098dbd2258c9430cd7d56f2d31"
+      "sha256": "276643d7a9ea335299f13ee65ec448ce50cdd3bef568ccdf5dd1081084fd869b"
     },
     {
       "path": "scripts/sprint-012-patch-001-live-dialogue.sh",
@@ -2950,7 +3060,7 @@
     {
       "path": "scripts/sprint-015-regression.sh",
       "classification": "common",
-      "sha256": "ac7adc361954d04edc3b2341cef9fa7305ca6b45278b3ecb685d63c942848f02"
+      "sha256": "0760c8ea8a9349084c805cf2e2d89707194bf5f7397642e2076fcceb1964c20e"
     },
     {
       "path": "scripts/sprint-016-regression.sh",
@@ -3010,7 +3120,7 @@
     {
       "path": "scripts/sprint-020-patch-001-copy-test.mjs",
       "classification": "common",
-      "sha256": "76b01821e56ac617d226c13b84f40bb01e07eae93374c7708455aa7145c4b232"
+      "sha256": "f74e868a8a8c3d616eb227a99ad10cedd7645849566a8a20912fd87205edaa8d"
     },
     {
       "path": "scripts/sprint-020-patch-001-regression.sh",
@@ -3020,12 +3130,12 @@
     {
       "path": "scripts/sprint-020-patch-002-cloud-setup-test.mjs",
       "classification": "common",
-      "sha256": "de90b1fffcceb709e096efaa88d1f9a7149735dc004f97e7d60901cd43b31fd5"
+      "sha256": "e2485aa87a9704cda74d28ac922ea7a5e8f5abcc2fcf1b8ac9935915f6ce0e20"
     },
     {
       "path": "scripts/sprint-020-patch-002-regression.sh",
       "classification": "common",
-      "sha256": "ccbb1c1b91dd3067bd296e83c77c38ba8338cfa68a09336b2d154d81183a8efa"
+      "sha256": "2ade6c37e5f432970656f4b84c6e547b208465259a2d080e662c0ea314565d9b"
     },
     {
       "path": "scripts/sprint-020-regression.sh",
@@ -3110,7 +3220,7 @@
     {
       "path": "scripts/sprint-027-copy-test.mjs",
       "classification": "common",
-      "sha256": "7a2cfbf9d057c75fdcc57a7c4f4150a3a94ecb99a734372e1c90a83975c31fe6"
+      "sha256": "bb98e74414b6aa3e0193859d2601d2250b8a7336852a6f9d3a7f0cddbdc5d221"
     },
     {
       "path": "scripts/sprint-027-regression.sh",
@@ -3125,12 +3235,12 @@
     {
       "path": "scripts/sprint-029-rule-boundary-test.mjs",
       "classification": "anchor-overlay",
-      "sha256": "422ad8bc5ca186731ea8d81bb59f541715e6327edc9fc4d930e80f379103b34c"
+      "sha256": "7b6a445dc39c9989d31f2903d40d75544ba46e2fdb01264615f71ee01a618873"
     },
     {
       "path": "scripts/sprint-030-edition-guard-test.mjs",
       "classification": "common",
-      "sha256": "b5cd79f7c31b35b8efc8eb9f2ea4f0ad4231081838f80f1d9f91bbd9e9d5632c"
+      "sha256": "dbbdfced53cb1393753769ea4333b5fd80b2bd37ce16349340524e9bf9ab1374"
     },
     {
       "path": "scripts/sprint-030-regression.sh",
@@ -3140,7 +3250,7 @@
     {
       "path": "scripts/sprint-030-update-config-test.mjs",
       "classification": "common",
-      "sha256": "2cef106a11731a2a56670eea47e5f9ef77f055feddee04fb833638f5945621f4"
+      "sha256": "783c841142b2464ca181325ada0630d3b4354f04bae4660b41fd905ee0aa9fc0"
     },
     {
       "path": "scripts/sprint-031-google-chat-file-input-browser.mjs",
@@ -3150,7 +3260,7 @@
     {
       "path": "scripts/sprint-031-plugin-path-test.mjs",
       "classification": "common",
-      "sha256": "c9d87676af3795c7ac91e9444454dd743b190771180ad65de8d06019941c948d"
+      "sha256": "e2e86e627f73f2ea8b6b481b38c817bf5db6927809e516f314826bb49b152483"
     },
     {
       "path": "scripts/sprint-031-regression.sh",
@@ -3170,7 +3280,7 @@
     {
       "path": "scripts/sprint-032-patch-001-readability-test.mjs",
       "classification": "common",
-      "sha256": "81dac09ead1feaec3e9ef7bafdbd6d141e61b3b353429bbdfeb7a6a583cf6013"
+      "sha256": "d56d71bf01bc1e0544d3b180e46e74ba1f617ab964588e8f698de14a5c7f5039"
     },
     {
       "path": "scripts/sprint-032-patch-001-regression.sh",
@@ -3190,7 +3300,7 @@
     {
       "path": "scripts/sprint-032-patch-002-test.mjs",
       "classification": "common",
-      "sha256": "7f676535b83295ded3dc4337281ef78835bf06975fb7d988f41ffa8154875477"
+      "sha256": "2b4d23ba716f45161c6b293ceb15786ebedddcb663e5c7b67d746b6fba8bb2c7"
     },
     {
       "path": "scripts/sprint-032-regression.sh",
@@ -3200,7 +3310,7 @@
     {
       "path": "scripts/sprint-032-update-gate-test.mjs",
       "classification": "common",
-      "sha256": "8cf1111c9e10b70920d44b8e7d6ab1ebc4ee5bdf5826cd4e9c300d9f9e6c69dd"
+      "sha256": "de8d8f32abaa173be2bf3704d8c7a6cf9120d5745ad892c3cb09cec0a23e33b2"
     },
     {
       "path": "scripts/sprint-033-test.mjs",
@@ -3246,6 +3356,41 @@
       "path": "scripts/sprint-037-test.mjs",
       "classification": "anchor-overlay",
       "sha256": "0751c1cd7c95bae6d3871f5ae3612133ca360c731ba438cb94038addb01378fd"
+    },
+    {
+      "path": "scripts/sprint-038-candidate-build.mjs",
+      "classification": "common",
+      "sha256": "ddc898ba87ebe5e76b3dbbd72d6aea9b821bb669a3d930d9ee34d6560029ab67"
+    },
+    {
+      "path": "scripts/sprint-038-candidate-digest.mjs",
+      "classification": "common",
+      "sha256": "641b9ef63ac98f1c7191739dceb0a5f19383d1834b0d602fe4144417a2c312eb"
+    },
+    {
+      "path": "scripts/sprint-038-historical-classifier-test.mjs",
+      "classification": "common",
+      "sha256": "df319926156ac0401e2ae5176a4452d20be6d6ddd7d12b7c9ded8851260dd330"
+    },
+    {
+      "path": "scripts/sprint-038-historical-path-test.mjs",
+      "classification": "common",
+      "sha256": "35c4a46ba383fec3e96f6a4323cb54758d9f02fc2d84aa48cd2f621e4bbb3254"
+    },
+    {
+      "path": "scripts/sprint-038-private-test.mjs",
+      "classification": "common",
+      "sha256": "e7977bc461a57221ce1ab3b61ccadc072dde9630ee9499bb0991383e67e72d77"
+    },
+    {
+      "path": "scripts/sprint-038-regression.sh",
+      "classification": "common",
+      "sha256": "4d9a81d51ab7a980a55059eca131e5b78473ae5d46fafeda8207254cc06b5fde"
+    },
+    {
+      "path": "scripts/sprint-038-test.mjs",
+      "classification": "common",
+      "sha256": "4add3dc445fedf486de706079ec7199522d992084fbead8e7f432b729d5f5e64"
     },
     {
       "path": "scripts/start-sprint-013-wizard-fixture.sh",
