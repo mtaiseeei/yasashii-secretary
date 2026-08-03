@@ -83,7 +83,7 @@ function makeDownstreamFixture(parent) {
 check("recorded upstream base and local candidate are exact", () => {
   const output = run(["--check", "--candidate", candidate]);
   assert.match(output, /OVERLAY_CHECK_PASS/);
-  assert.match(output, /external-live-gate-unavailable/);
+  assert.match(output, /upstream-0\.9\.1-release-verified/);
 });
 
 check("common safety and wizard implementation match upstream bytes", () => {
@@ -110,19 +110,17 @@ check("wizard DOM/copy/OAuth/sync assets remain byte-identical", () => {
   ]) assert.equal(digest(join(root, path)), digest(join(candidate, path)), path);
 });
 
-check("yasashii settings display is readable and does not leak values", () => {
+check("yasashii settings display keeps readable keys and confirmation boundaries", () => {
   const yasashii = readFileSync(join(root, "plugins/secretary/skills/settings/SKILL.md"), "utf8");
   const agentic = readFileSync(join(candidate, "plugins/secretary/skills/settings/SKILL.md"), "utf8");
   assert(agentic.includes("<変更項目>=<値>"), "agentic direct display must remain upstream-owned");
-  assert(!yasashii.includes("<変更項目>=<値>"));
-  assert(yasashii.includes("- 変更する項目: <日本語の項目名>"));
-  assert(yasashii.includes("- 内部の正式key: `<セクション>.<キー>`"));
-  assert(yasashii.includes("値は表示しません"));
+  assert(yasashii.includes("この設定で反映しますか: <変更項目>=<値>"));
+  assert(yasashii.includes("| セクション | 日本語の項目名 | 内部の正式key | 入力の種類 |"));
   assert(yasashii.includes("`言葉遣い.報告の詳しさ`"));
-  assert(!yasashii.includes("設定を変更: <変更項目>=<値>"));
+  assert(yasashii.includes('journal-add <secretary> did "設定を変更: <変更項目>=<値>"'));
 });
 
-check("edition metadata stays yasashii and release candidate stays 0.8.0", () => {
+check("edition metadata stays yasashii and release candidate stays 0.9.1", () => {
   const edition = JSON.parse(readFileSync(join(root, "plugins/secretary/edition.json"), "utf8"));
   const marketplace = JSON.parse(readFileSync(join(root, ".claude-plugin/marketplace.json"), "utf8"));
   const manifest = JSON.parse(readFileSync(join(root, "plugins/secretary/.claude-plugin/plugin.json"), "utf8"));
@@ -131,16 +129,17 @@ check("edition metadata stays yasashii and release candidate stays 0.8.0", () =>
   assert.equal(edition.edition, "yasashii-secretary");
   assert.equal(edition.copy.path, "rules/copy/yasashii.json");
   assert.equal(edition.harness.installId, "harness@yasashii-harness");
-  assert.equal(edition.harness.version, "0.5.0");
+  assert.equal(edition.harness.version, "0.5.1");
+  assert.equal(edition.harness.observedCommit, "f50917e3cf9c24b6e4370adba547bd4891c85986");
   assert.equal(edition.harness.repository, "https://github.com/mtaiseeei/yasashii-harness");
   assert.equal(edition.harness.hosts.claudeCode.installId, "harness@yasashii-harness");
   assert.equal(edition.harness.hosts.codex.installId, "harness@yasashii-harness");
-  assert.equal(marketplace.plugins[0].version, "0.8.0");
-  assert.equal(manifest.version, "0.8.0");
+  assert.equal(marketplace.plugins[0].version, "0.9.1");
+  assert.equal(manifest.version, "0.9.1");
   assert.equal(codexMarketplace.name, "yasashii-secretary");
   assert.equal(codexMarketplace.plugins[0].name, "yasashii-secretary");
   assert.equal(codexManifest.name, "yasashii-secretary");
-  assert.equal(codexManifest.version, "0.8.0");
+  assert.equal(codexManifest.version, "0.9.1");
   assert.equal(codexManifest.skills, "./skills/");
   assert.equal(marketplace.plugins[0].forkedFrom, "https://github.com/Shin-sibainu/cc-company");
 });

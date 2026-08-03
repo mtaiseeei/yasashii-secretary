@@ -57,8 +57,8 @@ dashboard は必須条件ではなく、sprint-012 で利用反応を踏まえ�
 書込先 `origin` は自身、読取専用の `upstream` は `mtaiseeei/agentic-harness` とし、上流追随とやさしさ差分の検証を反復可能にする。
 配布時は marketplace名 `yasashii-harness` とplugin本体名 `harness` を組み合わせ、`harness@yasashii-harness` で一意に導入できるようにする。上流との差分は `yasashii` 見出し追加と、宣言的allowlistに載せた配布識別metadataだけに限定する。
 2 editionのSecretaryは、対応するHarnessを内包せず、識別・導入状態確認・ホストに合う導入案内・接続だけを担う。
-最終公開候補では `agentic-secretary` を `agentic-harness 0.5.0`、`yasashii-secretary` を
-`yasashii-harness 0.5.0` と組み合わせ、各Secretary固有の指示を保ったままrepo内runtime設定と運用契約を互換にする。
+最終公開候補では `agentic-secretary` を `agentic-harness 0.5.1`、`yasashii-secretary` を
+`yasashii-harness 0.5.1` と組み合わせ、各Secretary固有の指示を保ったままrepo内runtime設定と運用契約を互換にする。
 
 ### G4 やさしいハーネスの再定義
 
@@ -213,7 +213,7 @@ Yasashii固有の言葉遣い・identity・配布metadata・repo-owned正本は�
 18. `agentic-secretary` を4つの正式対象ホスト（Claude Code Desktop App／Claude Code CLI／Codex App／Codex CLI）で、共通本体＋host adapterの構成により導入・検証でき、対応対象と検証済みが別集計で正直に表示される。
 19. Codex App／Codex CLIではCodex正式plugin manifestとrepo marketplaceから新規導入・skill発見・新規sessionでの利用・更新確認まで成立し、Claude marketplaceのlegacy互換読込や手動skillsコピーだけで合格を作らない。
 20. private `origin/main` の `4670438` をSprint 033の完成候補とし、同一current bytesで取得済みの4 host固有実会話4/4と、配布・identity・会話・wizard・安全性・回帰の証拠を実用的な出荷判断へ使える。
-21. 各Secretaryが対応Harness 0.5.0を別Pluginとして正しく識別し、Claude Code／Codexごとの正規導入先を案内できる。Harness 0.5.0の停止上限、検証範囲の失敗分類、証拠再利用、基準変更gateをrepo内運用へ反映しつつ、Secretary固有の指示と2 editionの対象差を維持する。
+21. 各Secretaryが対応Harness 0.5.1を別Pluginとして正しく識別し、Claude Code／Codexごとの正規導入先を案内できる。Harness 0.5.1の停止上限、検証範囲の失敗分類、証拠再利用、基準変更gateをrepo内運用へ反映しつつ、Secretary固有の指示と2 editionの対象差を維持する。
 22. 共通15 skillsがhost固有の環境変数設定に依存せず同じplugin本体へ到達し、両editionがClaude CodeとCodexの正式manifest／marketplaceから共通skillsを配布できる。
 23. 初回の呼び方を4経路から選び、安全な候補を確認してから保存できる。既存変更では現役3正本を一括同期し、Yasashiiの言葉遣いとedition境界を保ったまま、配布物を利用者中立にできる。
 
@@ -229,7 +229,7 @@ Yasashii固有の言葉遣い・identity・配布metadata・repo-owned正本は�
 - `yasashii-secretary` にハーネスや agents のコピーがなく、`yasashii-harness` への案内が切れていない。
 - GitHub上の `mtaiseeei/yasashii-harness` がpublic・`fork=false`で実在し、origin/upstream remoteとfb9c303基点を証跡で確認できる。
 - remote manifestsのmarketplace `name` / `repository`、plugin `name` / `source` / `repository` / `homepage` がdownstreamと `harness@yasashii-harness` に整合し、metadata allowlist外の上流行変更が0件である。
-- `agentic-secretary`／`yasashii-secretary` の対応Harness識別と導入案内が、GitHub `main` のClaude／Codex正式manifest・marketplaceの `0.5.0` と一致する。Secretary内にHarness実体・agents・Harness Git履歴はなく、repo固有の `CLAUDE.md`／`AGENTS.md`／ガイダンスを上書きしていない。
+- `agentic-secretary`／`yasashii-secretary` の対応Harness識別と導入案内が、GitHub `main` のClaude／Codex正式manifest・marketplaceの `0.5.1` と一致する。Secretary内にHarness実体・agents・Harness Git履歴はなく、repo固有の `CLAUDE.md`／`AGENTS.md`／ガイダンスを上書きしていない。
 - Agenticの合格済み固定candidateをreview済みbaseとして記録し、Yasashii overlayのapply／reapplyが追加差分0件である。共通の呼び方機能は一致し、Yasashii固有copy／identity／repo-owned正本は不変である。
 - 配布物と現行製品正本のactive surfaceに、unexpectedな個人名、利用者端末固有path、私用workspace依存がない。正式所有情報と合成fixtureは区別して維持する。
 - private GitHub repoの初回push後、秘書・プロジェクト・Chatwork設定が同じrepoにあり、別のChatwork専用repoを必要としない。

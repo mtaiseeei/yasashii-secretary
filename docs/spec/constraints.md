@@ -14,9 +14,9 @@
 8. 上流由来行を変更できる機械的例外は、独立downstreamの配布識別metadataだけ。`.claude-plugin/marketplace.json` のmarketplace `name=yasashii-harness` / `repository=mtaiseeei/yasashii-harness`、plugin `name=harness` / `source=./plugins/harness`、plugin manifestの `repository` / `homepage=https://github.com/mtaiseeei/yasashii-harness`、必要なCodex marketplace識別子をdownstream向けに揃える。
 9. metadata例外は `gentle-overlay/metadata-overrides.json` に対象ファイル・JSON field・期待値を宣言し、これをoverlay兼allowlistの唯一の正本とする。sync後に完全一致を検査し、allowlist外のmetadata変更と上流由来行の書換・削除は0件でなければならない。
 10. SecretaryとHarnessは別Plugin／別Repoを維持する。SecretaryへHarnessのskills、agents、commands、hooks、runtime script、vendor依存、Git履歴をmerge、vendor、submodule、symlink、コピーで内包せず、Secretary manifestの暗黙依存として自動導入もしない。
-11. 対応関係は `agentic-secretary` → GitHub `mtaiseeei/agentic-harness`、`yasashii-secretary` → GitHub `mtaiseeei/yasashii-harness` とする。最終候補は両方の `main` にあるClaude／Codex正式配布面が `0.5.0` で一致することをread-onlyで確認する。network不可はonline合格にしない。
+11. 対応関係は `agentic-secretary` → GitHub `mtaiseeei/agentic-harness`、`yasashii-secretary` → GitHub `mtaiseeei/yasashii-harness` とする。最終候補は両方の `main` にあるClaude／Codex正式配布面が `0.5.1` で一致することをread-onlyで確認する。Yasashii側の公開commitは `f50917e3cf9c24b6e4370adba547bd4891c85986` に固定し、network不可はonline合格にしない。
 12. Harness案内はhost別の正式配布識別子を保持する。Claude Codeのmarketplace／install IDとCodex repo marketplace／install IDが異なる場合、edition設定、案内、検査で区別し、片方の値を他方へ推測適用しない。
-13. Secretary repo内の `CLAUDE.md`、`AGENTS.md`、`.harness/config.toml`、`docs/harness-guidance.md` は製品固有指示を正本として保持する。Harness 0.5.0追随は必要な互換項目の追加・整合に限定し、テンプレートの全面置換、既存指示・Agent定義・個人設定の上書きを行わない。
+13. Secretary repo内の `CLAUDE.md`、`AGENTS.md`、`.harness/config.toml`、`docs/harness-guidance.md` は製品固有指示を正本として保持する。Harness 0.5.1追随は必要な互換項目の追加・整合に限定し、テンプレートの全面置換、既存指示・Agent定義・個人設定の上書きを行わない。
 14. `<workspace-root>/agentic-harness` はread、list、存在確認、status、HEAD、branch、remote確認も含め絶対に操作しない。上流のversion、manifest、template、差分はGitHub remote／raw／APIのread-only結果だけを証拠にする。
 15. 共通15 skillsの通常実行は `${CLAUDE_PLUGIN_ROOT}` の暗黙設定を前提にしない。各 `SKILL.md` の実パスからplugin rootを決定し、未解決変数、空path、現在directory依存の誤rootをshellやfilesystem APIへ渡す前に停止する。host別skill本文コピーは作らない。
 16. Codex正式配布面は両editionに持つ。`plugins/secretary/.codex-plugin/plugin.json` とrepo rootの `.agents/plugins/marketplace.json` が同じ共通skillsを参照し、edition別identity、version、repository、source.pathを正しく表す。Claude legacy互換またはagentic側だけのmanifestでyasashii側の欠落を代替しない。

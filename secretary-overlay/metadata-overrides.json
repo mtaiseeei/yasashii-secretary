@@ -43,7 +43,7 @@
       { "op": "set", "pointer": "/harness/marketplace", "value": "yasashii-harness" },
       { "op": "set", "pointer": "/harness/installId", "value": "harness@yasashii-harness" },
       { "op": "set", "pointer": "/harness/repository", "value": "https://github.com/mtaiseeei/yasashii-harness" },
-      { "op": "set", "pointer": "/harness/observedCommit", "value": "8f9eb4c1d9e14414a7e94051ca6f4c34da282784" },
+      { "op": "set", "pointer": "/harness/observedCommit", "value": "f50917e3cf9c24b6e4370adba547bd4891c85986" },
       { "op": "set", "pointer": "/harness/hosts/claudeCode/marketplace", "value": "yasashii-harness" },
       { "op": "set", "pointer": "/harness/hosts/claudeCode/installId", "value": "harness@yasashii-harness" },
       { "op": "set", "pointer": "/harness/hosts/codex/marketplace", "value": "yasashii-harness" },

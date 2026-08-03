@@ -191,27 +191,28 @@ editionごとに1つの宣言的設定を持ち、分散した文字列置換で
 | 開発導線 | Harnessのmarketplace／導入先 |
 | 表現 | 会話、診断、報告、developer handoffで使う集約済みcopy |
 
-## 対応Harnessとの分離と0.5.0互換
+## 対応Harnessとの分離と0.5.1互換
 
 HarnessはSecretaryの内部機能ではなく、対応する別Plugin／別Repoである。Secretaryが持つのは、editionごとの対応先、
 host別の導入識別子、導入状態確認、未導入時の案内、導入済み時の接続だけとする。
 
 | Secretary | Harness正本 | Claude Code marketplace／install | Codex repo marketplace／install |
 |---|---|---|---|
-| `agentic-secretary` | GitHub `mtaiseeei/agentic-harness` `main` `0.5.0` | `agentic-harness`／`harness@agentic-harness` | `agentic-harness-local`／`harness@agentic-harness-local` |
-| `yasashii-secretary` | GitHub `mtaiseeei/yasashii-harness` `main` `0.5.0` | `yasashii-harness`／`harness@yasashii-harness` | `yasashii-harness`／`harness@yasashii-harness` |
+| `agentic-secretary` | GitHub `mtaiseeei/agentic-harness` `main` `0.5.1` | `agentic-harness`／`harness@agentic-harness` | `agentic-harness-local`／`harness@agentic-harness-local` |
+| `yasashii-secretary` | GitHub `mtaiseeei/yasashii-harness` `main` `0.5.1` | `yasashii-harness`／`harness@yasashii-harness` | `yasashii-harness`／`harness@yasashii-harness` |
 
-この表の値は2026-07-21にGitHub上の正式manifest／marketplaceとREADMEをread-only確認した結果である。
+この表の値は2026-08-03にGitHub上の正式manifest／marketplaceとREADMEをread-only確認した結果である。
+Yasashii Harnessの観測commitは `f50917e3cf9c24b6e4370adba547bd4891c85986` とする。
 公開判定時にも同じGitHub `main` を再確認し、versionまたは識別子が変わっていた場合は推測で追随せず、
 observed commitと差分を記録してPlannerへ戻す。ローカル `<workspace-root>/agentic-harness` は証拠源にしない。
 
-Secretary repoのHarness運用面は0.5.0の次の意味契約に追随する。
+Secretary repoのHarness運用面は0.5.1の次の意味契約に追随する。
 
 1. 検証基盤だけが原因の不合格は `verification-scope-issue` とし、Generator／Plannerへの自動差し戻しではなく、選択肢を示してユーザーへ返す。findingはproductとverification-infraを区別し、迷う場合はproductとして安全側に扱う。
 2. Sprint契約またはrubricに列挙済みの証拠形式を合格に十分なsafe harborとし、Evaluatorが統一attestation基盤等を後付けの必須条件にしない。既存の下限を下回ることはできない。
 3. activeなSprintの受入基準・rubricを厳しくする場合はユーザー承認を要する。緩和またはNon-scope化もPlanner提案とユーザー承認を記録する。
 4. `.harness/config.toml` はlineage dispatch上限10、同一Sprintのspec-issue差し戻し上限2を共有既定として明示し、上限到達後は追加dispatchせずユーザーへ返す。個人overrideと既存model／effort設定は上書きしない。
-5. stateの `Spec-Issue Count` と `Lineage Dispatches` はOrchestratorが0.5.0の遅延移行規則に従って追加・更新する。Generator／Evaluatorはstateを書かない。
+5. stateの `Spec-Issue Count` と `Lineage Dispatches` はOrchestratorが0.5.1の規則に従って追加・更新する。Generator／Evaluatorはstateを書かない。
 6. 再評価は変更範囲へ比例させ、同一candidateに結びつき失効条件へ該当しない証拠を再利用できる。実行していない検証をPASSへ数えず、回帰スイートが実行不能または失敗のままなら回帰なしをPASSにしない。
 7. ユーザーが未達を理解してaccept-as-isを選んだ場合だけ `done-by-user-decision` を使い、Evaluator未達記録を保持する。通常のEvaluator PASSと同義にしない。
 
@@ -295,8 +296,8 @@ Yasashii固有copy、identity、manifest、README、repo-owned docsを開始前�
 10. 全会話面が改行・段落・必要なMarkdown箇条書きを持ち、agentic／yasashiiの4面の内容差を維持する。Chatwork wizardの `Name`／`Secret` 入力案内は両editionで同一かつ具体的である。
 11. Codex正式配布では `.codex-plugin/plugin.json`、repo rootの `.agents/plugins/marketplace.json`、共通skills参照、GitHub marketplace導入、Plugins Directory／CLI plugin browser、新規chat／session、更新・cache確認が成立する。Claude marketplaceのlegacy互換成功や手動skillsコピーだけで代替しない。
 12. agenticの4 hostはcurrent bytesで個別に実機smokeが成立し、GUI Appは実UI証拠、CLIはcommand／session証拠を持つ。正式manifest／marketplace、`0.8.0`、identity、skill、会話8面、wizard、workspace変更0件、Secret露出0件、更新／再導入手順、全回帰・archive・利用可能な公式validatorが整合する。`4670438` の既取得証拠は、同一bytesとの対応をfresh Evaluatorが確認した場合に再利用できる。
-13. 対応HarnessのGitHub `main` が両方とも `0.5.0` で、Claude／Codex別のmarketplace、install ID、manifest、repository／homepageが各Secretaryのedition設定、build案内、README、互換検査と一致する。Secretary内のHarness実体・agents・Harness Git履歴は0件である。
-14. 両Secretary repoのHarness運用設定・ガイダンスが0.5.0の停止上限、失敗分類、safe harbor、基準変更gate、増分再評価、証拠再利用、user-decision出口を扱い、既存の製品固有指示とagentic／yasashiiの対象差を保持する。
+13. 対応HarnessのGitHub `main` が両方とも `0.5.1` で、Claude／Codex別のmarketplace、install ID、manifest、repository／homepageが各Secretaryのedition設定、build案内、README、互換検査と一致する。Secretary内のHarness実体・agents・Harness Git履歴は0件である。
+14. 両Secretary repoのHarness運用設定・ガイダンスが0.5.1の停止上限、失敗分類、safe harbor、基準変更gate、増分再評価、証拠再利用、user-decision出口を扱い、既存の製品固有指示とagentic／yasashiiの対象差を保持する。
 15. 共通15 skillsは各 `SKILL.md` の実パスからhost-neutralにplugin rootを解決し、未設定の `${CLAUDE_PLUGIN_ROOT}` を通常shellへ渡さない。Claude Code、Codex App、Codex CLIで代表scriptが同じ共通本体へ到達し、15 skills全件の参照が静的検査を通る。
 16. `agentic-secretary` と `yasashii-secretary` の双方にCodex正式manifest／repo marketplaceがあり、同じ共通skillsを参照しながらedition別identityを表す。agenticのmanifestやClaude legacy互換をyasashiiの正式配布証拠へ流用しない。
 17. `${CLAUDE_PLUGIN_ROOT}` 以外のClaude Code限定前提も15 skillsと配布面でinventoryし、slash command、Hook、Claude固有UI、Claude marketplace等の真にhost固有な面だけをadapter／案内へ分離する。共通skillsの意味内容をhost別に複製せず、静的inventory、任意path fixture、既存Codex正式installテスト、両edition全回帰を主証拠にする。

@@ -1,5 +1,27 @@
 # 変更履歴
 
+## [0.9.1] - 2026-08-03
+
+### 対象者
+
+- Yasashii Secretaryから別配布のやさしいハーネス `0.5.1`を使う方。
+
+### 変わること
+
+- `build` skillとREADMEの互換案内、online互換診断をやさしいハーネス `0.5.1`の公開commitに合わせます。
+
+### 設定・ファイルへの影響
+
+- Harnessは従来どおり別pluginです。Secretary内にHarness本体やLuna custom agent定義を同梱せず、利用者workspaceを変更しません。
+
+### 必要な操作
+
+- Secretary更新後もHarnessはhost別のinstall IDで別途導入・更新します。Secretaryのworkspace migrationは不要です。
+
+### 互換性上の注意
+
+- `0.9.0`以前のrelease記録、migration、fixtureは履歴として維持します。
+
 ## [0.9.0] - 2026-07-31
 
 ### 対象者

@@ -336,7 +336,7 @@ const OWNER_COUNTS = new Map(Object.entries({
   "scripts/regression-check.sh": 2, "scripts/sprint-012-patch-001-regression.sh": 1,
   "scripts/sprint-014-regression.sh": 1, "scripts/sprint-025-regression.sh": 1,
   "scripts/sprint-026-release-gate-test.mjs": 5, "scripts/sprint-034-test.mjs": 1,
-  "scripts/sprint-035-test.mjs": 2,
+  "scripts/sprint-035-test.mjs": 2, "scripts/sprint-038-patch-001-test.mjs": 2,
 }));
 
 function filesUnder(path) {

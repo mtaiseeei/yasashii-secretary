@@ -57,6 +57,11 @@ schema v2／v3のproduction collector／driver／attestorは製品必須要件�
 Secretaryへskills、agents、runtime実装、Git履歴をmerge、vendor、submodule、symlink、コピーのいずれでも内包しない。
 `agentic-secretary` はGitHub上の `mtaiseeei/agentic-harness`、`yasashii-secretary` は
 `mtaiseeei/yasashii-harness` を参照し、ローカル `<workspace-root>/agentic-harness` はread／list／statusを含め全面非接触とする。
+2026-08-03、公開済みAgentic Secretary `0.9.1` のreview済みmerge commit
+`3a5a6c30ac4ad823b5535d290a46423e8e5d15d6` をYasashii overlayへ同期し、対応Harnessを
+公開済みYasashii Harness `0.5.1`（commit `f50917e3cf9c24b6e4370adba547bd4891c85986`）へ更新して、
+Yasashii Secretary `0.9.1` として独立評価・独立公開する方針を確定した。Harnessの非同梱、
+Yasashii固有identity／copy／repository／host別install ID、fetch専用upstreamとpush無効は維持する。
 2026-07-24 に、初回オンボーディングの呼び方を「あなた」「アカウント名」「指定の名前」「その他」から選び、
 「アカウント名」のときだけ現在タスクへhostが提供済みの文脈、Git表示名、OSユーザー名を順に使う方針を確定した。
 候補は名前らしい値だけを出典つきで提案し、探索結果ではなく確認済みの呼び方だけを保存する。
@@ -143,6 +148,7 @@ Gmail等の公式コネクタは従来どおり都度参照し、Chatworkと明�
 | [sprint-035-patch-001](sprints/sprint-035-patch-001.md) | 下流同期: 共通wizardのIME安全な検索を取り込み、Yasashii固有copy／identityを保持 | sprint-035 |
 | [sprint-036](sprints/sprint-036.md) | 旧account-name方針。Generator着手前にsprint-037へ置換 | superseded by sprint-037 |
 | [sprint-037](sprints/sprint-037.md) | 固定Agentic candidateから、呼び方4経路、安全な候補探索、現役正本同期、利用者中立化をYasashii overlayへ同期 | sprint-036を置換する次メインSprint |
+| [sprint-038](sprints/sprint-038.md) | Agentic Secretary 0.9.1をoverlay同期し、Yasashii Harness 0.5.1互換・Yasashii Secretary 0.9.1を独立評価／公開 | sprint-037 |
 
 既存 sprint-001〜006 と各 patch の契約・progress・feedback は履歴として保持する。
 sprint-007 は製品方針転換で白紙化され、旧計画と実装は `backup/sprint-007-010-plan` に退避済みである。

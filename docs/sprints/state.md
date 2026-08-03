@@ -2,10 +2,10 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-037
+- Current ID: sprint-038
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 4
+- Lineage Dispatches: 2
 - Model Tier: standard
 - Rotate: none
 - Next Planned: TBD
@@ -67,12 +67,17 @@
 | sprint-035-patch-003 | done | [contract](sprint-035-patch-003.md) | [progress](../progress/sprint-035-patch-003.md) | [feedback](../feedback/sprint-035-patch-003.md) |
 | sprint-036 | superseded | [contract](sprint-036.md) | - | - |
 | sprint-037 | done | [contract](sprint-037.md) | [progress](../progress/sprint-037.md) | [feedback](../feedback/sprint-037.md) |
+| sprint-038 | done | [contract](sprint-038.md) | [progress](../progress/sprint-038.md) | [feedback](../feedback/sprint-038.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-03: sprint-038はfresh独立EvaluatorでPASS。micro採点は機能完全性5/5・動作安定性5/5・回帰なし5/5、product finding 0、blocking verification-infra 0。targeted current、overlay冪等性、Git-free current archive、release integrity、online互換は全PASS。full offlineは開始HEAD／candidateとも同じhistorical FAIL後の同時点打切りで未完了、full archiveはcandidate 274/286（12 FAIL）対baseline 255/272（18 FAIL）で新規悪化0。full gateをPASSへ昇格せず、非因果baselineの検証負債としてfeedbackへ保持した。Status done、Retry Count／Spec-Issue Count 0、Lineage Dispatches 2、Model Tier standard、Rotate none、Next Planned TBD。v0.9.1 tag／GitHub Release未作成のため許可済みrelease phaseへ進む。
+- 2026-08-03: sprint-038 Generatorが固定Agentic 0.9.1 candidate `3a5a6c30...` をreviewし、overlay base/treeを前進。688 filesを全分類、managed 265、未分類0、check PASS、reapply secondChanged 0、repo-owned不変、upstream push DISABLEDを確認した。Yasashii Secretary 0.9.1、Yasashii Harness 0.5.1／`f50917e3...`、host ID維持を実装し、overlay 11/11、Harness local 15/15、Sprint 038 64/64、専用6/6、active scan 14/14、release integrity、Git-free targeted archive 14/14＋6/6＋64/64、online 2経路、JSON、diff checkをPASS。full master offlineは既存historical FAIL後sprint-021で長時間無出力となり停止、full archiveも既存historical期待差でFAILのため、current必須面へ昇格せずprogressへ分離した。Status awaiting-eval、Lineage Dispatches 2、Model Tier strong、Rotate noneとしてfresh独立Evaluatorへ進む。
+- 2026-08-03: sprint-038 Planner契約を確定。Agentic Harness 0.5.1 resolverは現taskで標準Lunaが起動不能のため、strong tier、fresh Generator、direct inherit fallback、Rotate `model-availability` を選択した。custom agent modeはrepoで無効、定義済みagentはnot-usedでありlaunch-verifiedではない。Generator dispatch予約としてLineage Dispatches 1、Status active、Model Tier strongへ更新する。
+- 2026-08-03: public Agentic Secretary 0.9.1がmerge commit `3a5a6c30ac4ad823b5535d290a46423e8e5d15d6`でreleaseされ、Harness 0.5.1互換を独立評価PASS・公開後照合済み。ユーザー承認に基づき、同じ共通candidateをYasashii overlayへ同期し、Yasashii Harness 0.5.1の公開commit `f50917e3cf9c24b6e4370adba547bd4891c85986`へedition固有参照を更新して0.9.1を別評価・別releaseする `Type: micro` Sprint 038を開始する。Status planned、Retry Count／Spec-Issue Count／Lineage Dispatches 0、Model Tier standard、Rotate none、Next Planned TBD。private版、installed cache、利用者workspaceは対象外とする。
 - 2026-07-24: sprint-037 spec-issue Retryはfresh独立EvaluatorでPASS、product finding 0件。初回Majorは、値を3正本だけへ保存しjournal `設定を変更: 呼び方`、commit subject `設定を変更（呼び方）`、body空、断片・escape・Base64・SHA由来metadata 0、5失敗点rollbackとして直接解消を確認した。固定Agentic `d9a62755...`／tree `9473f36...`、overlay 654 files・未分類0・managed 239・check／apply／reapply差分0、common SHA `f792...d24`、専用5/5・14/14、Sprint 011 69/69・012 38/38・022 69/69＋8/8、archive 11/11、loopback許可面のChatwork／Google Chat、Yasashii identity、Sprint 045保護、diff checkを確認。旧digestは開始HEADと同じstale fixture、restricted EPERMは環境要因として分離し、Status done、Retry Count／Spec-Issue Count 0、Model Tier standard、Rotate none、Next Planned TBDで完了する。
 - 2026-07-24: sprint-037 spec-issue Retry Generatorがoverlay base/treeをAgentic `d9a62755ff78db12c435f225cdd40e95f86a8055`へ前進し、654 files・未分類0、managed 239、apply変更3 paths、check／reapply `secondChanged=0`を確認。共通transactionは6,626 bytes・SHA-256 `f7924212...`でbyte一致し、journal／subject固定、body空、値・断片・変換値混入0、3正本同期、5失敗点rollbackを専用5/5・14/14で確認した。overlay 11/11、Sprint 011 69/69、012 38/38、022 69/69＋wrapper 8/8、archive 11/11、Sprint 045保護diff 0、diff checkを引き渡した。既存digestとloopback sandbox制約は非因果として分離し、Status awaiting-eval、Lineage Dispatches 4でfresh独立Evaluatorへ進める。
 - 2026-07-24: Agentic共通修正 `sprint-037-patch-001` が独立評価PASSし、commit `d9a62755ff78db12c435f225cdd40e95f86a8055`へ固定された。PlannerがYasashii sprint-037の同期元を新SHAへ更新し、journal `設定を変更: 呼び方`、commit subject `設定を変更（呼び方）`、body空、入力値・断片・escape・hash等の履歴metadata非再掲を既存3正本transaction条件と両立させた。Spec-Issue Count 1を保持し、Lineage Dispatches 3としてfresh Generatorで同じSprintを再同期する。
