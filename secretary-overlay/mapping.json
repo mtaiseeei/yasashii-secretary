@@ -14,6 +14,8 @@
     "plugins/secretary/rules/rule-manifest.json"
   ],
   "anchorOverlay": [
+    "plugins/secretary/CHANGELOG.md",
+    "plugins/yasashii-secretary/CHANGELOG.md",
     "plugins/secretary/rules/plain-language.md",
     "plugins/secretary/skills/build/SKILL.md",
     "plugins/secretary/skills/projects/SKILL.md",
@@ -25,6 +27,9 @@
     "scripts/sprint-011-regression.sh",
     "scripts/sprint-025-regression.sh",
     "scripts/sprint-029-rule-boundary-test.mjs",
+    "scripts/sprint-032-update-gate-test.mjs",
+    "scripts/sprint-035-test.mjs",
+    "scripts/sprint-038-patch-001-test.mjs",
     "scripts/sprint-037-test.mjs"
   ],
   "upstreamOnly": [

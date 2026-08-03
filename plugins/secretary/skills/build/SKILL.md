@@ -2,7 +2,7 @@
 name: build
 description: >
   「〇〇を作って」「開発したい」「アプリ／ツールにして」等のまとまった開発依頼の入口。
-  別プラグイン yasashii-harness 0.5.0 の導入状態を確認し、未導入ならhost別の正式手順を案内、導入済みなら
+  別プラグイン yasashii-harness 0.5.1 の導入状態を確認し、未導入ならhost別の正式手順を案内、導入済みなら
   Planner → Generator → Evaluator のループへ接続する。
 ---
 
@@ -23,7 +23,7 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 
 「〇〇を作って」「これを実装して」「アプリ／ツールにしたい」といった、まとまった開発依頼を受け取る入口です。
 開発そのものは別リポジトリ [mtaiseeei/yasashii-harness](https://github.com/mtaiseeei/yasashii-harness) の
-`harness` プラグインが担当します。対応versionは `0.5.0` です。この秘書プラグインにHarnessの
+`harness` プラグインが担当します。対応versionは `0.5.1` です。この秘書プラグインにHarnessの
 skills、agents、commands、hooks、runtime scriptは同梱せず、暗黙の自動installも行いません。
 
 `${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
@@ -104,6 +104,6 @@ Harness管理下かどうかを確認し、管理下なら `state.md` と契約�
 ## 参照
 
 - 言葉づかいルール: `${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md`
-- やさしいハーネス 0.5.0: `https://github.com/mtaiseeei/yasashii-harness`
+- やさしいハーネス 0.5.1: `https://github.com/mtaiseeei/yasashii-harness`
 - Claude Codeの入口: 通常会話 / `/harness`
 - Codexの入口: 通常会話 / `$using-harness` / `$harness-loop`

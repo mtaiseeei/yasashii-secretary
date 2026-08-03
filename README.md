@@ -235,7 +235,7 @@ yasashii-secretary/                         ← public / MIT
 
 ### 開発（やさしいハーネス）
 
-「〇〇を作って」と言うと、`build` スキルが `yasashii-harness` 0.5.0の有無を確認します。未導入なら現在のhostに合う手順を案内し、導入済みなら**計画→実装→検証**のループ（Planner → Generator → Evaluator）に接続します。
+「〇〇を作って」と言うと、`build` スキルが `yasashii-harness` 0.5.1の有無を確認します。未導入なら現在のhostに合う手順を案内し、導入済みなら**計画→実装→検証**のループ（Planner → Generator → Evaluator）に接続します。
 
 Claude Code:
 

@@ -185,7 +185,7 @@ check("Codex and Claude formal manifests share the same 15 skills", () => {
   const claude = json(join(plugin, ".claude-plugin/plugin.json"));
   assert.equal(codex.name, edition.edition);
   assert.equal(claude.name, edition.edition);
-  assert.equal(codex.version, "0.8.0");
+  assert.equal(codex.version, "0.9.1");
   assert.equal(codex.skills, "./skills/");
   assert.equal(codexMarket.plugins[0].source.path, "./plugins/secretary");
   assert.equal(codexMarket.name, edition.distribution.marketplaceId);
@@ -230,10 +230,11 @@ check("three setup skills keep Codex authorization and read-only smoke free of C
   }
 });
 
-check("edition declares Harness 0.5.0 with distinct host IDs", () => {
+check("edition declares Harness 0.5.1 with distinct host IDs", () => {
   const edition = json(join(plugin, "edition.json"));
   const harness = edition.harness;
-  assert.equal(harness.version, "0.5.0");
+  assert.equal(harness.version, "0.5.1");
+  assert.equal(harness.observedCommit, "f50917e3cf9c24b6e4370adba547bd4891c85986");
   if (edition.edition === "agentic-secretary") {
     assert.equal(harness.repository, "https://github.com/mtaiseeei/agentic-harness");
     assert.equal(harness.hosts.claudeCode.installId, "harness@agentic-harness");
@@ -262,7 +263,7 @@ check("README and build skill expose the edition's host-specific Harness route",
     assert(source.includes("$using-harness"));
     assert(source.includes("$harness-loop"));
   }
-  assert(readme.includes("${SECRETARY_PLUGIN_ROOT}"));
+  assert(build.includes("${SECRETARY_PLUGIN_ROOT}"));
 });
 
 check("Harness compatibility validator rejects wrong version ID missing manifest and network", () => {
@@ -290,7 +291,7 @@ check("Harness compatibility validator rejects wrong version ID missing manifest
   assert.deepEqual(validateHarnessSnapshot({ networkUnavailable: true }, expected), ["network unavailable is not a PASS"]);
 });
 
-check("Harness 0.5.0 limits and guidance preserve repository rules", () => {
+check("Harness 0.5.1 limits and guidance preserve repository rules", () => {
   const config = readFileSync(join(root, ".harness/config.toml"), "utf8");
   const agents = readFileSync(join(root, "AGENTS.md"), "utf8");
   const claude = readFileSync(join(root, "CLAUDE.md"), "utf8");

@@ -12,9 +12,9 @@ from pathlib import Path
 SEMVER = re.compile(r"^\d+\.\d+\.\d+$")
 HEADING = re.compile(r"^## \[(\d+\.\d+\.\d+)\](?: - \d{4}-\d{2}-\d{2})?$", re.M)
 REQUIRED = ["対象者", "変わること", "設定・ファイルへの影響", "必要な操作", "互換性上の注意"]
-PLUGIN_NAME = "agentic-secretary"
+PLUGIN_NAME = "yasashii-secretary"
 PLUGIN_SOURCE = "./plugins/secretary"
-REPOSITORY = "https://github.com/mtaiseeei/agentic-secretary"
+REPOSITORY = "https://github.com/mtaiseeei/yasashii-secretary"
 FORKED_FROM = "https://github.com/Shin-sibainu/cc-company"
 AUTHOR = "mtaiseeei"
 
@@ -78,7 +78,7 @@ def validate(root: Path) -> list[str]:
     codex_entries = codex_market.get("plugins", [])
     if codex_market.get("name") != PLUGIN_NAME:
         errors.append("Codex marketplace name is missing or invalid")
-    if codex_market.get("interface") != {"displayName": "Agentic Secretary"}:
+    if codex_market.get("interface") != {"displayName": "Yasashii Secretary"}:
         errors.append("Codex marketplace interface is missing or invalid")
     if len(codex_entries) != 1:
         errors.append("Codex marketplace must contain exactly one plugin entry")
@@ -95,8 +95,8 @@ def validate(root: Path) -> list[str]:
 
     if codex_plugin.get("name") != PLUGIN_NAME:
         errors.append("Codex plugin manifest name is missing or invalid")
-    if codex_plugin.get("version") != "0.9.0":
-        errors.append("Codex plugin manifest version must be 0.9.0")
+    if codex_plugin.get("version") != "0.9.1":
+        errors.append("Codex plugin manifest version must be 0.9.1")
     if codex_plugin.get("skills") != "./skills/":
         errors.append("Codex plugin manifest skills must be ./skills/")
     if codex_plugin.get("author", {}).get("name") != AUTHOR:

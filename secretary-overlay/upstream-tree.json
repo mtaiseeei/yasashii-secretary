@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "baseCommit": "9f9d276ff0836f096a1dbf0a3eb77f1058d94170",
+  "baseCommit": "3a5a6c30ac4ad823b5535d290a46423e8e5d15d6",
   "files": [
     {
       "path": ".agents/plugins/marketplace.json",
@@ -10,7 +10,7 @@
     {
       "path": ".claude-plugin/marketplace.json",
       "classification": "metadata-overlay",
-      "sha256": "d1fa7ed62ca723d04e0c10bff65ae20fae26276995c310768c943cc3f00e3b25"
+      "sha256": "cba0d7e07f17b7e1718d1daed01be8ae60862bca5ddf0675dc2476687a6da16f"
     },
     {
       "path": ".harness/.gitignore",
@@ -40,7 +40,7 @@
     {
       "path": "README.md",
       "classification": "repo-owned",
-      "sha256": "c1dd91197c7594f8413703b7b074dd3d48786b0ca231229d6cda01a084b28339"
+      "sha256": "46bba4c126fcc6da34dd1d86a917b94c81653725f4b10bb2d28ae34759dd4189"
     },
     {
       "path": "adapters/agentic-overlay.json",
@@ -1443,6 +1443,11 @@
       "sha256": "0f0f9c1c8c52eb5b768a8a29105e8c558291b0680cef976bb954c758d53b0b2c"
     },
     {
+      "path": "docs/feedback/sprint-038-patch-001.md",
+      "classification": "repo-owned",
+      "sha256": "2f24a2faa8bf102d9505e8e57b6e6c3fd33cf2bc0edeea3553df8c56e429ab66"
+    },
+    {
       "path": "docs/feedback/sprint-038.md",
       "classification": "repo-owned",
       "sha256": "10cfd3fdc549c0c7092c93f5693f435defa133c6e595a498c3182015d28a676e"
@@ -1728,6 +1733,11 @@
       "sha256": "484c6935d2f1f57304a74ec06d8882960e209162fe6ab1aea8d553401ab4d608"
     },
     {
+      "path": "docs/progress/sprint-038-patch-001.md",
+      "classification": "repo-owned",
+      "sha256": "f3abb1d15437a6ed9a8664443ffc53ce4fcd68b54513bd41e6203bac854fac4d"
+    },
+    {
       "path": "docs/progress/sprint-038.md",
       "classification": "repo-owned",
       "sha256": "2aec15ad031f1bf2db3e10120a9b378ee8ac439c4fa3b2e25a787073f093d414"
@@ -1755,32 +1765,32 @@
     {
       "path": "docs/spec/constraints.md",
       "classification": "repo-owned",
-      "sha256": "de34c838a2a551e4080204f5b967e5ac5b1141485960d151606917a76f70e4a4"
+      "sha256": "310cc867a75ae5363ce5a3a3ea7b4ac1948fcd0abfdddb52da5b6d54cf867080"
     },
     {
       "path": "docs/spec/domain.md",
       "classification": "repo-owned",
-      "sha256": "bcaf6e9886f21422774b35cc3beec24451c20b26bd6179d708711712fa53f019"
+      "sha256": "234fa18816fd24c2139fc987d6c9989641484f62d8a2abfa12636df1d3ad3924"
     },
     {
       "path": "docs/spec/editions.md",
       "classification": "repo-owned",
-      "sha256": "9addefc02f51903c2508a5392406727276801409fe3859c376e51ae05e1f1a8e"
+      "sha256": "01041b34cd653e9563300c0ceb475ed43302349e4b391333871b66254ed630aa"
     },
     {
       "path": "docs/spec/features.md",
       "classification": "repo-owned",
-      "sha256": "00ef17dbefc1145aa40633c0a2adb14e1fea88f9a08350c3947f87a3bca9bc0f"
+      "sha256": "eed9b0965d441dc96176b6e5a4bee1a72248df89a57e4d54ebbc3c6a5c4fc40c"
     },
     {
       "path": "docs/spec/product.md",
       "classification": "repo-owned",
-      "sha256": "c414d9f45493b59dfcba88783df1e40dbc6f7c3ba8cc8d4b5e87b181066895bf"
+      "sha256": "421e1d6ece854b5e5554b7ca3fc87ae02db6dfc2d1b71344ebf05adef8e01edc"
     },
     {
       "path": "docs/spec/rubric.md",
       "classification": "repo-owned",
-      "sha256": "8dd984345948b062a7a536f1fced946b912888b191542f354614eac2378114f6"
+      "sha256": "e76a983511f2ba986315df92392899f1fc1dd84aec31be94344cb7cde86792ac"
     },
     {
       "path": "docs/spec/ui.md",
@@ -2043,6 +2053,11 @@
       "sha256": "99e07566424b53a2f403055b818a5872ad2e63273aeadd23a4b7a3fa012a0df8"
     },
     {
+      "path": "docs/sprints/sprint-038-patch-001.md",
+      "classification": "repo-owned",
+      "sha256": "7a59297b463e07519e7b16f9d09e62e1cfe2ae43d23f34b3d4ec770fff942082"
+    },
+    {
       "path": "docs/sprints/sprint-038.md",
       "classification": "repo-owned",
       "sha256": "3d23f3dfcf7c70fd7252b5496e84cccfb8a95eab7d49e2746ce26a7918a00cc5"
@@ -2050,17 +2065,17 @@
     {
       "path": "docs/sprints/state.md",
       "classification": "repo-owned",
-      "sha256": "aed5c30110f3ca9295de7fe4adeec472719883d3a40f8835c1d8d83c47beedc1"
+      "sha256": "28da59de8985cd3bcc1ead454e2eec3203585dfe5a0c76303eef6696eaee15a4"
     },
     {
       "path": "plugins/secretary/.claude-plugin/plugin.json",
       "classification": "metadata-overlay",
-      "sha256": "ac5ebf885c41073c54423a57bda818b30035d592ed7dfc87f82d908b65d60af0"
+      "sha256": "0d2ba7b23c8cd8abb8a8c3dee9b523546f346657cb580f033e9287cee93b5527"
     },
     {
       "path": "plugins/secretary/.codex-plugin/plugin.json",
       "classification": "metadata-overlay",
-      "sha256": "8ba5613c612ac15df28a6dc6b83b1e8e6a8ca639e37518859cdf57b4a7125464"
+      "sha256": "9459ebb75603c77c6b4d10f494a04d03764c9a35f2d72ce9d48c90d39fd9c92d"
     },
     {
       "path": "plugins/secretary/.mcp.json",
@@ -2069,13 +2084,13 @@
     },
     {
       "path": "plugins/secretary/CHANGELOG.md",
-      "classification": "common",
-      "sha256": "84434099adfec110b5c4fb9b7a41c28907aa081c8fa8e9bbd258f14253f506bc"
+      "classification": "anchor-overlay",
+      "sha256": "2aa806e2509374f085cf416208c6b513318ae22f101d2bb409df84344615fbf7"
     },
     {
       "path": "plugins/secretary/edition.json",
       "classification": "metadata-overlay",
-      "sha256": "35b619730385aa959888332f8df6b6bc933b0d5d8d451d3e1f305f3ea8af213f"
+      "sha256": "eae8503aff6ceb106c6bbe3d7fbe2357b6c3f089e60b21c1b114da6a996100b9"
     },
     {
       "path": "plugins/secretary/host-inventory.json",
@@ -2330,7 +2345,7 @@
     {
       "path": "plugins/secretary/skills/build/SKILL.md",
       "classification": "anchor-overlay",
-      "sha256": "c00de40d122a5146547fdcdd4a9e477eee55c7bd3221ee686bdeb816f63f1001"
+      "sha256": "39d0c08f20ecf16d9c33ca4ff9cf1a44438ef96e1f03ad8c5c9ff12959ccb5dc"
     },
     {
       "path": "plugins/secretary/skills/chatwork/SKILL.md",
@@ -2649,8 +2664,8 @@
     },
     {
       "path": "plugins/yasashii-secretary/CHANGELOG.md",
-      "classification": "common",
-      "sha256": "84434099adfec110b5c4fb9b7a41c28907aa081c8fa8e9bbd258f14253f506bc"
+      "classification": "anchor-overlay",
+      "sha256": "2aa806e2509374f085cf416208c6b513318ae22f101d2bb409df84344615fbf7"
     },
     {
       "path": "scripts/agentic-archive-gate.mjs",
@@ -2690,7 +2705,7 @@
     {
       "path": "scripts/archive-release-gate.mjs",
       "classification": "repo-owned",
-      "sha256": "12d01aca57546c2d81e5b47bd75786094a8c8640b226e2bb4f698dbdd1465177"
+      "sha256": "8d241c50d80f058311cb58973bc4772f8767fcf76b407b01fcac286e67170563"
     },
     {
       "path": "scripts/check-distribution-channel.py",
@@ -2705,7 +2720,7 @@
     {
       "path": "scripts/check-release-integrity.py",
       "classification": "repo-owned",
-      "sha256": "7ff66647ced01d22e78998732cc34b68f2730777cd916201c5ec0887b152a3c6"
+      "sha256": "a4818f2d4424ed2a73427d3246e3b772d23421721a2bf5d905d146030af1a610"
     },
     {
       "path": "scripts/check-report-schema.py",
@@ -2980,7 +2995,7 @@
     {
       "path": "scripts/master-release-gate.mjs",
       "classification": "common",
-      "sha256": "fb7f8bf17ac07e50b03033b620e4aaa4edea043b3bc3f70c430b28a0d8e8da6a"
+      "sha256": "14851f1f38f9ab7dc0369fc08c22d1ceb99c2264815eb4572b2aa0bc53b004c0"
     },
     {
       "path": "scripts/master-release-gate.sh",
@@ -3309,8 +3324,8 @@
     },
     {
       "path": "scripts/sprint-032-update-gate-test.mjs",
-      "classification": "common",
-      "sha256": "de8d8f32abaa173be2bf3704d8c7a6cf9120d5745ad892c3cb09cec0a23e33b2"
+      "classification": "anchor-overlay",
+      "sha256": "0a7e0a832e59a79e456abf5742152a04b1467d0c8a2f9004b92bc79aab7f1c79"
     },
     {
       "path": "scripts/sprint-033-test.mjs",
@@ -3344,8 +3359,8 @@
     },
     {
       "path": "scripts/sprint-035-test.mjs",
-      "classification": "common",
-      "sha256": "0676f41653b076464d670b6afb36efa7c37baf5c64e389576ead6cd6ebd8b73a"
+      "classification": "anchor-overlay",
+      "sha256": "fd0848982fce2826ea68d101298d02ff27407c888354a6a430e1361796c785b1"
     },
     {
       "path": "scripts/sprint-037-patch-001-test.mjs",
@@ -3378,6 +3393,16 @@
       "sha256": "35c4a46ba383fec3e96f6a4323cb54758d9f02fc2d84aa48cd2f621e4bbb3254"
     },
     {
+      "path": "scripts/sprint-038-patch-001-regression.sh",
+      "classification": "common",
+      "sha256": "b11cbadb1b4d8c446693918a093a3c743adc8f40049dfc1d0520b19337b96cd9"
+    },
+    {
+      "path": "scripts/sprint-038-patch-001-test.mjs",
+      "classification": "anchor-overlay",
+      "sha256": "a0217da98dc6377a4a635620e04a0fabb733ab2f94ae1165e69935b604c76132"
+    },
+    {
       "path": "scripts/sprint-038-private-test.mjs",
       "classification": "common",
       "sha256": "e7977bc461a57221ce1ab3b61ccadc072dde9630ee9499bb0991383e67e72d77"
@@ -3390,7 +3415,7 @@
     {
       "path": "scripts/sprint-038-test.mjs",
       "classification": "common",
-      "sha256": "4add3dc445fedf486de706079ec7199522d992084fbead8e7f432b729d5f5e64"
+      "sha256": "3a85dcb5415d8db5fb1f44bac870fc1206cf7a8a5e41eb1ae6a46bf3d29c72e0"
     },
     {
       "path": "scripts/start-sprint-013-wizard-fixture.sh",

@@ -64,8 +64,8 @@
     {
       "id": "build-reference-label",
       "path": "plugins/secretary/skills/build/SKILL.md",
-      "match": "- Agentic Harness 0.5.0: `https://github.com/mtaiseeei/agentic-harness`",
-      "replacement": "- やさしいハーネス 0.5.0: `https://github.com/mtaiseeei/yasashii-harness`"
+      "match": "- Agentic Harness 0.5.1: `https://github.com/mtaiseeei/agentic-harness`",
+      "replacement": "- やさしいハーネス 0.5.1: `https://github.com/mtaiseeei/yasashii-harness`"
     },
     {
       "id": "projects-harness",
@@ -146,6 +146,72 @@
       "replacement": "for (const phrase of [\"実コネクタ\", \"edition.json\", \"4面copy\", \"根拠\", \"推測で断定しません\"]) assert(evidence.includes(phrase), `証拠契約が不足しています: ${phrase}`);"
     },
     {
+      "id": "canonical-changelog-yasashii-audience",
+      "path": "plugins/secretary/CHANGELOG.md",
+      "match": "- Agentic Secretaryから別配布のAgentic Harness `0.5.1`を使う方。",
+      "replacement": "- Yasashii Secretaryから別配布のやさしいハーネス `0.5.1`を使う方。"
+    },
+    {
+      "id": "canonical-changelog-yasashii-harness",
+      "path": "plugins/secretary/CHANGELOG.md",
+      "match": "- `build` skillとREADMEの互換案内、online互換診断をAgentic Harness `0.5.1`の公開commitに合わせます。",
+      "replacement": "- `build` skillとREADMEの互換案内、online互換診断をやさしいハーネス `0.5.1`の公開commitに合わせます。"
+    },
+    {
+      "id": "legacy-changelog-yasashii-audience",
+      "path": "plugins/yasashii-secretary/CHANGELOG.md",
+      "match": "- Agentic Secretaryから別配布のAgentic Harness `0.5.1`を使う方。",
+      "replacement": "- Yasashii Secretaryから別配布のやさしいハーネス `0.5.1`を使う方。"
+    },
+    {
+      "id": "legacy-changelog-yasashii-harness",
+      "path": "plugins/yasashii-secretary/CHANGELOG.md",
+      "match": "- `build` skillとREADMEの互換案内、online互換診断をAgentic Harness `0.5.1`の公開commitに合わせます。",
+      "replacement": "- `build` skillとREADMEの互換案内、online互換診断をやさしいハーネス `0.5.1`の公開commitに合わせます。"
+    },
+    {
+      "id": "sprint-032-current-edition",
+      "path": "scripts/sprint-032-update-gate-test.mjs",
+      "match": "check(\"editionのcandidate/latest参照はagentic 0.9.1配布面と整合\", edition.edition === \"agentic-secretary\" && edition.distribution.marketplaceUrl.includes(\"agentic-secretary\") && edition.distribution.changelogUrl.endsWith(\"/plugins/secretary/CHANGELOG.md\"));",
+      "replacement": "check(\"editionのcandidate/latest参照はyasashii 0.9.1配布面と整合\", edition.edition === \"yasashii-secretary\" && edition.distribution.marketplaceUrl.includes(\"yasashii-secretary\") && edition.distribution.changelogUrl.endsWith(\"/plugins/yasashii-secretary/CHANGELOG.md\"));"
+    },
+    {
+      "id": "sprint-032-current-marker",
+      "path": "scripts/sprint-032-update-gate-test.mjs",
+      "match": "check(\"新規0.9.1 onboardingはneutral markerを作る\", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === \"agentic-secretary\", fresh.prepared.stderr);",
+      "replacement": "check(\"新規0.9.1 onboardingはneutral markerを作る\", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === \"yasashii-secretary\", fresh.prepared.stderr);"
+    },
+    {
+      "id": "sprint-032-current-ledger",
+      "path": "scripts/sprint-032-update-gate-test.mjs",
+      "match": "check(\"新規0.9.1導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"agentic-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.9.1\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);",
+      "replacement": "check(\"新規0.9.1導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"yasashii-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.9.1\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);"
+    },
+    {
+      "id": "sprint-035-yasashii-harness-commit",
+      "path": "scripts/sprint-035-test.mjs",
+      "match": "assert.equal(harness.observedCommit, \"747a8fbd06000144ca7e27330bf1d32495475fe0\");",
+      "replacement": "assert.equal(harness.observedCommit, \"f50917e3cf9c24b6e4370adba547bd4891c85986\");"
+    },
+    {
+      "id": "sprint-038-patch-harness-source",
+      "path": "scripts/sprint-038-patch-001-test.mjs",
+      "match": "  assert.equal(harness.repository, \"https://github.com/mtaiseeei/agentic-harness\");\n  assert.equal(harness.observedCommit, \"747a8fbd06000144ca7e27330bf1d32495475fe0\");",
+      "replacement": "  assert.equal(harness.repository, \"https://github.com/mtaiseeei/yasashii-harness\");\n  assert.equal(harness.observedCommit, \"f50917e3cf9c24b6e4370adba547bd4891c85986\");"
+    },
+    {
+      "id": "sprint-038-patch-host-routes",
+      "path": "scripts/sprint-038-patch-001-test.mjs",
+      "match": "  assert.deepEqual(harness.hosts.claudeCode, {\n    marketplace: \"agentic-harness\",\n    installId: \"harness@agentic-harness\",\n    explicitEntry: \"/harness\",\n  });\n  assert.deepEqual(harness.hosts.codex, {\n    marketplace: \"agentic-harness-local\",\n    installId: \"harness@agentic-harness-local\",\n    explicitEntries: [\"$using-harness\", \"$harness-loop\"],\n  });",
+      "replacement": "  assert.deepEqual(harness.hosts.claudeCode, {\n    marketplace: \"yasashii-harness\",\n    installId: \"harness@yasashii-harness\",\n    explicitEntry: \"/harness\",\n  });\n  assert.deepEqual(harness.hosts.codex, {\n    marketplace: \"yasashii-harness\",\n    installId: \"harness@yasashii-harness\",\n    explicitEntries: [\"$using-harness\", \"$harness-loop\"],\n  });"
+    },
+    {
+      "id": "sprint-038-patch-public-copy",
+      "path": "scripts/sprint-038-patch-001-test.mjs",
+      "match": "    assert(source.includes(\"Agentic Harness 0.5.1\"));\n    assert(source.includes(\"https://github.com/mtaiseeei/agentic-harness\"));\n    assert(source.includes(\"harness@agentic-harness\"));\n    assert(source.includes(\"harness@agentic-harness-local\"));",
+      "replacement": "    assert(source.includes(\"0.5.1\"));\n    assert(source.includes(\"https://github.com/mtaiseeei/yasashii-harness\"));\n    assert(source.includes(\"harness@yasashii-harness\"));"
+    },
+    {
       "id": "sprint-037-yasashii-active-mapping",
       "path": "scripts/sprint-037-test.mjs",
       "match": "\"docs/agentic-upstream-mapping.md\", \"docs/guide\", \"scripts\",",
@@ -156,6 +222,12 @@
       "path": "scripts/sprint-037-test.mjs",
       "match": "const OWNER_COUNTS = new Map(Object.entries({\n  \".claude-plugin/marketplace.json\": 2, \"CLAUDE.md\": 2, \"README.md\": 5,\n  \"adapters/claude-code-cli/README.md\": 1, \"adapters/claude-code-desktop-app/README.md\": 1,\n  \"adapters/codex-cli/README.md\": 1, \"docs/DESIGN.md\": 9, \"docs/agentic-upstream-mapping.md\": 2,\n  \"docs/guide/getting-started.md\": 2, \"docs/spec/constraints.md\": 10, \"docs/spec/domain.md\": 7,\n  \"docs/spec/editions.md\": 1, \"docs/spec/features.md\": 4, \"docs/spec/product.md\": 3,\n  \"docs/spec/rubric.md\": 1, \"plugins/secretary/.claude-plugin/plugin.json\": 3,\n  \"plugins/secretary/.codex-plugin/plugin.json\": 6, \"plugins/secretary/edition.json\": 4,\n  \"plugins/secretary/skills/build/SKILL.md\": 5, \"scripts/agentic-codex-plugin-test.mjs\": 2,\n  \"scripts/archive-release-gate.mjs\": 2, \"scripts/check-release-integrity.py\": 2,\n  \"scripts/check-yasashii-harness-online.sh\": 1, \"scripts/check-yasashii-harness-reference.py\": 3,\n  \"scripts/fixtures/yasashii-harness/claude-marketplace-good.json\": 1,\n  \"scripts/fixtures/yasashii-harness/claude-marketplace-mismatch.json\": 1,\n  \"scripts/fixtures/yasashii-harness/claude-plugin-good.json\": 2,\n  \"scripts/fixtures/yasashii-harness/codex-plugin-good.json\": 2,\n  \"scripts/fixtures/yasashii-harness/metadata-overrides-good.json\": 5,\n  \"scripts/fixtures/yasashii-harness/repo-good.json\": 2, \"scripts/master-release-gate.mjs\": 2,\n  \"scripts/regression-check.sh\": 2, \"scripts/sprint-012-patch-001-regression.sh\": 1,\n  \"scripts/sprint-014-regression.sh\": 1, \"scripts/sprint-025-regression.sh\": 1,\n  \"scripts/sprint-026-release-gate-test.mjs\": 5, \"scripts/sprint-033-test.mjs\": 1,\n  \"scripts/sprint-035-test.mjs\": 2,\n}));",
       "replacement": "const OWNER_COUNTS = new Map(Object.entries({\n  \".claude-plugin/marketplace.json\": 2, \"CLAUDE.md\": 2, \"README.md\": 9,\n  \"docs/DESIGN.md\": 9, \"docs/guide/getting-started.md\": 1, \"docs/spec.md\": 2,\n  \"docs/spec/constraints.md\": 11, \"docs/spec/domain.md\": 7, \"docs/spec/editions.md\": 4,\n  \"docs/spec/features.md\": 5, \"docs/spec/product.md\": 3, \"docs/spec/rubric.md\": 3,\n  \"docs/yasashii-upstream-mapping.md\": 4, \"plugins/secretary/.claude-plugin/plugin.json\": 3,\n  \"plugins/secretary/.codex-plugin/plugin.json\": 6, \"plugins/secretary/edition.json\": 4,\n  \"plugins/secretary/skills/build/SKILL.md\": 5, \"scripts/archive-release-gate.mjs\": 2,\n  \"scripts/check-release-integrity.py\": 2, \"scripts/check-yasashii-harness-online.sh\": 1,\n  \"scripts/check-yasashii-harness-reference.py\": 3,\n  \"scripts/fixtures/yasashii-harness/claude-marketplace-good.json\": 1,\n  \"scripts/fixtures/yasashii-harness/claude-marketplace-mismatch.json\": 1,\n  \"scripts/fixtures/yasashii-harness/claude-plugin-good.json\": 2,\n  \"scripts/fixtures/yasashii-harness/codex-plugin-good.json\": 2,\n  \"scripts/fixtures/yasashii-harness/metadata-overrides-good.json\": 5,\n  \"scripts/fixtures/yasashii-harness/repo-good.json\": 2, \"scripts/master-release-gate.mjs\": 2,\n  \"scripts/regression-check.sh\": 2, \"scripts/sprint-012-patch-001-regression.sh\": 1,\n  \"scripts/sprint-014-regression.sh\": 1, \"scripts/sprint-025-regression.sh\": 1,\n  \"scripts/sprint-026-release-gate-test.mjs\": 5, \"scripts/sprint-034-test.mjs\": 1,\n  \"scripts/sprint-035-test.mjs\": 2,\n}));"
+    },
+    {
+      "id": "sprint-037-yasashii-sprint-038-owner",
+      "path": "scripts/sprint-037-test.mjs",
+      "match": "  \"scripts/sprint-035-test.mjs\": 2,\n}));",
+      "replacement": "  \"scripts/sprint-035-test.mjs\": 2, \"scripts/sprint-038-patch-001-test.mjs\": 2,\n}));"
     }
   ]
 }

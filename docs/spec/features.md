@@ -1,6 +1,6 @@
 # Features
 
-機能IDと、ユーザーから見える振る舞いの正本。F01〜F16 は受け入れ済みの既存機能、F17〜F22 は 2026-07-15 方針転換、F23〜F27 は 2026-07-16 のsingle-repo Git-first + Chatwork方針、F28 は 2026-07-17 の一般プロジェクト管理方針、F29 は配布チャネルから独立した製品説明、F30〜F31 は更新の説明と実行を分ける安全な更新体験、F32〜F35 は各社所有Google Cloudプロジェクトを使うGoogle Chat同期、F36〜F43 は `0.7.0` の配布前監査を閉じたrelease hardening、F44〜F50 は次候補 `0.8.0` で2 editionへ安全に分離する機能、F51は両edition共通の会話可読性、F52は4つの正式対象ホストへ拡張できるホスト非依存の共通本体と各ホストの正式配布adapter、F53は別Pluginの対応Harness 0.5.0へ安全に追随する機能、F54はhost-neutralなplugin root解決と両editionのCodex正式配布parity、F55は利用者中立の呼び方と配布物を合格済み上流candidateから安全に同期する機能である。
+機能IDと、ユーザーから見える振る舞いの正本。F01〜F16 は受け入れ済みの既存機能、F17〜F22 は 2026-07-15 方針転換、F23〜F27 は 2026-07-16 のsingle-repo Git-first + Chatwork方針、F28 は 2026-07-17 の一般プロジェクト管理方針、F29 は配布チャネルから独立した製品説明、F30〜F31 は更新の説明と実行を分ける安全な更新体験、F32〜F35 は各社所有Google Cloudプロジェクトを使うGoogle Chat同期、F36〜F43 は `0.7.0` の配布前監査を閉じたrelease hardening、F44〜F50 は次候補 `0.8.0` で2 editionへ安全に分離する機能、F51は両edition共通の会話可読性、F52は4つの正式対象ホストへ拡張できるホスト非依存の共通本体と各ホストの正式配布adapter、F53は別Pluginの対応Harness 0.5.1へ安全に追随する機能、F54はhost-neutralなplugin root解決と両editionのCodex正式配布parity、F55は利用者中立の呼び方と配布物を合格済み上流candidateから安全に同期する機能である。
 
 ## 既存機能（F01〜F16）
 
@@ -373,15 +373,15 @@ read-only plugin copy、env allowlist、最小tool、sandbox／path-scoped permi
 `4670438` の同一current bytesで取得済みの4 host固有証拠は、fresh Evaluatorが実装との対応を確認した場合に再利用できる。
 schema v2／v3のproduction attestationは将来のoptional internal QAであり、製品・配布Pluginの必須機能にしない。
 
-### F53 対応Harness 0.5.0との分離連携
+### F53 対応Harness 0.5.1との分離連携
 
-`agentic-secretary` はGitHub `main` の `mtaiseeei/agentic-harness 0.5.0`、`yasashii-secretary` は
-GitHub `main` の `mtaiseeei/yasashii-harness 0.5.0` を対応先とする。各SecretaryはHarnessの識別、導入状態確認、
+`agentic-secretary` はGitHub `main` の `mtaiseeei/agentic-harness 0.5.1`、`yasashii-secretary` は
+GitHub `main` の `mtaiseeei/yasashii-harness 0.5.1` を対応先とする。各SecretaryはHarnessの識別、導入状態確認、
 Claude Code／Codex別の正規導入案内、導入済みHarnessへの接続を提供するが、Harnessのskills、agents、runtime実装、
 Git履歴を配布物へ内包しない。Claude CodeとCodexでmarketplace名が異なる場合は、1つの識別子へ丸めず、
 対応Harnessの正式manifest／marketplaceにあるhost別の値を案内する。
 
-Secretary repo自身をHarnessで保守する運用面では、既存の製品固有指示を保持したまま、0.5.0の停止上限、
+Secretary repo自身をHarnessで保守する運用面では、既存の製品固有指示を保持したまま、0.5.1の停止上限、
 `verification-scope-issue`、product／verification-infra区分、契約済み証拠のsafe harbor、active Sprintの基準変更gate、
 spec-issue／lineage上限、増分再評価、同一candidate証拠の条件付き再利用、`done-by-user-decision` を扱える。
 互換確認はoffline構造検査とGitHub read-onlyのonline検査を分離し、network不可や未実行をPASSへ数えない。
