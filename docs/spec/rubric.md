@@ -9,7 +9,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 ## 合格の基本条件
 
 - Evaluatorは対象スプリントの実物を動かし、実行コマンド、結果、対象ファイル／repo、模擬会話の入力と観測結果を feedback に残す。
-- C2・C5・C6・C9・C10・C11・C12・C13・C14・C15 は5/5必須。対象Sprintの保証範囲で、1件でも構文欠陥、secret露出、安全違反、新規回帰、現行面の配布チャネル依存、無確認の更新副作用、Google ChatのOAuth／選択スペース境界違反、配布前gateの未達、edition境界違反、会話可読性の必須条件違反、または正式ホスト配布面の欠落があれば不合格。
+- C2・C5・C6・C9・C10・C11・C12・C13・C14・C15・C16 は5/5必須。対象Sprintの保証範囲で、1件でも構文欠陥、secret露出、安全違反、新規回帰、現行面の配布チャネル依存、無確認の更新副作用、Google ChatのOAuth／選択スペース境界違反、配布前gateの未達、edition境界違反、会話可読性の必須条件違反、正式ホスト配布面の欠落、またはWindows native保存／0.9.2下流同期の欠落があれば不合格。
 - Sprint 021は、Google Chatのlocal wizard session memory→`gh` stdin→Repository Secretと、Chatworkの利用者本人によるGitHub Repository Secret画面への直接入力という既存の2導線、および製品管理対象／初回publish inventoryにおける合理的な誤混入を0許容で評価する。Chatwork wizardへToken取得・受領・登録機能を要求しない。利用者が任意のJS／TS／shell／JSONを意図的に特殊構文・難読化・computed／escaped key・偽placeholderへ改変したケースの未検出だけでは不合格にしない。その形式を製品が生成する、または通常導線が実値を残すなら不合格とする。
 - 1軸でも閾値を下回ればスプリント全体を不合格にする。
 - やさしさの得点で安全・規律・回帰の欠陥を相殺しない。
@@ -63,6 +63,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 45. **対応Harness 0.5.1互換**: GitHub API／rawのread-only結果で `mtaiseeei/agentic-harness` と `mtaiseeei/yasashii-harness` の `main`、observed commit、Claude／Codex marketplace、plugin manifest、READMEを確認し、両方のversion `0.5.1`、repository／homepage、host別install IDをSecretaryのedition設定・build案内・READMEと照合する。Yasashii Harnessはcommit `f50917e3cf9c24b6e4370adba547bd4891c85986` と一致させる。offlineでは、Harness実体・agents・Git履歴の非同梱、0.5.1運用語彙、`[limits]` の実効値10／2、既存製品指示の保持、誤version／誤host ID／欠落項目／同梱復活を壊したfixtureで検出する。network不可、片hostだけ、片editionだけ、Claude IDをCodexへ流用した結果をPASSにしない。`<workspace-root>/agentic-harness` を対象にしたread／list／status等の操作は0件でなければならない。
 46. **host-neutral plugin rootとCodex正式配布parity**: 共通15 skillsの全 `SKILL.md` と参照先をinventoryし、通常shell実行が未設定の `${CLAUDE_PLUGIN_ROOT}` に依存しないこと、未解決の環境変数文字列をcommand引数やpathへ渡さないこと、各SKILL自身の実パスを起点に同じ `plugins/secretary/` rootへ到達することを静的検査と任意絶対path fixtureで確認する。`${CLAUDE_PLUGIN_ROOT}` 以外のslash command、Hook、Claude固有UI、Claude marketplace等も列挙し、共通本文へのClaude限定前提混入0件、真にhost固有なadapter／案内の欠落0件を確認する。既存Codex正式installテストと必要最小限のClaude Code／Codex App／Codex CLI代表script確認を使い、新しい大規模runner／attestation基盤は作らない。両editionに `.codex-plugin/plugin.json` とrepo rootの `.agents/plugins/marketplace.json` があり、`skills=./skills/`、edition別identity／version／source.pathが正式面と一致することを検証する。host別skillコピー、未解決変数の黙示fallback、agentic manifestだけの流用、yasashii manifest欠落をPASSにしない。
 47. **呼び方・利用者中立性・下流同期**: Claude Code／Codexの4経路、account-name選択時だけのhost-task-context→Git→OS、正規化・全除外値・Unicode case-fold・hostname拒否、出典と推奨、候補なし、探索結果非保存、保存前確認を合成fixtureで確認する。既存変更は3正本一致、初回decision不変、失敗時完全rollbackを一時Git workspaceで確認する。Agentic完全SHA、review済みbase record、overlay apply／reapply、共通path byte一致、Yasashii固有surface不変、active surface scanと固定allowlistを証拠化する。
+48. **Windows native保存と0.9.2下流同期**: Agenticの固定完全SHA `24520a1d06f8d3833568a1386bf814e1085f5da9` と独立PASS記録を入力にし、Yasashiiのclean candidateで同じ12 Windows labelsを実行する。日本語・空白path、project作成／journal／memory／TODO／settings／文書保存、recursive copy、CRLF preferences、rollback、path guardを実動作で確認し、exit codeと `0xC0000005` の有無を記録する。macOS／Linux対象回帰、Git-free archive、overlay record／apply／check／reapply、common byte parity、Yasashii固有surface digest、0.9.2 manifest／marketplace／edition／CHANGELOG／release integrityも確認する。Windows証跡はcleanな固定SHAに対するユーザー所有実機の宣言を採用でき、関係コード変更時だけ失効する。UI、private版、cache、利用者workspace、service writeは対象外／0件であり、新しいcollectorを要求しない。
 
 ## 必須の模擬会話
 
@@ -123,6 +124,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 | C13 | edition分離・互換 | Git系譜、別repo、共通path、overlay、衝突停止、旧raw CHANGELOG、新規0.8.0導入、外部許可 | **5** |
 | C14 | 会話のMarkdown可読性 | 改行、段落、必要な箇条書き、3行報告の物理分離、edition差維持、過剰Markdownなし | **5** |
 | C15 | 4ホスト正式配布 | Claude／Codex両manifest、marketplace、新規導入、skill一意発見、新規session、更新・cache、host別実証 | **5** |
+| C16 | Windows native保存・0.9.2下流同期 | 12 labels、Bash非依存、CRLF、rollback／path guard、overlay保護、release整合、外部write禁止 | **5** |
 
 ## スコアアンカー
 
@@ -206,6 +208,11 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 - 5: `4670438` がcandidateで、Claudeの `.claude-plugin` とCodexの `.codex-plugin/plugin.json`／repo marketplaceが公式path規則どおり成立し、両manifestが共通skillsを参照する。4 hostそれぞれについてcurrent-bytesのhost固有smoke証拠があり、`0.8.0`、Agentic identity、正本skill、会話8面のMarkdown、wizard、workspace変更0件、Secret露出0件が確認できる。GUI Appは実UI証拠、CLIはcommand／session証拠を持ち、1 hostの証拠を別hostへ流用しない。更新／再導入手順、全回帰、Gitなしarchive、利用可能な公式validatorが0 FAILで、public／release禁止、OAuth／Secret／実API操作なしを維持する。既取得証拠は同一bytesとの対応をfresh Evaluatorが確認した場合に再利用できる。
 - 4以下: candidateが `4670438` と一致しない、schema v3用の未push commitを出荷対象に含める、Codex manifest／repo marketplace欠落、path不正、legacy／手動skillsだけで合格する、共通skillsの二重実装または重複、4 hostのいずれかにhost固有証拠がない、会話8面／wizard／workspace変更0件／Secret露出0件／更新手順のいずれか未確認、AppをCLI結果だけで判定する、回帰／archive／利用可能なvalidatorにFAILがある、または禁止されたpublic／release／OAuth／Secret／実API操作を行う。→不合格。
 
+### C16 Windows native保存・0.9.2下流同期【ゼロ許容】
+
+- 5: 固定Agentic完全SHAから宣言的overlayで同期し、Windows native 12 labelsが全てPASS、`0xC0000005` 0件。project作成／journal／memory／TODO／settings／文書保存、recursive copy、CRLF、rollback、path guardが成立する。common byte parity、overlay冪等性、Yasashii固有surface不変、macOS／Linux・archive無回帰、0.9.2 release整合、private／cache／workspace／service write 0件を証拠化し、my-vault対応済みと誤表示しない。
+- 4以下: 固定SHA以外の同期、Windows labelの未実行／FAIL、access violation、Bash path依存、recursive copy crash、CRLF破壊、部分状態残存、path guard後退、未分類／anchor／allowlist逸脱の部分適用、Yasashii固有surface変化、common byte不一致、macOS／Linux・archive回帰、0.9.2不整合、無許可の外部write／release、private版対応済み表示のいずれかが1件でもある。→不合格。
+
 ## スプリント別の重点
 
 | Sprint | 重点 |
@@ -244,6 +251,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 | 035 | 2 editionの `0.8.0` 全回帰、公式validator、parity、衝突停止、新規導入、会話可読性、系譜、クレジット、対応Harness 0.5.0の別Plugin連携・host別案内・運用互換、host-neutral plugin root、両editionのCodex正式manifest／marketplace、公開許可と後始末 |
 | 036 | superseded — account-name候補source変更前の旧方針。Generatorを起動せずsprint-037へ置換 |
 | 037 | Agentic固定candidate `d9a62755`、review済みbase record、overlay冪等、呼び方4経路、候補探索・非保存、値を履歴メタデータへ再掲しない現役3正本transaction、利用者中立scan、Yasashii固有surface保護、Sprint 045無回帰 |
+| 038-patch-002 | 固定Agentic `24520a1d...`、Windows native同一12 labels、project／journal／memory／TODO／settings／文書、recursive copy、CRLF、rollback／path guard、overlay byte parity・固有surface保護、0.9.2整合、macOS／Linux・archive無回帰、独立PASS前の公開禁止 |
 
 ## 差し戻し分類
 

@@ -62,6 +62,13 @@ Secretaryへskills、agents、runtime実装、Git履歴をmerge、vendor、submo
 公開済みYasashii Harness `0.5.1`（commit `f50917e3cf9c24b6e4370adba547bd4891c85986`）へ更新して、
 Yasashii Secretary `0.9.1` として独立評価・独立公開する方針を確定した。Harnessの非同梱、
 Yasashii固有identity／copy／repository／host別install ID、fetch専用upstreamとpush無効は維持する。
+2026-08-11、Windowsでproject作成・journal・memory・TODO・settings・文書保存がBashのpath解釈に依存して失敗する問題、
+recursive copyのcrash、`preferences.md` のCRLF保持を、独立評価PASS済みAgentic Secretary完全SHA
+`24520a1d06f8d3833568a1386bf814e1085f5da9` から宣言的overlayで同期し、Yasashii Secretary `0.9.2` として
+独立評価する方針を確定した。Agentic側の固定証跡はWindows native 12/12、macOS target 12/12、
+Git-free archive 291/291、product finding 0、blocking verification-infra 0である。Yasashii固有surfaceと
+repo-owned正本を保護し、UIは変更しない。独立EvaluatorのPASS前はpush、tag、Release、marketplace、install／updateを行わず、
+PASS後の公開も宛先とrollbackを別途確認する。
 2026-07-24 に、初回オンボーディングの呼び方を「あなた」「アカウント名」「指定の名前」「その他」から選び、
 「アカウント名」のときだけ現在タスクへhostが提供済みの文脈、Git表示名、OSユーザー名を順に使う方針を確定した。
 候補は名前らしい値だけを出典つきで提案し、探索結果ではなく確認済みの呼び方だけを保存する。
@@ -149,6 +156,7 @@ Gmail等の公式コネクタは従来どおり都度参照し、Chatworkと明�
 | [sprint-036](sprints/sprint-036.md) | 旧account-name方針。Generator着手前にsprint-037へ置換 | superseded by sprint-037 |
 | [sprint-037](sprints/sprint-037.md) | 固定Agentic candidateから、呼び方4経路、安全な候補探索、現役正本同期、利用者中立化をYasashii overlayへ同期 | sprint-036を置換する次メインSprint |
 | [sprint-038](sprints/sprint-038.md) | Agentic Secretary 0.9.1をoverlay同期し、Yasashii Harness 0.5.1互換・Yasashii Secretary 0.9.1を独立評価／公開 | sprint-037 |
+| [sprint-038-patch-002](sprints/sprint-038-patch-002.md) | Agenticの合格済み完全SHAからWindows native保存互換をoverlay同期し、Yasashii Secretary 0.9.2を独立評価する通常Patch | sprint-038 done |
 
 既存 sprint-001〜006 と各 patch の契約・progress・feedback は履歴として保持する。
 sprint-007 は製品方針転換で白紙化され、旧計画と実装は `backup/sprint-007-010-plan` に退避済みである。

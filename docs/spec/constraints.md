@@ -335,3 +335,18 @@
 6. 同じlocal candidateへのoverlay check／apply／reapplyで未分類0件、二回目の追加差分0件、repo-owned digest不変を確認する。同期前にbase記録だけをcandidateへ書き換えて検査を迂回しない。
 7. Yasashii固有copy、identity、manifest、marketplace、edition設定、README、repo-owned docsをAgentic値へ戻さない。宣言済みanchor／metadata差分だけを維持する。
 8. upstreamはfetch専用・push disabledとし、本機能同期ではremote追加・変更・fetch・push、cache更新、利用者workspace反映、releaseを行わない。
+
+## 20. Windows native保存と0.9.2下流同期
+
+1. Windows互換の同期入力は、Agentic側の独立EvaluatorがWindows native 12/12、macOS target 12/12、Git-free archive 291/291、product finding 0、blocking verification-infra 0でPASSした完全SHA `24520a1d06f8d3833568a1386bf814e1085f5da9` だけに固定する。別commit、dirty tree、未評価の派生物へ読み替えない。
+2. project作成、journal、memory、TODO、settings、文書保存はWindowsでBashのpath解釈を必要としない。日本語・空白を含むpathで同じ結果になり、process access violation `0xC0000005` を正常終了や検証基盤の問題として扱わない。
+3. project作成時のrecursive copyはコピー先を再帰的に取り込まず、crash、無限増殖、半端なprojectを残さない。書込み途中の失敗、path逸脱、symlink拒否ではproject、journal、memory、TODO、preferences、文書、Git状態を対象transactionの開始前へrollbackする。
+4. 既存 `preferences.md` がCRLFなら設定更新後もCRLFを保ち、LFとの混在を作らない。既存LFは意図なくCRLFへ変えない。
+5. 共通coreは宣言的overlayのrecord／apply／check／reapplyで同期する。base／treeと必要な宣言変更をreviewして確定した後にoverlay定義digestを固定し、apply／check／reapplyの前後で不変にする。宣言されたcommon対象は固定Agentic candidateとbyte一致し、Yasashii固有copy、identity、README、LICENSE、repo-owned docs／spec／Sprint／progress／feedback／evidenceを保護する。
+6. 未分類追加・削除、anchor不在／複数一致、metadata allowlist外変更、Yasashii固有surfaceの変化、base／tree不一致、二回目の追加差分は、同期先へ部分変更を残さず停止する。recordだけを先行させてcheckを迂回しない。
+7. Yasashii Secretary `0.9.2` はClaude／Codexのmanifest、marketplace、edition metadata、正本／旧raw CHANGELOG、release gateを一致させる。CHANGELOGはWindows保存互換をYasashii版の変更として説明するが、private `agentic-secretary-my-vault` やmy-vault版へ対応済みとは表示しない。
+8. WindowsだけでなくmacOS／Linuxの対象保存導線、path guard、rollback、Git-free archive、release integrityを回帰させない。UI／wizardの表示・DOM・導線は変更しない。
+9. private版、installed plugin／cache、利用者workspace、他repo、Secret、Actions、OAuth、Chatwork／Google Chat APIへのwriteは0件とする。独立EvaluatorのPASS前はorigin push、PR、merge、tag、GitHub Release、marketplace公開、plugin install／updateを行わない。
+10. Windows native証跡は、ユーザー所有Windowsでcleanな固定Yasashii candidate SHAを実行した宣言を、対象基準・日時・command・結果と結びつけて受領してよい。対象コードがそのSHAから変わった場合だけ関係証跡を失効させ、無関係なdocs／release metadata変更だけで取り直しを要求しない。
+11. 独立Evaluator PASS後のreleaseも自動実行しない。公開先、対象candidate、tag／Release／marketplaceの範囲、失敗時のrollbackを別途ユーザーへ示し、明示確認後だけ実行する。
+12. 合格証跡は既存のWindows 12 labels、macOS／Linux回帰、archive、overlay、release integrityのcommandと結果で十分とする。新しいcollector、統一attestation、approval manifest、外部署名を追加の合格条件にしない。

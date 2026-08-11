@@ -2,12 +2,12 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-038
+- Current ID: sprint-038-patch-002
 - Retry Count: 0
 - Spec-Issue Count: 0
 - Lineage Dispatches: 2
-- Model Tier: standard
-- Rotate: none
+- Model Tier: strong
+- Rotate: model-escalation
 - Next Planned: TBD
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
@@ -68,12 +68,15 @@
 | sprint-036 | superseded | [contract](sprint-036.md) | - | - |
 | sprint-037 | done | [contract](sprint-037.md) | [progress](../progress/sprint-037.md) | [feedback](../feedback/sprint-037.md) |
 | sprint-038 | done | [contract](sprint-038.md) | [progress](../progress/sprint-038.md) | [feedback](../feedback/sprint-038.md) |
+| sprint-038-patch-002 | awaiting-eval | [contract](sprint-038-patch-002.md) | [progress](../progress/sprint-038-patch-002.md) | [feedback](../feedback/sprint-038-patch-002.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-11: fresh strong Generatorが固定Agentic完全SHA `24520a1d06f8d3833568a1386bf814e1085f5da9` のGit archiveを入力に、Yasashii Secretary 0.9.2候補commit `0677a0d67ce70b478dd0d19e676b23295b78a4a3` を作成した。697 filesを全分類し未分類0、overlay record／apply／check／reapplyをPASS、actual apply changed 33／managed 269、common byte一致、secondChanged 0、Yasashii固有surfaceとrepo-owned digest不変。Patch 14/14、macOS上の同一Windows 12 labels 12/12、`--require-windows` negative gate、Sprint 038 64/64、037 14/14、034 11/11、022 core 69/69＋wrapper 8/8、release integrity、JSON／Node syntax、diff checkをPASSした。広いarchive gateはcandidate 286/298、開始HEAD 274/286で追加12 assertions全PASS、既知historical 12 FAIL同数のため全体greenへ昇格せず分離した。Windows nativeはnot-runでありPASSを主張しない。外部write、push、PR、tag、Release、marketplace、install/update、private版、cache、利用者workspace変更0。fresh独立Evaluator dispatch予約としてLineage Dispatchesを2、Status awaiting-eval、Model Tier strong、Rotate model-escalation、Retry Count／Spec-Issue Count 0を維持する。
+- 2026-08-11: public Agentic Secretaryのsprint-038-patch-002が製品／test candidate `24520a1d06f8d3833568a1386bf814e1085f5da9` でfresh独立Evaluator PASS。Windows native 12/12、macOS target 12/12、Git-free archive 291/291、product finding 0、blocking verification-infra 0を確認した。ユーザー承認済みの下流同期として、同完全SHAを固定入力にWindows保存互換、recursive copy crash回避、CRLF保持、path guard／rollbackを宣言的overlayで取り込み、Yasashii固有copy／identity／README／LICENSE／repo所有docsを保護して0.9.2候補を作る通常Patch・high riskの `sprint-038-patch-002` を開始する。private版、installed cache、利用者workspace、外部serviceは対象外。high risk routeとしてfresh Generator dispatch予約のLineage Dispatchesを1、Model Tier strong、Rotate model-escalation、Status active、Retry Count／Spec-Issue Count 0、Next Planned TBDとする。独立Evaluator PASS前のpush、PR、merge、tag、Release、marketplace、install/updateは行わない。
 - 2026-08-03: sprint-038はfresh独立EvaluatorでPASS。micro採点は機能完全性5/5・動作安定性5/5・回帰なし5/5、product finding 0、blocking verification-infra 0。targeted current、overlay冪等性、Git-free current archive、release integrity、online互換は全PASS。full offlineは開始HEAD／candidateとも同じhistorical FAIL後の同時点打切りで未完了、full archiveはcandidate 274/286（12 FAIL）対baseline 255/272（18 FAIL）で新規悪化0。full gateをPASSへ昇格せず、非因果baselineの検証負債としてfeedbackへ保持した。Status done、Retry Count／Spec-Issue Count 0、Lineage Dispatches 2、Model Tier standard、Rotate none、Next Planned TBD。v0.9.1 tag／GitHub Release未作成のため許可済みrelease phaseへ進む。
 - 2026-08-03: sprint-038 Generatorが固定Agentic 0.9.1 candidate `3a5a6c30...` をreviewし、overlay base/treeを前進。688 filesを全分類、managed 265、未分類0、check PASS、reapply secondChanged 0、repo-owned不変、upstream push DISABLEDを確認した。Yasashii Secretary 0.9.1、Yasashii Harness 0.5.1／`f50917e3...`、host ID維持を実装し、overlay 11/11、Harness local 15/15、Sprint 038 64/64、専用6/6、active scan 14/14、release integrity、Git-free targeted archive 14/14＋6/6＋64/64、online 2経路、JSON、diff checkをPASS。full master offlineは既存historical FAIL後sprint-021で長時間無出力となり停止、full archiveも既存historical期待差でFAILのため、current必須面へ昇格せずprogressへ分離した。Status awaiting-eval、Lineage Dispatches 2、Model Tier strong、Rotate noneとしてfresh独立Evaluatorへ進む。
 - 2026-08-03: sprint-038 Planner契約を確定。Agentic Harness 0.5.1 resolverは現taskで標準Lunaが起動不能のため、strong tier、fresh Generator、direct inherit fallback、Rotate `model-availability` を選択した。custom agent modeはrepoで無効、定義済みagentはnot-usedでありlaunch-verifiedではない。Generator dispatch予約としてLineage Dispatches 1、Status active、Model Tier strongへ更新する。
