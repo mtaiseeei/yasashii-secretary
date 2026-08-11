@@ -1,303 +1,300 @@
-# Sprint 038 Patch 002 独立評価
+# Sprint 038 Patch 002 独立再評価 — Retry 1
 
 ## 判定
 
 - Sprint contract result: **NOT PASS / HOLD**
-- Primary failure kind: **implementation-issue**
-- Secondary blocker: **verification-scope-issue**
-- Evaluated product/test candidate: `0677a0d67ce70b478dd0d19e676b23295b78a4a3`
-- Current HEAD: `c364eb45cdbf79d0376ccef9f2965c939e31f848`（候補後のPlanner／state正本だけを持つdocs-only commit）
+- Primary failure kind: **verification-scope-issue**
+- Generator差し戻し: **不要**
+- Evaluated product/test candidate: `eb757e6a9382378e1dbd7a8bad00ba990a1f7ad3`
+- Current HEAD at evaluation start: `46901d573379ee180e95ecc5df2b2739daeab05b`（`eb757e6...` 後の `docs/sprints/state.md` だけを変更したdocs-only commit）
 - Fixed upstream: `24520a1d06f8d3833568a1386bf814e1085f5da9`
-- Evaluator environment: `Darwin arm64`、Node.js `v22.23.2`
+- Evaluator environment: `Darwin 25.6.0 arm64`、Node.js `v22.23.2`
+- Evaluated at: `2026-08-11T13:10:41+0900`
+- Product findings: **0件**
+- Blocking verification-infra findings: **1件（V1のみ）**
 - Yasashii Windows native: **not-run**
-- Product findings: **1件**
-- Blocking verification-infra findings: **1件**
 - Escalation Recommendation: **none**
 
-overlay同期、共通byte parity、Yasashii固有surface、macOS対象回帰、Git-free targeted archive、
-`0.9.2` release整合には新しいproduct failureを確認しなかった。一方、広いarchive gateの既存12 FAILを
-開始HEADと照合した結果、1件は単なるhistorical期待値ではなく、現行の
-`plugins/secretary/rules/rule-manifest.json` の実不整合だった。開始HEADから存在する欠陥だが、
-観測したproduct failureをbaselineへ隠さないため、P1として記録する。
+初回評価のproduct finding P1は、Retry 1の限定差分で解消した。rule manifestのpriorityは存在する5 rulesを各1回だけ含み、
+`agentic-style` は0件、`conversation-contract` は `yasashii-style` より前、
+`yasashii-style.dependencies` は `evidence`、`safety`、`common-language`、`conversation-contract` を含む。
 
-また、Yasashii candidate自身のWindows native実行は未実施である。Agentic upstreamのWindows 12/12や、
-YasashiiのmacOS 12/12をYasashii Windows PASSへ流用していない。したがってAC5〜8、AC13〜14とC16は未達で、
-release holdを維持する。
+固定upstream、common byte parity、overlay check／reapply、Yasashii identity・owned surfaces、Patch 14/14、
+Sprint 034 11/11、Sprint 038 64/64、Sprint 022 core 69/69＋wrapper 8/8、release integrity、
+Git-free targeted archive 14/14、macOS同一labels 12/12を独立再現した。Sprint 029 oracleは変更されておらず、
+旧P1のgraph assertionを通過した後、今回と無関係なhistorical文言 `固定3項目` でexit 1となることを確認した。
+広いarchive gateも286/298、12 FAILのままgreenとはしていないが、旧graph errorは消えており、残るhistorical driftを
+P1未解消や新product findingへ誤分類しない。
 
-## Candidate integrity
+残るblockerは、Yasashii candidate自身をWindows nativeで実行した証跡が無いV1だけである。Agentic upstreamの
+Windows 12/12とYasashii macOS 12/12は、Yasashii Windows PASSへ流用していない。したがって現時点では
+Windows依存のAC5〜8、AC13〜14とC16を完了できず、release holdを維持する。
+
+## Candidate integrityと増分境界
+
+Retry 1の実diffは、初回feedbackで指定した範囲に閉じていた。
 
 ```text
-git rev-parse HEAD
-c364eb45cdbf79d0376ccef9f2965c939e31f848
+git diff --name-status 8661b16..eb757e6
+M docs/progress/sprint-038-patch-002.md
+M plugins/secretary/rules/rule-manifest.json
+M scripts/sprint-038-patch-002-test.mjs
+M secretary-overlay/metadata-overrides.json
+```
 
-git rev-parse 0677a0d
-0677a0d67ce70b478dd0d19e676b23295b78a4a3
+このうち製品／test／overlay差分は次の3 filesだけである。
 
-git diff --name-status 0677a0d c364eb4
-M docs/spec.md
-M docs/spec/constraints.md
-M docs/spec/features.md
-M docs/spec/rubric.md
-A docs/sprints/sprint-038-patch-002.md
+- `plugins/secretary/rules/rule-manifest.json`
+- `scripts/sprint-038-patch-002-test.mjs`
+- `secretary-overlay/metadata-overrides.json`
+
+`eb757e6...` から評価開始HEAD `46901d5...` までの差分は `docs/sprints/state.md` だけだった。
+
+```text
+git diff --name-status eb757e6..46901d5
 M docs/sprints/state.md
 
-git diff --exit-code 0677a0d c364eb4 -- . ':(exclude)docs/**'
+git diff --exit-code eb757e6..46901d5 -- . ':(exclude)docs/**'
 exit 0 / output empty
-
-git status --porcelain=v1
-output empty
 ```
 
-`0677a0d...`以降の製品、test、overlay、manifest、CHANGELOG、workflow bytes変更は0件である。
-Windowsでcurrent HEAD `c364eb4...`を使う場合も、Windows対象の製品／test bytesは
-`0677a0d...`と同一である。ただしWindows証跡の固定対象は曖昧にせず、下記では製品candidate
-`0677a0d...`を指定する。
+さらに、初回製品candidate `0677a0d...` から `46901d5...` まで、Windows保存coreとWindows testのbytes差分は0件だった。
+対象は `scripts/sprint-038-patch-002-windows-test.mjs`、`plugins/secretary/scripts/**`、
+memory-care保存script、daily／secretary／settings／setup-google／setup-microsoft／setup-notion／weeklyの対象skillsである。
+Retry 1はrule manifest、overlay metadata、Patch testだけを変更し、Windows native 12 labelsの製品／test bytesを変えていない。
 
-## Upstream固定とoverlay
+Windowsへ渡すSHAは曖昧さを避け、製品／test／overlayを最後に変更したclean commit
+`eb757e6a9382378e1dbd7a8bad00ba990a1f7ad3` に一意に固定する。`46901d5...` はWindows対象bytesが同一だが、
+state記録だけのcommitなのでWindows証跡のcandidateには使わない。
 
-Agentic repoのGit objectから完全SHAをGitなしdirectoryへ展開し、Yasashiiのworking treeや
-Agenticの現在HEADを同期元に使わなかった。
+評価開始時のworking treeはcleanだった。overlay reapply後も `git status --porcelain=v1` は空だった。
 
-```text
-git -C /Users/taisei/workspace/agentic-secretary cat-file -t 24520a1d...
-commit
+## P1修正の独立確認
 
-git -C /Users/taisei/workspace/agentic-secretary show -s --format='%H %T %P %s' 24520a1d...
-24520a1d... d42521bf... 15b0f27d... [sprint-038-patch-002] Windowsの保存処理とCRLF設定を修正
+### P1 — RESOLVED
 
-git -C /Users/taisei/workspace/agentic-secretary merge-base --is-ancestor 3a5a6c30... 24520a1d...
-exit 0
+- Classification: **product**（初回findingの分類を保持）
+- Severity: **Medium**
+- Retry 1 result: **RESOLVED**
+- New product finding: **なし**
+
+`plugins/secretary/rules/rule-manifest.json` の実値は次のとおりだった。
+
+```json
+{
+  "priority": [
+    "safety",
+    "evidence",
+    "common-language",
+    "conversation-contract",
+    "yasashii-style"
+  ],
+  "rules": [
+    "evidence",
+    "safety",
+    "common-language",
+    "conversation-contract",
+    "yasashii-style"
+  ],
+  "agenticStylePriorityCount": 0,
+  "yasashiiDependencies": [
+    "evidence",
+    "safety",
+    "common-language",
+    "conversation-contract"
+  ]
+}
 ```
 
-`secretary-overlay/upstream-tree.json` は完全SHA `24520a1d...`、697 filesを記録していた。
+独立確認した不変条件:
 
-| classification | files |
-|---|---:|
-| common | 246 |
-| metadata-overlay | 6 |
-| anchor-overlay | 17 |
-| upstream-only | 23 |
-| repo-owned | 405 |
-| 合計 | 697 |
+- priority length 5、rule key count 5、unique count 5。
+- 全rule keyがpriorityに各1回だけ存在する。
+- `agentic-style` はpriority・rulesとも0件。
+- `conversation-contract` はpriorityで `yasashii-style` より前。
+- `yasashii-style.dependencies` は4つの保護dependencyをすべて含む。
+- fixed upstream common fileはbyte一致。
+- Yasashii identity、copy、style、README、LICENSE、Harness導線、repo-owned docs／evidenceは回帰なし。
 
-未分類は0件。専用Patch test内で、固定treeの全pathとSHA-256、common全fileのbyte一致、
-record → apply → check → reapply、二回目追加差分0、保護digest、次の負例の同期先副作用0を再実行した。
+`secretary-overlay/metadata-overrides.json` は固定upstreamのpriority index 4を `yasashii-style` に置換し、
+現役styleへ `conversation-contract` dependencyを追加する。生成済みmanifestと宣言が一致している。
+Patch testの既存14 checks内に集合、重複、順序、dependenciesの検査が追加され、検査件数を水増ししていない。
 
-- 未分類追加
-- upstream削除
-- anchor 0件
-- anchor複数
-- metadata allowlist外変更
-- Yasashii保護identity変更
-- base／tree不一致
+### Sprint 029 oracleの扱い
+
+`scripts/sprint-029-rule-boundary-test.mjs` はRetry 1で変更されていない。
 
 ```text
-node scripts/sprint-038-patch-002-test.mjs --candidate <git-free-24520a1-tree>
-exit 0
-SPRINT038_PATCH002_PASS=14 SPRINT038_PATCH002_FAIL=0 WINDOWS_NATIVE=not-run
+node scripts/sprint-029-rule-boundary-test.mjs
+exit 1
+AssertionError: active styleが不足しています: 固定3項目
+```
 
-node scripts/sync-secretary-overlay.mjs --check --candidate <git-free-24520a1-tree> --observed-commit 24520a1d...
-exit 0
-OVERLAY_CHECK_PASS base=24520a1d... managed=269
-repoOwnedDigest=fb5362e70c669ac7192a2ac78f5ee632fa5859f942c4f8d6c8688a0c85128180
-overlayDigest=05ba070414b6d3ba766f00b38f6fd373a19c149974183fa5b1541c7d48ee6bbe
+初回P1の次のgraph errorは出なくなった。
+
+- `priorityが全ruleを一度ずつ含みません`
+- `yasashii-styleがprotected rule conversation-contractを先に読みません`
+
+したがってP1は解消済みである。残る `固定3項目`、README exact wording、旧Agentic style pathなどは開始HEADから続く
+historical test driftで、今回のrule manifest修正のproduct残差ではない。oracleを弱めたり、広いgateをgreenへ言い換えたりはしていない。
+
+## 固定upstream・overlay・edition保護
+
+固定Agentic treeは `24520a1d06f8d3833568a1386bf814e1085f5da9` のGit objectからGitなしdirectoryへ展開した。
+Patch 14/14が固定tree全697 files、分類、SHA-256、common parity、overlay負例を検査した。
+
+```text
+node scripts/sync-secretary-overlay.mjs --check --candidate <git-free-24520a1-tree> --observed-commit 24520a1...
+OVERLAY_CHECK_PASS base=24520a1... managed=269
+overlayDigest=773773b72405c20e16c26bf075ea96a458b03ac13ade47b26a20484f07c91d77
 REMOTE_GATE ... upstreamPush=disabled
+
+node scripts/sync-secretary-overlay.mjs --reapply --candidate <git-free-24520a1-tree> --observed-commit 24520a1...
+OVERLAY_REAPPLY_PASS ... secondChanged=0
+overlayDigest=773773b72405c20e16c26bf075ea96a458b03ac13ade47b26a20484f07c91d77
 ```
 
-current HEADのrepo-owned digestはPlanner／state docsの追加後の値である。製品candidate `0677a0d...`の
-Git-free treeでもcheckはPASSし、overlay definition digestは同じ
-`05ba0704...ee6bbe`だった。apply／check／reapply中にREADME、LICENSE、Yasashii copy／style、
-repo-owned docs／evidence sentinel、overlay定義が変わらないことを専用testで確認した。
-
-## Yasashii identity・copy・release面
-
-- Claude／Codex marketplace、両manifest、editionは `yasashii-secretary`、version `0.9.2`。
-- repository、marketplace、install ID、Harness導線はYasashii版を維持。
-- Harnessは `mtaiseeei/yasashii-harness`、`0.5.1`、両host install ID
-  `harness@yasashii-harness` を維持。
-- READMEの `agentic-secretary` 言及は上下流関係を説明する節だけで、配布identity混入ではない。
-- `対応済み.*my-vault`、`my-vault.*対応済み`、private版対応済み表示はactive release面で0件。
-- 正本と旧raw CHANGELOGはbyte一致。
-- `0.9.1`以前のCHANGELOG sectionは開始HEADとbyte一致。
-- LICENSE、Yasashii copy／style、wizard assetsの開始HEAD差分は0件。
+Git-free `eb757e6...` archiveに対するcheckもPASSした。
 
 ```text
-python3 scripts/check-release-integrity.py --root .
-PASS release integrity: manifests and CHANGELOG are consistent
-
-cmp <start-HEAD-0.9.1-and-older> <current-0.9.1-and-older>
-exit 0
-
-cmp plugins/secretary/CHANGELOG.md plugins/yasashii-secretary/CHANGELOG.md
-exit 0
+repoOwnedDigest=8543fd547c768e8b48f036622a1ca309a816418d5a8508e40ece75651848f000
+overlayDigest=773773b72405c20e16c26bf075ea96a458b03ac13ade47b26a20484f07c91d77
 ```
+
+未分類追加、upstream削除、anchor 0件／複数、metadata allowlist外変更、Yasashii protected identity変更、
+base／tree不一致は、同期先への追加副作用0件で停止した。common byte parity、Yasashii identity・copy・style、
+repository、marketplace、install ID、README、LICENSE、Harness 0.5.1導線を維持している。
 
 ## 回帰コマンドと結果
 
 | command | result |
 |---|---|
-| `node scripts/sprint-038-patch-002-test.mjs --candidate <fixed-tree>` | 14 PASS / 0 FAIL、Windows native not-run |
-| `node scripts/sprint-038-patch-002-windows-test.mjs` | macOS 12 PASS / 0 FAIL |
-| 同 `--require-windows` | 期待どおりexit 1、11 PASS / 1 FAIL、`darwin !== win32` |
-| `node scripts/sprint-034-test.mjs <fixed-tree>` | 11 PASS / 0 FAIL |
-| `node scripts/sprint-037-test.mjs` | 14 PASS / 0 FAIL、unexpected 0 |
-| `node scripts/sprint-038-test.mjs` | 64 PASS / 0 FAIL |
-| `bash scripts/sprint-022-regression.sh` | core 69 / 0、wrapper 8 / 0 |
-| `bash scripts/sprint-038-patch-001-regression.sh` | Patch 6 / 0、Sprint 035 15 / 0、release PASS |
-| Git-free `archive-release-gate.mjs` | 14 PASS / 0 FAIL |
-| Git-free新Patch | 14 PASS / 0 FAIL |
-| Git-free Sprint 038 | 64 PASS / 0 FAIL |
-| JSON parse | `JSON_OK=13` |
-| `node --check` | 変更core／overlay／test 10 files、全exit 0 |
-| `git diff --check a733679..c364eb4` | exit 0 |
+| `node scripts/sync-secretary-overlay.mjs --check ...` | PASS、managed 269、upstream push disabled |
+| 同 `--reapply` | PASS、secondChanged 0、overlay digest不変 |
+| `node scripts/sprint-038-patch-002-test.mjs --candidate <fixed-tree>` | **14 PASS / 0 FAIL**、Windows native not-run |
+| `node scripts/sprint-034-test.mjs <fixed-tree>` | **11 PASS / 0 FAIL** |
+| `node scripts/sprint-038-test.mjs` | **64 PASS / 0 FAIL** |
+| `bash scripts/sprint-022-regression.sh` | **core 69 / 0、wrapper 8 / 0** |
+| `python3 scripts/check-release-integrity.py --root .` | PASS |
+| `node scripts/sprint-038-patch-002-windows-test.mjs` | macOS同一labels **12 / 0**、exit 0 |
+| 同 `--require-windows` | expected negative、**11 PASS / 1 FAIL**、exit 1、`darwin !== win32` |
+| Git-free `archive-release-gate.mjs` at `eb757e6...` | **14 PASS / 0 FAIL** |
+| Git-free Patch at `eb757e6...` | **14 PASS / 0 FAIL** |
+| Git-free Sprint 038 at `eb757e6...` | **64 PASS / 0 FAIL** |
+| `git diff --check 8661b16..46901d5` | PASS |
 
-macOS同一labelsは、日本語・空白path、project／journal／memory／TODO／settings／文書、recursive copy、
-CRLF、rollback、path guard、Bash非依存を実動作させている。ただしOS固有のdrive letter、junction、
-native crash、Windows process終了を確認する証拠ではない。
+macOS同一labelsは日本語・空白path、project／journal／memory／TODO／settings／文書、recursive copy、
+CRLF、rollback、path guard、Bash非依存を実動作させた。ただしWindows固有のdrive letter、junction、
+`0xC0000005`、Windows process終了を証明しない。
 
 ## 広いGit-free archive gate
 
-広いgateはgreenと主張しない。candidateと開始HEADを同じコマンドでGit-free treeにして比較した。
+`eb757e6...` のGit-free archiveで広いgateを再実行した。
 
 ```text
-node scripts/master-release-gate.mjs --mode archive --root <candidate-0677a0d-archive>
+node scripts/master-release-gate.mjs --mode archive --root <eb757e6-archive>
 exit 1
 RELEASE_GATE mode=archive status=fail suites=23 required=15 passed=7
 verification-infra=0 failed=8 skipped=0 assertions=298 pass=286 fail=12 infra-fail=0
-
-node scripts/master-release-gate.mjs --mode archive --root <start-a733679-archive>
-exit 1
-status=fail suites=22 required=14 passed=6 failed=8 assertions=286 pass=274 fail=12
 ```
 
-失敗suiteとassert countは開始HEAD／candidateで同一だった。
-
-| suite | start | candidate |
-|---|---:|---:|
-| sprint-010-timeline | 55/56 | 55/56 |
-| sprint-011-settings | 66/68 | 66/68 |
-| sprint-027-focus-copy | 4/5 | 4/5 |
-| sprint-029-rule-boundary | 1/3 | 1/3 |
-| sprint-030-edition-guard | 1/3 | 1/3 |
-| sprint-031-plugin-path | 6/8 | 6/8 |
-| sprint-032-patch-001-readability | 1/2 | 1/2 |
-| sprint-032-patch-002-conversation-safety | 1/2 | 1/2 |
-
-candidateで増えた12 assertionsは新しいWindows保存suiteの12 PASSだけで、新しいFAILは0件だった。
-ただしbaseline同一を理由に12 FAILを自動的に非product化していない。実内容を確認した結果、古い
-Agentic style path、旧raw URL、READMEのexact wording、重複した旧wrapper期待はcurrent targeted検証と
-一致しないhistorical test driftだった。一方、次のP1は現行正本の実不整合でありproduct findingとした。
+広いgateはPASSとしない。残る12 FAILは初回評価と同じhistorical driftである。重要な点として、
+Sprint 029の最初の失敗は現在 `active styleが不足しています: 固定3項目` であり、旧P1 graph assertionは消えている。
+今回のchanged surface、targeted suites、Git-free targeted archiveに新しいFAILは0件だった。
 
 ## Finding分類
 
-### P1 — rule manifestのpriorityと依存が現行Yasashii rule graphと不一致
+### Product findings
 
-- Classification: **product**
-- Severity: **Medium**
-- Introduced by this Patch: **No**（開始HEAD `a733679...` から存在）
-- Blocking axes: C2、C6、C13、AC3、AC9、AC13
-
-`plugins/secretary/rules/rule-manifest.json` は `rule-manifest.json` 自身を正本と宣言するactive surfaceだが、
-次の不整合がある。
-
-1. `rules.agentic-style` はoverlayで削除済みなのに、`priority` の末尾へ `agentic-style` が残る。
-2. 現役 `rules.yasashii-style.dependencies` に、保護rule `conversation-contract` が無い。
-
-固定upstreamのAgentic manifestは `priority` に `conversation-contract` と `agentic-style` を一度ずつ持ち、
-`agentic-style.dependencies` に `conversation-contract` を含む。Yasashii overlayはstyleを置き換える際に
-priority末尾の旧style削除と、現役styleへの保護依存追加を完了していない。
-
-```text
-node scripts/sprint-029-rule-boundary-test.mjs
-exit 1
-AssertionError: rule graphが不正です
-- priorityが全ruleを一度ずつ含みません
-- yasashii-styleがprotected rule conversation-contractを先に読みません
-```
-
-`plain-language.md` は人間向け列挙では正しい順番を持つため、直ちに全会話が壊れるとは限らない。しかし、
-機械可読な正本manifestと入口が矛盾し、manifest consumerごとに解釈が分かれる。現行targeted testが
-このgraph不整合を見落とすtest gapもあるが、主 finding は製品manifestの不整合である。
+**0件。** 初回P1はRESOLVED。Retry 1のchanged surfaceから新しい製品欠陥は確認しなかった。
 
 ### V1 — Yasashii Windows native証跡が無い
 
 - Classification: **verification-infra**
 - Severity: **blocking**
 - Failure kind: **verification-scope-issue**
+- Status: **OPEN**
 
-Yasashii candidate `0677a0d...` または製品／test bytes同一のdocs-only HEAD `c364eb4...` は、
-Windows nativeでまだ実行されていない。Agentic `24520a1...` のWindows 12/12はupstream coreの証拠であり、
-Yasashii overlay／manifest／下流candidateのWindows PASSではない。macOS 12/12も代替しない。
+clean candidate `eb757e6a9382378e1dbd7a8bad00ba990a1f7ad3` は、Windows nativeでまだ実行されていない。
+Agentic `24520a1...` のWindows 12/12は固定common coreの上流証拠であり、Yasashii overlay／manifest／下流candidateの
+Windows PASSではない。YasashiiのmacOS 12/12もWindows nativeへ流用しない。
 
-### Non-blocking verification observations
-
-- 広いarchiveのremaining historical assertionsは開始HEADと同じだが、gate自体はexit 1である。
-  P1以外は古いAgentic path／exact wording／旧URL期待の重複で、current targeted suitesのgreenを
-  product FAILへ読み替えない。広いgateをPASSとも表現しない。
-- UI差分なしのため、契約どおりbrowser操作とscreenshotは実施していない。
-- Linux nativeは別runnerで実行していない。POSIX wrapper、macOS実動作、Git-free archiveで
-  本Patchの非Windows回帰を確認した。
+V1だけが残るため、Generatorへ自動差し戻しはしない。Windowsユーザー実機証跡を取得後、同じfeedback正本を
+fresh独立Evaluatorが更新して最終PASS可否を判定する。
 
 ## Rubric
 
+Windows実機が必要な軸は、製品findingではなく証跡不足により閾値未達としている。
+
 | 項目 | Score | Threshold | 判定根拠 |
 |---|---:|---:|---|
-| 機能完全性 | 4/5 | 5 | overlay／macOS／releaseは成立。P1とWindows native未検証により5へ到達しない。 |
-| 動作安定性 | 4/5 | 5 | 実行済みtargeted suiteはgreenだが、Windows downstream未実行。 |
-| エラーハンドリング | 5/5 | 5 | rollback、path guard、symlink、負overlay、`--require-windows`拒否を再現。 |
-| 回帰なし | 4/5 | 5 | 新規FAIL 0だが、現行正本P1を確認したため5にしない。 |
-| C2 構文・整合 | 4/5 | 5 | JSON／Node／releaseはgreenだがrule manifestが自己不整合。 |
+| 機能完全性 | 4/5 | 5 | 実行可能な全対象面とP1は合格。Yasashii Windows nativeだけ未検証。 |
+| 動作安定性 | 4/5 | 5 | macOS、rollback、path guard、archiveはgreen。Windows downstream実機だけ未検証。 |
+| エラーハンドリング | 5/5 | 5 | rollback、拒否path、symlink、overlay負例、`--require-windows` fail-closedを再現。 |
+| 回帰なし | 5/5 | 5 | changed surface、required targeted、Git-free targetedは0 FAIL。P1解消、historical driftは分離。 |
+| C2 構文・整合 | 5/5 | 5 | rule manifest集合・順序・依存、JSON、Node、release整合が成立。 |
 | C5 安全・規律 | 5/5 | 5 | path／rollback／overlay副作用0、外部write禁止を維持。 |
-| C6 無回帰 | 4/5 | 5 | 新規悪化0でも、観測済みactive product defectをbaselineで隠さない。 |
+| C6 無回帰 | 5/5 | 5 | required current regressionsはgreen。広いarchiveの既知12 FAILをPASSへ偽装していない。 |
 | C10 更新の安全性 | 5/5 | 5 | version履歴、rollback、no-write境界を維持。 |
-| C13 edition分離・互換 | 4/5 | 5 | identityは保護されたが、Yasashii rule graphの旧Agentic priority残存。 |
-| C16 Windows native保存・0.9.2下流同期 | 4/5 | 5 | 下流同期と0.9.2は確認。Yasashii Windows native 12/12が未実施。 |
+| C13 edition分離・互換 | 5/5 | 5 | Agentic priority残存を解消し、Yasashii identity・common parity・overlayを維持。 |
+| C16 Windows native保存・0.9.2下流同期 | 4/5 | 5 | 下流同期、0.9.2、macOS・archiveは合格。Yasashii Windows native 12/12のみnot-run。 |
 
-1軸でも5未満なら不合格という契約により、総合PASSにはしない。
+1軸でも5未満ならPASSにしない契約により、現時点の総合判定はNOT PASS / HOLDである。
+未達の原因はV1だけで、implementation-issueではない。
 
 ## Acceptance Criteria 1〜14
 
 | AC | 結果 | 独立確認 |
 |---:|---|---|
-| 1 | PASS | fixed upstream `24520a1...` とAgentic独立PASS記録を確認。Agentic Windows証跡をYasashiiへ流用していない。 |
+| 1 | PASS | fixed upstream `24520a1...` とAgentic独立PASS記録の対応を確認。Agentic Windows証跡はYasashiiへ流用していない。 |
 | 2 | PASS | ancestry、49 changed paths、697 files分類、base／tree完全SHA、未分類0。 |
-| 3 | **FAIL** | record／apply／check／reapply、byte parity、digest保護はPASS。ただし現行rule manifestに旧Agentic priorityが残るproduct defect P1。 |
-| 4 | PASS | 7種の負例が同期先の追加副作用0で停止。 |
+| 3 | PASS | record／apply／check／reapply、common parity、digest保護、secondChanged 0、P1 rule graph修正を確認。 |
+| 4 | PASS | 7種の負例が同期先への追加副作用0件で停止。 |
 | 5 | **UNVERIFIED** | Yasashii Windows native 12/12、exit 0、crash／hang／残存process 0はnot-run。 |
 | 6 | **UNVERIFIED** | macOSでは各保存面とBash非依存をPASS。Windows日本語・空白pathの下流実runはnot-run。 |
-| 7 | **UNVERIFIED** | macOSではrecursive copyと4系統rollbackをPASS。Windows downstream実runはnot-run。 |
-| 8 | **UNVERIFIED** | macOSではCRLF／LF、手書き行、見出し重複0をPASS。Windows downstream実runはnot-run。 |
-| 9 | **FAIL** | targeted／Git-free新規面は0 FAIL、新規悪化0。ただしactive正本P1があるため全体の回帰なしを満たさない。 |
+| 7 | **UNVERIFIED** | macOSではrecursive copyとrollbackをPASS。Windows downstream実runはnot-run。 |
+| 8 | **UNVERIFIED** | macOSではCRLF／LF保持をPASS。Windows downstream実runはnot-run。 |
+| 9 | PASS | macOS対象、path guard、rollback、Git-free targeted archive、release integrityが0 FAIL。UI／wizard／会話copy差分0。 |
 | 10 | PASS | 0.9.2 manifests／marketplaces／edition／CHANGELOG／release gate、旧raw byte一致、旧履歴不変。 |
-| 11 | PASS | Yasashii identity／repo／marketplace／install ID／README／LICENSE／Harness導線を維持。対応済みprivate表示0。 |
-| 12 | PASS | external write 0、upstream push disabled。実行はsource repo readと`/tmp` fixtureだけ。 |
-| 13 | **FAIL** | product finding 1、Windows必須内部項目未検証のためfresh Evaluator 5/5条件を満たさない。 |
-| 14 | **NOT USED** | Yasashii Windowsユーザー実機宣言はまだ無い。採用条件を次節に固定する。 |
+| 11 | PASS | Yasashii identity／repo／marketplace／install ID／README／LICENSE／Harness導線を維持。Agentic priority残存0。 |
+| 12 | PASS | external write 0、upstream push disabled。source repoと`/tmp` fixtureだけを使用。 |
+| 13 | **UNVERIFIED** | fresh Evaluatorのproduct findingは0だが、Windows必須内部項目とblocking V1が残る。 |
+| 14 | **NOT USED** | Windowsユーザー実機宣言はまだ無い。次節のexact inputで採用する。 |
 
-## Windowsで次に必要な実行
+## Windows実機へ渡すexact prompt inputs
 
-P1を修正する場合、Windows対象の製品／test bytesが変わるかを実diffで確認する。manifest／overlay定義／
-targeted testだけの変更でも、Windowsで実行するclean candidate SHAは修正後の完全SHAへ固定する。
-
-現時点の製品candidateをそのまま検証する場合のexact SHAとcommandは次のとおり。
+### 固定candidate
 
 ```text
-candidate SHA:
-0677a0d67ce70b478dd0d19e676b23295b78a4a3
+repository: mtaiseeei/yasashii-secretary
+branch context: codex/sprint-038-patch-002-windows-compat
+candidate SHA: eb757e6a9382378e1dbd7a8bad00ba990a1f7ad3
+fixed upstream SHA: 24520a1d06f8d3833568a1386bf814e1085f5da9
+expected version: 0.9.2
+```
 
-PowerShell:
+`eb757e6...` はP1修正を含む最後の製品／test／overlay commitである。後続 `46901d5...` はstate docs-onlyで、
+Windows対象製品／test bytesは同一だが、証跡candidateを一意にするため使用しない。
+
+### PowerShell command
+
+```powershell
 git status --short
 git rev-parse HEAD
 node --version
+node -p "JSON.stringify({platform:process.platform,arch:process.arch,node:process.version})"
 node scripts/sprint-038-patch-002-windows-test.mjs --require-windows
+$testExit = $LASTEXITCODE
 git status --short
+exit $testExit
 ```
 
-期待値:
+### Expected result
 
 ```text
 開始時 `git status --short` が空
-HEAD == 0677a0d67ce70b478dd0d19e676b23295b78a4a3
+HEAD == eb757e6a9382378e1dbd7a8bad00ba990a1f7ad3
+platform == win32
 SPRINT038_PATCH002_WINDOWS_PASS=12 FAIL=0 OS=win32
 process exit 0
 0xC0000005 0件
@@ -307,61 +304,42 @@ hang 0件
 終了時 `git status --short` が空
 ```
 
-証跡にはWindows version、`win32`、architecture、Node version、日時、完全SHA、command、12 label、
-signed／unsigned exit、access violation／crash／hang／残存process、開始／終了cleanを記録する。
-`c364eb4...`をWindows candidateにする場合は、実行前に
-`git diff --exit-code 0677a0d... c364eb4... -- . ':(exclude)docs/**'` がexit 0であることも記録する。
+証跡には次を残す。
+
+- Windows version、`win32`、architecture。
+- Node version、実行日時、完全candidate SHA。
+- 上記command全文とprocess exit。
+- 12 labelsの各PASS行とsummary。
+- signed／unsigned exit、`0xC0000005`、crash、hang、残存processの有無。
+- 開始前／終了後のclean status。
+
+Windows実行後に製品／test／overlayへ変更が入った場合は、影響するlabelの証跡を失効させる。
+docs-only変更ではWindows対象bytesを実diffで確認したうえで証跡を維持できるが、今回の入力SHA自体は
+`eb757e6...` に固定する。
+
+## 外部操作とrelease hold
+
+- push、PR、merge、tag、GitHub Release、marketplace、plugin install／update: **not-run**。
+- private版、installed cache、利用者workspace、他repoへのwrite: **not-run**。
+- Secret、Actions、OAuth、Chatwork／Google Chat API、external service: **not-run**。
+- upstream push: `disabled` をread-only確認。
+- release hold: **維持**。
 
 ## 次の遷移
 
-現状はGeneratorへ自動でWindows runnerを作らせてもWindows native証跡は得られないため、V1だけなら
-verification-scope-issueとしてユーザーへ返すべきである。ただし今回はP1というproduct findingがあるため、
-総合の主分類はimplementation-issueとする。
-
-推奨順序:
-
-1. GeneratorがP1だけを限定修正し、overlay metadata／negative testを更新する。
-2. fresh EvaluatorがP1、Patch 14/14、Sprint 029近傍、common parity、targeted archiveを再確認する。
-3. 修正後のclean完全SHAをWindowsで上記12 labels実行する。
-4. Windows証跡を採用したfresh Evaluatorが最終判定する。
-
-Generatorへ渡すexact repair contract:
-
-- 正本編集対象: `secretary-overlay/metadata-overrides.json`。必要なら、この不変条件を固定する
-  `scripts/sprint-038-patch-002-test.mjs` だけを追加変更する。
-- overlay適用結果: `plugins/secretary/rules/rule-manifest.json`。
-- 変更しないtest oracle: `scripts/sprint-029-rule-boundary-test.mjs`。現行のgraph検査を弱めない。
-- expected invariant:
-  - `priority` は存在する全 `rules` keyを各1回だけ含む。
-  - `priority` に `agentic-style` は0件。
-  - `conversation-contract` は `yasashii-style` より前に1件。
-  - `yasashii-style.dependencies` は `evidence`、`safety`、`common-language`、
-    `conversation-contract` を含む。
-  - Yasashii identity／copy、common byte parity、owned digest、overlay digest、Windows製品／test bytesを
-    意図せず変えない。
-- required repair tests:
-
-```text
-node scripts/sprint-029-rule-boundary-test.mjs
-node scripts/sprint-038-patch-002-test.mjs --candidate <git-free-24520a1-tree>
-node scripts/sprint-034-test.mjs <git-free-24520a1-tree>
-node scripts/sprint-038-test.mjs
-bash scripts/sprint-022-regression.sh
-python3 scripts/check-release-integrity.py --root .
-git diff --check
-```
-
-期待値はSprint 029 graph PASS、Patch 14/14、Sprint 034 11/11、Sprint 038 64/64、
-Sprint 022 core 69/69＋wrapper 8/8、release integrity／diff check PASSである。
-
-push、PR、merge、tag、Release、marketplace、install／updateは引き続き禁止する。
+1. Generatorへ戻さない。
+2. Windowsユーザー実機で、上記exact candidate／commandを実行する。
+3. Windows version、Node、時刻、SHA、12 labels、exit、access violation／crash／hang／残存process、clean statusを受け取る。
+4. fresh独立EvaluatorがV1を閉じ、AC5〜8、AC13〜14、機能完全性、動作安定性、C16を5/5へ更新できるか最終判定する。
+5. PASS後も自動releaseせず、公開先、対象SHA、branch／PR／merge／tag／Release／marketplace、rollbackを別途ユーザー確認する。
 
 ## Evaluator自己レビュー
 
-- Generatorの自己評価ではなく、固定upstream、candidate、current HEADの実diffを確認した。
+- Generatorの自己評価ではなく、`8661b16..eb757e6` と `eb757e6..46901d5` の実diffを確認した。
+- 編集した正本は本feedbackだけで、製品、test、overlay、spec、contract、progress、state、Gitは変更していない。
+- P1不変条件をmanifest実値、overlay生成宣言、Patch 14/14、Sprint 029 oracleの到達位置で確認した。
+- Sprint 029 oracleを変更・弱体化していない。
+- broad archive 12 FAILを0 FAILへ言い換えず、旧graph error消滅とhistorical wording driftを分離した。
 - Agentic Windows 12/12とYasashii macOS 12/12をYasashii Windows PASSへ昇格していない。
-- 広いarchiveの12 FAILを0 FAILへ言い換えず、開始HEAD比較後も実内容を個別確認した。
-- baseline同一でもactive正本の欠陥P1をproduct findingとして残した。
-- Windows未実行をproduct defectへ誤分類せず、verification-scope-issueとして分離した。
-- 実装、test、overlay、spec、contract、state、progress、Git履歴は編集していない。
-- 書き込んだ正本は本feedbackだけである。
+- Windows未実行をproduct defectへ誤分類せず、V1 verification-scope-issueだけをblockingとして残した。
+- Windows対象製品／test bytesが `0677a0d...`、`eb757e6...`、`46901d5...` 間で同一であることを対象path diffで確認し、Windows入力SHAを `eb757e6...` に一意化した。
