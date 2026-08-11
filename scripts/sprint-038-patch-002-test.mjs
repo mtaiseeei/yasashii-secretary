@@ -166,12 +166,13 @@ check("current overlay check protects owned and definition digests", () => {
   assert.match(text, /upstreamPush=disabled/u);
 });
 
-check("Yasashii identity, copy, Harness route and 0.9.2 release surfaces are intact", () => {
+check("Yasashii identity, copy, Harness route, rule graph and 0.9.2 release surfaces are intact", () => {
   const claudeMarket = JSON.parse(readFileSync(join(ROOT, ".claude-plugin/marketplace.json"), "utf8"));
   const codexMarket = JSON.parse(readFileSync(join(ROOT, ".agents/plugins/marketplace.json"), "utf8"));
   const claudePlugin = JSON.parse(readFileSync(join(ROOT, "plugins/secretary/.claude-plugin/plugin.json"), "utf8"));
   const codexPlugin = JSON.parse(readFileSync(join(ROOT, "plugins/secretary/.codex-plugin/plugin.json"), "utf8"));
   const edition = JSON.parse(readFileSync(join(ROOT, "plugins/secretary/edition.json"), "utf8"));
+  const ruleManifest = JSON.parse(readFileSync(join(ROOT, "plugins/secretary/rules/rule-manifest.json"), "utf8"));
   assert.equal(claudeMarket.name, "yasashii-secretary");
   assert.equal(claudeMarket.plugins[0].version, "0.9.2");
   assert.equal(codexMarket.name, "yasashii-secretary");
@@ -186,6 +187,16 @@ check("Yasashii identity, copy, Harness route and 0.9.2 release surfaces are int
   assert.equal(edition.harness.version, "0.5.1");
   assert.equal(edition.harness.hosts.claudeCode.installId, "harness@yasashii-harness");
   assert.equal(edition.harness.hosts.codex.installId, "harness@yasashii-harness");
+  const ruleNames = Object.keys(ruleManifest.rules);
+  assert.equal(ruleManifest.priority.length, ruleNames.length);
+  assert.equal(new Set(ruleManifest.priority).size, ruleNames.length);
+  assert.ok(ruleNames.every((name) => ruleManifest.priority.includes(name)));
+  assert.equal(ruleManifest.priority.filter((name) => name === "agentic-style").length, 0);
+  assert.equal(ruleManifest.priority.filter((name) => name === "conversation-contract").length, 1);
+  assert.ok(ruleManifest.priority.indexOf("conversation-contract") < ruleManifest.priority.indexOf("yasashii-style"));
+  for (const dependency of ["evidence", "safety", "common-language", "conversation-contract"]) {
+    assert.ok(ruleManifest.rules["yasashii-style"].dependencies.includes(dependency), dependency);
+  }
   const canonical = readFileSync(join(ROOT, "plugins/secretary/CHANGELOG.md"));
   const legacy = readFileSync(join(ROOT, "plugins/yasashii-secretary/CHANGELOG.md"));
   assert.ok(canonical.equals(legacy));

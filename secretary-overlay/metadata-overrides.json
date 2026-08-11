@@ -51,7 +51,7 @@
       { "op": "set", "pointer": "/copy/path", "value": "rules/copy/yasashii.json" }
     ],
     "plugins/secretary/rules/rule-manifest.json": [
-      { "op": "set", "pointer": "/priority/3", "value": "yasashii-style" },
+      { "op": "set", "pointer": "/priority/4", "value": "yasashii-style" },
       { "op": "delete", "pointer": "/rules/agentic-style" },
       {
         "op": "set",
@@ -60,7 +60,7 @@
           "path": "styles/yasashii.md",
           "owner": "yasashii-overlay",
           "protected": false,
-          "dependencies": ["evidence", "safety", "common-language"],
+          "dependencies": ["evidence", "safety", "common-language", "conversation-contract"],
           "copy": "copy/yasashii.json",
           "copySurfaces": ["conversation", "diagnosis", "report", "developerHandoff"],
           "overrides": []

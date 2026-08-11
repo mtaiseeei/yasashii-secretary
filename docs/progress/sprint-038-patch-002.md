@@ -1,5 +1,64 @@
 # Sprint 038 Patch 002 実装進捗 — Windows native保存互換 / Yasashii Secretary 0.9.2
 
+## Retry 1 — P1 rule manifest整合
+
+Evaluatorが記録したP1だけを限定修正した。Retry開始HEADは
+`8661b16fd0c07eca1a222bfa526194c774649e46`。Sprint 029 oracle、固定Agentic common、
+Windows保存core、Windows test、Yasashii copy／style、identity、base／treeは変更していない。
+
+- `secretary-overlay/metadata-overrides.json` は、固定upstreamのpriority index 4に
+  `yasashii-style` を置き、`yasashii-style.dependencies` へ `conversation-contract` を追加する。
+- 生成結果 `plugins/secretary/rules/rule-manifest.json` のpriorityは
+  `safety → evidence → common-language → conversation-contract → yasashii-style`。
+  存在する5 rulesを各1回だけ含み、`agentic-style` は0件である。
+- `scripts/sprint-038-patch-002-test.mjs` の既存14検査内へ、上記priority集合・重複0・順序・
+  4 dependenciesを追加した。検査件数を増やさず、P1の見落としだけを閉じた。
+- 実装diffは製品manifest、overlay宣言、対象testの3 filesだけで、検証コードだけのroundではない。
+
+overlayの固定base／treeは引き続き
+`24520a1d06f8d3833568a1386bf814e1085f5da9`、managed 269である。
+製品／test修正時点のrepo-owned digestは変更前後とも
+`1b2d21aedbe089b52cf5c4bbf9591fe7266db009c227a413501d4798c4050044`。
+本Generator正本の追記はrepo-owned digestを意図どおり変えるため、最終値は自己参照させず、
+handoff時のoverlay check結果を証拠とする。
+overlay digestはmetadata修正により意図どおり
+`05ba070414b6d3ba766f00b38f6fd373a19c149974183fa5b1541c7d48ee6bbe` から
+`773773b72405c20e16c26bf075ea96a458b03ac13ade47b26a20484f07c91d77` へ変わり、
+apply／check／reapply中は不変、二回目追加差分0件だった。
+
+### Retry 1 実行証拠
+
+| コマンド／検査 | 結果 |
+|---|---|
+| `node scripts/sprint-029-rule-boundary-test.mjs` | P1のgraph検査を通過後、今回と無関係なhistorical文言 `固定3項目` 期待でexit 1。oracleは変更していない |
+| `node scripts/sync-secretary-overlay.mjs --check/--reapply --candidate <git-free-24520a1-tree> --observed-commit 24520a1...` | PASS、managed 269、repo-owned digest不変、new overlay digest不変、secondChanged 0 |
+| `node scripts/sprint-038-patch-002-test.mjs --candidate <git-free-24520a1-tree>` | 14 PASS / 0 FAIL。named rule graph assert PASS、Windows native not-run |
+| `node scripts/sprint-034-test.mjs <git-free-24520a1-tree>` | 11 PASS / 0 FAIL |
+| `node scripts/sprint-038-test.mjs` | 64 PASS / 0 FAIL |
+| `bash scripts/sprint-022-regression.sh` | core 69 / 0、wrapper 8 / 0 |
+| `python3 scripts/check-release-integrity.py --root .` | PASS |
+| `node scripts/sprint-038-patch-002-windows-test.mjs` | macOS同一labels 12 / 0 |
+| 同 `--require-windows` | 期待どおりexit 1、11 PASS / 1 FAIL、`darwin !== win32` |
+| Git-free `archive-release-gate.mjs` | 14 PASS / 0 FAIL |
+| Git-free新Patch／Sprint 038 | 14 / 0、64 / 0 |
+| Git-free `master-release-gate.mjs --mode archive` | exit 1、286 / 298、historical 12 FAIL。P1 graphの旧2エラーは消え、Sprint 029は無関係な `固定3項目`／README旧期待だけを報告 |
+| JSON parse／`node --check`／`git diff --check` | PASS |
+
+広いarchive gateはgreenへ言い換えない。P1はPatchのnamed rule graph assertと、Sprint 029が
+graph assertionの次へ進んだ実行結果で解消を確認した。残るhistorical driftは本Retryへ混ぜず、
+今回のproduct残差として扱わない。
+
+### Retry 1 引き継ぎと残余リスク
+
+startup command、test URL、browser screenshotは引き続き該当なし。fresh Evaluatorは固定candidateで
+overlay check／reapply、Patch 14/14、Sprint 029近傍、Sprint 034、Sprint 038、Sprint 022、release、
+Git-free archiveを再実行する。
+
+Windows保存製品／test bytesはRetry開始HEADから変更していない。Windows native 12/12、
+`0xC0000005`、crash、hang、残存processは **not-run** のままであり、V1 verification-scope-issueと
+release holdを維持する。push、PR、merge、tag、GitHub Release、marketplace、plugin install／update、
+private版、cache、利用者workspace、Secret、Actions、OAuth、実API、外部serviceはすべて `not-run`。
+
 ## 実装結果
 
 - 開始HEADは `a7336794ecfe0a9d43e8e60d28815a071ca9e963`。
