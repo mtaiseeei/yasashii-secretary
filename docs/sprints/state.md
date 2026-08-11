@@ -5,7 +5,7 @@
 - Current ID: sprint-038-patch-002
 - Retry Count: 1
 - Spec-Issue Count: 0
-- Lineage Dispatches: 3
+- Lineage Dispatches: 4
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
@@ -68,13 +68,14 @@
 | sprint-036 | superseded | [contract](sprint-036.md) | - | - |
 | sprint-037 | done | [contract](sprint-037.md) | [progress](../progress/sprint-037.md) | [feedback](../feedback/sprint-037.md) |
 | sprint-038 | done | [contract](sprint-038.md) | [progress](../progress/sprint-038.md) | [feedback](../feedback/sprint-038.md) |
-| sprint-038-patch-002 | active | [contract](sprint-038-patch-002.md) | [progress](../progress/sprint-038-patch-002.md) | [feedback](../feedback/sprint-038-patch-002.md) |
+| sprint-038-patch-002 | awaiting-eval | [contract](sprint-038-patch-002.md) | [progress](../progress/sprint-038-patch-002.md) | [feedback](../feedback/sprint-038-patch-002.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-11: Retry 1 fresh strong GeneratorがP1だけを限定修正し、commit `eb757e6a9382378e1dbd7a8bad00ba990a1f7ad3` を作成した。`secretary-overlay/metadata-overrides.json` でpriority index 4を `yasashii-style` へ置換し、`conversation-contract` dependencyを追加。生成結果 `rule-manifest.json` はpriority `safety → evidence → common-language → conversation-contract → yasashii-style`、`agentic-style` 0件となり、Patch testの既存14件内に集合／重複／順序／dependency不変条件を追加した。Sprint 029 oracleは変更・弱体化せず、旧graph error 2件の解消後に無関係historical文言期待で全体exit 1となることを分離。overlay check／reapply、Patch 14/14、Sprint 034 11/11、038 64/64、022 core69＋wrapper8、release integrity、Git-free targeted archive14/14、macOS同一Windows labels12/12、`--require-windows` negative 11/1、JSON／Node／diff checkをPASS。Windows nativeはnot-runのためV1とrelease holdを維持する。fresh独立Evaluator dispatch予約としてLineage Dispatchesを4、Status awaiting-eval、Retry Count 1、Model Tier strong、Rotate noneを維持する。
 - 2026-08-11: sprint-038-patch-002初回fresh独立EvaluatorはNOT PASS／HOLD。主分類 `implementation-issue`、secondary `verification-scope-issue`。製品candidate `0677a0d67ce70b478dd0d19e676b23295b78a4a3` 以降はdocs-onlyで製品／test／overlay bytes変更0、固定上流exact tree、697分類、common parity、overlay record／apply／check／reapply、保護digest、負例副作用0、Patch 14/14、macOS 12/12、Sprint 034 11/11、037 14/14、038 64/64、022 core69＋wrapper8、release integrity、targeted archiveをPASSした。一方、広いarchiveの開始HEADと同数12 FAILを内容確認し、現行正本 `plugins/secretary/rules/rule-manifest.json` に、削除済み `agentic-style` がpriorityへ残り、`yasashii-style.dependencies` に保護rule `conversation-contract` が無い既存product finding P1（Medium）を確認した。単なるhistorical期待差ではないためbaselineへ隠さず、`secretary-overlay/metadata-overrides.json` と必要時のみPatch testで不変条件を固定し、Sprint 029 oracleを弱めず限定修正する。Yasashii Windows nativeはnot-runのためsecondary blockerとして維持し、Agentic Windows 12/12やmacOS 12/12を流用しない。Retry Countを1、fresh strong Generator dispatch予約としてLineage Dispatchesを3、Status active、Model Tier strong、Rotate noneとする。push、PR、merge、tag、Release、marketplace、install/updateは未実施。
 - 2026-08-11: fresh strong Generatorが固定Agentic完全SHA `24520a1d06f8d3833568a1386bf814e1085f5da9` のGit archiveを入力に、Yasashii Secretary 0.9.2候補commit `0677a0d67ce70b478dd0d19e676b23295b78a4a3` を作成した。697 filesを全分類し未分類0、overlay record／apply／check／reapplyをPASS、actual apply changed 33／managed 269、common byte一致、secondChanged 0、Yasashii固有surfaceとrepo-owned digest不変。Patch 14/14、macOS上の同一Windows 12 labels 12/12、`--require-windows` negative gate、Sprint 038 64/64、037 14/14、034 11/11、022 core 69/69＋wrapper 8/8、release integrity、JSON／Node syntax、diff checkをPASSした。広いarchive gateはcandidate 286/298、開始HEAD 274/286で追加12 assertions全PASS、既知historical 12 FAIL同数のため全体greenへ昇格せず分離した。Windows nativeはnot-runでありPASSを主張しない。外部write、push、PR、tag、Release、marketplace、install/update、private版、cache、利用者workspace変更0。fresh独立Evaluator dispatch予約としてLineage Dispatchesを2、Status awaiting-eval、Model Tier strong、Rotate model-escalation、Retry Count／Spec-Issue Count 0を維持する。
 - 2026-08-11: public Agentic Secretaryのsprint-038-patch-002が製品／test candidate `24520a1d06f8d3833568a1386bf814e1085f5da9` でfresh独立Evaluator PASS。Windows native 12/12、macOS target 12/12、Git-free archive 291/291、product finding 0、blocking verification-infra 0を確認した。ユーザー承認済みの下流同期として、同完全SHAを固定入力にWindows保存互換、recursive copy crash回避、CRLF保持、path guard／rollbackを宣言的overlayで取り込み、Yasashii固有copy／identity／README／LICENSE／repo所有docsを保護して0.9.2候補を作る通常Patch・high riskの `sprint-038-patch-002` を開始する。private版、installed cache、利用者workspace、外部serviceは対象外。high risk routeとしてfresh Generator dispatch予約のLineage Dispatchesを1、Model Tier strong、Rotate model-escalation、Status active、Retry Count／Spec-Issue Count 0、Next Planned TBDとする。独立Evaluator PASS前のpush、PR、merge、tag、Release、marketplace、install/updateは行わない。
