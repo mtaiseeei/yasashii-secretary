@@ -418,19 +418,33 @@ agentic側だけのmanifest存在やClaude legacy互換を、yasashii側のCodex
 repo-owned docsを上流値で上書きしない。配布物と現行製品正本から、正式所有情報を除く個人名、
 利用者端末固有path、私用workspace依存を除く。
 
+### F56 Windows native保存と0.9.2下流同期
+
+Windowsでも、project作成、journal、memory、TODO、settings、文書保存をBashのpath解釈へ依存せず実行できる。
+日本語・空白を含むpathでも同じ保存結果になり、project作成時のrecursive copyが自分自身を取り込んでcrashせず、
+途中失敗はpath guardとrollbackにより開始前へ戻る。既存 `preferences.md` がCRLFなら、設定更新後もCRLFを維持し、
+LFとの混在を作らない。macOS／Linuxの同じ保存導線とGit-free archiveも回帰させない。
+
+この共通機能は、独立評価PASS済みAgentic Secretary完全SHA
+`24520a1d06f8d3833568a1386bf814e1085f5da9` だけを入力にして宣言的overlayから同期する。
+Yasashii固有copy、identity、README、LICENSE、repo-owned docs／spec／Sprint／progress／feedback／evidence、
+overlay定義を保護し、Yasashii Secretary `0.9.2` のmanifest、marketplace、edition metadata、正本／旧raw CHANGELOG、
+release gateを一致させる。private版、installed cache、利用者workspaceへは反映せず、my-vault対応済みとも表示しない。
+UIは変更しない。
+
 ## Gテーマと機能の対応
 
 | テーマ | 主な機能 |
 |---|---|
-| G1 | F05 F06 F07 F08 F17 F18 F19 F21 |
-| G2 | F04 F10 F20 F51 F55 |
+| G1 | F05 F06 F07 F08 F17 F18 F19 F21 F56 |
+| G2 | F04 F10 F20 F51 F55 F56 |
 | G3 | F14 F15 F22 F53 |
 | G4 | F10 F14 F15 F20 F22 F51 F53 F55 |
 | G5 | F04 F07 F23 F24 F25 F26 F27 |
-| G6 | F03 F05 F06 F07 F08 F15 F17 F18 F19 F28 |
+| G6 | F03 F05 F06 F07 F08 F15 F17 F18 F19 F28 F56 |
 | G7 | F01 F02 F04 F10 F16 F29 |
-| G8 | F01 F02 F07 F10 F16 F20 F30 F31 |
+| G8 | F01 F02 F07 F10 F16 F20 F30 F31 F56 |
 | G9 | F03 F07 F10 F16 F23 F32 F33 F34 F35 |
 | G10 | F01 F02 F04 F05 F07 F10 F16 F23 F24 F30 F31 F32 F33 F34 F35 F36 F37 F38 F39 F40 F41 F42 F43 |
-| G11 | F30 F31 F36 F40 F41 F42 F43 F44 F45 F46 F47 F48 F49 F50 F51 F52 F53 F54 F55 |
+| G11 | F30 F31 F36 F40 F41 F42 F43 F44 F45 F46 F47 F48 F49 F50 F51 F52 F53 F54 F55 F56 |
 | G12 | F04 F16 F20 F41 F42 F49 F55 |

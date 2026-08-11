@@ -146,6 +146,18 @@
       "replacement": "for (const phrase of [\"実コネクタ\", \"edition.json\", \"4面copy\", \"根拠\", \"推測で断定しません\"]) assert(evidence.includes(phrase), `証拠契約が不足しています: ${phrase}`);"
     },
     {
+      "id": "canonical-changelog-yasashii-092-scope",
+      "path": "plugins/secretary/CHANGELOG.md",
+      "match": "- Agentic版を先に独立評価し、合格した完全SHAからYasashii版へoverlay同期します。privateの`agentic-secretary-my-vault`はこの変更の対象外です。",
+      "replacement": "- この変更はYasashii Secretaryの公開版が対象です。合格済みの共通実装を宣言的overlayから同期します。"
+    },
+    {
+      "id": "legacy-changelog-yasashii-092-scope",
+      "path": "plugins/yasashii-secretary/CHANGELOG.md",
+      "match": "- Agentic版を先に独立評価し、合格した完全SHAからYasashii版へoverlay同期します。privateの`agentic-secretary-my-vault`はこの変更の対象外です。",
+      "replacement": "- この変更はYasashii Secretaryの公開版が対象です。合格済みの共通実装を宣言的overlayから同期します。"
+    },
+    {
       "id": "canonical-changelog-yasashii-audience",
       "path": "plugins/secretary/CHANGELOG.md",
       "match": "- Agentic Secretaryから別配布のAgentic Harness `0.5.1`を使う方。",
@@ -172,20 +184,20 @@
     {
       "id": "sprint-032-current-edition",
       "path": "scripts/sprint-032-update-gate-test.mjs",
-      "match": "check(\"editionのcandidate/latest参照はagentic 0.9.1配布面と整合\", edition.edition === \"agentic-secretary\" && edition.distribution.marketplaceUrl.includes(\"agentic-secretary\") && edition.distribution.changelogUrl.endsWith(\"/plugins/secretary/CHANGELOG.md\"));",
-      "replacement": "check(\"editionのcandidate/latest参照はyasashii 0.9.1配布面と整合\", edition.edition === \"yasashii-secretary\" && edition.distribution.marketplaceUrl.includes(\"yasashii-secretary\") && edition.distribution.changelogUrl.endsWith(\"/plugins/yasashii-secretary/CHANGELOG.md\"));"
+      "match": "check(\"editionのcandidate/latest参照はagentic 0.9.2配布面と整合\", edition.edition === \"agentic-secretary\" && edition.distribution.marketplaceUrl.includes(\"agentic-secretary\") && edition.distribution.changelogUrl.endsWith(\"/plugins/secretary/CHANGELOG.md\"));",
+      "replacement": "check(\"editionのcandidate/latest参照はyasashii 0.9.2配布面と整合\", edition.edition === \"yasashii-secretary\" && edition.distribution.marketplaceUrl.includes(\"yasashii-secretary\") && edition.distribution.changelogUrl.endsWith(\"/plugins/yasashii-secretary/CHANGELOG.md\"));"
     },
     {
       "id": "sprint-032-current-marker",
       "path": "scripts/sprint-032-update-gate-test.mjs",
-      "match": "check(\"新規0.9.1 onboardingはneutral markerを作る\", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === \"agentic-secretary\", fresh.prepared.stderr);",
-      "replacement": "check(\"新規0.9.1 onboardingはneutral markerを作る\", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === \"yasashii-secretary\", fresh.prepared.stderr);"
+      "match": "check(\"新規0.9.2 onboardingはneutral markerを作る\", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === \"agentic-secretary\", fresh.prepared.stderr);",
+      "replacement": "check(\"新規0.9.2 onboardingはneutral markerを作る\", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === \"yasashii-secretary\", fresh.prepared.stderr);"
     },
     {
       "id": "sprint-032-current-ledger",
       "path": "scripts/sprint-032-update-gate-test.mjs",
-      "match": "check(\"新規0.9.1導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"agentic-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.9.1\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);",
-      "replacement": "check(\"新規0.9.1導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"yasashii-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.9.1\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);"
+      "match": "check(\"新規0.9.2導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"agentic-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.9.2\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);",
+      "replacement": "check(\"新規0.9.2導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"yasashii-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.9.2\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);"
     },
     {
       "id": "sprint-035-yasashii-harness-commit",
@@ -227,7 +239,13 @@
       "id": "sprint-037-yasashii-sprint-038-owner",
       "path": "scripts/sprint-037-test.mjs",
       "match": "  \"scripts/sprint-035-test.mjs\": 2,\n}));",
-      "replacement": "  \"scripts/sprint-035-test.mjs\": 2, \"scripts/sprint-038-patch-001-test.mjs\": 2,\n}));"
+      "replacement": "  \"scripts/sprint-035-test.mjs\": 2, \"scripts/sprint-038-patch-001-test.mjs\": 2,\n  \"scripts/sprint-038-patch-002-test.mjs\": 1, \"scripts/sync-secretary-overlay.mjs\": 4,\n}));"
+    },
+    {
+      "id": "sprint-037-yasashii-private-boundary-negative-copy",
+      "path": "scripts/sprint-037-test.mjs",
+      "match": "    for (const match of text.matchAll(regex)) matches.push(match[0]);",
+      "replacement": "    for (const match of text.matchAll(regex)) {\n      if (regex.source.includes(\"my-vault\")) {\n        const lineStart = text.lastIndexOf(\"\\n\", match.index) + 1;\n        const nextBreak = text.indexOf(\"\\n\", match.index);\n        const line = text.slice(lineStart, nextBreak < 0 ? text.length : nextBreak);\n        if (/(?:対象外|(?:write|書込み)(?:は)?0件|対応済み(?:と|とも)?(?:は)?(?:誤)?表示しない|対応済み.*表示しない)/u.test(line)) continue;\n      }\n      matches.push(match[0]);\n    }"
     }
   ]
 }

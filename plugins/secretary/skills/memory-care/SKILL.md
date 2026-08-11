@@ -46,26 +46,28 @@ secretary/memory/
 索引の追従・空上書きの拒否・削除前の確認・しおりの読み書き・節目コミットは、**必ず**次のヘルパーを使う。
 自前で `rm` したり空ファイルを書いたりしない（事故防止）。ヘルパーは同じ入力なら同じ結果になる。
 
-ヘルパー: `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.sh`
+ヘルパー: `node "${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.mjs"`
+
+以下の `memory-tools.mjs` は、すべて上記のように `node` で実行する。WindowsでもBashは使わない。
 
 | やりたいこと | コマンド |
 |---|---|
-| 決定を記録（＋目次追従） | `memory-tools.sh remember-decision <secretary> <YYYY-MM-DD> "<本文>"` |
-| 活動をjournalへ追記 | `memory-tools.sh journal-add <secretary> <did\|decided\|next\|note> "<本文>"` |
-| 確認済みの相談要点を案件メモへ追加 | `memory-tools.sh topic-add <secretary> "<トピック名>" "<要点>"` |
-| 活動・決定を時系列表示 | `memory-tools.sh timeline <secretary> [--from YYYY-MM-DD] [--to YYYY-MM-DD] [--type decisions\|journal\|all] [--grep "<キーワード>"]` |
-| 週次ふりかえり | `memory-tools.sh weekly <secretary> [--week YYYY-MM-DD]` |
-| 古い月の退避候補 | `memory-tools.sh archive-plan <secretary> [YYYY-MM]` |
-| 確認済みの月を退避 | `memory-tools.sh archive-month <secretary> YYYY-MM --confirm` |
-| preferencesの指定行だけを変更 | `memory-tools.sh pref-set <secretary> "<セクション>" "<キー>" "<値>"` |
-| 確認済みの秘書メモを末尾追記 | `memory-tools.sh pref-note-add <secretary> "<本文>"` |
-| 目次を作り直す（増減に追従） | `memory-tools.sh reindex <secretary>` |
-| 記憶を安全に書き換える（空・範囲外は拒否） | `memory-tools.sh guarded-write <secretary> <memory相対パス> < <(内容)` |
-| 記憶を消す（要確認） | `memory-tools.sh delete <secretary> <memory相対パス> [--confirm]` |
-| しおりを書く | `memory-tools.sh resume-write <secretary> "<進行中>" "<次にやること>" "<未確定>"` |
-| しおりの有無を見る | `memory-tools.sh resume-check <secretary>` |
-| しおりを読む／閉じる | `memory-tools.sh resume-read <secretary>` / `resume-clear <secretary>` |
-| 節目コミット（日本語・push しない） | `memory-tools.sh commit <secretary> "<日本語メッセージ>"` |
+| 決定を記録（＋目次追従） | `memory-tools.mjs remember-decision <secretary> <YYYY-MM-DD> "<本文>"` |
+| 活動をjournalへ追記 | `memory-tools.mjs journal-add <secretary> <did\|decided\|next\|note> "<本文>"` |
+| 確認済みの相談要点を案件メモへ追加 | `memory-tools.mjs topic-add <secretary> "<トピック名>" "<要点>"` |
+| 活動・決定を時系列表示 | `memory-tools.mjs timeline <secretary> [--from YYYY-MM-DD] [--to YYYY-MM-DD] [--type decisions\|journal\|all] [--grep "<キーワード>"]` |
+| 週次ふりかえり | `memory-tools.mjs weekly <secretary> [--week YYYY-MM-DD]` |
+| 古い月の退避候補 | `memory-tools.mjs archive-plan <secretary> [YYYY-MM]` |
+| 確認済みの月を退避 | `memory-tools.mjs archive-month <secretary> YYYY-MM --confirm` |
+| preferencesの指定行だけを変更 | `memory-tools.mjs pref-set <secretary> "<セクション>" "<キー>" "<値>"` |
+| 確認済みの秘書メモを末尾追記 | `memory-tools.mjs pref-note-add <secretary> "<本文>"` |
+| 目次を作り直す（増減に追従） | `memory-tools.mjs reindex <secretary>` |
+| 記憶を安全に書き換える（空・範囲外は拒否） | `memory-tools.mjs guarded-write <secretary> <memory相対パス>`（本文は標準入力） |
+| 記憶を消す（要確認） | `memory-tools.mjs delete <secretary> <memory相対パス> [--confirm]` |
+| しおりを書く | `memory-tools.mjs resume-write <secretary> "<進行中>" "<次にやること>" "<未確定>"` |
+| しおりの有無を見る | `memory-tools.mjs resume-check <secretary>` |
+| しおりを読む／閉じる | `memory-tools.mjs resume-read <secretary>` / `resume-clear <secretary>` |
+| 節目コミット（日本語・push しない） | `memory-tools.mjs commit <secretary> "<日本語メッセージ>"` |
 
 `<secretary>` は作業中フォルダの `secretary/`。相対日付（「きのう」等）は必ず絶対日付（`YYYY-MM-DD`）に直してから渡す。
 
@@ -160,4 +162,4 @@ secretary/memory/
 ## 参照
 
 - 言葉づかいルール（必読）: `${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md`
-- 決定的シームのヘルパー: `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.sh`
+- 決定的シームのヘルパー: `node "${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.mjs"`

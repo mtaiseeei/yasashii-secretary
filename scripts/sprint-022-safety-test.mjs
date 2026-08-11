@@ -477,13 +477,22 @@ else{spawn(process.execPath,[process.argv[1],"--child"],{stdio:"ignore",env:proc
     "scripts/lib/safe-git.mjs",
     "scripts/update-apply.mjs",
     "scripts/workspace-repo.mjs",
-    "scripts/project-tools.mjs",
     "skills/chatwork/scripts/wizard-server.mjs",
     "skills/google-chat/scripts/wizard-server.mjs",
     "skills/google-chat/scripts/cloud-setup.mjs",
     "skills/google-chat/scripts/search.mjs",
   ];
-  check("主要production callsiteを共通安全処理へ集約", routedSources.every((path) => /external-ops\.mjs/.test(readFileSync(join(pluginRoot, path), "utf8"))) && /safe-external\.mjs/.test(readFileSync(memoryTools, "utf8")));
+  const storageSources = [
+    "scripts/project-tools.mjs",
+    "scripts/workspace-tools.mjs",
+    "skills/memory-care/scripts/memory-tools.mjs",
+  ];
+  check(
+    "主要production callsiteを外部処理と記録保存の共通安全境界へ集約",
+    routedSources.every((path) => /external-ops\.mjs/.test(readFileSync(join(pluginRoot, path), "utf8")))
+      && storageSources.every((path) => /secretary-store\.mjs/.test(readFileSync(join(pluginRoot, path), "utf8")))
+      && /memory-tools\.mjs/.test(readFileSync(memoryTools, "utf8")),
+  );
 } finally {
   rmSync(work, { recursive: true, force: true });
 }

@@ -5,8 +5,8 @@
     "safety",
     "evidence",
     "common-language",
-    "yasashii-style",
-    "agentic-style"
+    "conversation-contract",
+    "yasashii-style"
   ],
   "rules": {
     "evidence": {
@@ -47,7 +47,8 @@
       "dependencies": [
         "evidence",
         "safety",
-        "common-language"
+        "common-language",
+        "conversation-contract"
       ],
       "copy": "copy/yasashii.json",
       "copySurfaces": [

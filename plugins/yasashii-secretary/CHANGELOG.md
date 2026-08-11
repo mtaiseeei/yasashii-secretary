@@ -1,5 +1,30 @@
 # 変更履歴
 
+## [0.9.2] - 2026-08-10
+
+### 対象者
+
+- Windowsの通常のローカルworkspaceで、プロジェクト、記憶、TODO、設定、文書保存を使う方。
+
+### 変わること
+
+- Windows形式のpathをBashへ渡さず、Node.jsの共通境界で記録・保存します。drive letter、空白、日本語を含むpathでも、project作成後のjournal記録を含む一連の操作を完了できます。
+- macOS／Linux向けの既存`.sh`入口は互換wrapperとして残し、同じNode.js実装へ接続します。
+
+### 設定・ファイルへの影響
+
+- 既存workspaceの構造、記憶、プロジェクト、チャット履歴、設定を移行するworkspace migrationはありません。
+- path guard、symlink／junction境界、journalと本体のrollback、空上書き拒否、削除2段階、所有pathだけのcommitは維持します。
+
+### 必要な操作
+
+- Secretaryを更新して新しいsessionを開始します。workspace側で変換commandを実行する必要はありません。
+
+### 互換性上の注意
+
+- この変更はYasashii Secretaryの公開版が対象です。合格済みの共通実装を宣言的overlayから同期します。
+- `0.9.1`以前のrelease記録、migration、fixtureは履歴として維持します。
+
 ## [0.9.1] - 2026-08-03
 
 ### 対象者

@@ -38,9 +38,9 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 
 ## morning: 今日の入口
 
-1. `memory-tools.sh resume-check <secretary>`を実行する。しおりがあれば`resume-read`で**中断点**を確認するが、自動で消さない。
-2. `memory-tools.sh timeline <secretary> --type journal`で直近の`next`（翌日以降への申し送り）を確認する。
-3. `workspace-tools.sh todo-list <secretary>`で未完TODOを確認する。
+1. `node "${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.mjs" resume-check <secretary>`を実行する。しおりがあれば`resume-read`で**中断点**を確認するが、自動で消さない。
+2. 同じNode.js helperの`timeline <secretary> --type journal`で直近の`next`（翌日以降への申し送り）を確認する。
+3. `node "${SECRETARY_PLUGIN_ROOT}/scripts/workspace-tools.mjs" todo-list <secretary>`で未完TODOを確認する。
 4. `project-tools.mjs list <secretary>`でopenの進行中PJだけを確認し、各`PROJECT.md`の状態・待ち・次の入口と、PJ参照つきTODOを分けて扱う。closedは明示依頼がない限り存在確認・探索・候補表示しない。
 5. 中断点、申し送り、PJ状態、待ち、TODOを混ぜずに、今日の入口として返す内容を整理する。外部予定も必要なら続けてdailyを1回だけ行う。
 
@@ -52,9 +52,9 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 
 - **外部の予定・タスク**: 接続済みコネクタ（Googleカレンダー・Gmail 等）から**その場で参照**する。全文はローカルに保存しない。
 - **ローカル TODO**: `secretary/inbox/todo.md`（クイックキャプチャ）。ここはコミット対象。
-  - TODO の追記は決定的シームを使う: `${SECRETARY_PLUGIN_ROOT}/scripts/workspace-tools.sh todo-add <secretary> "<本文>" "<根拠>" [期限]`（期限は任意）。
-  - 一覧は `workspace-tools.sh todo-list <secretary>`。
-  - 完了は `workspace-tools.sh todo-done <secretary> <番号> [--confirm]`、持ち越しは `workspace-tools.sh todo-carry <secretary> <番号> <YYYY-MM-DD> [--confirm]`。どちらも対象を先に見せ、確認後だけ変更する。
+  - TODO の追記は決定的シームを使う: `node "${SECRETARY_PLUGIN_ROOT}/scripts/workspace-tools.mjs" todo-add <secretary> "<本文>" "<根拠>" [期限]`（期限は任意）。
+  - 一覧は同じNode.js helperの `todo-list <secretary>`。
+  - 完了は同helperの `todo-done <secretary> <番号> [--confirm]`、持ち越しは `todo-carry <secretary> <番号> <YYYY-MM-DD> [--confirm]`。どちらも対象を先に見せ、確認後だけ変更する。
 - **進行中PJ**: `project-tools.mjs list <secretary>`と各`PROJECT.md`。状態・待ち・次の入口を確認する。実行項目はPJ内へ複製せず、PJ参照つきで上記TODO正本に置く。
 
 ## ステップ1: つながっているか見る（未接続でも壊さない）
@@ -78,7 +78,7 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 
 - メール本文・予定の詳細などの**全文をローカルファイルに書き出さない**。キャッシュ・同期コピー・`10_sources` 型の置き場を作らない。
 - ローカルに残してよいのは、**ユーザーの TODO** と、**根拠参照（サービス名＋リンク/ID＋日付）** まで。本文が必要なときはその都度コネクタで見る。
-- 新しく TODO を足すときは `workspace-tools.sh todo-add`（根拠必須。根拠が無いと追記できない）を使う。
+- 新しく TODO を足すときは `workspace-tools.mjs todo-add`（Node.jsで実行、根拠必須。根拠が無いと追記できない）を使う。
 - TODO追加・完了・持ち越しが成功するとjournalへ1回だけ追記される。失敗時はjournalへ残さない。期限が無いTODOも通常どおり扱う。
 
 ## ステップ4: routerへ返す内容を整える
@@ -92,9 +92,9 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 
 ## evening: 今日の締め
 
-1. 今日の絶対日付を使い、`memory-tools.sh timeline <secretary> --from <今日> --to <今日> --type all`で
+1. 今日の絶対日付を使い、`memory-tools.mjs timeline <secretary> --from <今日> --to <今日> --type all`をNode.jsで実行して
    当日の活動と決定を確認する。timelineの閲覧だけでは成果物を作らない。
-2. `workspace-tools.sh todo-list <secretary>`で未完TODOを確認する。完了・持ち越しは対象を先に見せ、
+2. `workspace-tools.mjs todo-list <secretary>`をNode.jsで実行して未完TODOを確認する。完了・持ち越しは対象を先に見せ、
    ユーザー確認後だけ`todo-done ... --confirm` / `todo-carry ... --confirm`を実行する。各シームがjournalへ1回だけ追記する。
 3. 当日のdecisionが0件なら会話を読み返す。決定候補があれば、ルーターとmemory-careの節目プロトコルをそのまま適用する。
    保存操作、対象、保存先が明示された決定は同じturnで1回記録し、曖昧な候補だけ副作用0で1問確認する。
@@ -113,5 +113,5 @@ PJ参照つきTODOを扱う場合も、`PROJECT.md`は状態・待ち・次の�
 
 - 言葉づかいルール（必読）: `${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md`
 - 未接続のときの接続ガイド: `${SECRETARY_PLUGIN_ROOT}/skills/setup-google/SKILL.md`
-- TODO・成果物の決定的シーム: `${SECRETARY_PLUGIN_ROOT}/scripts/workspace-tools.sh`
+- TODO・成果物の決定的シーム: `node "${SECRETARY_PLUGIN_ROOT}/scripts/workspace-tools.mjs"`
 - プロジェクト操作: `${SECRETARY_PLUGIN_ROOT}/skills/projects/SKILL.md`

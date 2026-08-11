@@ -195,12 +195,14 @@ check("0.8 to 0.9 migration dry-run, ownership, atomicity, rollback and idempote
   }
 });
 
-check("current release owners are 0.9.1 and historical 0.8 migration unchanged", () => {
-  assert.equal(JSON.parse(readFileSync(join(root, ".claude-plugin/marketplace.json"))).plugins[0].version, "0.9.1");
-  assert.equal(JSON.parse(readFileSync(join(root, "plugins/secretary/.claude-plugin/plugin.json"))).version, "0.9.1");
-  assert.ok(JSON.parse(readFileSync(join(root, "plugins/secretary/.codex-plugin/plugin.json"))).version.startsWith("0.9.1"));
+check("current release owners are 0.9.2 and historical 0.8 migration unchanged", () => {
+  assert.equal(JSON.parse(readFileSync(join(root, ".claude-plugin/marketplace.json"))).plugins[0].version, "0.9.2");
+  assert.equal(JSON.parse(readFileSync(join(root, "plugins/secretary/.claude-plugin/plugin.json"))).version, "0.9.2");
+  assert.ok(JSON.parse(readFileSync(join(root, "plugins/secretary/.codex-plugin/plugin.json"))).version.startsWith("0.9.2"));
   assert.equal(JSON.parse(readFileSync(join(root, "plugins/secretary/migrations/0.7.0-to-0.8.0.json"))).toVersion, "0.8.0");
-  assert.match(readFileSync(join(root, "plugins/secretary/CHANGELOG.md"), "utf8"), /^# 変更履歴\n\n## \[0\.9\.1\]/);
+  const changelog = readFileSync(join(root, "plugins/secretary/CHANGELOG.md"), "utf8");
+  assert.match(changelog, /^# 変更履歴\n\n## \[0\.9\.2\]/);
+  assert.match(changelog, /## \[0\.9\.1\] - 2026-08-03/);
 });
 
 check("historical fixtures remain byte-addressable", () => {

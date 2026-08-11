@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Portable release gate for the current 0.9.1 release candidate.
+ * Portable release gate for the current 0.9.2 release candidate.
  *
  * The gate deliberately keeps the checkout-only and archive-compatible paths
  * separate.  A suite that cannot run without Git is recorded as skipped in an
@@ -92,6 +92,7 @@ function defaultInventory(root, mode) {
       { id: "sprint-032-patch-002-conversation-safety", command: "bash", args: [script("sprint-032-patch-002-regression.sh")], archive: true },
       { id: "sprint-038-conversation", command: "bash", args: [script("sprint-038-regression.sh")], archive: true },
       { id: "sprint-038-patch-001-harness-compat", command: "bash", args: [script("sprint-038-patch-001-regression.sh")], archive: true },
+      { id: "sprint-038-patch-002-windows-storage", command: process.execPath, args: [script("sprint-038-patch-002-windows-test.mjs")], archive: true },
       { id: "report-schema", command: "python3", args: [script("check-report-schema.py"), "--plugin-root", join(root, "plugins", "secretary")], archive: true },
     ];
   }
@@ -120,6 +121,7 @@ function defaultInventory(root, mode) {
     },
     { id: "sprint-038-conversation", command: "bash", args: [script("sprint-038-regression.sh")], archive: false },
     { id: "sprint-038-patch-001-harness-compat", command: "bash", args: [script("sprint-038-patch-001-regression.sh")], archive: false },
+    { id: "sprint-038-patch-002-windows-storage", command: process.execPath, args: [script("sprint-038-patch-002-windows-test.mjs")], archive: false },
     { id: "report-schema", command: "python3", args: [script("check-report-schema.py"), "--plugin-root", join(root, "plugins", "secretary")], archive: false },
     { id: "current-release-integrity", command: "python3", args: [script("check-release-integrity.py"), "--root", root], archive: false },
   ];
@@ -304,8 +306,8 @@ function archiveAssertions(root) {
     const market = JSON.parse(readFileSync(marketPath, "utf8"));
     const plugin = JSON.parse(readFileSync(pluginPath, "utf8"));
     const entry = market.plugins?.[0] || {};
-    check("marketplace version 0.9.1", entry.version === "0.9.1");
-    check("plugin version 0.9.1", plugin.version === "0.9.1");
+    check("marketplace version 0.9.2", entry.version === "0.9.2");
+    check("plugin version 0.9.2", plugin.version === "0.9.2");
     check("author and MIT metadata", JSON.stringify(entry.author) === JSON.stringify({ name: "mtaiseeei" }) && JSON.stringify(plugin.author) === JSON.stringify({ name: "mtaiseeei" }) && entry.license === "MIT" && plugin.license === "MIT");
     check("single fork credit", entry.forkedFrom === "https://github.com/Shin-sibainu/cc-company");
     check("plugin source exists", entry.source === "./plugins/secretary" && existsSync(join(root, entry.source.slice(2))));

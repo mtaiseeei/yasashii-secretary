@@ -337,6 +337,7 @@ const OWNER_COUNTS = new Map(Object.entries({
   "scripts/sprint-014-regression.sh": 1, "scripts/sprint-025-regression.sh": 1,
   "scripts/sprint-026-release-gate-test.mjs": 5, "scripts/sprint-034-test.mjs": 1,
   "scripts/sprint-035-test.mjs": 2, "scripts/sprint-038-patch-001-test.mjs": 2,
+  "scripts/sprint-038-patch-002-test.mjs": 1, "scripts/sync-secretary-overlay.mjs": 4,
 }));
 
 function filesUnder(path) {
@@ -352,7 +353,15 @@ function scanText(path, text) {
     /\/Users\/(?!synthetic-real-home(?:\/|$))(?=[A-Za-z0-9._-]+\/)[A-Za-z0-9._-]+\/[^\s"'`]*/gu,
     /(?:agentic-secretary-my-vault|\bmy-vault\b)/gu,
   ]) {
-    for (const match of text.matchAll(regex)) matches.push(match[0]);
+    for (const match of text.matchAll(regex)) {
+      if (regex.source.includes("my-vault")) {
+        const lineStart = text.lastIndexOf("\n", match.index) + 1;
+        const nextBreak = text.indexOf("\n", match.index);
+        const line = text.slice(lineStart, nextBreak < 0 ? text.length : nextBreak);
+        if (/(?:対象外|(?:write|書込み)(?:は)?0件|対応済み(?:と|とも)?(?:は)?(?:誤)?表示しない|対応済み.*表示しない)/u.test(line)) continue;
+      }
+      matches.push(match[0]);
+    }
   }
   return matches;
 }

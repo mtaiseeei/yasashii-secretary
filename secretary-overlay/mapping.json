@@ -2,8 +2,7 @@
   "schemaVersion": 1,
   "defaultUpstreamClassification": "common",
   "common": [
-    "adapters/neutral-base.json",
-    "plugins/secretary/rules/styles/yasashii.md"
+    "adapters/neutral-base.json"
   ],
   "metadataOverlay": [
     ".agents/plugins/marketplace.json",

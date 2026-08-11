@@ -1,0 +1,35 @@
+name: Windows recording regression
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/windows-recording-regression.yml"
+      - "plugins/secretary/scripts/**"
+      - "plugins/secretary/skills/memory-care/scripts/**"
+      - "plugins/secretary/skills/**/SKILL.md"
+      - "scripts/sprint-038-patch-002-windows-test.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  windows-native:
+    runs-on: windows-2025
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Node-native syntax
+        shell: pwsh
+        run: |
+          node --check plugins/secretary/scripts/lib/secretary-store.mjs
+          node --check plugins/secretary/scripts/workspace-tools.mjs
+          node --check plugins/secretary/skills/memory-care/scripts/memory-tools.mjs
+          node --check plugins/secretary/scripts/project-tools.mjs
+          node --check plugins/secretary/scripts/owner-name-transaction.mjs
+      - name: Windows path, rollback, retry, and boundary regression
+        shell: pwsh
+        run: node scripts/sprint-038-patch-002-windows-test.mjs --require-windows

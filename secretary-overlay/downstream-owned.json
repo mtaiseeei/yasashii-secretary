@@ -8,6 +8,8 @@
     "LICENSE",
     "README.md",
     "docs/**",
+    "plugins/secretary/rules/copy/yasashii.json",
+    "plugins/secretary/rules/styles/yasashii.md",
     "scripts/archive-release-gate.mjs",
     "scripts/check-release-integrity.py"
   ]

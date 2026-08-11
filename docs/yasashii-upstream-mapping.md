@@ -7,9 +7,9 @@
 - 上流GitHub repository: `mtaiseeei/agentic-secretary`
 - 下流GitHub repository: `mtaiseeei/yasashii-secretary`
 - 共通plugin path: `plugins/secretary/`
-- 記録済み上流base: `467043802ea030b67d092d86761caffa84675d61`
+- 記録済み上流base: `24520a1d06f8d3833568a1386bf814e1085f5da9`
 - 共通基点: `52016cf10c1c5587fbd83ff2faf3888e29282d5e`
-- release candidate: `0.8.0`
+- release candidate: `0.9.2`
 
 `agentic-secretary` が技術者向けの上流、`yasashii-secretary` が非エンジニア向けの下流です。
 同じGit系譜を共通基点まで保持し、下流は上流の共通安全修正を宣言的overlayで取り込みます。
@@ -39,9 +39,9 @@ README、LICENSE、`docs/spec/`、Sprint、progress、feedback、evidence、公�
 push URLを無効にします。`origin` は引き続き `https://github.com/mtaiseeei/yasashii-secretary.git` です。
 上流へのpushは許可対象にしません。
 
-Sprint 034のGeneratorではremote追加・変更、fetch、push URL変更、GitHub参照、pushが未承認のため、
-実remote設定は変更していません。localの読み取り専用candidate treeだけでoverlayを検証し、
-remote実証は `external-live-gate-unavailable` として引き渡します。
+Sprint 038 Patch 002では、Agentic側で独立評価PASS済みの完全SHAを `git archive` で読み取り専用candidate treeへ展開し、
+local overlayだけを同期します。remote追加・変更、fetch、push URL変更、GitHub参照、pushは行いません。
+既存remote設定を変更せず、宣言上のupstream pushは引き続き `disabled` とします。
 
 ## LICENSEとクレジット
 

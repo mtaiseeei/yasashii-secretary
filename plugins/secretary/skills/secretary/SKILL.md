@@ -46,7 +46,7 @@ Claude Codeの明示入口は `/secretary`、Codexは `$secretary` です。通�
 
 用件を聞くより先に、中断した作業の付箋（再起動しおり `secretary/memory/_resume.md`）が残っていないかを確認する。
 
-- 確認コマンド: `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.sh resume-check <secretary>`（あれば終了コード0）。
+- 確認コマンド: `node "${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.mjs" resume-check <secretary>`（あれば終了コード0）。
 - **しおりがある** → 記憶ケアを段階ロードして「前回の続き」を日常語で提案する。
   読み込む: `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/SKILL.md`（「3. 再起動しおり」に従う）。
   例: 「おかえりなさい。前回は『企画書づくり』の途中でした。続きから始めてよいですか？」
@@ -89,7 +89,7 @@ LINE等の未対応サービスは準備中。Chatworkと明示設定済みGoogl
 このルーターは薄いまま保つが、`rules/conversation-contract.md` を適用し、現在の依頼をしおり、decision 0件確認、project候補より先に扱う。
 
 - 保存操作、対象、保存先が現在の依頼で明示された低リスク操作は、同じassistant turnで正規シームをちょうど1回呼ぶ。
-  決定は一般事項なら`memory-tools.sh remember-decision`、PJ固有なら`project-tools.mjs add-decision`を使い、二重保存しない。
+  決定は一般事項なら`memory-tools.mjs remember-decision`、PJ固有なら`project-tools.mjs add-decision`をNode.jsで使い、二重保存しない。
 - 「〜にしよう」だけで保存操作が明示されない場合、引用、伝聞、仮定、訂正、取り消し、過去依頼の質問は副作用0とし、必要なら1問だけ確認する。
 - 決定検出はLLMによるため完全自動ではない。会話の締めでは、当日のdecisionを確認し、0件なら会話を読み返して
   決定候補の拾い漏れを1回だけ確認する。都度＋締めの二段構えで補う。
@@ -112,9 +112,9 @@ LINE等の未対応サービスは準備中。Chatworkと明示設定済みGoogl
 
 企画書・調査まとめ等の成果物を保存するときは、決定的シームで出力規約（保存先・frontmatter・命名）を守る。
 
-1. 保存: `${SECRETARY_PLUGIN_ROOT}/scripts/workspace-tools.sh save-deliverable <secretary> <YYYY-MM-DD> "<タイトル>" "<タグ,カンマ区切り>"`（本文は標準入力）。
+1. 保存: `node "${SECRETARY_PLUGIN_ROOT}/scripts/workspace-tools.mjs" save-deliverable <secretary> <YYYY-MM-DD> "<タイトル>" "<タグ,カンマ区切り>"`（本文は標準入力）。
    → `secretary/docs/YYYY/MM/YYYY-MM-DD_<タイトル>.md` に `createdAt`／`tags` 入りで保存される。1ファイル1トピック・見出しに固有名詞。
-2. 節目コミット（日本語・push しない）: `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.sh commit <secretary> "成果物を保存（<タイトル>）"`。
+2. 節目コミット（日本語・push しない）: `node "${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.mjs" commit <secretary> "成果物を保存（<タイトル>）"`。
 
 ## 参照
 
@@ -133,4 +133,4 @@ LINE等の未対応サービスは準備中。Chatworkと明示設定済みGoogl
 - 継続する仕事の整理: `${SECRETARY_PLUGIN_ROOT}/skills/projects/SKILL.md`
 - 更新状況の確認: `${SECRETARY_PLUGIN_ROOT}/skills/update/SKILL.md`
 - 開発の入口（やさしいハーネス）: `${SECRETARY_PLUGIN_ROOT}/skills/build/SKILL.md`
-- 成果物・TODO の決定的シーム: `${SECRETARY_PLUGIN_ROOT}/scripts/workspace-tools.sh`
+- 成果物・TODO の決定的シーム: `node "${SECRETARY_PLUGIN_ROOT}/scripts/workspace-tools.mjs"`

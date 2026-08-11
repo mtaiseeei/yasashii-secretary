@@ -45,7 +45,7 @@ Outlook（メール・予定表）・OneDrive・Teams を秘書が参照でき�
 これで認可画面への移動などで会話が途切れても、戻ってきたときに秘書のほうから続きを案内できる。
 
 ```
-${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.sh resume-write <secretary> \
+node "${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.mjs" resume-write <secretary> \
   "Microsoft接続の設定" "現在のhostでMicrosoftの公式App／connectorを確認→認可" "どのMicrosoftアカウントでログインするか"
 ```
 
@@ -111,7 +111,7 @@ Teamsのうち利用するサービスが存在する場合だけ、そのhost�
 実コネクタの成功結果が無ければ接続済みと断定しない。ここでは通常報告を作らず、
 内容と安全条件だけをrouterへ返し、出力形は`plain-language.md` から解決される「最終応答serializer」に任せる。
 
-接続が完了したら、記憶ケアのしおりを閉じる（`memory-tools.sh resume-clear <secretary>`）。
+接続が完了したら、記憶ケアのNode.js helperでしおりを閉じる（`memory-tools.mjs resume-clear <secretary>`）。
 
 ## やらないこと（この案内の範囲）
 
