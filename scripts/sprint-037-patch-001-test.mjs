@@ -60,7 +60,7 @@ function makeWorkspace(prefix) {
 function activeName(path, section) {
   const text = readFileSync(path, "utf8");
   const block = text.split(`## ${section}`)[1]?.split("\n## ")[0] || "";
-  return block.match(/^- 呼び方: (.+)$/mu)?.[1];
+  return block.match(/^- 呼び方: (.+)$/mu)?.[1]?.trimEnd();
 }
 
 const candidateRoot = mkdtempSync(join(tmpdir(), "sprint-037-patch-001-downstream-"));
@@ -99,6 +99,17 @@ try {
     check(`${label}は値を3正本だけへ保存し履歴メタデータへ再掲しない`, () => {
       const { repo, secretary } = makeWorkspace(`sprint-037-patch-001-${label}-`);
       try {
+        const activePaths = [
+          join(secretary, "memory", "preferences.md"),
+          join(secretary, "AGENTS.md"),
+          join(secretary, "memory", "MEMORY.md"),
+        ];
+        for (const path of activePaths) {
+          const crlf = readFileSync(path, "utf8").replace(/\r?\n/gu, "\r\n");
+          writeFileSync(path, crlf, "utf8");
+        }
+        git(repo, "add", ".");
+        git(repo, "commit", "-q", "-m", "CRLF fixture");
         const decisionPath = join(secretary, "memory", "decisions", "2026-01-01-decisions.md");
         const decision = readFileSync(decisionPath);
         const beforeCommits = Number(git(repo, "rev-list", "--count", "HEAD"));
@@ -111,6 +122,9 @@ try {
         assert.equal(activeName(join(secretary, "memory", "preferences.md"), "基本"), fixture.normalized);
         assert.equal(activeName(join(secretary, "AGENTS.md"), "オーナー情報"), fixture.normalized);
         assert.equal(activeName(join(secretary, "memory", "MEMORY.md"), "オーナーの基本"), fixture.normalized);
+        for (const path of activePaths.slice(0, 2)) {
+          assert.doesNotMatch(readFileSync(path, "utf8"), /(^|[^\r])\n/u, `${path} のCRLFを維持する`);
+        }
         assert.deepEqual(readFileSync(decisionPath), decision);
         assert.match(readFileSync(join(secretary, "AGENTS.md"), "utf8"), /projects\/open[\s\S]*projects\/closed/u);
 

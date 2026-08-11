@@ -172,8 +172,9 @@ Google People APIの `contacts.readonly` では、連絡先にない同僚名を
 
 ### 更新を確認する
 
-公開済み`0.7.0`の記録はそのまま残し、最初の明示配布候補を`0.8.0`へ揃えています。「更新ある？」と話しかけると、現在版・最新版・主な変更・設定やファイルへの影響を確認できます。
-この診断はplugin、workspace、Git、Claude Code設定を変更しません。なお、公開済み`0.7.0`の旧updaterにはGoogle Chat標準生成fileで止まる既知のblockerがあるため、`0.7.0 → 0.8.0`のlive updateは今回の配布保証に含めず、`0.8.0`を新規導入する候補として検証しています。
+現在のmanifest candidateは`0.9.2`です。Windowsの日本語・空白を含むworkspaceでも、project、記憶、TODO、設定、文書をNode.jsの共通保存処理で記録できるようにします。workspace migrationはありません。
+「更新ある？」と話しかけると、現在版・最新版、主な変更、設定やファイルへの影響を確認できます。この診断はplugin、workspace、Git、Claude Code設定を変更しません。
+公開済み`0.7.0`の旧updaterにはGoogle Chat標準生成fileで止まる既知のblockerがあるため、`0.7.0 → 0.8.0`のlive updateは配布保証に含めていません。
 失敗時はworkspaceとpluginを別々に復元し、片方しか戻っていない状態を完了と表示しません。
 変更内容の正本は [CHANGELOG](plugins/secretary/CHANGELOG.md) です。
 

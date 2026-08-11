@@ -40,6 +40,15 @@ const downstreamFiles = json(join(overlayRoot, "downstream-files.json"));
 const metadata = json(join(overlayRoot, "metadata-overrides.json"));
 const anchors = json(join(overlayRoot, "anchors.json"));
 const snapshotPath = join(overlayRoot, "upstream-tree.json");
+const overlayDefinitionPaths = [
+  "anchors.json",
+  "downstream-files.json",
+  "downstream-owned.json",
+  "mapping.json",
+  "metadata-overrides.json",
+  "upstream-base.json",
+  "upstream-tree.json",
+];
 
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const slash = (path) => path.split(sep).join("/");
@@ -230,6 +239,45 @@ function ownedDigest() {
   return digestEntries(entries);
 }
 
+function overlayDefinitionDigest() {
+  return digestEntries(overlayDefinitionPaths.map((path) => [path, readBytes(overlayRoot, path)]));
+}
+
+function expectedJson(expected, path) {
+  const bytes = expected.get(path);
+  if (!bytes) throw new Error(`required Yasashii identity surface is unmanaged: ${path}`);
+  return JSON.parse(bytes.toString("utf8"));
+}
+
+function verifyYasashiiExpected(expected) {
+  const claudeMarket = expectedJson(expected, ".claude-plugin/marketplace.json");
+  const codexMarket = expectedJson(expected, ".agents/plugins/marketplace.json");
+  const claudePlugin = expectedJson(expected, "plugins/secretary/.claude-plugin/plugin.json");
+  const codexPlugin = expectedJson(expected, "plugins/secretary/.codex-plugin/plugin.json");
+  const edition = expectedJson(expected, "plugins/secretary/edition.json");
+  const ruleManifest = expectedJson(expected, "plugins/secretary/rules/rule-manifest.json");
+  const failures = [];
+  const requireValue = (condition, label) => { if (!condition) failures.push(label); };
+  requireValue(claudeMarket.name === "yasashii-secretary" && claudeMarket.plugins?.[0]?.name === "yasashii-secretary", "Claude marketplace identity");
+  requireValue(codexMarket.name === "yasashii-secretary" && codexMarket.plugins?.[0]?.name === "yasashii-secretary", "Codex marketplace identity");
+  requireValue(claudePlugin.name === "yasashii-secretary" && claudePlugin.repository === "https://github.com/mtaiseeei/yasashii-secretary", "Claude manifest identity");
+  requireValue(codexPlugin.name === "yasashii-secretary" && codexPlugin.repository === "https://github.com/mtaiseeei/yasashii-secretary", "Codex manifest identity");
+  requireValue(edition.edition === "yasashii-secretary", "edition identity");
+  requireValue(edition.distribution?.pluginId === "yasashii-secretary@yasashii-secretary", "install identity");
+  requireValue(edition.distribution?.repository === "https://github.com/mtaiseeei/yasashii-secretary", "distribution repository");
+  requireValue(edition.copy?.path === "rules/copy/yasashii.json", "Yasashii copy route");
+  requireValue(edition.harness?.repository === "https://github.com/mtaiseeei/yasashii-harness", "Yasashii Harness repository");
+  requireValue(edition.harness?.hosts?.claudeCode?.installId === "harness@yasashii-harness" && edition.harness?.hosts?.codex?.installId === "harness@yasashii-harness", "Yasashii Harness install identity");
+  requireValue(Boolean(ruleManifest.rules?.["yasashii-style"]) && !ruleManifest.rules?.["agentic-style"], "Yasashii style rule");
+  if (failures.length) throw new Error(`Yasashii protected surface changed: ${failures.join(", ")}`);
+
+  const canonical = expected.get("plugins/secretary/CHANGELOG.md");
+  const legacy = expected.get("plugins/yasashii-secretary/CHANGELOG.md");
+  requireValue(Boolean(canonical) && Boolean(legacy) && canonical.equals(legacy), "canonical/legacy CHANGELOG parity");
+  requireValue(Boolean(canonical) && canonical.toString("utf8").startsWith("# 変更履歴\n\n## [0.9.2]"), "0.9.2 CHANGELOG head");
+  if (failures.length) throw new Error(`Yasashii protected surface changed: ${failures.join(", ")}`);
+}
+
 function verifyNeutralizationAncestor() {
   for (const [label, directory] of [["downstream", root], ["upstream", candidateRoot]]) {
     const inside = runGit(directory, ["rev-parse", "--is-inside-work-tree"], { allowFailure: true });
@@ -287,6 +335,7 @@ function prepare() {
   const snapshot = verifySnapshot();
   verifyNeutralizationAncestor();
   const expected = expectedManaged(snapshot);
+  verifyYasashiiExpected(expected);
   return { snapshot, expected };
 }
 
@@ -294,12 +343,16 @@ function applyOnce() {
   const { snapshot, expected } = prepare();
   verifyDownstreamInventory(snapshot);
   const beforeOwned = ownedDigest();
+  const beforeOverlay = overlayDefinitionDigest();
   const changed = writeExpected(expected);
   const afterOwned = ownedDigest();
+  const afterOverlay = overlayDefinitionDigest();
   if (beforeOwned !== afterOwned) throw new Error("repo-owned files changed during overlay apply");
+  if (beforeOverlay !== afterOverlay) throw new Error("overlay definitions changed during overlay apply");
   verifyDownstreamInventory(snapshot);
   compareExpected(expected);
-  return { snapshot, expected, changed, ownedDigest: afterOwned };
+  verifyYasashiiExpected(expected);
+  return { snapshot, expected, changed, ownedDigest: afterOwned, overlayDigest: afterOverlay };
 }
 
 try {
@@ -309,20 +362,20 @@ try {
     const { snapshot, expected } = prepare();
     verifyDownstreamInventory(snapshot);
     compareExpected(expected);
-    console.log(`OVERLAY_CHECK_PASS base=${base.baseCommit} managed=${expected.size} repoOwnedDigest=${ownedDigest()}`);
+    console.log(`OVERLAY_CHECK_PASS base=${base.baseCommit} managed=${expected.size} repoOwnedDigest=${ownedDigest()} overlayDigest=${overlayDefinitionDigest()}`);
     console.log(`REMOTE_GATE ${base.externalLiveGate} origin=${base.remoteContract.originRepository} upstreamFetch=${base.remoteContract.upstreamFetchRepository} upstreamPush=${base.remoteContract.upstreamPush}`);
   } else if (mode === "--apply") {
     const result = applyOnce();
-    console.log(`OVERLAY_APPLY_PASS base=${base.baseCommit} changed=${result.changed} managed=${result.expected.size} repoOwnedDigest=${result.ownedDigest}`);
+    console.log(`OVERLAY_APPLY_PASS base=${base.baseCommit} changed=${result.changed} managed=${result.expected.size} repoOwnedDigest=${result.ownedDigest} overlayDigest=${result.overlayDigest}`);
   } else if (mode === "--reapply") {
     const first = applyOnce();
     const firstDigest = digestEntries(first.expected);
     const second = applyOnce();
     const secondDigest = digestEntries(second.expected);
-    if (firstDigest !== secondDigest || second.changed !== 0 || first.ownedDigest !== second.ownedDigest) {
+    if (firstDigest !== secondDigest || second.changed !== 0 || first.ownedDigest !== second.ownedDigest || first.overlayDigest !== second.overlayDigest) {
       throw new Error("overlay reapply is not idempotent");
     }
-    console.log(`OVERLAY_REAPPLY_PASS digest=${secondDigest} secondChanged=${second.changed} repoOwnedDigest=${second.ownedDigest}`);
+    console.log(`OVERLAY_REAPPLY_PASS digest=${secondDigest} secondChanged=${second.changed} repoOwnedDigest=${second.ownedDigest} overlayDigest=${second.overlayDigest}`);
   }
 } catch (error) {
   console.error(`OVERLAY_FAIL ${error.message}`);

@@ -1,10 +1,16 @@
 import {
+  constants,
+  copyFileSync,
   existsSync,
   lstatSync,
   mkdirSync,
+  readdirSync,
+  readlinkSync,
   realpathSync,
   renameSync,
   rmSync,
+  statSync,
+  symlinkSync,
   unlinkSync,
   writeFileSync,
 } from "node:fs";
@@ -29,6 +35,14 @@ function insideOrSame(root, target) {
   return rel === "" || (rel !== ".." && !rel.startsWith(`..${sep}`) && !isAbsolute(rel));
 }
 
+function isPlatformRootAlias(path) {
+  if (process.platform !== "darwin" || (path !== "/var" && path !== "/tmp")) return false;
+  try {
+    const resolved = realpathSync(path);
+    return (path === "/var" && resolved === "/private/var") || (path === "/tmp" && resolved === "/private/tmp");
+  } catch { return false; }
+}
+
 export function workingRoot(value) {
   const requested = resolve(value || ".");
   const root = parse(requested).root;
@@ -37,7 +51,7 @@ export function workingRoot(value) {
   for (const component of components) {
     cursor = join(cursor, component);
     const componentStat = lstatOptional(cursor);
-    if (componentStat?.isSymbolicLink()) {
+    if (componentStat?.isSymbolicLink() && !isPlatformRootAlias(cursor)) {
       throw new FilesystemBoundaryError("working rootの途中にsymlinkがあるため、変更を止めました。", "working-root-unsafe");
     }
   }
@@ -169,4 +183,40 @@ export function removeSafe(root, value, { recursive = false } = {}) {
   }
   rmSync(path);
   return { removed: true, kind: "file" };
+}
+
+// Node.js 22 on Windows can crash while cpSync recursively copies a directory
+// whose path contains Japanese characters. Walk the tree ourselves and copy
+// only one entry at a time. Symbolic links are copied as link objects and are
+// never traversed.
+export function copyTreeNoFollow(source, destination) {
+  if (lstatOptional(destination)) {
+    throw new FilesystemBoundaryError("コピー先が既に存在するため変更を止めました。", "copy-target-exists");
+  }
+  const stat = lstatOptional(source);
+  if (!stat) {
+    throw new FilesystemBoundaryError("コピー元を確認できないため変更を止めました。", "copy-source-missing");
+  }
+  if (stat.isSymbolicLink()) {
+    const target = readlinkSync(source);
+    let type;
+    if (process.platform === "win32") {
+      try { type = statSync(source).isDirectory() ? "junction" : "file"; }
+      catch { type = "file"; }
+    }
+    symlinkSync(target, destination, type);
+    return destination;
+  }
+  if (stat.isFile()) {
+    copyFileSync(source, destination, constants.COPYFILE_EXCL);
+    return destination;
+  }
+  if (!stat.isDirectory()) {
+    throw new FilesystemBoundaryError("通常file／directory以外はコピーできません。", "copy-source-unsafe");
+  }
+  mkdirSync(destination, { mode: stat.mode });
+  for (const entry of readdirSync(source, { withFileTypes: true })) {
+    copyTreeNoFollow(join(source, entry.name), join(destination, entry.name));
+  }
+  return destination;
 }

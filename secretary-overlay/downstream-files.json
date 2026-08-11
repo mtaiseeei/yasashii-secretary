@@ -3,6 +3,7 @@
   "description": "上流treeに存在せず、downstream overlayが所有するfile。",
   "files": [
     "scripts/sprint-034-test.mjs",
+    "scripts/sprint-038-patch-002-test.mjs",
     "scripts/sync-secretary-overlay.mjs",
     "secretary-overlay/README.md",
     "secretary-overlay/anchors.json",

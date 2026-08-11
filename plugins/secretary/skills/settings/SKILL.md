@@ -51,7 +51,7 @@ output stylesには依存しない。
    - 呼び方:
      `node "${SECRETARY_PLUGIN_ROOT}/scripts/owner-name-transaction.mjs" <secretary> "<確認済みの値>"`
    - それ以外:
-     `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.sh pref-set <secretary> "<セクション>" "<キー>" "<値>"`
+     `node "${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.mjs" pref-set <secretary> "<セクション>" "<キー>" "<値>"`
 5. `こう覚えました: <変更項目>=<値>` と宣言する。他項目を変えていないことも短く伝える。
 6. 呼び方以外は、宣言後に `journal-add <secretary> did "設定を変更: <変更項目>=<値>"` を1回だけ呼ぶ。
 7. 呼び方以外は、最後に `commit <secretary> "設定を変更（<変更項目>: <値>）"` を呼ぶ。
@@ -100,4 +100,4 @@ output stylesには依存しない。
 - preferences雛形: `${SECRETARY_PLUGIN_ROOT}/templates/memory/preferences.md`
 - 呼び方候補: `${SECRETARY_PLUGIN_ROOT}/scripts/name-candidates.mjs`
 - 呼び方の3正本同期・journal・local commit: `${SECRETARY_PLUGIN_ROOT}/scripts/owner-name-transaction.mjs`
-- その他の部分更新・追記・journal・commit: `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.sh`
+- その他の部分更新・追記・journal・commit: `node "${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.mjs"`

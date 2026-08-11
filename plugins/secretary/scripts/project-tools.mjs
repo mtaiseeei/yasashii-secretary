@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import { existsSync, lstatSync, readFileSync, writeFileSync, mkdirSync, rmSync, renameSync, cpSync, readdirSync } from "node:fs";
-import { basename, dirname, join, resolve } from "node:path";
+import { existsSync, lstatSync, readFileSync, writeFileSync, mkdirSync, rmSync, renameSync, readdirSync } from "node:fs";
+import { basename, dirname, join, parse, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { runExternalSync } from "./lib/external-ops.mjs";
-import { safeWritePath, workingRoot } from "./lib/safe-fs.mjs";
+import { copyTreeNoFollow, safeWritePath, workingRoot } from "./lib/safe-fs.mjs";
+import { journalAppend, todoAdd } from "./lib/secretary-store.mjs";
 
 class ProjectError extends Error {
   constructor(message, code = 3) {
@@ -16,8 +16,6 @@ class ProjectError extends Error {
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const editionConfig = JSON.parse(readFileSync(resolve(scriptDir, "../edition.json"), "utf8"));
 const harnessHosts = editionConfig.harness.hosts;
-const memoryTools = resolve(scriptDir, "../skills/memory-care/scripts/memory-tools.sh");
-const workspaceTools = resolve(scriptDir, "workspace-tools.sh");
 const coreFiles = new Set(["AGENTS.md", "CLAUDE.md", "PROJECT.md", "DECISIONS.md", "MEMORY.md", "INDEX.md", "TODO.md"]);
 
 function usage(message) {
@@ -74,8 +72,15 @@ function validateName(value) {
 }
 
 function secretaryRoot(value) {
-  try { return workingRoot(value); }
-  catch { refuse(`秘書ディレクトリが通常のdirectoryではないため、安全に操作できません: ${value}`); }
+  try {
+    const root = workingRoot(value);
+    if (root === parse(root).root) refuse("ドライブまたはfilesystemの直下は秘書ディレクトリとして使えません。");
+    return root;
+  }
+  catch (error) {
+    if (error instanceof ProjectError) throw error;
+    refuse(`秘書ディレクトリが通常のdirectoryではないため、安全に操作できません: ${value}`);
+  }
 }
 
 function safePath(root, rel) {
@@ -224,18 +229,11 @@ function writeMarkdown(path, value) {
 }
 
 function runJournal(root, type, message) {
-  let result;
   try {
-    result = runExternalSync("bash", [memoryTools, "journal-add", root, type, message], {
-      encoding: "utf8",
-      timeoutMs: Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000),
-      label: "journal記録",
-      allowFailure: true,
-    });
+    journalAppend(root, type, message);
   } catch (error) {
-    refuse(error?.code === "timeout" ? "journalの記録が時間切れになりました。後続処理は行っていません。" : "journalの記録を安全に完了できませんでした。");
+    refuse(error instanceof Error ? error.message : "journalの記録を安全に完了できませんでした。");
   }
-  if (result.status !== 0) refuse((result.stderr || result.stdout || "journalの記録に失敗しました。").trim());
 }
 
 function mutateProject(root, name, { create = false, journalType = "did", journalMessage }, mutate) {
@@ -252,7 +250,7 @@ function mutateProject(root, name, { create = false, journalType = "did", journa
   const backup = safePath(root, `projects/.project-backup-${nonce}`);
   try {
     if (create) mkdirSync(stage);
-    else cpSync(target, stage, { recursive: true, dereference: false, errorOnExist: true });
+    else copyTreeNoFollow(target, stage);
     mutate(stage);
     if (!existsSync(join(stage, "PROJECT.md"))) refuse("PROJECT.md が生成されませんでした。変更を中止します。");
     if (create) {
@@ -293,7 +291,7 @@ function moveProject(root, name, fromScope, toScope, { journalType = "did", jour
   const stage = safePath(root, `projects/.project-stage-${nonce}`);
   const backup = safePath(root, `projects/.project-backup-${nonce}`);
   try {
-    cpSync(source, stage, { recursive: true, dereference: false, errorOnExist: true });
+    copyTreeNoFollow(source, stage);
     mutate(stage);
     if (!existsSync(join(stage, "PROJECT.md"))) refuse("PROJECT.md が生成されませんでした。変更を中止します。");
     renameSync(source, backup);
@@ -594,18 +592,11 @@ function cmdTodo(argv) {
   const due = options.get("--due") ?? "";
   if (due && !/^\d{4}-\d{2}-\d{2}$/.test(due)) usage("--due は YYYY-MM-DD 形式で指定してください。");
   const linked = `${todo} [PJ: ${name} / ${project.rel}/PROJECT.md]`;
-  let result;
   try {
-    result = runExternalSync("bash", [workspaceTools, "todo-add", root, linked, source, due], {
-      encoding: "utf8",
-      timeoutMs: Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000),
-      label: "TODO追加",
-      allowFailure: true,
-    });
+    todoAdd(root, linked, source, due);
   } catch (error) {
-    throw new ProjectError(error?.code === "timeout" ? "TODO追加が時間切れになりました。後続処理は行っていません。" : "TODO追加を安全に完了できませんでした。", 3);
+    throw new ProjectError(error instanceof Error ? error.message : "TODO追加を安全に完了できませんでした。", error?.exitCode === 2 ? 2 : 3);
   }
-  if (result.status !== 0) throw new ProjectError((result.stderr || result.stdout).trim(), result.status === 2 ? 2 : 3);
   console.log(`PJ参照つきTODOを正本へ追加しました: inbox/todo.md`);
 }
 

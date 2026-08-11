@@ -7,6 +7,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/.." && pwd)"
 PLUGIN="$REPO/plugins/secretary"
 MEM="$PLUGIN/skills/memory-care/scripts/memory-tools.sh"
+MEM_NODE="$PLUGIN/skills/memory-care/scripts/memory-tools.mjs"
 WORKSPACE="$PLUGIN/scripts/workspace-tools.sh"
 TEMPLATES="$PLUGIN/templates"
 PASS=0
@@ -25,7 +26,8 @@ cp -R "$TEMPLATES/." "$SEC/"
 assert "timeline関連shellの構文が有効" \
   "bash -n '$PLUGIN/scripts/lib/timeline.sh' '$MEM' '$WORKSPACE'"
 assert "timeline共有ライブラリが存在" "[ -f '$PLUGIN/scripts/lib/timeline.sh' ]"
-assert "memory-toolsがtimelineを公開" "grep -q 'timeline)' '$MEM'"
+assert "memory-toolsがtimelineを公開" \
+  "grep -q 'memory-tools.mjs' '$MEM' && grep -q 'case \"timeline\"' '$MEM_NODE'"
 
 CC_SECRETARY_NOW=2026-07-14T09:00:00+09:00 "$MEM" remember-decision "$SEC" 2026-07-14 \
   "Zoomはオンライン開催にする" >/dev/null
