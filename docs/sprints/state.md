@@ -5,7 +5,7 @@
 - Current ID: sprint-039
 - Retry Count: 1
 - Spec-Issue Count: 1
-- Lineage Dispatches: 5
+- Lineage Dispatches: 6
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
@@ -69,13 +69,14 @@
 | sprint-037 | done | [contract](sprint-037.md) | [progress](../progress/sprint-037.md) | [feedback](../feedback/sprint-037.md) |
 | sprint-038 | done | [contract](sprint-038.md) | [progress](../progress/sprint-038.md) | [feedback](../feedback/sprint-038.md) |
 | sprint-038-patch-002 | done-by-user-decision | [contract](sprint-038-patch-002.md) | [progress](../progress/sprint-038-patch-002.md) | [feedback](../feedback/sprint-038-patch-002.md) |
-| sprint-039 | active | [contract](sprint-039.md) | [progress](../progress/sprint-039.md) | [feedback](../feedback/sprint-039.md) |
+| sprint-039 | awaiting-eval | [contract](sprint-039.md) | [progress](../progress/sprint-039.md) | [feedback](../feedback/sprint-039.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-14: spec修正後のfresh strong Generatorは製品candidate `65dccf6`を変更せず、Planner正本と実装がaccepted `3fa8d97`／`c810f60c`、commonPaths 16件、13 parity＋3 anchors、追加safe paths、overlay handoff所有fieldで整合し、旧値は履歴docs外0件と確認した。実repo、clean checkout、Git-free archiveでPatch 16/16、Sprint 039 69/69＋7/7、Git safety 71/71、release 2/2、schema、overlay 6/6、二回目差分0を確認。fresh独立Evaluator dispatch予約としてLineage Dispatchesを6、Statusをawaiting-eval、Model Tier strong、Rotate noneとする。release holdを維持する。
 - 2026-08-14: fresh Plannerがspec-issueを修正し、Agentic固定入力をpublic patch PASS／done済み `3fa8d97e5dbfb2afa314f4ad179f17401b76d320`／`c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557`へ更新した。commonPaths 16件、13 byte parity＋Yasashii固有3 anchors、`external-ops.mjs`／`safe-git.mjs`、overlay handoff所有fieldを正本化し、製品方向、AC閾値、安全境界、release範囲は不変。fresh strong Generatorで実装と更新済み正本の整合を再確認するためLineage Dispatchesを5、Status active、Model Tier strong、Rotate noneとする。
 - 2026-08-14: Retry 1 fresh独立Evaluatorは製品candidate `65dccf6` の旧P1／P2解消、clean checkout／Git-free archive、正式16 Skills、schema 21 surfaces、release integrity、所有path限定checkpoint、commit／post-commit rollback、overlay未分類0／二回目差分0を確認し、product finding 0件、blocking verification-infra 0件とした。一方、Planner正本が旧固定入力 `3e08eb6`／`7498d3` のままで、実装がpublic patch PASS済みのaccepted入力 `3fa8d97`／`c810f6`へ進んだ事実と不整合なため、判定はFAIL `spec-issue`。Retry Countは1、Lineage Dispatchesは4を維持し、Spec-Issue Countを1、Statusをactiveとしてfresh Plannerへ戻す。release holdを維持する。
 - 2026-08-14: Retry 1 strong Generatorが、fresh public Evaluator PASS済みの固定Agentic candidate `3fa8d97e5dbfb2afa314f4ad179f17401b76d320`、common digest `c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557` をoverlay正本へ再同期した。正式16 Skillsのexact inventoryと同数unknown差し替えnegative、所有pathだけの実Git checkpoint、commit失敗／commit後失敗rollbackを追加し、overlay未分類0・reapply `secondChanged=0`、Patch 16/16、Sprint 039 69/69＋wrapper 7/7、release integrity 2/2、schema、clean checkout相当とGit-free archiveを0 FAILで確認した。製品candidate `65dccf6` をfresh独立Evaluatorへ渡すため、Lineage Dispatchesを4、Statusをawaiting-eval、Model Tier strong、Rotate noneとする。実HOME、cache、private版、Mac mini、remote、release変更は0件を維持する。
