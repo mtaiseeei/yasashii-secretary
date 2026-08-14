@@ -4,9 +4,9 @@
 
 - Current ID: sprint-039-patch-001
 - Retry Count: 0
-- Spec-Issue Count: 1
+- Spec-Issue Count: 0
 - Lineage Dispatches: 9
-- Model Tier: strong
+- Model Tier: standard
 - Rotate: none
 - Next Planned: TBD
 
@@ -70,13 +70,14 @@
 | sprint-038 | done | [contract](sprint-038.md) | [progress](../progress/sprint-038.md) | [feedback](../feedback/sprint-038.md) |
 | sprint-038-patch-002 | done-by-user-decision | [contract](sprint-038-patch-002.md) | [progress](../progress/sprint-038-patch-002.md) | [feedback](../feedback/sprint-038-patch-002.md) |
 | sprint-039 | done | [contract](sprint-039.md) | [progress](../progress/sprint-039.md) | [feedback](../feedback/sprint-039.md) |
-| sprint-039-patch-001 | awaiting-eval | [contract](sprint-039-patch-001.md) | [progress](../progress/sprint-039-patch-001.md) | - |
+| sprint-039-patch-001 | done | [contract](sprint-039-patch-001.md) | [progress](../progress/sprint-039-patch-001.md) | [feedback](../feedback/sprint-039-patch-001.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-14: Sprint 039 Patch 001はproduct／test candidate `372791fdcd99eb5deb42199a97257ff53b63612e` でfresh独立Evaluator PASS。overlay fixed upstream product `3ef792819a4a445df089f70aa74ca09176762e5e`、digest `a7d74a7a9bb42ea67815a75132acf588fe312314f98b7f9685cef97fdfca59c9`、20 paths＝16 parity＋4 anchors、secondChanged=0。独自workspaceでread-only digest一致、post-commit完全rollback、retryの4 owned paths限定commit、CRLF／mode／自由記述／Git状態／user-scope不変、rerun commit0、README許可1段落以外のsentinel digest一致を確認。clean checkout／Git-free archive wrapper各0 FAIL、archive master required17/17・308 PASS／0 FAIL・infra0。product finding 0、blocking verification-infra0、必須内部未検証0、C2／C5／C6／C9／C10／C13／C14／C16／C17／C18は全5/5。Windows nativeはnot-runのまま、external write0。Status done、Retry／Spec-Issue0、Lineage Dispatches9、全計画完了のためModel Tier standard、Rotate noneとしてrelease運用phaseへ渡す。
 - 2026-08-14: Sprint 039 Patch 001 Generatorが最終product／test candidate `372791fdcd99eb5deb42199a97257ff53b63612e`、progress commit `eb74e799999a093032bd0dac13c53afb5bf74eee` を作成。accepted upstream20 pathsを16 byte parity＋4 Yasashii anchorsとしてoverlay同期し、既存v0.10.0完全migration、update handoff、0.10.1 current、checkpoint／rollback／retry／rerunを実装。READMEは許可されたcurrent／migration段落だけ更新し、Yasashii文体・構造・semantic anchorを保持、他段落と0.10.0以前の履歴bytesを不変とした。clean checkout／Git-free archive両面でoverlay check／reapply、secondChanged=0、overlay6/6、Patch wrapper10/10、migration23/23、rename16/16、Sprint039 69/69、Git safety71/71、Sprint035 15/15、schema、release integrityを0 FAIL。archive master required17/17、308 PASS／0 FAIL、verification-infra0。開始HEADのhistorical stale10 FAILは同じ7 suiteで再現し、正式anchor追随後0 FAIL、製品意味・安全境界・履歴bytesを緩和していない。実HOME、cache、private、Mac mini、remote、release write 0。fresh独立Evaluator予約としてLineage Dispatches 9、Status awaiting-eval、Retry 0、Spec-Issue 1、Model Tier strong、Rotate noneとする。
 - 2026-08-14: fresh PlannerがSprint 039 Patch 001のspec-issueを限定修正。AC3のREADME全体digest不変を撤回し、0.10.1 current release／既存workspace migrationを説明する製品所有段落だけを更新可能とした。同段落はYasashii固有の文体・構造とsemantic anchorを保持し、それ以外のREADME section／段落と他保護surfaceはdigest不変。Scope G／AC17／C18と整合し、新規AC・閾値追加はない。Retry Count 0、Spec-Issue Count 1、Model Tier strongを維持し、fresh strong Generator dispatch予約としてLineage Dispatchesを8、Status active、Rotate noneとする。
 - 2026-08-14: Sprint 039 Patch 001 Generatorの着手前確認で、契約AC3のREADME開始前後digest不変と、AC17／GのREADMEを0.10.1 current candidateへ整合する要求が明文衝突していることを検出した。現READMEは0.10.0と「workspace migrationはありません」を明記するため、全byte不変では今回の利用者向け事実を表せない。Generatorの独自解釈で進めずproduct編集を停止し、Retry Count／Model Tierを消費せずSpec-Issue Countを1、Lineage Dispatches 7、Status active、Model Tier strong、Rotate noneのままfresh Plannerへ戻す。PlannerはYasashii固有の文体・構造・範囲外段落を保護しつつ、current release／migration段落だけを0.10.1へ更新可能な契約へ矛盾なく直す。
