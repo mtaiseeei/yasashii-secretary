@@ -279,6 +279,11 @@ Chatwork／Google Chatの共有wizard assetを同期した場合は、DOM、copy
 一致を確認し、edition固有surfaceの開始前後digestが変わらないことを下流側の独立回帰で証明する。
 呼び方候補の共通scripts、onboarding、settings transactionを同期した場合も、共通動作を別実装へ複製せず、
 Yasashii固有copy、identity、manifest、README、repo-owned docsを開始前後digestで保護する。
+秘書identity機能の同期では、固定Agentic candidateに含まれる `adapters/downstream-identity-handoff.json` をhandoff正本とし、
+その `commonPaths` だけをoverlay対象にする。Agentic側のspec、Sprint、progress、feedback、state、release記録は取り込まない。
+英語名、stable identity、AI author、名前Skill、canonical resolver、user-scope managed block、直接呼びかけrouting、
+分類付き改名とrollbackの意味は共通のまま維持する一方、Yasashii固有copy、style、rule manifest、README、identity、
+overlay metadata、LICENSEは下流所有としてdigestを保護する。
 
 ## 公開gate
 

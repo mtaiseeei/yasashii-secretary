@@ -2,12 +2,12 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-038-patch-002
+- Current ID: sprint-039
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 4
-- Model Tier: standard
-- Rotate: none
+- Lineage Dispatches: 1
+- Model Tier: strong
+- Rotate: model-escalation
 - Next Planned: TBD
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
@@ -69,12 +69,14 @@
 | sprint-037 | done | [contract](sprint-037.md) | [progress](../progress/sprint-037.md) | [feedback](../feedback/sprint-037.md) |
 | sprint-038 | done | [contract](sprint-038.md) | [progress](../progress/sprint-038.md) | [feedback](../feedback/sprint-038.md) |
 | sprint-038-patch-002 | done-by-user-decision | [contract](sprint-038-patch-002.md) | [progress](../progress/sprint-038-patch-002.md) | [feedback](../feedback/sprint-038-patch-002.md) |
+| sprint-039 | active | [contract](sprint-039.md) | [progress](../progress/sprint-039.md) | [feedback](../feedback/sprint-039.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-14: Agentic共通コアSprint 039が製品candidate `3e08eb6d377392440e753bd5073c73d1d63399b6`、common digest `7498d3550734ba63b689463f01e2a52e16d2ce3f8eb31cebead16aef2181f883` でfresh独立Evaluator PASS。Plannerが同固定SHAのhandoff commonPathsだけをoverlay正本経由で同期し、英語名、stable identity、AI author、name Skill、canonical resolver、user-scope routing、P1〜P4解消済みrenameをYasashii固有copy／style／rule manifest／README／identity／LICENSE保護と両立させるhigh-risk main Sprint 039を確定した。新main SprintとしてRetry Count／Spec-Issue Count／Lineage Dispatchesを0から開始し、fresh strong Generator dispatch予約としてLineage Dispatches 1、Model Tier strong、Rotate model-escalation、Status activeとする。private版、実HOME／cache、Mac mini、remote、releaseは本Sprint外で変更0件を維持する。
 - 2026-08-11: ユーザーが「windowsはさっきのでPASSしたんだからもういいんじゃないの？」に続けて「はい、進めてください」と明示し、Yasashii candidate自身で同じWindows native testを再実行しない残余証跡差を引き受けて完了を選択した。既存のWindows実機証跡は、Agentic Harness `4e2f9b921e01b5d7daadfd4b3c6340b4544f893a` の `WINDOWS_INIT_PASS=8 FAIL=0 OS=win32` とAgentic Secretary `24520a1d06f8d3833568a1386bf814e1085f5da9` の `SPRINT038_PATCH002_WINDOWS_PASS=12 FAIL=0 OS=win32`、いずれもexit 0・開始時／終了時clean。Yasashii Harness `ca3d3a939b8e9c4c3e5041c5c9fd372b3fbc19be` とYasashii Secretaryの製品／test／overlay candidate `eb757e6a9382378e1dbd7a8bad00ba990a1f7ad3` は修正済みWindows共通実装をbyte一致で取り込み、下流で変更したedition overlay、identity、rule manifestはWindows path／保存／initializer実装を変更していない。macOS同一labels、overlay check／reapply、common parity、targeted archive、release integrityはgreenで、product finding 0件。Evaluator feedbackのV1（Yasashii candidate自身のWindows native未実行）は書き換えず残余リスクとして保持し、Harnessの `done-by-user-decision` 例外によりsprint-038-patch-002を完了する。Status `done-by-user-decision`、Retry Count 0、Spec-Issue Count 0、Lineage Dispatches 4、Model Tier standard、Rotate none、Next Planned TBDとする。これはリリース実行の承認ではなく、PR／merge／tag／Release／marketplace公開は対象・rollback提示後の別確認まで保留する。
 - 2026-08-11: verification-scope-issueに対し、ユーザーが「OK」と明示し、Windows実機へ候補を渡すための検証branch限定pushを承認した。Yasashii Secretaryはremote branch `codex/sprint-038-patch-002-windows-compat` へ、製品／test／overlay candidate `eb757e6a9382378e1dbd7a8bad00ba990a1f7ad3` をancestorとして含むbranchをpush。Yasashii Harnessはremote branch `codex/windows-init-permission-preflight` へcandidate `ca3d3a939b8e9c4c3e5041c5c9fd372b3fbc19be` をpushした。用途はユーザー所有WindowsでSecretary 12/12、Harness 8/8を取得することだけで、PR、merge、tag、GitHub Release、marketplace公開、plugin install／update、private版、cache、利用者workspace、外部service変更は0件。失敗・中止時は各remote検証branchを削除でき、mainや公開版へ影響しない。Status active、Retry Count 1、Lineage Dispatches 4、Model Tier strong、Rotate noneを維持し、実機結果受領後にcandidate不変を確認してfresh最終Evaluatorへ進む。
 - 2026-08-11: Retry 1 fresh独立EvaluatorはNOT PASS／HOLD、主分類 `verification-scope-issue` のみ。P1はRESOLVEDで、priorityは5 rulesを各1回、`agentic-style` 0件、`conversation-contract` は `yasashii-style` より前、Yasashii dependencies 4件を独立確認し、新規product finding 0件。Patch 14/14、Sprint 034 11/11、038 64/64、022 core69＋wrapper8、release integrity、Git-free targeted archive14/14、macOS同一Windows labels12/12、overlay check／reapply、fixed upstream common parity、Yasashii固有surfaceをPASSした。Sprint 029 oracleは未変更で、旧graph assertion解消後の無関係historical文言driftと、広いarchiveの既知12 FAILはgreenへ昇格せず分離した。残るblockerは製品／test／overlay candidate `eb757e6a9382378e1dbd7a8bad00ba990a1f7ad3` のYasashii Windows native 12/12未実行だけで、Generator差し戻しは不要。Statusをactiveへ戻し、Retry Count 1、Lineage Dispatches 4、Model Tier strong、Rotate noneを維持する。検証branch push、Windows実機証跡採用、fresh最終Evaluator PASSの順で進め、release holdを維持する。

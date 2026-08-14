@@ -1,6 +1,6 @@
 # Features
 
-機能IDと、ユーザーから見える振る舞いの正本。F01〜F16 は受け入れ済みの既存機能、F17〜F22 は 2026-07-15 方針転換、F23〜F27 は 2026-07-16 のsingle-repo Git-first + Chatwork方針、F28 は 2026-07-17 の一般プロジェクト管理方針、F29 は配布チャネルから独立した製品説明、F30〜F31 は更新の説明と実行を分ける安全な更新体験、F32〜F35 は各社所有Google Cloudプロジェクトを使うGoogle Chat同期、F36〜F43 は `0.7.0` の配布前監査を閉じたrelease hardening、F44〜F50 は次候補 `0.8.0` で2 editionへ安全に分離する機能、F51は両edition共通の会話可読性、F52は4つの正式対象ホストへ拡張できるホスト非依存の共通本体と各ホストの正式配布adapter、F53は別Pluginの対応Harness 0.5.1へ安全に追随する機能、F54はhost-neutralなplugin root解決と両editionのCodex正式配布parity、F55は利用者中立の呼び方と配布物を合格済み上流candidateから安全に同期する機能である。
+機能IDと、ユーザーから見える振る舞いの正本。F01〜F16 は受け入れ済みの既存機能、F17〜F22 は 2026-07-15 方針転換、F23〜F27 は 2026-07-16 のsingle-repo Git-first + Chatwork方針、F28 は 2026-07-17 の一般プロジェクト管理方針、F29 は配布チャネルから独立した製品説明、F30〜F31 は更新の説明と実行を分ける安全な更新体験、F32〜F35 は各社所有Google Cloudプロジェクトを使うGoogle Chat同期、F36〜F43 は `0.7.0` の配布前監査を閉じたrelease hardening、F44〜F50 は次候補 `0.8.0` で2 editionへ安全に分離する機能、F51は両edition共通の会話可読性、F52は4つの正式対象ホストへ拡張できるホスト非依存の共通本体と各ホストの正式配布adapter、F53は別Pluginの対応Harness 0.5.1へ安全に追随する機能、F54はhost-neutralなplugin root解決と両editionのCodex正式配布parity、F55は利用者中立の呼び方と配布物、F56はWindows native保存、F57は英語の秘書名とstable identityを合格済み上流candidateから安全に同期する機能である。
 
 ## 既存機能（F01〜F16）
 
@@ -432,19 +432,38 @@ overlay定義を保護し、Yasashii Secretary `0.9.2` のmanifest、marketplace
 release gateを一致させる。private版、installed cache、利用者workspaceへは反映せず、my-vault対応済みとも表示しない。
 UIは変更しない。
 
+### F57 英語の秘書名、stable identity、別repoからの呼び出し
+
+初回オンボーディングでは、利用者の呼び方とは別に秘書自身の英語名を決める。利用者は英語名を指定するか、
+秘書から候補を提案してもらえる。既存利用者は専用の名前Skillから同じ設定へ進み、後から変更できる。
+名前は表示名、変更されないstable identityは同じ秘書を追跡する内部識別として分離する。秘書が作成した文書や記録では
+人が作成したものと区別できるAI author表現を用い、改名後も過去の作者を一括置換せず当時名とaliasの関係を保つ。
+
+別repoからはcanonical resolver、つまり正本の秘書workspaceを一意に見つける仕組みを通して同じ秘書へ接続する。
+利用者が選んだ場合だけ、Codexのユーザーscope `AGENTS.md` とClaude Codeのユーザーscope `CLAUDE.md` に
+製品管理blockを置き、「Alex、…」「Alexに聞いて」のような直接呼びかけを秘書へ案内する。取引先、著者、担当者など
+実在人物として同名が現れる文脈ではroutingせず、曖昧な場合は一度だけ確認する。名前変更は現行設定、製品管理block、
+現役の参照候補、利用者文書、履歴を先に分類して影響を示し、確認後だけ安全な対象を変更する。途中失敗は開始前へ戻す。
+
+この共通機能は、独立評価PASS済みAgentic Secretary製品candidate
+`3e08eb6d377392440e753bd5073c73d1d63399b6` と `adapters/downstream-identity-handoff.json` を正本とし、
+manifestの `commonPaths` だけをYasashii overlayへ同期する。共通対象はAgentic candidateとbyte一致させ、
+Yasashii固有のやさしいcopy、style、rule manifest、README、identity、overlay metadata、LICENSE、repo-owned docsを維持する。
+private版、実HOME、installed cache、Mac mini、releaseはこの機能同期自体の対象外とする。
+
 ## Gテーマと機能の対応
 
 | テーマ | 主な機能 |
 |---|---|
 | G1 | F05 F06 F07 F08 F17 F18 F19 F21 F56 |
-| G2 | F04 F10 F20 F51 F55 F56 |
+| G2 | F04 F10 F20 F51 F55 F56 F57 |
 | G3 | F14 F15 F22 F53 |
-| G4 | F10 F14 F15 F20 F22 F51 F53 F55 |
+| G4 | F10 F14 F15 F20 F22 F51 F53 F55 F57 |
 | G5 | F04 F07 F23 F24 F25 F26 F27 |
 | G6 | F03 F05 F06 F07 F08 F15 F17 F18 F19 F28 F56 |
 | G7 | F01 F02 F04 F10 F16 F29 |
 | G8 | F01 F02 F07 F10 F16 F20 F30 F31 F56 |
 | G9 | F03 F07 F10 F16 F23 F32 F33 F34 F35 |
 | G10 | F01 F02 F04 F05 F07 F10 F16 F23 F24 F30 F31 F32 F33 F34 F35 F36 F37 F38 F39 F40 F41 F42 F43 |
-| G11 | F30 F31 F36 F40 F41 F42 F43 F44 F45 F46 F47 F48 F49 F50 F51 F52 F53 F54 F55 F56 |
-| G12 | F04 F16 F20 F41 F42 F49 F55 |
+| G11 | F30 F31 F36 F40 F41 F42 F43 F44 F45 F46 F47 F48 F49 F50 F51 F52 F53 F54 F55 F56 F57 |
+| G12 | F04 F16 F20 F41 F42 F49 F55 F57 |
