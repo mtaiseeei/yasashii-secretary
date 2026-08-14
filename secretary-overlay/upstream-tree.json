@@ -3164,7 +3164,7 @@
     },
     {
       "path": "scripts/sprint-010-regression.sh",
-      "classification": "common",
+      "classification": "anchor-overlay",
       "sha256": "face1c72d748965e7ee9683b582b33b0f7328a571277d1d5b32d8430a7b72cdb"
     },
     {
@@ -3279,7 +3279,7 @@
     },
     {
       "path": "scripts/sprint-020-patch-001-copy-test.mjs",
-      "classification": "common",
+      "classification": "anchor-overlay",
       "sha256": "f74e868a8a8c3d616eb227a99ad10cedd7645849566a8a20912fd87205edaa8d"
     },
     {
@@ -3379,7 +3379,7 @@
     },
     {
       "path": "scripts/sprint-027-copy-test.mjs",
-      "classification": "common",
+      "classification": "anchor-overlay",
       "sha256": "bb98e74414b6aa3e0193859d2601d2250b8a7336852a6f9d3a7f0cddbdc5d221"
     },
     {
@@ -3419,7 +3419,7 @@
     },
     {
       "path": "scripts/sprint-031-plugin-path-test.mjs",
-      "classification": "common",
+      "classification": "anchor-overlay",
       "sha256": "e2e86e627f73f2ea8b6b481b38c817bf5db6927809e516f314826bb49b152483"
     },
     {

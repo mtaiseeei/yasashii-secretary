@@ -128,6 +128,24 @@
       "replacement": "grep -q 'edition.json.*4面copy' \"$evidence\""
     },
     {
+      "id": "sprint-010-yasashii-active-copy",
+      "path": "scripts/sprint-010-regression.sh",
+      "match": "  \"grep -q '最終応答serializer.*だけを正本' '$DAILY_SKILL' && grep -q 'styles/agentic.md' '$REPO/plugins/secretary/rules/plain-language.md' && node -e 'const c=require(\\\"./plugins/secretary/rules/copy/agentic.json\\\");const s=Object.keys(c.surfaces.report.states).sort().join(\\\",\\\");process.exit(s===\\\"answered,error,partial,question,saved\\\"&&!Object.hasOwn(c.surfaces.report,\\\"shortLines\\\")?0:1)'\"",
+      "replacement": "  \"grep -q '最終応答serializer.*だけを正本' '$DAILY_SKILL' && grep -q 'styles/yasashii.md' '$REPO/plugins/secretary/rules/plain-language.md' && node -e 'const c=require(\\\"./plugins/secretary/rules/copy/yasashii.json\\\");const s=Object.keys(c.surfaces.report.states).sort().join(\\\",\\\");process.exit(s===\\\"answered,error,partial,question,saved\\\"&&!Object.hasOwn(c.surfaces.report,\\\"shortLines\\\")?0:1)'\""
+    },
+    {
+      "id": "sprint-020-yasashii-readme-cloud-contract",
+      "path": "scripts/sprint-020-patch-001-copy-test.mjs",
+      "match": "  if (!readme.includes(\"Google Chatを設定したい\") || !readme.includes(\"Google Cloudの準備から案内\") || !readme.includes(\"同意後だけ初回取得と自動取得を設定\")) errors.push(\"READMEのAI主導線または初回一体型説明が不足しています\");",
+      "replacement": "  if (!readme.includes(\"Google Chatを設定したい\") || !readme.includes(\"Google Cloudの準備から\")\n    || !readme.includes(\"初回取得と自動取得の設定をまとめて行います\") || !readme.includes(\"同意した場合だけ\")) {\n    errors.push(\"READMEのAI主導線または初回一体型説明が不足しています\");\n  }"
+    },
+    {
+      "id": "sprint-027-yasashii-readme-cloud-contract",
+      "path": "scripts/sprint-027-copy-test.mjs",
+      "match": "check(\"READMEがCloud準備と安全境界を説明\", /Google Cloud project/.test(files.readme) && /chat\\.spaces\\.readonly/.test(files.readme) && /選択した通常スペース/.test(files.readme) && /commit・pushを確認/.test(files.readme));",
+      "replacement": "check(\"READMEがCloud準備と安全境界を説明\", /Google CloudでProject/.test(files.readme) && /chat\\.spaces\\.readonly/.test(files.readme) && /通常スペースだけ/.test(files.readme) && /commit・push/.test(files.readme) && /同意した場合だけ|確認した後だけ/.test(files.readme));"
+    },
+    {
       "id": "sprint-011-evidence-dynamic-copy",
       "path": "scripts/sprint-011-regression.sh",
       "match": "grep -q '実コネクタ' '$EVIDENCE_RULES' && grep -q '接続状態.*未確認' '$EVIDENCE_RULES'",
@@ -180,6 +198,30 @@
       "path": "scripts/sprint-029-rule-boundary-test.mjs",
       "match": "for (const phrase of [\"実コネクタ\", \"接続状態を未確認\", \"根拠\", \"推測で断定しません\"]) assert(evidence.includes(phrase), `証拠契約が不足しています: ${phrase}`);",
       "replacement": "for (const phrase of [\"実コネクタ\", \"edition.json\", \"4面copy\", \"根拠\", \"推測で断定しません\"]) assert(evidence.includes(phrase), `証拠契約が不足しています: ${phrase}`);"
+    },
+    {
+      "id": "sprint-029-yasashii-variable-output-shape",
+      "path": "scripts/sprint-029-rule-boundary-test.mjs",
+      "match": "for (const phrase of [\"最終応答serializer（通常報告の唯一の正本）\", \"固定3項目\", \"developer handoff\"]) assert(style.includes(phrase), `active styleが不足しています: ${phrase}`);",
+      "replacement": "for (const phrase of [\"最終応答serializer（通常報告の唯一の正本）\", \"固定項目\", \"developer handoff\"]) assert(style.includes(phrase), `active styleが不足しています: ${phrase}`);"
+    },
+    {
+      "id": "sprint-031-yasashii-changelog-url",
+      "path": "scripts/sprint-031-plugin-path-test.mjs",
+      "match": "    config.distribution.changelogUrl.endsWith(\"/plugins/secretary/CHANGELOG.md\")\n      && config.distribution.changelogUrl.includes(\"/agentic-secretary/\"),",
+      "replacement": "    config.distribution.changelogUrl.endsWith(\"/plugins/yasashii-secretary/CHANGELOG.md\")\n      && config.distribution.changelogUrl.includes(\"/yasashii-secretary/\"),"
+    },
+    {
+      "id": "sprint-031-yasashii-legacy-label",
+      "path": "scripts/sprint-031-plugin-path-test.mjs",
+      "match": "    \"current raw URL diagnosis is read-only and keeps opposite-edition detection\",",
+      "replacement": "    \"current raw URL diagnosis is read-only and keeps legacy Yasashii detection\","
+    },
+    {
+      "id": "sprint-031-yasashii-legacy-state",
+      "path": "scripts/sprint-031-plugin-path-test.mjs",
+      "match": "      && diagnosisJson.workspaceEdition?.state === \"opposite-edition\"",
+      "replacement": "      && diagnosisJson.workspaceEdition?.state === \"legacy-yasashii\""
     },
     {
       "id": "canonical-changelog-yasashii-0100-release",
