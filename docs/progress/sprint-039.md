@@ -140,3 +140,39 @@ Agenticのdocs、progress、feedback、state、release記録は同期してい�
 Retry 1では長いhistorical master全体を再実行していない。上記「既知baseline／verification-infra」の6件は初回実行時の記録を維持し、baseline変更で隠していない。Windowsの新identity面native実行も引き続き **not-run** であり、既存Darwin実行結果だけを記録する。
 
 実HOME、installed cache、private版、Mac mini、external service、remote、Secret、Actions、OAuth、実APIへのwriteは0。実Yasashii repoではcommit／push／tag／releaseを行っていない。テスト内のcommitは隔離した一時fixtureだけである。
+
+## Spec-issue修正後のfresh strong Generator再確認
+
+Retry 1 EvaluatorのS1は、製品欠陥ではなくPlanner正本がaccepted upstream Patchへ追随していない固定入力の不整合だった。更新済みの`features.md`、`constraints.md`、`editions.md`、`rubric.md`、Sprint 039契約、state、最新feedbackを読み直し、次を確認した。
+
+- 更新後の固定入力はAgentic `3fa8d97e5dbfb2afa314f4ad179f17401b76d320`、handoff digest `c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557`で一致する。
+- handoffは16 `commonPaths`、13 byte parity＋`name`／`secretary`／`settings`の3 anchorsで一致する。`external-ops.mjs`と`safe-git.mjs`は共通安全pathとして管理されている。
+- overlay metadataはaccepted candidate、digest、16-path分類に関係するhandoff所有fieldだけが更新対象で、その他のfield、anchor、安全基準は保護される契約へ整合した。
+- 製品candidateは`65dccf6cb333f11d3fac6bfab729fb993bc1a26f`のまま。再確認HEADは`0934797e3677f2c7d83221c6b9c2221d0597dd92`で、`65dccf6..0934797`の差分はspec、Sprint契約、state、feedbackだけ。製品、test、overlay bytesの差分は0件だった。
+- 旧固定入力`3e08eb6d377392440e753bd5073c73d1d63399b6`／`7498d3550734ba63b689463f01e2a52e16d2ce3f8eb31cebead16aef2181f883`は、履歴を保持する`docs/**`以外の実装所有面に0件だった。
+
+製品変更は不要と判断し、product／test／overlayを編集していない。S1の原因だったPlanner正本と実装candidateの対応は解消した。
+
+### Overlayと保護面
+
+- 実repo、隔離clean checkout、Git-free archiveの各面でoverlay test 6/0、check PASS、apply `changed=0`、reapply `secondChanged=0`。
+- 各面で`managed=277`、`handoffPaths=16`、handoff digest `c810f60c...`、overlay definition digest `5850ef7b...`、reapply digest `3698b74e...`が一致した。
+- README、LICENSE、AGENTS、Yasashii copy/style、edition、rule manifest、Claude／Codex marketplace／manifestは開始HEAD `ee62b5e`、製品candidate `65dccf6`、再確認HEAD `0934797`でGit blobが同一だった。
+- `secretary-overlay/anchors.json`はSprint実装でname等の宣言anchorを追加した製品candidateのblobを再確認HEADでも維持し、`metadata-overrides.json`も開始HEADから不変。再確認工程でoverlay metadata変更0件だった。
+- Agenticのspec、Sprint、progress、feedback、state、release記録の同期は0件。
+
+### 再実行結果
+
+実repo開始時はcleanだった。次の集計は実repo、隔離clean checkout、同じ`0934797`の`git archive`から展開したGit-free archiveの3面で同一だった。
+
+- `bash scripts/sprint-039-patch-001-regression.sh`: exit 0、wrapper 9/0。
+- Patch: `SPRINT039_PATCH001_PASS=16 FAIL=0`。
+- Sprint 039: `SPRINT039_PASS=69 FAIL=0`、wrapper 7/0。
+- 既存target: Git safety 71/0、Sprint 035 15/0。
+- release integrity: 正式16 Skillsとsame-count unknown negative 2/0。
+- report schema: 正式21 surfaces、1/0。
+- overlay専用: 6/0、check／apply／reapply PASS、未分類0、二回目差分0。
+
+長時間historical masterは、target／checkout／archiveがgreenで、Retry 1 feedbackに開始candidateと同数の既知infra差が記録済みのため反復していない。baselineは変更していない。実行OSはDarwin arm64、Sprint 039の新identity／renameのWindows nativeは引き続き **not-run** で、全環境PASSへ昇格しない。
+
+browser UI変更はなく、起動URL／screenshotはnot applicable。実HOME、installed cache、private版、実workspace、Mac mini、external service、remote、Secret、Actions、OAuth、実APIへのwriteは0。実repoでcommit／push／PR／merge／tag／release／marketplace／install／updateを行っていない。テスト中のGit操作は隔離fixtureと一時checkoutだけである。
