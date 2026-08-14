@@ -3,9 +3,9 @@
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
 - Current ID: sprint-039
-- Retry Count: 0
+- Retry Count: 1
 - Spec-Issue Count: 0
-- Lineage Dispatches: 2
+- Lineage Dispatches: 3
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
@@ -69,13 +69,14 @@
 | sprint-037 | done | [contract](sprint-037.md) | [progress](../progress/sprint-037.md) | [feedback](../feedback/sprint-037.md) |
 | sprint-038 | done | [contract](sprint-038.md) | [progress](../progress/sprint-038.md) | [feedback](../feedback/sprint-038.md) |
 | sprint-038-patch-002 | done-by-user-decision | [contract](sprint-038-patch-002.md) | [progress](../progress/sprint-038-patch-002.md) | [feedback](../feedback/sprint-038-patch-002.md) |
-| sprint-039 | awaiting-eval | [contract](sprint-039.md) | [progress](../progress/sprint-039.md) | [feedback](../feedback/sprint-039.md) |
+| sprint-039 | active | [contract](sprint-039.md) | [progress](../progress/sprint-039.md) | [feedback](../feedback/sprint-039.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-14: Sprint 039初回fresh独立Evaluatorはimplementation-issueでFAIL。専用identity／routing／managed block／overlay／schemaはcheckoutとGit-free archiveで合格したが、P1としてrelease integrityが旧15 Skills固定のまま新しい`name` Skillを拒否し開始commit exit 0に対してcandidate checkout／archiveはexit 1、P2として`rename-apply --fail-at commit`がexit 0でrenameとdirty Git状態を残しcommit失敗rollback未実装を確認した。既知wizard digest、loopback `EPERM`、旧overlay current HEAD依存、README期待差はhistorical／verification-infraとして分離。共通P2はYasashiiだけへanchor化せずAgentic common coreの`sprint-039-patch-001`へ戻し、そのPASS後の新固定SHA／digestを再同期する。Yasashii側はP1と固定candidate前進だけを限定修正するためRetry Count 1、fresh strong Generator dispatch予約としてLineage Dispatches 3、Status active、Model Tier strong、Rotate noneとする。release holdを維持する。
 - 2026-08-14: fresh strong Generatorが固定Agentic製品candidate `3e08eb6d377392440e753bd5073c73d1d63399b6` とcommon digest `7498d3550734ba63b689463f01e2a52e16d2ce3f8eb31cebead16aef2181f883` を入力に、Yasashii candidate `e23bdafd4d853d30eecbfa8ed97b534f739fa78f` を作成した。overlayは712 filesを全分類、未分類0、managed 277、check／reapply PASS、`secondChanged=0`。handoff 14 pathsのうち11 pathをbyte一致、`name`／`secretary`／`settings`の3 Skillだけを宣言済みYasashii anchorとして維持した。Sprint 039は69/69＋wrapper 7/7、overlay専用6/6、report schema 21面、Sprint 011 68/68、Sprint 035 15/15、Sprint 038 64/64、既存Windows labels 12/12、Git-free候補をPASS。README、LICENSE、Yasashii copy／style、manifest、marketplace、edition、rule manifestのdigest不変。既知historical wrapperのwizard digest、loopback `EPERM`、旧overlay test、README期待差はbaseline／verification-infraとして分離し、新identityのWindows nativeはnot-runのままgreenへ昇格しない。private版、実HOME／cache、Mac mini、remote、release変更0。fresh独立Evaluator dispatch予約としてLineage Dispatchesを2、Status awaiting-eval、Model Tier strong、Rotate noneとする。
 - 2026-08-14: Agentic共通コアSprint 039が製品candidate `3e08eb6d377392440e753bd5073c73d1d63399b6`、common digest `7498d3550734ba63b689463f01e2a52e16d2ce3f8eb31cebead16aef2181f883` でfresh独立Evaluator PASS。Plannerが同固定SHAのhandoff commonPathsだけをoverlay正本経由で同期し、英語名、stable identity、AI author、name Skill、canonical resolver、user-scope routing、P1〜P4解消済みrenameをYasashii固有copy／style／rule manifest／README／identity／LICENSE保護と両立させるhigh-risk main Sprint 039を確定した。新main SprintとしてRetry Count／Spec-Issue Count／Lineage Dispatchesを0から開始し、fresh strong Generator dispatch予約としてLineage Dispatches 1、Model Tier strong、Rotate model-escalation、Status activeとする。private版、実HOME／cache、Mac mini、remote、releaseは本Sprint外で変更0件を維持する。
 - 2026-08-11: ユーザーが「windowsはさっきのでPASSしたんだからもういいんじゃないの？」に続けて「はい、進めてください」と明示し、Yasashii candidate自身で同じWindows native testを再実行しない残余証跡差を引き受けて完了を選択した。既存のWindows実機証跡は、Agentic Harness `4e2f9b921e01b5d7daadfd4b3c6340b4544f893a` の `WINDOWS_INIT_PASS=8 FAIL=0 OS=win32` とAgentic Secretary `24520a1d06f8d3833568a1386bf814e1085f5da9` の `SPRINT038_PATCH002_WINDOWS_PASS=12 FAIL=0 OS=win32`、いずれもexit 0・開始時／終了時clean。Yasashii Harness `ca3d3a939b8e9c4c3e5041c5c9fd372b3fbc19be` とYasashii Secretaryの製品／test／overlay candidate `eb757e6a9382378e1dbd7a8bad00ba990a1f7ad3` は修正済みWindows共通実装をbyte一致で取り込み、下流で変更したedition overlay、identity、rule manifestはWindows path／保存／initializer実装を変更していない。macOS同一labels、overlay check／reapply、common parity、targeted archive、release integrityはgreenで、product finding 0件。Evaluator feedbackのV1（Yasashii candidate自身のWindows native未実行）は書き換えず残余リスクとして保持し、Harnessの `done-by-user-decision` 例外によりsprint-038-patch-002を完了する。Status `done-by-user-decision`、Retry Count 0、Spec-Issue Count 0、Lineage Dispatches 4、Model Tier standard、Rotate none、Next Planned TBDとする。これはリリース実行の承認ではなく、PR／merge／tag／Release／marketplace公開は対象・rollback提示後の別確認まで保留する。
