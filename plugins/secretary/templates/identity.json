@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "secretary_id": "{{SECRETARY_ID}}",
+  "actor_type": "ai-secretary",
+  "display_name": "{{SECRETARY_NAME}}",
+  "aliases": [],
+  "created_at": "{{CREATED_AT_ISO}}"
+}

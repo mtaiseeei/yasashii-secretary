@@ -10,6 +10,18 @@ from pathlib import Path
 
 
 ENTRYPOINT_REL = Path("rules/plain-language.md")
+EXPECTED_USER_SURFACES = {
+    *(Path("skills") / name / "SKILL.md" for name in (
+        "build", "chatwork", "connections", "daily", "google-chat", "memory-care", "name",
+        "onboarding", "projects", "secretary", "settings", "setup-google", "setup-microsoft",
+        "setup-notion", "update", "weekly",
+    )),
+    Path("templates/AGENTS.md"),
+    Path("templates/CLAUDE.md"),
+    Path("templates/tones/formal.md"),
+    Path("templates/tones/friendly.md"),
+    Path("templates/tones/standard.md"),
+}
 PREFIX_GROUPS = {
     "done": ("やったこと", "実施内容", "実施したこと", "行ったこと", "対応内容"),
     "result": ("結果", "確認結果", "実行結果", "状態の要約", "どうなったか"),
@@ -134,8 +146,13 @@ def validate(plugin: Path) -> list[str]:
         errors.append("serializer owner lacks unique-owner declaration")
 
     surfaces = user_surfaces(plugin)
-    if len(surfaces) != 20:
-        errors.append(f"unexpected user-facing surface count: {len(surfaces)} (expected 20)")
+    surface_inventory = {path.relative_to(plugin) for path in surfaces}
+    for path in sorted(surface_inventory - EXPECTED_USER_SURFACES):
+        errors.append(f"unexpected user-facing surface: {path}")
+    for path in sorted(EXPECTED_USER_SURFACES - surface_inventory):
+        errors.append(f"expected user-facing surface missing from inventory: {path}")
+    if len(surfaces) != 21:
+        errors.append(f"unexpected user-facing surface count: {len(surfaces)} (expected 21)")
 
     schema_owners = {owner}
     for path in surfaces:
@@ -174,7 +191,7 @@ def main() -> int:
         for error in errors:
             print(f"SCHEMA_ERROR {error}", file=sys.stderr)
         return 1
-    print("SCHEMA_OK owner=active-edition-style entrypoint=rules/plain-language.md surfaces=20 conflicts=0 states=5")
+    print("SCHEMA_OK owner=active-edition-style entrypoint=rules/plain-language.md surfaces=21 conflicts=0 states=5")
     print("PASS=1 FAIL=0")
     return 0
 

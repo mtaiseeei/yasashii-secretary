@@ -2,10 +2,14 @@
   "schemaVersion": 1,
   "repository": "https://github.com/mtaiseeei/agentic-secretary.git",
   "fetchRemoteName": "upstream",
-  "baseCommit": "24520a1d06f8d3833568a1386bf814e1085f5da9",
+  "baseCommit": "3fa8d97e5dbfb2afa314f4ad179f17401b76d320",
   "neutralizationCommit": "52016cf10c1c5587fbd83ff2faf3888e29282d5e",
   "releaseCandidate": "0.9.2",
-  "externalLiveGate": "upstream-0.9.2-release-verified",
+  "externalLiveGate": "upstream-sprint-039-product-pass-verified",
+  "identityHandoff": {
+    "manifest": "adapters/downstream-identity-handoff.json",
+    "commonTreeSha256": "c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557"
+  },
   "remoteContract": {
     "originRepository": "https://github.com/mtaiseeei/yasashii-secretary.git",
     "upstreamFetchRepository": "https://github.com/mtaiseeei/agentic-secretary.git",

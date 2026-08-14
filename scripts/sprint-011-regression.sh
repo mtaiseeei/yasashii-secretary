@@ -8,7 +8,7 @@ PLUGIN="$ROOT/plugins/secretary"
 TOOLS="$PLUGIN/skills/memory-care/scripts/memory-tools.sh"
 SETTINGS="$PLUGIN/skills/settings/SKILL.md"
 RULES_ENTRY="$PLUGIN/rules/plain-language.md"
-RULES="$PLUGIN/rules/styles/agentic.md"
+RULES="$PLUGIN/rules/styles/yasashii.md"
 COMMON_RULES="$PLUGIN/rules/common-language.md"
 SAFETY_RULES="$PLUGIN/rules/safety.md"
 EVIDENCE_RULES="$PLUGIN/rules/evidence.md"
@@ -59,8 +59,8 @@ tree_digest(){
 serializer_contract_ok(){
   local file="$1"
   grep -q '最終応答serializer（通常報告の唯一の正本）' "$file" &&
-    grep -q '全tool call後にserializerを1回だけ適用' "$file" &&
-    grep -q '固定3項目' "$file" && grep -q '部分完了' "$file"
+    grep -q 'すべてのtool実行後に1回だけ適用' "$file" &&
+    grep -q '固定項目' "$file" && grep -q '部分完了' "$file"
 }
 
 serializer_reference_ok(){
@@ -105,8 +105,8 @@ done
 check "active styleの内容依存serializer唯一正本はI1-I3境界を満たす" "serializer_contract_ok '$RULES'"
 check "安全・証拠境界はstyleから分離" \
   "grep -q 'push.*明示的に指示' '$SAFETY_RULES' && grep -q '実コネクタ' '$EVIDENCE_RULES' && grep -q 'edition.json.*4面copy' '$EVIDENCE_RULES' && ! grep -q '実コネクタの証跡が無い' '$RULES'"
-check "templates/tones/全15スキルは正本参照だけでschema重複0" \
-  "[ '${#REFERENCE_SURFACES[@]}' -eq 20 ] && [ '$reference_bad' -eq 0 ]"
+check "templates/tones/全16スキルは正本参照だけでschema重複0" \
+  "[ '${#REFERENCE_SURFACES[@]}' -eq 21 ] && [ '$reference_bad' -eq 0 ]"
 SCHEMA_OWNER_COUNT="$(grep -Rsl '^- やったこと:' "$PLUGIN/rules" "$PLUGIN/skills" "$PLUGIN/templates" --include='*.md' | wc -l | tr -d ' ')"
 check "現役固定schema所有ファイルは0件" \
   "[ '$SCHEMA_OWNER_COUNT' -eq 0 ]"
@@ -117,12 +117,12 @@ ROUTE_LINE="$(grep -n -m1 '^## まずやること' "$ROUTER" | cut -d: -f1)"
 check "routerはserializer読込→無言境界→routingの順" \
   "[ '$SERIALIZER_REF_LINE' -lt '$SILENT_LINE' ] && [ '$SILENT_LINE' -lt '$ROUTE_LINE' ]"
 check "共通表現とyasashii styleは同一turn read-onlyで途中出力しない" \
-  "grep -q '同じturn内のRead、routing、read-only確認では途中メッセージを出さず' '$COMMON_RULES' && grep -q '全tool call後にserializerを1回だけ適用' '$RULES'"
+  "grep -q '同じturn内のRead、routing、read-only確認では途中メッセージを出さず' '$COMMON_RULES' && grep -q 'すべてのtool実行後に1回だけ適用' '$RULES'"
 check "routerの競合する旧予告と末尾schema複製は0" \
   "! grep -q 'ひとこと予告してから' '$ROUTER' && ! grep -q '^## 最終出力の絶対条件' '$ROUTER'"
 
 # 意図的失敗fixture: 正本欠落、schema重複、無言境界欠落、適用順逆転を必ず拒否する。
-cp "$RULES" "$WORK/bad-owner.md"; perl -pi -e 's/全tool call後にserializerを1回だけ適用/serializerを適用/g' "$WORK/bad-owner.md"
+cp "$RULES" "$WORK/bad-owner.md"; perl -pi -e 's/すべてのtool実行後に1回だけ適用/serializerを適用/g' "$WORK/bad-owner.md"
 cp "$SETTINGS" "$WORK/bad-duplicate.md"; printf '\nやったこと: 複製\n結果: 複製\n次に何が起きるか: 複製\n' >> "$WORK/bad-duplicate.md"
 cp "$ROUTER" "$WORK/bad-silent.md"; perl -pi -e 's/ルーティング、段階ロードは無言/ルーティング、段階ロードを実行/' "$WORK/bad-silent.md"
 check "意図的失敗fixtureはserializer無言境界の欠落を検出" "! serializer_contract_ok '$WORK/bad-owner.md'"
@@ -140,12 +140,12 @@ check "preferences v2は4セクション" \
 check "preferences v2は4つのcategorical項目" \
   "grep -q '^- 口調: 丁寧（標準）' '$TEMPLATES/memory/preferences.md' && grep -q '^- 専門用語: ふつう' '$TEMPLATES/memory/preferences.md' && grep -q '^- 報告の詳しさ:' '$TEMPLATES/memory/preferences.md' && grep -q '^- 決定の確認: 都度' '$TEMPLATES/memory/preferences.md'"
 
-# 初回5問
-QCOUNT="$(grep -Ec '^### Q[1-5]:' "$ONBOARD")"
-check "初回質問は5問" "[ '$QCOUNT' -eq 5 ]"
+# 初回6問（Q0は秘書自身の名前、Q1〜5は利用者設定）
+QCOUNT="$(grep -Ec '^### Q[0-5]:' "$ONBOARD")"
+check "初回質問は6問" "[ '$QCOUNT' -eq 6 ]"
 check "初回に仕事・役割と説明の詳しさを聞く" "grep -q '^### Q4: お仕事・役割' '$ONBOARD' && grep -q '^### Q5: 説明の詳しさ' '$ONBOARD'"
 check "詳しさは3択で既定みじかく" "grep -q '1) \*\*みじかく' '$ONBOARD' && grep -q '2) \*\*くわしく' '$ONBOARD' && grep -q '3) \*\*おまかせ' '$ONBOARD'"
-check "口調を初回質問にしない" "! grep -qE '^### Q[1-5]: .*口調' '$ONBOARD' && grep -q '口調は初回に質問しない' '$ONBOARD'"
+check "口調を初回質問にしない" "! grep -qE '^### Q[0-5]: .*口調' '$ONBOARD' && grep -q '口調は初回に質問しない' '$ONBOARD'"
 check "初回後に設定変更導線を案内" "grep -q '設定はいつでも.*設定変えたい' '$ONBOARD'"
 
 # settings規律とプリセット
@@ -170,7 +170,7 @@ missing_pref_ref=0
 while IFS= read -r skill; do
   grep -q 'preferences.md' "$skill" || { printf '  preferences参照なし: %s\n' "$skill"; missing_pref_ref=$((missing_pref_ref+1)); }
 done < <(find "$PLUGIN/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | sort)
-check "全15スキルがpreferencesを参照" "[ '$missing_pref_ref' -eq 0 ] && [ \"\$(find '$PLUGIN/skills' -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')\" -eq 15 ]"
+check "全16スキルがpreferencesを参照" "[ '$missing_pref_ref' -eq 0 ] && [ \"\$(find '$PLUGIN/skills' -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')\" -eq 16 ]"
 
 # 部分更新・追記・確認後のjournal/commit
 SEC="$WORK/main/secretary"

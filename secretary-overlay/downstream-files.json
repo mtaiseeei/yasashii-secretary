@@ -4,6 +4,12 @@
   "files": [
     "scripts/sprint-034-test.mjs",
     "scripts/sprint-038-patch-002-test.mjs",
+    "scripts/sprint-039-regression.sh",
+    "scripts/sprint-039-overlay-test.mjs",
+    "scripts/sprint-039-patch-001-regression.sh",
+    "scripts/sprint-039-patch-001-test.mjs",
+    "scripts/sprint-039-release-integrity-test.mjs",
+    "scripts/sprint-039-test.mjs",
     "scripts/sync-secretary-overlay.mjs",
     "secretary-overlay/README.md",
     "secretary-overlay/anchors.json",

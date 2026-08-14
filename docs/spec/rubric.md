@@ -9,7 +9,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 ## 合格の基本条件
 
 - Evaluatorは対象スプリントの実物を動かし、実行コマンド、結果、対象ファイル／repo、模擬会話の入力と観測結果を feedback に残す。
-- C2・C5・C6・C9・C10・C11・C12・C13・C14・C15・C16 は5/5必須。対象Sprintの保証範囲で、1件でも構文欠陥、secret露出、安全違反、新規回帰、現行面の配布チャネル依存、無確認の更新副作用、Google ChatのOAuth／選択スペース境界違反、配布前gateの未達、edition境界違反、会話可読性の必須条件違反、正式ホスト配布面の欠落、またはWindows native保存／0.9.2下流同期の欠落があれば不合格。
+- C2・C5・C6・C9・C10・C11・C12・C13・C14・C15・C16・C17 は5/5必須。対象Sprintの保証範囲で、1件でも構文欠陥、secret露出、安全違反、新規回帰、現行面の配布チャネル依存、無確認の更新副作用、Google ChatのOAuth／選択スペース境界違反、配布前gateの未達、edition境界違反、会話可読性の必須条件違反、正式ホスト配布面の欠落、Windows native保存／0.9.2下流同期の欠落、または秘書identity／routing／改名境界違反があれば不合格。
 - Sprint 021は、Google Chatのlocal wizard session memory→`gh` stdin→Repository Secretと、Chatworkの利用者本人によるGitHub Repository Secret画面への直接入力という既存の2導線、および製品管理対象／初回publish inventoryにおける合理的な誤混入を0許容で評価する。Chatwork wizardへToken取得・受領・登録機能を要求しない。利用者が任意のJS／TS／shell／JSONを意図的に特殊構文・難読化・computed／escaped key・偽placeholderへ改変したケースの未検出だけでは不合格にしない。その形式を製品が生成する、または通常導線が実値を残すなら不合格とする。
 - 1軸でも閾値を下回ればスプリント全体を不合格にする。
 - やさしさの得点で安全・規律・回帰の欠陥を相殺しない。
@@ -64,6 +64,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 46. **host-neutral plugin rootとCodex正式配布parity**: 共通15 skillsの全 `SKILL.md` と参照先をinventoryし、通常shell実行が未設定の `${CLAUDE_PLUGIN_ROOT}` に依存しないこと、未解決の環境変数文字列をcommand引数やpathへ渡さないこと、各SKILL自身の実パスを起点に同じ `plugins/secretary/` rootへ到達することを静的検査と任意絶対path fixtureで確認する。`${CLAUDE_PLUGIN_ROOT}` 以外のslash command、Hook、Claude固有UI、Claude marketplace等も列挙し、共通本文へのClaude限定前提混入0件、真にhost固有なadapter／案内の欠落0件を確認する。既存Codex正式installテストと必要最小限のClaude Code／Codex App／Codex CLI代表script確認を使い、新しい大規模runner／attestation基盤は作らない。両editionに `.codex-plugin/plugin.json` とrepo rootの `.agents/plugins/marketplace.json` があり、`skills=./skills/`、edition別identity／version／source.pathが正式面と一致することを検証する。host別skillコピー、未解決変数の黙示fallback、agentic manifestだけの流用、yasashii manifest欠落をPASSにしない。
 47. **呼び方・利用者中立性・下流同期**: Claude Code／Codexの4経路、account-name選択時だけのhost-task-context→Git→OS、正規化・全除外値・Unicode case-fold・hostname拒否、出典と推奨、候補なし、探索結果非保存、保存前確認を合成fixtureで確認する。既存変更は3正本一致、初回decision不変、失敗時完全rollbackを一時Git workspaceで確認する。Agentic完全SHA、review済みbase record、overlay apply／reapply、共通path byte一致、Yasashii固有surface不変、active surface scanと固定allowlistを証拠化する。
 48. **Windows native保存と0.9.2下流同期**: Agenticの固定完全SHA `24520a1d06f8d3833568a1386bf814e1085f5da9` と独立PASS記録を入力にし、Yasashiiのclean candidateで同じ12 Windows labelsを実行する。日本語・空白path、project作成／journal／memory／TODO／settings／文書保存、recursive copy、CRLF preferences、rollback、path guardを実動作で確認し、exit codeと `0xC0000005` の有無を記録する。macOS／Linux対象回帰、Git-free archive、overlay record／apply／check／reapply、common byte parity、Yasashii固有surface digest、0.9.2 manifest／marketplace／edition／CHANGELOG／release integrityも確認する。Windows証跡はcleanな固定SHAに対するユーザー所有実機の宣言を採用でき、関係コード変更時だけ失効する。UI、private版、cache、利用者workspace、service writeは対象外／0件であり、新しいcollectorを要求しない。
+49. **秘書identityと下流同期**: accepted Agentic candidate `3fa8d97e5dbfb2afa314f4ad179f17401b76d320`、digest `c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557` のhandoff manifestに列挙された16 `commonPaths` だけを同期する。13 pathのbyte parity、`name`／`secretary`／`settings` の3宣言anchor、共通安全path `external-ops.mjs`／`safe-git.mjs`、overlay check／apply／reapply、未分類0件、保護surface digestを確認する。overlay metadataはcandidate／digest／16-path分類のhandoff所有fieldだけを整合更新し、他fieldと安全基準を保護する。合成HOMEと隔離workspaceで英語名の指定／提案、stable identity不変、AI author、名前Skill、canonical resolver、Codex／Claude user-scope managed block、direct／human／ambiguous routing、改名分類、確認、rollbackを実動作で検証する。実HOME、cache、private版、Mac mini、remote、releaseへのwriteは0件とし、Windowsはportable review、既存suite、実行済み環境証拠、残余リスクを分けて記録する。
 
 ## 必須の模擬会話
 
@@ -125,6 +126,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 | C14 | 会話のMarkdown可読性 | 改行、段落、必要な箇条書き、3行報告の物理分離、edition差維持、過剰Markdownなし | **5** |
 | C15 | 4ホスト正式配布 | Claude／Codex両manifest、marketplace、新規導入、skill一意発見、新規session、更新・cache、host別実証 | **5** |
 | C16 | Windows native保存・0.9.2下流同期 | 12 labels、Bash非依存、CRLF、rollback／path guard、overlay保護、release整合、外部write禁止 | **5** |
+| C17 | 秘書identity・routing・安全な改名 | 英語名、stable identity、AI author、canonical resolver、managed block、人名誤routing防止、分類付き改名、overlay保護 | **5** |
 
 ## スコアアンカー
 
@@ -213,6 +215,11 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 - 5: 固定Agentic完全SHAから宣言的overlayで同期し、Windows native 12 labelsが全てPASS、`0xC0000005` 0件。project作成／journal／memory／TODO／settings／文書保存、recursive copy、CRLF、rollback、path guardが成立する。common byte parity、overlay冪等性、Yasashii固有surface不変、macOS／Linux・archive無回帰、0.9.2 release整合、private／cache／workspace／service write 0件を証拠化し、my-vault対応済みと誤表示しない。
 - 4以下: 固定SHA以外の同期、Windows labelの未実行／FAIL、access violation、Bash path依存、recursive copy crash、CRLF破壊、部分状態残存、path guard後退、未分類／anchor／allowlist逸脱の部分適用、Yasashii固有surface変化、common byte不一致、macOS／Linux・archive回帰、0.9.2不整合、無許可の外部write／release、private版対応済み表示のいずれかが1件でもある。→不合格。
 
+### C17 秘書identity・routing・安全な改名【ゼロ許容】
+
+- 5: 英語の秘書名と利用者の呼び方が分離し、指定／提案の両経路、stable identity不変、AI author、既存利用者向け名前Skill、canonical resolverが成立する。user-scope managed blockはopt-in、冪等、既存内容保護で、直接呼びかけだけをroutingし、人名文脈は除外、曖昧時は一度確認する。改名は候補を分類・提示して確認後だけ現行設定と製品所有blockを変更し、過去author／履歴を保ち、失敗時は完全rollbackする。固定handoffのcommonPathsだけがbyte一致し、Yasashii固有surfaceは不変、外部write 0件、Windows残余は正直に区別される。
+- 4以下: 利用者の呼び方との混同、非英語名の無確認保存、stable identity再発行、人のauthorとの識別不能、cwdへの別workspace誤作成、user-scope fileの無確認／全置換、managed block重複、`AGENTS.override.md` 無視の成功表示、人名文脈の誤routing、曖昧確認の反復、blind global replace、履歴改変、partial state、commonPaths外同期、Yasashii固有surface変化、実HOME／cache／private／remote／release write、Windows未実行の全環境PASS表示のいずれかが1件でもある。→不合格。
+
 ## スプリント別の重点
 
 | Sprint | 重点 |
@@ -252,6 +259,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 | 036 | superseded — account-name候補source変更前の旧方針。Generatorを起動せずsprint-037へ置換 |
 | 037 | Agentic固定candidate `d9a62755`、review済みbase record、overlay冪等、呼び方4経路、候補探索・非保存、値を履歴メタデータへ再掲しない現役3正本transaction、利用者中立scan、Yasashii固有surface保護、Sprint 045無回帰 |
 | 038-patch-002 | 固定Agentic `24520a1d...`、Windows native同一12 labels、project／journal／memory／TODO／settings／文書、recursive copy、CRLF、rollback／path guard、overlay byte parity・固有surface保護、0.9.2整合、macOS／Linux・archive無回帰、独立PASS前の公開禁止 |
+| 039 | accepted Agentic `3fa8d97e...`／digest `c810f60c...`、16 commonPaths（13 byte parity＋3 anchors、`external-ops.mjs`／`safe-git.mjs`を含む）、英語名／stable identity／AI author、名前Skill、canonical resolver、user-scope managed block、direct／human routing、分類付き改名／rollback、Yasashii固有surface保護、Windows残余の正直な区別、外部write禁止 |
 
 ## 差し戻し分類
 

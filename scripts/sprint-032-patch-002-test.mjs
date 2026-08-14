@@ -69,7 +69,7 @@ function walk(root) {
   return files;
 }
 
-// check-report-schema.py と同じ20 user-facing surface。
+// check-report-schema.py と同じ21 user-facing surface。
 function userSurfaces() {
   return [
     ...walk(join(plugin, "skills")).filter((path) => path.endsWith("/SKILL.md")),

@@ -1,8 +1,8 @@
 ---
 name: settings
 description: >
-  秘書の呼び方、仕事・役割、口調、専門用語、報告の詳しさ、決定確認を初回または途中で安全に変更する。
-  「設定変えたい」「もっとフランクに」「専門用語そのままで」「呼び方を変えて」で使う。
+  利用者の呼び方、仕事・役割、口調、専門用語、報告の詳しさ、決定確認を初回または途中で安全に変更する。
+  「設定変えたい」「もっとフランクに」「専門用語そのままで」「私の呼び方を変えて」で使う。
 ---
 
 # settings — その人に合わせる設定
@@ -24,6 +24,9 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 `${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は `secretary/memory/preferences.md` を毎回読み直す。
 preferences が無い・空・一部欠損なら、丁寧（標準）／専門用語=ふつう／報告=みじかく／決定確認=都度を使う。
 output stylesには依存しない。
+
+「秘書自身の名前を付けたい／変えたい」「Alexと呼びたい」「別repoから名前で呼びたい」はこのSkillで
+利用者の呼び方へ誤適用せず、`${SECRETARY_PLUGIN_ROOT}/skills/name/SKILL.md` へ案内する。
 
 ## 全設定で上書きできない出力・許可・根拠
 

@@ -32,6 +32,7 @@
     { "name": "daily", "hostSpecific": ["connector availability"] },
     { "name": "google-chat", "hostSpecific": ["explicit skill invocation", "loopback browser surface"] },
     { "name": "memory-care", "hostSpecific": ["explicit skill invocation only"] },
+    { "name": "name", "hostSpecific": ["explicit skill invocation", "user-scope guidance file selection"] },
     { "name": "onboarding", "hostSpecific": ["explicit skill invocation", "plugin reload surface"] },
     { "name": "projects", "hostSpecific": ["Harness handoff invocation"] },
     { "name": "secretary", "hostSpecific": ["explicit skill invocation"] },

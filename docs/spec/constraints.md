@@ -350,3 +350,20 @@
 10. Windows native証跡は、ユーザー所有Windowsでcleanな固定Yasashii candidate SHAを実行した宣言を、対象基準・日時・command・結果と結びつけて受領してよい。対象コードがそのSHAから変わった場合だけ関係証跡を失効させ、無関係なdocs／release metadata変更だけで取り直しを要求しない。
 11. 独立Evaluator PASS後のreleaseも自動実行しない。公開先、対象candidate、tag／Release／marketplaceの範囲、失敗時のrollbackを別途ユーザーへ示し、明示確認後だけ実行する。
 12. 合格証跡は既存のWindows 12 labels、macOS／Linux回帰、archive、overlay、release integrityのcommandと結果で十分とする。新しいcollector、統一attestation、approval manifest、外部署名を追加の合格条件にしない。
+
+## 21. 秘書identity、user-scope routing、改名の安全境界
+
+1. 利用者の呼び方と秘書の名前は別設定にする。秘書名は英語の名前だけを受け付け、空値、path、email、token風、制御文字、過長値を保存しない。任せる場合も英語名を提案し、保存前に実際の値を確認する。
+2. 表示名とstable identityを分ける。改名してもstable identityは変えず、同じ秘書workspace、author、aliasの連続性を失わない。作者は人と区別できるAI Secretary表現を持つ。
+3. 初回利用者はonboarding、既存利用者は名前Skillから同じidentity設定へ進める。設定後も名前Skillまたはsettingsから変更でき、未設定状態を別repoで新規onboardingと誤判定しない。
+4. canonical resolverは確認済みの秘書workspaceを一意に解決する。候補0件、複数件、破損registry、workspace外向きsymlinkでは書き込まず、理由と次の確認を示す。現在cwdに別の秘書を無断作成しない。
+5. user-scope routingはopt-inとし、影響と対象fileを示した明示確認後だけ製品管理blockを追加・更新・削除する。既存の手書き内容と別製品blockを保ち、同じ操作の再実行で重複blockを作らない。
+6. Codexでは有効なユーザーscope指示面を尊重する。`AGENTS.override.md` が有効な環境で、読まれない `AGENTS.md` だけを更新して成功表示しない。Claude Codeではユーザーscope `CLAUDE.md` を対象とし、repo-local指示を上書きしない。
+7. routingは直接呼びかけまたは明示的な委譲だけを対象とする。同名が取引先、著者、担当者、コード上のsymbol等として現れる文脈では秘書へroutingしない。曖昧なら一度確認し、拒否後に同じ用件で繰り返し尋ねない。
+8. 改名前に、現行identity設定、製品管理block、現役参照、利用者文書、履歴の候補を分類して件数と影響を示す。自動変更は現行設定と製品所有blockに限定し、利用者文書は個別確認、履歴・過去authorは原則不変としてaliasで追跡する。blind global replaceは禁止する。
+9. 改名、managed block、registry更新は1 transactionとして扱う。書込み、path guard、symlink、構文検証、commitの失敗では対象fileとGit状態を開始前へrollbackし、backup、一時file、半端な旧名／新名混在を残さない。
+10. Yasashiiへの同期入力はpublic `sprint-039-patch-001` のfresh独立評価でPASSしたAgentic製品candidate `3fa8d97e5dbfb2afa314f4ad179f17401b76d320` と、そのtreeにある `adapters/downstream-identity-handoff.json` に固定する。handoff digestは `c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557`、`commonPaths` は16件とし、Agenticのdocs、progress、feedback、state、release記録を同期しない。
+11. 16 commonPathsは13件のbyte parityと、`name`／`secretary`／`settings` の3宣言anchorに分類する。`external-ops.mjs` と `safe-git.mjs` を共通安全pathとして含め、除外・下流overrideしない。overlay check／apply／reapplyは未分類0件、二回目追加差分0件を満たす。
+12. overlay metadataはaccepted candidate、digest、16 commonPaths、13 parity／3 anchor分類を記録する所有fieldだけを更新できる。Yasashii固有copy、style、rule manifest、README、identity、repo-owned docs、LICENSEと、それ以外のoverlay metadataのdigestを保護し、Agentic値へ戻さない。
+13. 合成HOMEと隔離workspaceでrouting、resolver、managed block、改名、rollbackを検証する。実HOME、installed plugin／cache、private版、Mac mini、remote、releaseへは本機能同期中に書き込まない。
+14. Windows nativeの既存12 labelsと残余リスクは過去証拠の範囲で正直に扱う。本機能のportable code review、既存suite、実行できた環境証拠を分け、Windows未実行を全環境PASSや解消済みへ昇格させない。

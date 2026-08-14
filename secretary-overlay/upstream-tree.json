@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "baseCommit": "24520a1d06f8d3833568a1386bf814e1085f5da9",
+  "baseCommit": "3fa8d97e5dbfb2afa314f4ad179f17401b76d320",
   "files": [
     {
       "path": ".agents/plugins/marketplace.json",
@@ -45,12 +45,12 @@
     {
       "path": "README.md",
       "classification": "repo-owned",
-      "sha256": "0b3be1c2f8fe5ac83b5b60a0fa9bc337a6a139a9e905b0c3f4b426d7329a1a47"
+      "sha256": "4923547de6dab19a2cab97e42445734df79f2fd0872b36f634a50faa65b801cf"
     },
     {
       "path": "adapters/agentic-overlay.json",
       "classification": "upstream-only",
-      "sha256": "dc1297bdb073e0a0bbf6328dd5ca3bbafbd6369a821bb1436d80b5968a1efb07"
+      "sha256": "28800245eb29f2d01ded4c73fe05761cbbd4b6261d3f2de522a7366341a0a0b7"
     },
     {
       "path": "adapters/claude-code-cli/README.md",
@@ -101,6 +101,11 @@
       "path": "adapters/codex-common/config.toml.example",
       "classification": "upstream-only",
       "sha256": "3da19b8fe169d8a2516fce9cc997d4be0ad6d0b0e4d5f5f790fb88031ed9fe95"
+    },
+    {
+      "path": "adapters/downstream-identity-handoff.json",
+      "classification": "upstream-only",
+      "sha256": "18c09cd474184fea802ed8ecc14b7b231e4187c95d7a58e40ceadf93b0ab2a36"
     },
     {
       "path": "adapters/host-matrix.json",
@@ -1455,12 +1460,17 @@
     {
       "path": "docs/feedback/sprint-038-patch-002.md",
       "classification": "repo-owned",
-      "sha256": "5b4dd95972bbcc816db2f4de2746a11204bcbdca4ebf6f5df9b9286b22409837"
+      "sha256": "0f3fb2f33524512b3ff090099c1e4a136790cac2953a2a4a9f63f11b06844eb6"
     },
     {
       "path": "docs/feedback/sprint-038.md",
       "classification": "repo-owned",
       "sha256": "10cfd3fdc549c0c7092c93f5693f435defa133c6e595a498c3182015d28a676e"
+    },
+    {
+      "path": "docs/feedback/sprint-039.md",
+      "classification": "repo-owned",
+      "sha256": "315aff81e7e0453266d06da6eee357fbfb9220df528f60f418e92e1524516cbc"
     },
     {
       "path": "docs/guide/README.md",
@@ -1758,6 +1768,16 @@
       "sha256": "2aec15ad031f1bf2db3e10120a9b378ee8ac439c4fa3b2e25a787073f093d414"
     },
     {
+      "path": "docs/progress/sprint-039-patch-001.md",
+      "classification": "repo-owned",
+      "sha256": "108a215e57e105fbaa80eb58374d330850152fae6fc929cf26bf2ed724b20bb0"
+    },
+    {
+      "path": "docs/progress/sprint-039.md",
+      "classification": "repo-owned",
+      "sha256": "3bce77638676097ddfa7b32aa798cb5be30b9170a74fba960bbd71d57cd24d97"
+    },
+    {
       "path": "docs/proposal-2026-07-15-realignment.md",
       "classification": "repo-owned",
       "sha256": "90831aba6e681c88a0fe23d1eb166313761cec4902c19d3402beb28ecbea2699"
@@ -1775,42 +1795,42 @@
     {
       "path": "docs/spec.md",
       "classification": "repo-owned",
-      "sha256": "b113f966ec5ba0d428ce36de0acbc20cb000c250202d0c7c0b6a98f075af72bb"
+      "sha256": "fff3f285e5aa82de14fda98a52d0c94330ae672344b4854315b9ee322adfe73b"
     },
     {
       "path": "docs/spec/constraints.md",
       "classification": "repo-owned",
-      "sha256": "3bb0072fe0f8b9780da77ff893607d4bc84b2b9f0c0ded490a43cb146e1d92f3"
+      "sha256": "d0dfe2f010a41fc1593173a63ecaf746e6db38e1a5285b19ec0106d50ec5159c"
     },
     {
       "path": "docs/spec/domain.md",
       "classification": "repo-owned",
-      "sha256": "b33fe445b522e9f2b9e965dd37de7df810496cc358b09659da776e642bb7d8c1"
+      "sha256": "9248dad60a2695edb43662d1f406ae833f3b2c29930ef138fca115cd0f8a9e83"
     },
     {
       "path": "docs/spec/editions.md",
       "classification": "repo-owned",
-      "sha256": "0adedb276a31856f345e3b6637d827a236b049a0c2466076bde56c4c93eea06d"
+      "sha256": "78bf281df48d8ff91320a27d65a6d820a27404da69f2e5318b7a14e7e17489bc"
     },
     {
       "path": "docs/spec/features.md",
       "classification": "repo-owned",
-      "sha256": "689c0c84444d72170ba2369c21f63bd7c5532daf930e4963b3e101e9bd2f9b1d"
+      "sha256": "b66fe5dfac470ee2257bfb68f38a1de9b1617ea526a89e2a87262035ad8f6b38"
     },
     {
       "path": "docs/spec/product.md",
       "classification": "repo-owned",
-      "sha256": "7edb1350eb39ebaf7a26d2f3c492f983e42d78ddf458a620ffc2ecb9d0f7b559"
+      "sha256": "262ecfd399ffcc6ee696383d327c818b9428f1c87394ac84f60d1348cd56d842"
     },
     {
       "path": "docs/spec/rubric.md",
       "classification": "repo-owned",
-      "sha256": "4782961e5d7286ae9e0084a57701892b2f2255d71d3389ff92984e863050f497"
+      "sha256": "44405f77f105fbc4775872734fd192d8753326904502efad7e0b3d43f8d7820d"
     },
     {
       "path": "docs/spec/ui.md",
       "classification": "repo-owned",
-      "sha256": "1b3e72cf78b4b9b48fdbfdc4ae90875849548c0dce670deb532f715e8db4a579"
+      "sha256": "3b18d44b41680c55b729e35ae3c874a65bd94dc11c65e135f616f45d2a575cdb"
     },
     {
       "path": "docs/sprints/sprint-001-patch-001.md",
@@ -2083,9 +2103,19 @@
       "sha256": "3d23f3dfcf7c70fd7252b5496e84cccfb8a95eab7d49e2746ce26a7918a00cc5"
     },
     {
+      "path": "docs/sprints/sprint-039-patch-001.md",
+      "classification": "repo-owned",
+      "sha256": "da35610a01481cc1596ce5a22c8a3e91b22d9cce05b22669ab18902a5b406bc1"
+    },
+    {
+      "path": "docs/sprints/sprint-039.md",
+      "classification": "repo-owned",
+      "sha256": "fcc645943f6eb169f92d20fdd02229183c665c1bfe4313bdc17a8903b869fea0"
+    },
+    {
       "path": "docs/sprints/state.md",
       "classification": "repo-owned",
-      "sha256": "a241d015387feb26b49401a337f49c8533ffa2c55ed1827d39374b634e6128c8"
+      "sha256": "f1807fe110e69465acdcfb1f49a5df09e3295c099f2b98583b79b43bbae2ed3d"
     },
     {
       "path": "plugins/secretary/.claude-plugin/plugin.json",
@@ -2115,7 +2145,7 @@
     {
       "path": "plugins/secretary/host-inventory.json",
       "classification": "common",
-      "sha256": "46727ec6c26fdc839ec99122f60ac575cdea583178dd64abdffa799e962ab926"
+      "sha256": "cc19a55dc7d5b132a77f685800dce37f1b06e9da7a141a4381ef6b265b25026e"
     },
     {
       "path": "plugins/secretary/migrations/0.2.0-to-0.3.0.json",
@@ -2278,6 +2308,11 @@
       "sha256": "c94f51460191e25b7c55c9dab40eeb03f45858be21e09fcb5a0298ab056c1506"
     },
     {
+      "path": "plugins/secretary/scripts/lib/name-router.mjs",
+      "classification": "common",
+      "sha256": "b0551c1a01874732738d16ddacbc5c7c7eb552ad71921b72631702db9f1ede12"
+    },
+    {
       "path": "plugins/secretary/scripts/lib/path-guard.sh",
       "classification": "common",
       "sha256": "88637709e15233ed6c36772d98f535e4d7ceaed900c86b217146825e1486d29e"
@@ -2290,7 +2325,17 @@
     {
       "path": "plugins/secretary/scripts/lib/safe-git.mjs",
       "classification": "common",
-      "sha256": "6db9cf49483cbfc6b8877e5e13ce43b084028416c04efe1836b9d6563beef6f2"
+      "sha256": "5d81c44849a39cccc5f0cd95163e243e3e403cd1c8b8a18f474d0ac726d2223a"
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/secretary-identity.mjs",
+      "classification": "common",
+      "sha256": "53d56a02e78565ee93c6672ce17394ab64fd5746b159490844a7909c23cc19d8"
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/secretary-rename.mjs",
+      "classification": "common",
+      "sha256": "de5be639e9a34b8c15be5212edf95d3c05907439b57301e0b3c79d5f21542247"
     },
     {
       "path": "plugins/secretary/scripts/lib/secretary-store.mjs",
@@ -2301,6 +2346,11 @@
       "path": "plugins/secretary/scripts/lib/timeline.sh",
       "classification": "common",
       "sha256": "1ebf5846724c329c47d8f41016c54cc008972071df27900f97a3c83b639a1ff7"
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/user-scope-routing.mjs",
+      "classification": "common",
+      "sha256": "4e7e996a3079ed94c9b4a900649f97e31862f876cc07329b83b865b1ab6203b0"
     },
     {
       "path": "plugins/secretary/scripts/lib/weekly.sh",
@@ -2316,6 +2366,11 @@
       "path": "plugins/secretary/scripts/lib/wizard-session.mjs",
       "classification": "common",
       "sha256": "f8065ece81be0941ae8a6d4f364590d32f15275d53438852c67c2c774d75e7a2"
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/workspace-registry.mjs",
+      "classification": "common",
+      "sha256": "74cd406d3b2d317f626cee17b89af08d001706d7c91a70d53d78dcc3b87775c9"
     },
     {
       "path": "plugins/secretary/scripts/name-candidates.mjs",
@@ -2348,6 +2403,11 @@
       "sha256": "e417f9170d94754aa42598b2f6753d68a0068bfd4a844cf08585621deb5b8f35"
     },
     {
+      "path": "plugins/secretary/scripts/secretary-name.mjs",
+      "classification": "common",
+      "sha256": "1778b858e7b8274a072e0261e5c78a2d3037ed0e8d4e4bff9c4950ccdb84ac95"
+    },
+    {
       "path": "plugins/secretary/scripts/update-apply.mjs",
       "classification": "common",
       "sha256": "aacc28225116e3987f752666028e2e9a9f3dbe1c39f0b351118e88350a4de0d2"
@@ -2370,7 +2430,7 @@
     {
       "path": "plugins/secretary/scripts/workspace-tools.mjs",
       "classification": "common",
-      "sha256": "254f8398c3c6526418bc82bc2bba462025a3850757010bfb0cf5be350787d465"
+      "sha256": "9b16723bdf445a84939fa5cd98c13ef9ef853da90acab72b1c56a9734cd508c5"
     },
     {
       "path": "plugins/secretary/scripts/workspace-tools.sh",
@@ -2553,9 +2613,14 @@
       "sha256": "7775dbb83134d6e3911473f39ad009c40b49c084e45067890a161ea57966c4b3"
     },
     {
+      "path": "plugins/secretary/skills/name/SKILL.md",
+      "classification": "anchor-overlay",
+      "sha256": "7c6cc068736c59af4e8c003825b299162548e0759d50bce80de4ab6a6cb48239"
+    },
+    {
       "path": "plugins/secretary/skills/onboarding/SKILL.md",
       "classification": "common",
-      "sha256": "cebf379cc672388876d6290b2686ee94141af5596fac53e208d942ecfe14c130"
+      "sha256": "a2a3332d7726d2b6cb590687f18a0fc8033d655e2efb8eff4040fa243239479e"
     },
     {
       "path": "plugins/secretary/skills/projects/SKILL.md",
@@ -2565,12 +2630,12 @@
     {
       "path": "plugins/secretary/skills/secretary/SKILL.md",
       "classification": "anchor-overlay",
-      "sha256": "726a1648915b0b46a64f1492f3bca26786386dd43d51acfb2f28120a85d5898f"
+      "sha256": "c8cc68d698a66215e38b0d3c76347507da74683574492833946c235a02a7fe2f"
     },
     {
       "path": "plugins/secretary/skills/settings/SKILL.md",
       "classification": "anchor-overlay",
-      "sha256": "0847d86298a75a02481dd3abe375ac44a937140c2904ebc16b0ce4ee7659eced"
+      "sha256": "ea555484cbaabf6577e518ec78be4d3a3821c40eb75c00b048fcf21765ff94dd"
     },
     {
       "path": "plugins/secretary/skills/setup-google/SKILL.md",
@@ -2600,7 +2665,7 @@
     {
       "path": "plugins/secretary/templates/AGENTS.md",
       "classification": "common",
-      "sha256": "409c7b7ddd67bafbda2aad5867e7b7f3713cc6caea7dee0cf85e71185fab5ae3"
+      "sha256": "590627c0363c30be2d2532be7fa5b777cf7094dc4a0771d25f7794b4d1f89f64"
     },
     {
       "path": "plugins/secretary/templates/CLAUDE.md",
@@ -2611,6 +2676,11 @@
       "path": "plugins/secretary/templates/docs/.gitkeep",
       "classification": "common",
       "sha256": "ebc6631bbc5db58e1072d9857ad21771531d7e513e9afb8e0ed923221a742524"
+    },
+    {
+      "path": "plugins/secretary/templates/identity.json",
+      "classification": "common",
+      "sha256": "1d64c072506547b986f21e76c02206095c5dcebec2c5385e748b3aa31634d2eb"
     },
     {
       "path": "plugins/secretary/templates/inbox/.gitkeep",
@@ -2630,7 +2700,7 @@
     {
       "path": "plugins/secretary/templates/memory/decisions/_first-decision.md",
       "classification": "common",
-      "sha256": "d2d12b5c3e09186f17fb4925a8c4afc0f456fef4d2df782cbc9f685d10ef9210"
+      "sha256": "f6e4593d1e7b8a979e672f845e5c4577e815fa4ebbffb31f807f38866ff81279"
     },
     {
       "path": "plugins/secretary/templates/memory/journal/.gitkeep",
@@ -2710,7 +2780,7 @@
     {
       "path": "scripts/agentic-archive-gate.mjs",
       "classification": "upstream-only",
-      "sha256": "de62a6ebe2e0981dcb8d6d5490f9508aad5ee7197dca78836a1cb87a9dfa838c"
+      "sha256": "3d900f65d9e238c5644b300a2fb57f2fc5b13777b7869cb603e4c52e50d2f907"
     },
     {
       "path": "scripts/agentic-codex-install-plan.mjs",
@@ -2720,7 +2790,7 @@
     {
       "path": "scripts/agentic-codex-plugin-test.mjs",
       "classification": "upstream-only",
-      "sha256": "12981c9d804096f6c75bcc25dd779cc96752b6f6833b790b5d97fe3ee05a79e3"
+      "sha256": "65f5ae25017f820ff2317d21a58594c0fd3eaf3918ca51b01072661a88362a5b"
     },
     {
       "path": "scripts/agentic-host-gate.mjs",
@@ -2740,12 +2810,12 @@
     {
       "path": "scripts/agentic-regression.sh",
       "classification": "upstream-only",
-      "sha256": "9a97ef25e69a60ec29091dcadae435b8ed0756e0752dd5829fdd59c63f925722"
+      "sha256": "d5d79e8aa492fb0b2e413a1fd89029541876f9c8c4661bc689c0dfb1dacafba9"
     },
     {
       "path": "scripts/archive-release-gate.mjs",
       "classification": "repo-owned",
-      "sha256": "0ef4b656ae03c11624d5e48ccc47db5df3b1718fdc773b8311cba03c09f112eb"
+      "sha256": "43350a0bb193ba11372c69c7d63307c219e7622675f6c8ead1d918781cbabc6f"
     },
     {
       "path": "scripts/check-distribution-channel.py",
@@ -2760,12 +2830,12 @@
     {
       "path": "scripts/check-release-integrity.py",
       "classification": "repo-owned",
-      "sha256": "8ac27c75c0547e7d166bf0bf64d0fe965fa2aac13e33f990a1ebe3f76e60efdb"
+      "sha256": "081feeace58446a51e4ceb06d6a6f891637971940844a826e2acbc02ba570212"
     },
     {
       "path": "scripts/check-report-schema.py",
       "classification": "common",
-      "sha256": "f64c649bc8965caed086b544e1df5c8d3b2aa5d40de37d9cf83ca9b48d1f8455"
+      "sha256": "98c138b2779e2caf945d31d5a32a30ee91bb0795fcc4f51923b69dcbb32e9fba"
     },
     {
       "path": "scripts/check-yasashii-harness-online.sh",
@@ -3034,8 +3104,8 @@
     },
     {
       "path": "scripts/master-release-gate.mjs",
-      "classification": "common",
-      "sha256": "2bd9a39dd8fbefa198ab6412b7496ce1187c8a2f0f08b200e55c061e05e84fac"
+      "classification": "anchor-overlay",
+      "sha256": "c152d92eadd083a4e41b56d2e8da9543802b7ab673afc4e3334f8ad2dcb38052"
     },
     {
       "path": "scripts/master-release-gate.sh",
@@ -3070,7 +3140,7 @@
     {
       "path": "scripts/sprint-011-regression.sh",
       "classification": "anchor-overlay",
-      "sha256": "276643d7a9ea335299f13ee65ec448ce50cdd3bef568ccdf5dd1081084fd869b"
+      "sha256": "a26564b99834860a92e719deefb4b76e90c89ae56678ba8585bef52851d89838"
     },
     {
       "path": "scripts/sprint-012-patch-001-live-dialogue.sh",
@@ -3335,7 +3405,7 @@
     {
       "path": "scripts/sprint-032-patch-001-readability-test.mjs",
       "classification": "common",
-      "sha256": "d56d71bf01bc1e0544d3b180e46e74ba1f617ab964588e8f698de14a5c7f5039"
+      "sha256": "c4c34f9cefd5a18bc6e6c916e518c23719bc086d479c9573fde079da01cd02b8"
     },
     {
       "path": "scripts/sprint-032-patch-001-regression.sh",
@@ -3355,7 +3425,7 @@
     {
       "path": "scripts/sprint-032-patch-002-test.mjs",
       "classification": "common",
-      "sha256": "2b4d23ba716f45161c6b293ceb15786ebedddcb663e5c7b67d746b6fba8bb2c7"
+      "sha256": "d36e16bc5e71ced52eb277a2b743a1181132a8bd27427937fb270954b03d51f6"
     },
     {
       "path": "scripts/sprint-032-regression.sh",
@@ -3370,7 +3440,7 @@
     {
       "path": "scripts/sprint-033-test.mjs",
       "classification": "upstream-only",
-      "sha256": "8fc01dfe66b77f7422b60c9f9cb0d0cf02947628da244ac190e582df1aa19aea"
+      "sha256": "98be6d0155949983880f1e2b32b5564484a5a6c0e4428d6d74ce12d8ff9dc6f3"
     },
     {
       "path": "scripts/sprint-035-patch-001-ime-test.mjs",
@@ -3395,12 +3465,12 @@
     {
       "path": "scripts/sprint-035-patch-004-test.mjs",
       "classification": "common",
-      "sha256": "519e298b552939032a4d49ef18f7ecace11a60f20dbfb20ea738ba1e03dfd95a"
+      "sha256": "283025fc4293211b252fd6fe81e96e943f57679b0159bfd3dd083015c94fc768"
     },
     {
       "path": "scripts/sprint-035-test.mjs",
       "classification": "anchor-overlay",
-      "sha256": "3a97c20b4e2f04c66db4b4c9594f1d14c909e1bcdcb6db567c6120c772f0201e"
+      "sha256": "5a881f1b8b0d4d9bd309a8b285a5b79021a1ff89ce54ae78aa9da9bcf15abdbf"
     },
     {
       "path": "scripts/sprint-037-patch-001-test.mjs",
@@ -3459,8 +3529,33 @@
     },
     {
       "path": "scripts/sprint-038-test.mjs",
-      "classification": "common",
+      "classification": "anchor-overlay",
       "sha256": "679d81975832e4490f9607e3e94ff79423a0c18f6c911d76e40f7ab0375b3d1e"
+    },
+    {
+      "path": "scripts/sprint-039-handoff.mjs",
+      "classification": "upstream-only",
+      "sha256": "645cb2e2b69db72f0e02651ea088ddd89c05d76a6bd9c96d45ad61b5176be2fe"
+    },
+    {
+      "path": "scripts/sprint-039-patch-001-regression.sh",
+      "classification": "upstream-only",
+      "sha256": "3d49888fede5b79d1bd7cd790dfa07735d463617b377f10895155530a98a4613"
+    },
+    {
+      "path": "scripts/sprint-039-patch-001-test.mjs",
+      "classification": "upstream-only",
+      "sha256": "5c67d303f243ddaa735d74559e45bec1de10cc8c3239342998e416d1ecbed94d"
+    },
+    {
+      "path": "scripts/sprint-039-regression.sh",
+      "classification": "upstream-only",
+      "sha256": "a26b8dade9352c0730ee9e52a6e97f10023fc7eae6365d01625110ee5d663c4b"
+    },
+    {
+      "path": "scripts/sprint-039-test.mjs",
+      "classification": "upstream-only",
+      "sha256": "9114136ff14fd13b6b6668a8bf3f25d257d88a73fab60a04858143131d98b5de"
     },
     {
       "path": "scripts/start-sprint-013-wizard-fixture.sh",

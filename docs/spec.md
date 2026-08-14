@@ -157,6 +157,7 @@ Gmail等の公式コネクタは従来どおり都度参照し、Chatworkと明�
 | [sprint-037](sprints/sprint-037.md) | 固定Agentic candidateから、呼び方4経路、安全な候補探索、現役正本同期、利用者中立化をYasashii overlayへ同期 | sprint-036を置換する次メインSprint |
 | [sprint-038](sprints/sprint-038.md) | Agentic Secretary 0.9.1をoverlay同期し、Yasashii Harness 0.5.1互換・Yasashii Secretary 0.9.1を独立評価／公開 | sprint-037 |
 | [sprint-038-patch-002](sprints/sprint-038-patch-002.md) | Agenticの合格済み完全SHAからWindows native保存互換をoverlay同期し、Yasashii Secretary 0.9.2を独立評価する通常Patch | sprint-038 done |
+| [sprint-039](sprints/sprint-039.md) | 固定Agentic candidateのhandoff manifestから英語の秘書名、stable identity、AI author、別repo routing、安全な改名をYasashii overlayへ同期 | sprint-038-patch-002 |
 
 既存 sprint-001〜006 と各 patch の契約・progress・feedback は履歴として保持する。
 sprint-007 は製品方針転換で白紙化され、旧計画と実装は `backup/sprint-007-010-plan` に退避済みである。
@@ -198,3 +199,4 @@ sprint-007 は製品方針転換で白紙化され、旧計画と実装は `back
 33. 初回の呼び方は「あなた」「アカウント名」「指定の名前」「その他」の4経路から解決し、保存前に実際の値を確認する。「アカウント名」は現在タスクへhostが提供済みの文脈、`git config user.name`、OSユーザー名の順で候補を探す。任意の過去会話や生session logを直接探索せず、不適格値を除外し、候補が無ければ利用不能とする。選択への未回答は「あなた」へ解決するが、保存確認が未完了なら書き込まない。
 34. 配布物と現行製品正本は、利用者・保守者の個人名、利用者端末固有の絶対path、私用workspaceを実行前提にしない。MITの著作権表示、GitHub owner、公式repository URL等の製品所有・配布識別情報は維持する。
 35. Yasashiiへの共通機能同期は、合格済みAgentic完全SHAをreview済みbaseとして記録し、宣言済みoverlayを二回適用して追加差分0件を確認する。Yasashii固有copy、identity、manifest、README、repo-owned docsを上流値で上書きしない。
+36. 秘書自身の英語名は利用者の呼び方と分離し、stable identity、AI author、canonical workspaceを維持する。user-scope routingはopt-inの製品管理blockだけを扱い、人名文脈を誤routingせず、改名では履歴をblind replaceしない。

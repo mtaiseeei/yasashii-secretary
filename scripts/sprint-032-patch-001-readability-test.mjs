@@ -100,7 +100,7 @@ check("A: inventory covers the four required user-facing categories", () => {
     "rules-and-edition-copy", "skills-and-commands", "workspace-guidance", "wizard",
   ]);
   assert(inventory.machineReadableExclusions.every((entry) => entry.reason.length > 20));
-  assert.equal(surfaces.filter((path) => path.endsWith("/SKILL.md")).length, 15);
+  assert.equal(surfaces.filter((path) => path.endsWith("/SKILL.md")).length, 16);
   assert(surfaces.some((path) => path.endsWith(`rules/${contract.styleRule.copy}`)));
   assert(surfaces.some((path) => path.endsWith("templates/AGENTS.md")));
   assert(surfaces.some((path) => path.endsWith("chatwork/assets/wizard/app.js")));

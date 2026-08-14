@@ -31,9 +31,11 @@ Claude Codeの明示入口は `/secretary`、Codexは `$secretary` です。通�
 通常報告のRead、しおり確認、preferences再読、ルーティング、段階ロードは無言で行い、
 下位skillの内容をrouterが再包装せず、すべてのtool実行後にserializerを1回だけ適用する。
 
-## まずやること: 初回か2回目以降かを見分ける
+## まずやること: canonical workspaceと初回を見分ける
 
-作業中のフォルダ（カレントディレクトリ）に `secretary/` フォルダがあるかを確認する。
+作業中のフォルダに `secretary/` が無い場合、すぐ初回扱いにしない。name Skillのread-only resolverで
+登録済みcanonical workspaceを確認する。解決できた場合はそこへ接続し、cwdへ `secretary/`、ledger、commitを作らない。
+registryが無い場合だけ、現在のフォルダで初回オンボーディングを提案する。欠落、重複、反対edition、symlink等は安全停止する。
 
 - **`secretary/` が無い → 初回**。オンボーディング（初回セットアップ）へ進む。
   読み込む: `${SECRETARY_PLUGIN_ROOT}/skills/onboarding/SKILL.md`
@@ -69,6 +71,7 @@ Claude Codeの明示入口は `/secretary`、Codexは `$secretary` です。通�
 | 「Google Chatを設定したい」「Google Chatにつなぎたい」「GChatで探して」「/google-chat」 | Google Chat高度接続・通常スペース履歴検索（google-chat） | `${SECRETARY_PLUGIN_ROOT}/skills/google-chat/SKILL.md` |
 | 「繋がってる？」「接続の調子」「診断して」「どれが使える？」 | 接続診断（connections） | `${SECRETARY_PLUGIN_ROOT}/skills/connections/SKILL.md` |
 | 「設定変えたい」「もっとフランクに」「専門用語そのままで」「呼び方を変えて」 | 個人設定（settings） | `${SECRETARY_PLUGIN_ROOT}/skills/settings/SKILL.md` |
+| 「秘書に名前をつけたい」「秘書名を変えたい」「Alexと呼びたい」「別repoでも呼びたい」 | 秘書identityと名前routing（name） | `${SECRETARY_PLUGIN_ROOT}/skills/name/SKILL.md` |
 | 「プロジェクトにまとめたい」「案件を整理したい」「プロジェクトの状況」「完了にしたい」「再開したい」 | 継続する仕事の整理（projects） | `${SECRETARY_PLUGIN_ROOT}/skills/projects/SKILL.md` |
 | 「最新版にして」「更新ある？」「バージョンを確認して」「自動更新はどうする？」 | 更新状況の読み取り専用診断（update） | `${SECRETARY_PLUGIN_ROOT}/skills/update/SKILL.md` |
 | 「保存して」「文書にして」「まとめて残して」「企画書にして」 | 成果物保存（出力規約） | 下記「成果物を保存するとき」 |
@@ -129,6 +132,7 @@ LINE等の未対応サービスは準備中。Chatworkと明示設定済みGoogl
 - Google Chat 接続・検索: `${SECRETARY_PLUGIN_ROOT}/skills/google-chat/SKILL.md`
 - 接続診断: `${SECRETARY_PLUGIN_ROOT}/skills/connections/SKILL.md`
 - 個人設定: `${SECRETARY_PLUGIN_ROOT}/skills/settings/SKILL.md`
+- 秘書自身の名前と別repo呼び出し: `${SECRETARY_PLUGIN_ROOT}/skills/name/SKILL.md`
 - 週次ふりかえり・索引退避: `${SECRETARY_PLUGIN_ROOT}/skills/weekly/SKILL.md`
 - 継続する仕事の整理: `${SECRETARY_PLUGIN_ROOT}/skills/projects/SKILL.md`
 - 更新状況の確認: `${SECRETARY_PLUGIN_ROOT}/skills/update/SKILL.md`
