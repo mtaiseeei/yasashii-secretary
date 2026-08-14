@@ -1,5 +1,37 @@
 # 変更履歴
 
+## [0.10.0] - 2026-08-14
+
+### 対象者
+
+- 初回セットアップで、呼びやすい英語名の秘書と仕事を始めたい方。
+- すでにYasashii Secretaryを使っていて、別repoから同じ秘書を呼び出したい方や、秘書名を安全に変更したい方。
+
+### 変わること
+
+- 初回セットアップで、秘書自身の英語名を希望名またはおまかせ提案から決めます。利用者の呼び方とは別に保存し、同じ秘書を追跡するstable identityは改名後も変えません。
+- 既存利用者は`name` Skillから英語名の設定、現在名の確認、改名へ進めます。新しい成果物は人の作者と区別できるAI Secretaryの作者情報を持ちます。
+- 希望する場合だけuser-scope managed blockを有効にし、別repoでも「Alex、…」「Alexに聞いて」のように同じ秘書を呼び出せます。取引先や著者として同名が出ただけでは秘書へ案内しません。
+- 改名前に候補を現行設定、利用者文書、過去の作者、所有不明へ分類して示します。確認した対象だけを変更し、無条件の一括置換は行いません。
+
+### 設定・ファイルへの影響
+
+- 新規workspaceには`secretary/identity.json`を作り、英語の表示名、stable identity、AI種別、aliasesを記録します。
+- 既存workspaceへは自動で名前を付けません。`name` Skillで確認した場合だけidentityを追加または変更し、過去の作者表示はそのまま残します。
+- Codexの`AGENTS.md`／`AGENTS.override.md`とClaude Codeの`CLAUDE.md`に置くuser-scope managed blockは任意です。効果と無効化方法を説明し、明示了承後だけ製品管理部分を変更します。workspace migrationはありません。
+
+### 必要な操作
+
+- Secretaryを更新し、新しいsessionを開始します。初回利用者は通常のセットアップで秘書名を決めます。
+- 既存利用者は「秘書に名前をつけたい」と伝えて`name` Skillを開き、保存する英語名を確認します。
+- 別repoから名前で呼びたい場合だけ、対象hostとfileの説明を確認してuser-scope routingを有効にします。
+
+### 互換性上の注意
+
+- user-scope routingは自動では有効になりません。未作成または無効化済みの設定は、改名だけで有効化しません。
+- 改名時にworkspace側の管理対象が変わる場合は所有pathだけをlocal commitへ記録します。書込み、commit、またはHOME側更新が失敗した場合は、Git状態とuser-scope fileを開始前へ戻します。pushは行いません。
+- `0.9.2`以前のrelease記録、migration、fixtureは履歴として維持します。
+
 ## [0.9.2] - 2026-08-10
 
 ### 対象者

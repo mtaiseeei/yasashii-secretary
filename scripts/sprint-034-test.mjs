@@ -124,7 +124,7 @@ check("yasashii settings display keeps readable keys and confirmation boundaries
   assert(yasashii.includes('journal-add <secretary> did "設定を変更: <変更項目>=<値>"'));
 });
 
-check("edition metadata stays yasashii and release candidate stays 0.9.2", () => {
+check("edition metadata stays yasashii and current release is 0.10.0", () => {
   const edition = JSON.parse(readFileSync(join(root, "plugins/secretary/edition.json"), "utf8"));
   const marketplace = JSON.parse(readFileSync(join(root, ".claude-plugin/marketplace.json"), "utf8"));
   const manifest = JSON.parse(readFileSync(join(root, "plugins/secretary/.claude-plugin/plugin.json"), "utf8"));
@@ -138,12 +138,12 @@ check("edition metadata stays yasashii and release candidate stays 0.9.2", () =>
   assert.equal(edition.harness.repository, "https://github.com/mtaiseeei/yasashii-harness");
   assert.equal(edition.harness.hosts.claudeCode.installId, "harness@yasashii-harness");
   assert.equal(edition.harness.hosts.codex.installId, "harness@yasashii-harness");
-  assert.equal(marketplace.plugins[0].version, "0.9.2");
-  assert.equal(manifest.version, "0.9.2");
+  assert.equal(marketplace.plugins[0].version, "0.10.0");
+  assert.equal(manifest.version, "0.10.0");
   assert.equal(codexMarketplace.name, "yasashii-secretary");
   assert.equal(codexMarketplace.plugins[0].name, "yasashii-secretary");
   assert.equal(codexManifest.name, "yasashii-secretary");
-  assert.equal(codexManifest.version, "0.9.2");
+  assert.equal(codexManifest.version, "0.10.0");
   assert.equal(codexManifest.skills, "./skills/");
   assert.equal(marketplace.plugins[0].forkedFrom, "https://github.com/Shin-sibainu/cc-company");
 });

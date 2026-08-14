@@ -3104,7 +3104,7 @@
     },
     {
       "path": "scripts/master-release-gate.mjs",
-      "classification": "common",
+      "classification": "anchor-overlay",
       "sha256": "c152d92eadd083a4e41b56d2e8da9543802b7ab673afc4e3334f8ad2dcb38052"
     },
     {
@@ -3529,7 +3529,7 @@
     },
     {
       "path": "scripts/sprint-038-test.mjs",
-      "classification": "common",
+      "classification": "anchor-overlay",
       "sha256": "679d81975832e4490f9607e3e94ff79423a0c18f6c911d76e40f7ab0375b3d1e"
     },
     {

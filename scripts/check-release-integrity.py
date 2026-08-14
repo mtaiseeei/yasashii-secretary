@@ -100,8 +100,8 @@ def validate(root: Path) -> list[str]:
 
     if codex_plugin.get("name") != PLUGIN_NAME:
         errors.append("Codex plugin manifest name is missing or invalid")
-    if codex_plugin.get("version") != "0.9.2":
-        errors.append("Codex plugin manifest version must be 0.9.2")
+    if codex_plugin.get("version") != "0.10.0":
+        errors.append("Codex plugin manifest version must be 0.10.0")
     if codex_plugin.get("skills") != "./skills/":
         errors.append("Codex plugin manifest skills must be ./skills/")
     if codex_plugin.get("author", {}).get("name") != AUTHOR:

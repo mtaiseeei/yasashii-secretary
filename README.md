@@ -13,6 +13,7 @@
 あなた専属のAI秘書です。次のことができます。
 
 - 決めたこと・好みを**覚えて守る**（うっかり消さない・前回の続きから再開できる）。
+- 秘書自身に英語名をつけ、別のリポジトリでも「Alex、…」のように同じ秘書を呼び出せる。
 - 予定とTODOを突き合わせて**今日やること**を根拠つきで返す。
 - 日次journal原本から**今週を振り返り**、古い月も確認してから安全に退避できる。
 - 一度で終わらない仕事を、確認後に**プロジェクトとして整理**し、別の日も現在の状況から再開できる。
@@ -38,7 +39,7 @@ Claude Codeでは、上から順に実行します。各コマンドの前に「
 /secretary
 ```
 
-Codexでは、repository marketplaceから同じ15 skillsを入れます。
+Codexでは、repository marketplaceから同じ16 skillsを入れます。
 
 ```text
 # 1. このプラグインの配布元を登録する
@@ -53,7 +54,7 @@ $secretary
 
 ### 初めての一歩
 
-`/secretary`（Claude Code）または `$secretary`（Codex）を初めて実行すると、**5問以内**（呼び方・主に使うサービス・任せたいこと・仕事や役割・説明の詳しさ）だけ聞かれます。
+`/secretary`（Claude Code）または `$secretary`（Codex）を初めて実行すると、**6問以内**（秘書自身の英語名・呼び方・主に使うサービス・任せたいこと・仕事や役割・説明の詳しさ）だけ聞かれます。
 答えると、いまいるフォルダの中に**秘書ディレクトリ**（`secretary/`）ができ、秘書・一般プロジェクト・Chatwork／Google Chat設定をまとめる1つのprivate GitHub repoへ初回pushします。Google ChatはCloud準備と接続用JSONの取得後、選んだ通常スペースだけを追加します。
 口調は丁寧な標準設定で始まり、あとから「設定変えたい」で変更できます。
 あとは「今日やること」「〇〇を覚えておいて」「Google につなぎたい」などと話しかけるだけです。
@@ -156,6 +157,7 @@ Google People APIの `contacts.readonly` では、連絡先にない同僚名を
 |---|---|---|
 | 初回セットアップ | `/secretary`（初回） | onboarding |
 | 用件のふりわけ（窓口） | `/secretary` | secretary |
+| 秘書自身の名前・別repo呼び出し | 「秘書に名前をつけたい」「Alexと呼びたい」 | name |
 | 覚える・守る・前回の続き | 「覚えて」「消して」「前回の続き」 | memory-care |
 | 今日やること | 「今日やること」「予定」「TODO」 | daily |
 | 継続する仕事をプロジェクトにまとめる | 「この案件をプロジェクトにして」「状況を更新して」 | projects |
@@ -172,7 +174,7 @@ Google People APIの `contacts.readonly` では、連絡先にない同僚名を
 
 ### 更新を確認する
 
-現在のmanifest candidateは`0.9.2`です。Windowsの日本語・空白を含むworkspaceでも、project、記憶、TODO、設定、文書をNode.jsの共通保存処理で記録できるようにします。workspace migrationはありません。
+現在のmanifest candidateは`0.10.0`です。初回セットアップまたは`name` Skillで秘書自身の英語名を決め、任意でuser-scope managed blockを有効にすると、別repoからも同じ秘書を名前で呼び出せます。改名前には変更候補を分類して示し、失敗時はworkspaceのGit状態とuser-scope fileを開始前へ戻します。workspace migrationはありません。更新後は新しいsessionを開始してください。
 「更新ある？」と話しかけると、現在版・最新版、主な変更、設定やファイルへの影響を確認できます。この診断はplugin、workspace、Git、Claude Code設定を変更しません。
 公開済み`0.7.0`の旧updaterにはGoogle Chat標準生成fileで止まる既知のblockerがあるため、`0.7.0 → 0.8.0`のlive updateは配布保証に含めていません。
 失敗時はworkspaceとpluginを別々に復元し、片方しか戻っていない状態を完了と表示しません。

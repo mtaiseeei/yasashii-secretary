@@ -182,6 +182,18 @@
       "replacement": "for (const phrase of [\"実コネクタ\", \"edition.json\", \"4面copy\", \"根拠\", \"推測で断定しません\"]) assert(evidence.includes(phrase), `証拠契約が不足しています: ${phrase}`);"
     },
     {
+      "id": "canonical-changelog-yasashii-0100-release",
+      "path": "plugins/secretary/CHANGELOG.md",
+      "match": "# 変更履歴\n\n## [0.9.2]",
+      "replacement": "# 変更履歴\n\n## [0.10.0] - 2026-08-14\n\n### 対象者\n\n- 初回セットアップで、呼びやすい英語名の秘書と仕事を始めたい方。\n- すでにYasashii Secretaryを使っていて、別repoから同じ秘書を呼び出したい方や、秘書名を安全に変更したい方。\n\n### 変わること\n\n- 初回セットアップで、秘書自身の英語名を希望名またはおまかせ提案から決めます。利用者の呼び方とは別に保存し、同じ秘書を追跡するstable identityは改名後も変えません。\n- 既存利用者は`name` Skillから英語名の設定、現在名の確認、改名へ進めます。新しい成果物は人の作者と区別できるAI Secretaryの作者情報を持ちます。\n- 希望する場合だけuser-scope managed blockを有効にし、別repoでも「Alex、…」「Alexに聞いて」のように同じ秘書を呼び出せます。取引先や著者として同名が出ただけでは秘書へ案内しません。\n- 改名前に候補を現行設定、利用者文書、過去の作者、所有不明へ分類して示します。確認した対象だけを変更し、無条件の一括置換は行いません。\n\n### 設定・ファイルへの影響\n\n- 新規workspaceには`secretary/identity.json`を作り、英語の表示名、stable identity、AI種別、aliasesを記録します。\n- 既存workspaceへは自動で名前を付けません。`name` Skillで確認した場合だけidentityを追加または変更し、過去の作者表示はそのまま残します。\n- Codexの`AGENTS.md`／`AGENTS.override.md`とClaude Codeの`CLAUDE.md`に置くuser-scope managed blockは任意です。効果と無効化方法を説明し、明示了承後だけ製品管理部分を変更します。workspace migrationはありません。\n\n### 必要な操作\n\n- Secretaryを更新し、新しいsessionを開始します。初回利用者は通常のセットアップで秘書名を決めます。\n- 既存利用者は「秘書に名前をつけたい」と伝えて`name` Skillを開き、保存する英語名を確認します。\n- 別repoから名前で呼びたい場合だけ、対象hostとfileの説明を確認してuser-scope routingを有効にします。\n\n### 互換性上の注意\n\n- user-scope routingは自動では有効になりません。未作成または無効化済みの設定は、改名だけで有効化しません。\n- 改名時にworkspace側の管理対象が変わる場合は所有pathだけをlocal commitへ記録します。書込み、commit、またはHOME側更新が失敗した場合は、Git状態とuser-scope fileを開始前へ戻します。pushは行いません。\n- `0.9.2`以前のrelease記録、migration、fixtureは履歴として維持します。\n\n## [0.9.2]"
+    },
+    {
+      "id": "legacy-changelog-yasashii-0100-release",
+      "path": "plugins/yasashii-secretary/CHANGELOG.md",
+      "match": "# 変更履歴\n\n## [0.9.2]",
+      "replacement": "# 変更履歴\n\n## [0.10.0] - 2026-08-14\n\n### 対象者\n\n- 初回セットアップで、呼びやすい英語名の秘書と仕事を始めたい方。\n- すでにYasashii Secretaryを使っていて、別repoから同じ秘書を呼び出したい方や、秘書名を安全に変更したい方。\n\n### 変わること\n\n- 初回セットアップで、秘書自身の英語名を希望名またはおまかせ提案から決めます。利用者の呼び方とは別に保存し、同じ秘書を追跡するstable identityは改名後も変えません。\n- 既存利用者は`name` Skillから英語名の設定、現在名の確認、改名へ進めます。新しい成果物は人の作者と区別できるAI Secretaryの作者情報を持ちます。\n- 希望する場合だけuser-scope managed blockを有効にし、別repoでも「Alex、…」「Alexに聞いて」のように同じ秘書を呼び出せます。取引先や著者として同名が出ただけでは秘書へ案内しません。\n- 改名前に候補を現行設定、利用者文書、過去の作者、所有不明へ分類して示します。確認した対象だけを変更し、無条件の一括置換は行いません。\n\n### 設定・ファイルへの影響\n\n- 新規workspaceには`secretary/identity.json`を作り、英語の表示名、stable identity、AI種別、aliasesを記録します。\n- 既存workspaceへは自動で名前を付けません。`name` Skillで確認した場合だけidentityを追加または変更し、過去の作者表示はそのまま残します。\n- Codexの`AGENTS.md`／`AGENTS.override.md`とClaude Codeの`CLAUDE.md`に置くuser-scope managed blockは任意です。効果と無効化方法を説明し、明示了承後だけ製品管理部分を変更します。workspace migrationはありません。\n\n### 必要な操作\n\n- Secretaryを更新し、新しいsessionを開始します。初回利用者は通常のセットアップで秘書名を決めます。\n- 既存利用者は「秘書に名前をつけたい」と伝えて`name` Skillを開き、保存する英語名を確認します。\n- 別repoから名前で呼びたい場合だけ、対象hostとfileの説明を確認してuser-scope routingを有効にします。\n\n### 互換性上の注意\n\n- user-scope routingは自動では有効になりません。未作成または無効化済みの設定は、改名だけで有効化しません。\n- 改名時にworkspace側の管理対象が変わる場合は所有pathだけをlocal commitへ記録します。書込み、commit、またはHOME側更新が失敗した場合は、Git状態とuser-scope fileを開始前へ戻します。pushは行いません。\n- `0.9.2`以前のrelease記録、migration、fixtureは履歴として維持します。\n\n## [0.9.2]"
+    },
+    {
       "id": "canonical-changelog-yasashii-092-scope",
       "path": "plugins/secretary/CHANGELOG.md",
       "match": "- Agentic版を先に独立評価し、合格した完全SHAからYasashii版へoverlay同期します。privateの`agentic-secretary-my-vault`はこの変更の対象外です。",
@@ -218,22 +230,88 @@
       "replacement": "- `build` skillとREADMEの互換案内、online互換診断をやさしいハーネス `0.5.1`の公開commitに合わせます。"
     },
     {
+      "id": "sprint-032-current-release-manifests-0100",
+      "path": "scripts/sprint-032-update-gate-test.mjs",
+      "match": "  check(\"current marketplace/pluginは0.9.2で一致\", market.plugins?.[0]?.version === \"0.9.2\" && pluginManifest.version === \"0.9.2\");",
+      "replacement": "  check(\"current marketplace/pluginは0.10.0で一致\", market.plugins?.[0]?.version === \"0.10.0\" && pluginManifest.version === \"0.10.0\");"
+    },
+    {
+      "id": "sprint-032-current-changelog-0100",
+      "path": "scripts/sprint-032-update-gate-test.mjs",
+      "match": "  check(\"canonical/legacy CHANGELOGは0.9.2先頭かつbyte一致\", readFileSync(candidateChangelog).equals(readFileSync(legacyChangelog)) && readFileSync(candidateChangelog, \"utf8\").startsWith(\"# 変更履歴\\n\\n## [0.9.2]\"));",
+      "replacement": "  check(\"canonical/legacy CHANGELOGは0.10.0先頭かつbyte一致\", readFileSync(candidateChangelog).equals(readFileSync(legacyChangelog)) && readFileSync(candidateChangelog, \"utf8\").startsWith(\"# 変更履歴\\n\\n## [0.10.0]\"));"
+    },
+    {
       "id": "sprint-032-current-edition",
       "path": "scripts/sprint-032-update-gate-test.mjs",
       "match": "check(\"editionのcandidate/latest参照はagentic 0.9.2配布面と整合\", edition.edition === \"agentic-secretary\" && edition.distribution.marketplaceUrl.includes(\"agentic-secretary\") && edition.distribution.changelogUrl.endsWith(\"/plugins/secretary/CHANGELOG.md\"));",
-      "replacement": "check(\"editionのcandidate/latest参照はyasashii 0.9.2配布面と整合\", edition.edition === \"yasashii-secretary\" && edition.distribution.marketplaceUrl.includes(\"yasashii-secretary\") && edition.distribution.changelogUrl.endsWith(\"/plugins/yasashii-secretary/CHANGELOG.md\"));"
+      "replacement": "check(\"editionのcandidate/latest参照はyasashii 0.10.0配布面と整合\", edition.edition === \"yasashii-secretary\" && edition.distribution.marketplaceUrl.includes(\"yasashii-secretary\") && edition.distribution.changelogUrl.endsWith(\"/plugins/yasashii-secretary/CHANGELOG.md\"));"
     },
     {
       "id": "sprint-032-current-marker",
       "path": "scripts/sprint-032-update-gate-test.mjs",
       "match": "check(\"新規0.9.2 onboardingはneutral markerを作る\", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === \"agentic-secretary\", fresh.prepared.stderr);",
-      "replacement": "check(\"新規0.9.2 onboardingはneutral markerを作る\", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === \"yasashii-secretary\", fresh.prepared.stderr);"
+      "replacement": "check(\"新規0.10.0 onboardingはneutral markerを作る\", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === \"yasashii-secretary\", fresh.prepared.stderr);"
     },
     {
       "id": "sprint-032-current-ledger",
       "path": "scripts/sprint-032-update-gate-test.mjs",
       "match": "check(\"新規0.9.2導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"agentic-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.9.2\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);",
-      "replacement": "check(\"新規0.9.2導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"yasashii-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.9.2\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);"
+      "replacement": "check(\"新規0.10.0導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"yasashii-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.10.0\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);"
+    },
+    {
+      "id": "sprint-032-current-skill-inventory-0100",
+      "path": "scripts/sprint-032-update-gate-test.mjs",
+      "match": "  check(\"新規0.9.2配布物は主要skillと両wizardを含む\", [",
+      "replacement": "  check(\"新規0.10.0配布物は主要skillと両wizardを含む\", ["
+    },
+    {
+      "id": "sprint-032-same-version-0100",
+      "path": "scripts/sprint-032-update-gate-test.mjs",
+      "match": "  check(\"0.9.2→0.9.2はCTAなし・副作用0\", same.status === 0 && parse(same).status === \"same\" && parse(same).choices?.find((item) => item.id === \"proceed-update\")?.available === false && sameStart.status === 0 && JSON.stringify(workspaceSnapshot(fresh.workspace)) === JSON.stringify(sameBefore), `${same.stderr}${same.stdout}${sameStart.stderr}${sameStart.stdout}`);",
+      "replacement": "  check(\"0.10.0→0.10.0はCTAなし・副作用0\", same.status === 0 && parse(same).status === \"same\" && parse(same).choices?.find((item) => item.id === \"proceed-update\")?.available === false && sameStart.status === 0 && JSON.stringify(workspaceSnapshot(fresh.workspace)) === JSON.stringify(sameBefore), `${same.stderr}${same.stdout}${sameStart.stderr}${sameStart.stdout}`);"
+    },
+    {
+      "id": "sprint-032-downgrade-0100",
+      "path": "scripts/sprint-032-update-gate-test.mjs",
+      "match": "  check(\"0.9.2→0.8.0はdowngrade-blocked・副作用0\", downgrade.status === 0 && parse(downgrade).status === \"downgrade-blocked\" && parse(downgrade).choices?.find((item) => item.id === \"proceed-update\")?.available === false && downgradeStart.status === 0 && JSON.stringify(workspaceSnapshot(fresh.workspace)) === JSON.stringify(downgradeBefore), `${downgrade.stderr}${downgrade.stdout}${downgradeStart.stderr}${downgradeStart.stdout}`);",
+      "replacement": "  check(\"0.10.0→0.8.0はdowngrade-blocked・副作用0\", downgrade.status === 0 && parse(downgrade).status === \"downgrade-blocked\" && parse(downgrade).choices?.find((item) => item.id === \"proceed-update\")?.available === false && downgradeStart.status === 0 && JSON.stringify(workspaceSnapshot(fresh.workspace)) === JSON.stringify(downgradeBefore), `${downgrade.stderr}${downgrade.stdout}${downgradeStart.stderr}${downgradeStart.stdout}`);"
+    },
+    {
+      "id": "master-release-comment-0100",
+      "path": "scripts/master-release-gate.mjs",
+      "match": " * Portable release gate for the current 0.9.2 release candidate.",
+      "replacement": " * Portable release gate for the current 0.10.0 release candidate."
+    },
+    {
+      "id": "master-release-archive-marketplace-0100",
+      "path": "scripts/master-release-gate.mjs",
+      "match": "    check(\"marketplace version 0.9.2\", entry.version === \"0.9.2\");",
+      "replacement": "    check(\"marketplace version 0.10.0\", entry.version === \"0.10.0\");"
+    },
+    {
+      "id": "master-release-archive-plugin-0100",
+      "path": "scripts/master-release-gate.mjs",
+      "match": "    check(\"plugin version 0.9.2\", plugin.version === \"0.9.2\");",
+      "replacement": "    check(\"plugin version 0.10.0\", plugin.version === \"0.10.0\");"
+    },
+    {
+      "id": "sprint-035-current-codex-version-0100",
+      "path": "scripts/sprint-035-test.mjs",
+      "match": "  assert.equal(codex.version, \"0.9.2\");",
+      "replacement": "  assert.equal(codex.version, \"0.10.0\");"
+    },
+    {
+      "id": "sprint-038-current-release-0100",
+      "path": "scripts/sprint-038-test.mjs",
+      "match": "check(\"current release owners are 0.9.2 and historical 0.8 migration unchanged\", () => {\n  assert.equal(JSON.parse(readFileSync(join(root, \".claude-plugin/marketplace.json\"))).plugins[0].version, \"0.9.2\");\n  assert.equal(JSON.parse(readFileSync(join(root, \"plugins/secretary/.claude-plugin/plugin.json\"))).version, \"0.9.2\");\n  assert.ok(JSON.parse(readFileSync(join(root, \"plugins/secretary/.codex-plugin/plugin.json\"))).version.startsWith(\"0.9.2\"));\n  assert.equal(JSON.parse(readFileSync(join(root, \"plugins/secretary/migrations/0.7.0-to-0.8.0.json\"))).toVersion, \"0.8.0\");\n  const changelog = readFileSync(join(root, \"plugins/secretary/CHANGELOG.md\"), \"utf8\");\n  assert.match(changelog, /^# 変更履歴\\n\\n## \\[0\\.9\\.2\\]/);\n  assert.match(changelog, /## \\[0\\.9\\.1\\] - 2026-08-03/);\n});",
+      "replacement": "check(\"current release owners are 0.10.0 and historical 0.9.2／0.8 migration remain unchanged\", () => {\n  assert.equal(JSON.parse(readFileSync(join(root, \".claude-plugin/marketplace.json\"))).plugins[0].version, \"0.10.0\");\n  assert.equal(JSON.parse(readFileSync(join(root, \"plugins/secretary/.claude-plugin/plugin.json\"))).version, \"0.10.0\");\n  assert.ok(JSON.parse(readFileSync(join(root, \"plugins/secretary/.codex-plugin/plugin.json\"))).version.startsWith(\"0.10.0\"));\n  assert.equal(JSON.parse(readFileSync(join(root, \"plugins/secretary/migrations/0.7.0-to-0.8.0.json\"))).toVersion, \"0.8.0\");\n  const changelog = readFileSync(join(root, \"plugins/secretary/CHANGELOG.md\"), \"utf8\");\n  assert.match(changelog, /^# 変更履歴\\n\\n## \\[0\\.10\\.0\\]/);\n  assert.match(changelog, /## \\[0\\.9\\.2\\] - 2026-08-10/);\n  assert.match(changelog, /## \\[0\\.9\\.1\\] - 2026-08-03/);\n});"
+    },
+    {
+      "id": "sprint-038-patch-current-release-0100",
+      "path": "scripts/sprint-038-patch-001-test.mjs",
+      "match": "check(\"0.9.1 history remains and current release surfaces are exactly 0.9.2\", () => {\n  assert.equal(json(join(root, \".claude-plugin/marketplace.json\")).plugins[0].version, \"0.9.2\");\n  assert.equal(json(join(plugin, \".claude-plugin/plugin.json\")).version, \"0.9.2\");\n  assert.equal(json(join(plugin, \".codex-plugin/plugin.json\")).version, \"0.9.2\");\n  const canonical = readFileSync(join(plugin, \"CHANGELOG.md\"), \"utf8\");\n  const legacy = readFileSync(join(root, \"plugins/yasashii-secretary/CHANGELOG.md\"), \"utf8\");\n  assert.match(canonical, /^# 変更履歴\\n\\n## \\[0\\.9\\.2\\] - 2026-08-10/);\n  assert.match(canonical, /## \\[0\\.9\\.1\\] - 2026-08-03/);\n  assert.equal(legacy, canonical);\n});",
+      "replacement": "check(\"0.9.2 history remains and current release surfaces are exactly 0.10.0\", () => {\n  assert.equal(json(join(root, \".claude-plugin/marketplace.json\")).plugins[0].version, \"0.10.0\");\n  assert.equal(json(join(plugin, \".claude-plugin/plugin.json\")).version, \"0.10.0\");\n  assert.equal(json(join(plugin, \".codex-plugin/plugin.json\")).version, \"0.10.0\");\n  const canonical = readFileSync(join(plugin, \"CHANGELOG.md\"), \"utf8\");\n  const legacy = readFileSync(join(root, \"plugins/yasashii-secretary/CHANGELOG.md\"), \"utf8\");\n  assert.match(canonical, /^# 変更履歴\\n\\n## \\[0\\.10\\.0\\] - 2026-08-14/);\n  assert.match(canonical, /## \\[0\\.9\\.2\\] - 2026-08-10/);\n  assert.match(canonical, /## \\[0\\.9\\.1\\] - 2026-08-03/);\n  assert.equal(legacy, canonical);\n});"
     },
     {
       "id": "sprint-035-yasashii-harness-commit",
