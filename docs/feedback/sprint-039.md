@@ -158,3 +158,259 @@ private版、実HOME、installed plugin／cache、実利用workspace、Mac mini�
 - historical／verification-infraの失敗を現candidateのproduct findingへ誤分類していない。
 - 専用面のPASSをrelease integrity／rollbackのFAILの代替にしていない。
 - Evaluatorは製品、test、spec、state、progress、Gitを変更していない。
+
+# Sprint 039 Retry 1 fresh独立評価
+
+## 判定
+
+- Sprint contract result: **FAIL**
+- Failure kind: **spec-issue**
+- Evaluated candidate HEAD: `ac16d605704b993003fba8f4843f11316374dd0c`
+- Evaluated product candidate: `65dccf6cb333f11d3fac6bfab729fb993bc1a26f`
+- Evaluated at: `2026-08-14`（Asia/Tokyo）
+- Product findings: **0件**
+- Blocking verification-infra findings: **0件**
+- Spec issues: **1件**
+- External write: **0件**
+- Escalation Recommendation: **none**
+
+Retry 1の製品修正は、clean checkoutと同一HEADのGit-free archiveで成立した。正式16 Skillsと
+same-count unknown負例、名前identity／routing、所有path限定local checkpoint、commit／post-commit失敗rollback、
+既存staged／unstaged／untracked保持、overlay、schema、release integrityはいずれも0 FAILだった。
+
+ただしPlanner正本は同期入力をAgentic `3e08eb6...`／handoff digest `7498d3...`へ固定している一方、
+実candidateは、Agentic `sprint-039-patch-001`のfresh独立PASS・state done後にaccepted candidate
+`3fa8d97...`／digest `c810f6...`を意図的に再同期している。製品挙動の欠陥ではなく、accepted upstream Patchへ
+Yasashii契約が追随していない仕様正本の不整合である。旧SHAを製品へ戻す、または現candidateを旧SHAとして
+読み替える判定は行わない。Plannerが固定入力、handoff、overlay metadata保護基準を更新した後、fresh Generatorの
+整合確認を経てEvaluatorへ戻す必要がある。
+
+## Spec issue S1 — accepted upstream PatchへSprint正本が追随していない
+
+- Failure classification: **spec-issue**
+- Finding target classification: **productではない／verification-infraではない**
+- Severity: **Blocking contract mismatch**
+- Status: **OPEN**
+- Affected acceptance criteria: **AC1、AC2、AC3、AC17**
+- Affected rubric: **C13、C17の固定入力・overlay境界**
+
+Planner正本:
+
+```text
+docs/sprints/sprint-039.md
+  Agentic candidate: 3e08eb6d377392440e753bd5073c73d1d63399b6
+  handoff digest: 7498d3550734ba63b689463f01e2a52e16d2ce3f8eb31cebead16aef2181f883
+
+docs/spec/constraints.md / docs/spec/rubric.md
+  同じ旧candidateをSprint 039の固定入力として記載
+```
+
+実candidate:
+
+```text
+secretary-overlay/upstream-base.json
+  baseCommit: 3fa8d97e5dbfb2afa314f4ad179f17401b76d320
+  commonTreeSha256: c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557
+
+scripts/sprint-039-overlay-test.mjs
+  FIXED_SHA: 3fa8d97e5dbfb2afa314f4ad179f17401b76d320
+  FIXED_DIGEST: c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557
+```
+
+この新入力は、初回Evaluator P2のrename checkpointを上流共通コアで直したaccepted Agentic
+`sprint-039-patch-001`を下流へ同期するための意図的な更新である。現製品を旧inputへ戻すのではなく、Plannerが
+accepted candidate更新を仕様へ反映し、14→16 handoff paths、旧／新digest、変更が必要なoverlay metadataの扱いを
+明文化するのが正しい差し戻し先である。
+
+## Retry 1で解消を確認したproduct findings
+
+### 旧P1 — release integrityの正式Skill inventory: RESOLVED
+
+- `check-release-integrity.py` は `name` を含む正式16 Skillsのexact setを受理した。
+- 独立fixtureで `name` を `unknown` へ置き換え、件数16を維持してもexit 1になった。
+- 出力は `unexpected formal Skill: unknown` と `expected formal Skill missing: name` の両方を含んだ。
+- clean checkoutとGit-free archiveの両方で正式candidateはPASS、unknown負例はFAILした。
+
+### 旧P2 — rename checkpoint／commit rollback: RESOLVED
+
+- canonical workspaceの正確なGit top-levelを確認し、製品所有pathだけをlocal commit 1件へ記録した。
+- 既存staged／unstaged／untrackedは成功後も開始前と同一だった。
+- `before-checkpoint`、`stage`、`commit`、`post-commit`の各失敗で、workspace、合成HOME、HEAD、index、
+  worktreeを開始前へrollbackした。
+- CLIの `rename-apply --fail-at commit` は非0で停止し、成功扱い・dirty残存・部分renameは0件だった。
+- failure後retryはcommit 1件、成功後の再実行は追加commit／差分0件だった。
+- rename対象自身の開始前dirty、親repo誤採用、nested別repoは副作用0でsafe stopした。
+
+## 実行証跡
+
+### 候補固定
+
+```text
+git rev-parse HEAD
+ac16d605704b993003fba8f4843f11316374dd0c
+
+git show -s --format='%H %P %s' ac16d60
+ac16d605704b993003fba8f4843f11316374dd0c 65dccf6cb333f11d3fac6bfab729fb993bc1a26f [sprint-039] Yasashii版を独立評価へ移行
+
+git diff --name-status 65dccf6..ac16d60
+M docs/sprints/state.md
+```
+
+製品bytesは `65dccf6`、評価待ちstateだけを加えた候補HEADが `ac16d60` である。開始時の実repo working treeはcleanだった。
+
+### clean checkout
+
+```text
+bash scripts/sprint-039-patch-001-regression.sh
+SPRINT039_PATCH001_PASS=16 SPRINT039_PATCH001_FAIL=0
+SPRINT039_PASS=69 SPRINT039_FAIL=0
+PASS=7 FAIL=0
+PASS=71 FAIL=0
+SPRINT035_PASS=15 SPRINT035_FAIL=0
+SCHEMA_OK owner=active-edition-style entrypoint=rules/plain-language.md surfaces=21 conflicts=0 states=5
+PASS=1 FAIL=0
+SPRINT039_RELEASE_INTEGRITY_PASS=2 SPRINT039_RELEASE_INTEGRITY_FAIL=0
+PASS=9 FAIL=0
+exit 0
+```
+
+### 同一HEADのGit-free archive
+
+```text
+git archive ac16d605704b993003fba8f4843f11316374dd0c | tar -xf - -C <git-free-archive>
+test ! -e <git-free-archive>/.git
+
+bash scripts/sprint-039-patch-001-regression.sh
+SPRINT039_PATCH001_PASS=16 SPRINT039_PATCH001_FAIL=0
+SPRINT039_PASS=69 SPRINT039_FAIL=0
+PASS=7 FAIL=0
+PASS=71 FAIL=0
+SPRINT035_PASS=15 SPRINT035_FAIL=0
+SCHEMA_OK owner=active-edition-style entrypoint=rules/plain-language.md surfaces=21 conflicts=0 states=5
+PASS=1 FAIL=0
+SPRINT039_RELEASE_INTEGRITY_PASS=2 SPRINT039_RELEASE_INTEGRITY_FAIL=0
+PASS=9 FAIL=0
+exit 0
+```
+
+### overlay／Yasashii固有surface
+
+accepted Agentic `3fa8d97...`のGit archiveをread-only入力にし、clean checkoutとGit-free archiveの両方で実行した。
+
+```text
+node scripts/sprint-039-overlay-test.mjs <fixed-agentic-archive>
+SPRINT039_OVERLAY_PASS=6 SPRINT039_OVERLAY_FAIL=0
+
+node scripts/sync-secretary-overlay.mjs --check --candidate <fixed-agentic-archive> --observed-commit 3fa8d97...
+OVERLAY_CHECK_PASS base=3fa8d97... managed=277 handoffPaths=16
+handoffDigest=c810f60c... overlayDigest=5850ef7b...
+
+node scripts/sync-secretary-overlay.mjs --reapply --candidate <fixed-agentic-archive> --observed-commit 3fa8d97...
+OVERLAY_REAPPLY_PASS digest=3698b74e... secondChanged=0 overlayDigest=5850ef7b...
+```
+
+13 common pathsはAgenticとbyte一致し、`name`／`secretary`／`settings`の3 Skillだけが宣言済みanchorだった。
+未分類0、Agentic docs／Sprint asset同期0、Yasashii identity／copy／style／repository／manifest／marketplace／README／
+LICENSE／Harness導線の変化0を確認した。
+
+開始HEAD `ee62b5e`、初回candidate `e23bdaf`、Retry 1製品candidate `65dccf6`で、次の保護surfaceは
+Git blobが同一だった: README、LICENSE、AGENTS、Yasashii copy、edition、rule manifest、Claude／Codexの
+marketplaceとplugin manifest。
+
+### Windows既存suite／実行OS
+
+```text
+Darwin 25.6.0 arm64
+Node.js v22.23.2
+
+node scripts/sprint-038-patch-002-windows-test.mjs
+SPRINT038_PATCH002_WINDOWS_PASS=12 FAIL=0 OS=darwin
+
+bash scripts/sprint-038-regression.sh
+SPRINT038_PASS=64 SPRINT038_FAIL=0
+SPRINT038_HISTORICAL_CLASSIFIER_PASS=14 SPRINT038_HISTORICAL_CLASSIFIER_FAIL=0
+SPRINT038_HISTORICAL_PATH_PASS=3 SPRINT038_HISTORICAL_PATH_FAIL=0
+
+bash scripts/sprint-011-regression.sh
+PASS=68 FAIL=0
+```
+
+これはportable／既存Node-native回帰であり、Sprint 039の新identity／rename面をWindows nativeで実行した証拠ではない。
+Windowsの新identity native実行は **not-run**。Windows解消済み、全環境PASS、Windows 16/16とは表示しない。
+
+## historical／verification-infra差の分離
+
+`bash scripts/sprint-035-patch-001-regression.sh` は、初回評価candidate `e23bdaf`とRetry 1候補
+`ac16d60`のclean cloneを同じDarwin sandbox・同じ現在Agentic siblingで実行し、両方とも
+`SPRINT035_PATCH001_REGRESSION_PASS=5 ... FAIL=6`だった。
+
+- 既存wizard assetの固定digest差。
+- sandboxのloopback bind拒否 `EPERM 127.0.0.1`（Chatwork／Google Chat）。
+- 旧Sprint 034 testが固定archiveではなく現在Agentic sibling HEADを読むための `UPSTREAM_ADVANCE` と後続fixture drift。
+- 旧README Cloud説明expectationとの差。
+
+開始candidateとRetry 1で集計が同一で、Retry 1の製品差分はこれらの領域を変更していない。したがって現product
+findingへ再分類せず、historical／verification-infraとして保持する。引き渡されたRetry専用回帰はcheckout／archiveとも
+exit 0なので、blocking verification-infra findingは0件である。
+
+## Acceptance Criteria
+
+| AC | 結果 | 根拠 |
+|---:|---|---|
+| 1 | **FAIL — spec-issue** | Planner正本は`3e08eb6`／`7498d3`固定、accepted実candidateは`3fa8d97`／`c810f6`。製品欠陥ではなく正本未追随。 |
+| 2 | **BLOCKED — spec-issue** | 現accepted handoff 16 paths、common parity、未分類0、check／reapplyはPASS。正式固定入力の更新後に確定する。 |
+| 3 | **BLOCKED — spec-issue** | 利用者向けYasashii保護surfaceは不変。accepted input更新に伴うoverlay metadata更新の許容をPlanner正本へ反映する必要がある。 |
+| 4 | PASS | 指定／提案、保存前確認、拒否、不適格名、既存利用者のname Skillがgreen。 |
+| 5 | PASS | display name、stable identity、AI種別、aliases、AI author、過去author主体を保持。 |
+| 6 | PASS | user-scope明示確認／拒否、Codex override、Claude user-scope fileを合成HOMEで確認。 |
+| 7 | PASS | managed blockのcreate／update／disable、rollback、冪等、手書き／別block／改行／mode保持がgreen。 |
+| 8 | PASS | canonical resolver、別repo cwd副作用0、registry異常／symlink等のsafe stopがgreen。 |
+| 9 | PASS | direct／delegation正case、人間／顧客／author／引用／code等の負case、曖昧一度確認がgreen。 |
+| 10 | PASS | A〜D preview、read-only snapshot、製品field限定、blind replacement 0がgreen。 |
+| 11 | PASS | A所有field、選択B、C保持＋alias、D不変、未作成／disabled routing保持がgreen。 |
+| 12 | PASS | 実commit checkpoint、commit／post-commit等のrollback、Git既存状態保持、retry冪等がgreen。 |
+| 13 | PASS | 正式16 Skillsを受理し、same-count unknownをunexpected＋missingで拒否。schema 21 surfacesもgreen。 |
+| 14 | PASS | clean checkout／Git-free archiveのRetry専用回帰、overlay、schema、release integrityが0 FAIL。旧広域6 FAILは開始candidate同一のhistorical infra。 |
+| 15 | PASS | Yasashii copy／identity／repository／marketplace／README／LICENSE／Harness導線を保持。Agentic／private identity混入0。 |
+| 16 | PASS | Darwin既存12/0と新identity Windows native not-runを分離し、全環境PASSへ昇格していない。 |
+| 17 | **FAIL — spec-issue** | product finding 0、blocking verification-infra 0だが、固定入力の仕様不整合が残るためcontract全体をPASSにできない。 |
+| 18 | PASS | private版、実HOME／cache／workspace、Mac mini、remote、release、Secret、Actions、OAuth、実APIへのwrite 0。 |
+
+## Rubric score
+
+現accepted input `3fa8d97`を前提にした製品挙動は全重点軸で5/5相当だった。ただしC13／C17の固定入力を定める
+Planner正本が旧candidateのため、下表の5/5は **製品挙動の暫定スコア** であり、Sprint contract PASSを意味しない。
+
+| ID | 基準 | Product score | Threshold | 判定根拠 |
+|---|---|---:|---:|---|
+| C2 | 構文・整合 | 5/5 | 5 | schema 21 surfaces、正式16 Skills、same-count unknown負例、checkout／archiveがgreen。 |
+| C5 | 安全・規律 | 5/5 | 5 | 明示確認、所有path限定commit、既存Git状態保持、commit／post-commit rollbackがgreen。 |
+| C6 | 無回帰 | 5/5 | 5 | Retry専用checkout／archive、Sprint 038／011がgreen。旧広域差は開始candidate同一のinfra。 |
+| C9 | 配布チャネル非依存 | 5/5 | 5 | Yasashii正式配布identity／manifest／marketplace／README／LICENSEを保持。 |
+| C10 | 更新の安全性 | 5/5 | 5 | 更新・release経路を変更せず、無確認の外部副作用0。 |
+| C13 | edition分離・互換 | 5/5暫定 | 5 | accepted 16-path handoff、13 common byte parity、3 anchors、未分類0、固有surface保護。正本更新待ち。 |
+| C14 | 会話のMarkdown可読性 | 5/5 | 5 | Yasashii copy／style／serializer正本を維持し、対象回帰green。 |
+| C16 | Windows native保存・0.9.2下流同期 | 5/5 | 5 | 既存Darwin 12/0とWindows新identity not-runを正直に分離し、0.9.2 surfaceを維持。 |
+| C17 | 秘書identity・routing・安全な改名 | 5/5暫定 | 5 | identity／routing／checkpoint／完全rollbackはgreen。accepted固定入力の正本更新待ち。 |
+
+総合判定は、product scoreではなく未解消のspec-issueによりFAILである。
+
+## UI／screenshot
+
+Sprint 039 Retry 1にbrowser画面の追加・変更はない。対象はCLI／library、file transaction、overlay、validatorであり、
+contractのEvidence safe harborもbrowser操作とscreenshotを必須としていない。UI採点とscreenshotは **not applicable**。
+
+## External operations
+
+private版、実HOME、installed plugin／cache、実利用workspace、Mac mini、origin／upstream remote、Secret、Actions、OAuth、
+実API、実repoのcommit、push、PR、merge、tag、Release、marketplace、install／updateはすべて **not-run / write 0**。
+Git commitは隔離fixture内だけで実行した。
+
+## Evaluator self-review
+
+- 旧P1／P2が実挙動で解消したことを確認し、以前のFAILを履歴から消していない。
+- accepted upstream Patchへの追随漏れを製品findingへ偽装せず、spec-issueとしてPlannerへ戻した。
+- 現candidateのtarget／archive greenを、旧固定入力のままSprint contract PASSへ読み替えていない。
+- historical master 5/6は開始candidateとRetry 1で同じ集計・同じ主因であり、product findingへ水増ししていない。
+- WindowsのDarwin実行をnative Windows証拠へ昇格していない。
+- Evaluatorは製品、test、spec、state、progress、Gitを変更せず、このfeedbackだけへ追記した。
