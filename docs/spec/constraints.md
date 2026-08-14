@@ -362,7 +362,8 @@
 7. routingは直接呼びかけまたは明示的な委譲だけを対象とする。同名が取引先、著者、担当者、コード上のsymbol等として現れる文脈では秘書へroutingしない。曖昧なら一度確認し、拒否後に同じ用件で繰り返し尋ねない。
 8. 改名前に、現行identity設定、製品管理block、現役参照、利用者文書、履歴の候補を分類して件数と影響を示す。自動変更は現行設定と製品所有blockに限定し、利用者文書は個別確認、履歴・過去authorは原則不変としてaliasで追跡する。blind global replaceは禁止する。
 9. 改名、managed block、registry更新は1 transactionとして扱う。書込み、path guard、symlink、構文検証、commitの失敗では対象fileとGit状態を開始前へrollbackし、backup、一時file、半端な旧名／新名混在を残さない。
-10. Yasashiiへの同期入力はAgentic製品candidate `3e08eb6d377392440e753bd5073c73d1d63399b6` と、そのtreeにある `adapters/downstream-identity-handoff.json` に固定する。handoffの `commonPaths` だけを共通同期対象とし、Agenticのdocs、progress、feedback、state、release記録を同期しない。
-11. overlay check／apply／reapplyは未分類0件、二回目追加差分0件、common byte parityを満たす。Yasashii固有copy、style、rule manifest、README、identity、repo-owned docs、overlay metadata、LICENSEのdigestを保護し、Agentic値へ戻さない。
-12. 合成HOMEと隔離workspaceでrouting、resolver、managed block、改名、rollbackを検証する。実HOME、installed plugin／cache、private版、Mac mini、remote、releaseへは本機能同期中に書き込まない。
-13. Windows nativeの既存12 labelsと残余リスクは過去証拠の範囲で正直に扱う。本機能のportable code review、既存suite、実行できた環境証拠を分け、Windows未実行を全環境PASSや解消済みへ昇格させない。
+10. Yasashiiへの同期入力はpublic `sprint-039-patch-001` のfresh独立評価でPASSしたAgentic製品candidate `3fa8d97e5dbfb2afa314f4ad179f17401b76d320` と、そのtreeにある `adapters/downstream-identity-handoff.json` に固定する。handoff digestは `c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557`、`commonPaths` は16件とし、Agenticのdocs、progress、feedback、state、release記録を同期しない。
+11. 16 commonPathsは13件のbyte parityと、`name`／`secretary`／`settings` の3宣言anchorに分類する。`external-ops.mjs` と `safe-git.mjs` を共通安全pathとして含め、除外・下流overrideしない。overlay check／apply／reapplyは未分類0件、二回目追加差分0件を満たす。
+12. overlay metadataはaccepted candidate、digest、16 commonPaths、13 parity／3 anchor分類を記録する所有fieldだけを更新できる。Yasashii固有copy、style、rule manifest、README、identity、repo-owned docs、LICENSEと、それ以外のoverlay metadataのdigestを保護し、Agentic値へ戻さない。
+13. 合成HOMEと隔離workspaceでrouting、resolver、managed block、改名、rollbackを検証する。実HOME、installed plugin／cache、private版、Mac mini、remote、releaseへは本機能同期中に書き込まない。
+14. Windows nativeの既存12 labelsと残余リスクは過去証拠の範囲で正直に扱う。本機能のportable code review、既存suite、実行できた環境証拠を分け、Windows未実行を全環境PASSや解消済みへ昇格させない。

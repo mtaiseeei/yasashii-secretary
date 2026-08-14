@@ -3,7 +3,7 @@
 - Type: main
 - Risk: high（user-scope guidance、複数workspace routing、作者identity、利用者コンテンツを候補に含むrename、下流overlay境界を同時に扱うため）
 - 主眼: 独立評価PASS済みAgentic共通コアの固定製品candidateから、秘書自身の英語名、stable identity、AI author、名前Skill、canonical resolver、別repo routing、安全なrenameをhandoff manifest経由で同期し、Yasashii固有のやさしい体験と配布identityを保つ。
-- 依存: sprint-038-patch-002完了。Agentic製品candidate `3e08eb6d377392440e753bd5073c73d1d63399b6` はfresh独立EvaluatorでRetry 1のP1〜P4解消を含めproduct finding 0件でPASS済み。handoffのcommon digestは `7498d3550734ba63b689463f01e2a52e16d2ce3f8eb31cebead16aef2181f883`。
+- 依存: sprint-038-patch-002完了。public `sprint-039-patch-001` のAgentic製品candidate `3fa8d97e5dbfb2afa314f4ad179f17401b76d320` はfresh独立Evaluatorでproduct finding 0件、blocking verification-infra 0件としてPASS済み。handoffのcommon digestは `c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557`。
 - UI差分: browser画面の追加はない。会話Skill、設定、file管理、routingの変更である。
 - 公開version: 本Sprintでは固定しない。
 
@@ -28,11 +28,12 @@ Yasashii Secretaryは初回または名前Skillで英語の秘書名を決め、
 
 ### A. 固定handoff manifestからcommonPathsだけを同期する
 
-- 同期元はAgentic製品candidate `3e08eb6d377392440e753bd5073c73d1d63399b6` に固定する。後続のAgentic docs／feedback／stateだけのcommitへ読み替えない。
-- 固定candidateの `adapters/downstream-identity-handoff.json` をhandoff正本とし、manifestのcandidate、common digest `7498d3550734ba63b689463f01e2a52e16d2ce3f8eb31cebead16aef2181f883`、`commonPaths`、必要な保護情報を検証する。
+- 同期元はAgentic製品candidate `3fa8d97e5dbfb2afa314f4ad179f17401b76d320` に固定する。後続のAgentic docs／feedback／stateだけのcommitへ読み替えない。
+- 固定candidateの `adapters/downstream-identity-handoff.json` をhandoff正本とし、manifestのcandidate、common digest `c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557`、16 `commonPaths`、必要な保護情報を検証する。
+- 16 commonPathsは13件のbyte parityと `name`／`secretary`／`settings` の3宣言anchorである。`external-ops.mjs` と `safe-git.mjs` はaccepted patchで追加された共通安全pathとして含め、同期対象外や下流overrideへ分類しない。
 - 現在のYasashii baseから固定candidateまでのtreeとpathを、commonPaths、既存metadata／anchor overlay、upstream-only、repo-owned、downstream-ownedへ分類し、未分類を0件にする。
 - review後だけoverlayをcheck／apply／reapplyし、commonPathsは固定Agentic candidateとbyte一致、二回目の追加差分0件とする。
-- Yasashii固有copy、style、rule manifest、README、identity、host別manifest／marketplace、repo-owned docs、overlay metadata、LICENSEの開始前後digestを保護する。
+- Yasashii固有copy、style、rule manifest、README、identity、host別manifest／marketplace、repo-owned docs、LICENSEの開始前後digestを保護する。overlay metadataはaccepted candidate、digest、16 commonPaths、13 parity／3 anchor分類を記録するhandoff所有fieldだけを更新でき、その他のfield、anchor、安全基準を保護する。
 - Agenticの `docs/spec/**`、`docs/sprints/**`、`docs/progress/**`、`docs/feedback/**`、`docs/sprints/state.md`、release記録を同期しない。
 
 ### B. 秘書自身の英語名とstable identityを成立させる
@@ -81,9 +82,9 @@ Yasashii Secretaryは初回または名前Skillで英語の秘書名を決め、
 
 ## Acceptance Criteria
 
-1. 同期入力がAgentic製品candidate `3e08eb6d377392440e753bd5073c73d1d63399b6` に固定され、fresh独立PASS、handoff candidate、common digest `7498d3550734ba63b689463f01e2a52e16d2ce3f8eb31cebead16aef2181f883` が対応する。後続docs-only commitへ読み替えていない。
-2. handoff manifestの `commonPaths` だけを同期対象とし、全path分類の未分類0件。overlay check／apply／reapplyが成功し、二回目追加差分0件、commonPathsのbyte parityが成立する。
-3. Yasashii固有copy、style、rule manifest、README、identity、Claude／Codex manifest／marketplace、repo-owned docs、overlay metadata、LICENSEのdigestが開始前後で不変。Agentic docs／progress／feedback／state／release記録の同期0件である。
+1. 同期入力がAgentic製品candidate `3fa8d97e5dbfb2afa314f4ad179f17401b76d320` に固定され、fresh独立PASS、handoff candidate、common digest `c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557` が対応する。後続docs-only commitへ読み替えていない。
+2. handoff manifestの16 `commonPaths` だけを同期対象とし、13 pathのbyte parity、`name`／`secretary`／`settings` の3宣言anchor、`external-ops.mjs`／`safe-git.mjs` の共通安全path、全path分類の未分類0件が成立する。overlay check／apply／reapplyが成功し、二回目追加差分0件である。
+3. Yasashii固有copy、style、rule manifest、README、identity、Claude／Codex manifest／marketplace、repo-owned docs、LICENSEと、handoff所有field以外のoverlay metadataのdigestが開始前後で不変。handoff所有fieldはaccepted candidate／digest／16-path分類と一致し、Agentic docs／progress／feedback／state／release記録の同期0件である。
 4. 初回onboardingで指定／提案の両経路が英語名へ解決し、保存前確認、拒否時変更0、利用者の呼び方との分離、不適格名拒否が成立する。既存利用者は名前Skillから設定・確認・renameへ進める。
 5. display name、stable identity、AI種別、aliases、AI authorが一貫し、改名前後でstable identityと過去author主体が不変。人の作者と秘書の作者を識別できる。
 6. user-scope enableは効果、対象host／file、managed block、無効化を示した明示確認後だけ行い、拒否／取消は変更0件。Codexのoverride優先とClaude Codeのuser-scope fileを正しく扱う。

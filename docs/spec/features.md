@@ -445,10 +445,13 @@ UIは変更しない。
 実在人物として同名が現れる文脈ではroutingせず、曖昧な場合は一度だけ確認する。名前変更は現行設定、製品管理block、
 現役の参照候補、利用者文書、履歴を先に分類して影響を示し、確認後だけ安全な対象を変更する。途中失敗は開始前へ戻す。
 
-この共通機能は、独立評価PASS済みAgentic Secretary製品candidate
-`3e08eb6d377392440e753bd5073c73d1d63399b6` と `adapters/downstream-identity-handoff.json` を正本とし、
-manifestの `commonPaths` だけをYasashii overlayへ同期する。共通対象はAgentic candidateとbyte一致させ、
-Yasashii固有のやさしいcopy、style、rule manifest、README、identity、overlay metadata、LICENSE、repo-owned docsを維持する。
+この共通機能は、public `sprint-039-patch-001` のfresh独立評価でPASSしたAgentic Secretary製品candidate
+`3fa8d97e5dbfb2afa314f4ad179f17401b76d320` と `adapters/downstream-identity-handoff.json` を正本とし、
+manifestの16 `commonPaths` だけをYasashii overlayへ同期する。13 pathはAgentic candidateとbyte一致させ、
+`name`／`secretary`／`settings` の3 Skillは宣言済みanchorだけを適用する。追加された共通安全path
+`external-ops.mjs` と `safe-git.mjs` も同期対象から外さない。Yasashii固有のやさしいcopy、style、rule manifest、
+README、identity、LICENSE、repo-owned docsを維持する。overlay metadataはaccepted candidate、digest、16-path分類を
+記録する所有fieldだけを更新でき、それ以外の下流所有metadataと安全基準を変えない。
 private版、実HOME、installed cache、Mac mini、releaseはこの機能同期自体の対象外とする。
 
 ## Gテーマと機能の対応
