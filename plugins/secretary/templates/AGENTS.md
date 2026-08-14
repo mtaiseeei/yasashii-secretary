@@ -12,6 +12,7 @@
 - 報告の詳しさ: {{REPORT_DETAIL}}
 - 秘書ディレクトリを作った日: {{CREATED_DATE}}
 
+<!-- secretary:workspace-identity:v1:start -->
 ## 秘書identity
 
 - 表示名: {{SECRETARY_NAME}} (AI Secretary)
@@ -20,6 +21,8 @@
 - 過去名: なし
 
 表示名は利用者の「呼び方」と別の設定です。変更してもstable IDと過去のauthor記録は変えません。
+新しい成果物のAI author表示と構造化author metadataは `identity.json` を正本として参照します。
+<!-- secretary:workspace-identity:v1:end -->
 
 ## 秘書ディレクトリ（secretary/）の中身
 

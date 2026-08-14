@@ -7,6 +7,9 @@ import {
 } from "./lib/secretary-identity.mjs";
 import { classifyNameRouting } from "./lib/name-router.mjs";
 import { applyRename, previewRename } from "./lib/secretary-rename.mjs";
+import {
+  applyIdentityMigration, diagnoseIdentityMigration, previewIdentityMigration,
+} from "./lib/secretary-identity-migration.mjs";
 import { inspectUserScopeRouting, updateUserScopeRouting } from "./lib/user-scope-routing.mjs";
 import { registerWorkspace, resolveCanonicalWorkspace } from "./lib/workspace-registry.mjs";
 
@@ -31,6 +34,25 @@ export async function run(argv) {
     const secretaryRoot = required(option(args, "--secretary"), "--secretary");
     const displayName = required(option(args, "--name"), "--name");
     return output(writeNewIdentity(secretaryRoot, { displayName, secretaryId: option(args, "--secretary-id"), now: option(args, "--now"), confirm: flag(args, "--confirm") }));
+  }
+  if (command === "migration-diagnose" || command === "migration-preview") {
+    const operation = command === "migration-diagnose" ? diagnoseIdentityMigration : previewIdentityMigration;
+    return output(operation({
+      workspace: required(option(args, "--workspace"), "--workspace"),
+      pluginRoot: required(option(args, "--plugin-root"), "--plugin-root"),
+      name: option(args, "--name"),
+    }));
+  }
+  if (command === "migration-apply") {
+    return output(applyIdentityMigration({
+      workspace: required(option(args, "--workspace"), "--workspace"),
+      pluginRoot: required(option(args, "--plugin-root"), "--plugin-root"),
+      name: option(args, "--name"),
+      secretaryId: option(args, "--secretary-id"),
+      now: option(args, "--now"),
+      confirm: flag(args, "--confirm"),
+      failAt: option(args, "--fail-at"),
+    }));
   }
   if (command === "status") {
     const secretaryRoot = required(option(args, "--secretary"), "--secretary");
@@ -64,7 +86,7 @@ export async function run(argv) {
       failAt: option(args, "--fail-at"),
     }));
   }
-  throw new Error("使い方: secretary-name.mjs validate|suggest|init|status|routing-enable|routing-disable|registry-register|resolve|route|rename-preview|rename-apply");
+  throw new Error("使い方: secretary-name.mjs validate|suggest|init|migration-diagnose|migration-preview|migration-apply|status|routing-enable|routing-disable|registry-register|resolve|route|rename-preview|rename-apply");
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] || "").href) {

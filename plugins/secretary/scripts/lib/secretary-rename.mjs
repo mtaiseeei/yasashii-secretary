@@ -4,6 +4,7 @@ import {
 } from "node:fs";
 import { dirname, extname, join, relative, resolve, sep } from "node:path";
 import { foldName, identityPath, readIdentity, renamedIdentity } from "./secretary-identity.mjs";
+import { updateIdentityManagedSection } from "./secretary-identity-migration.mjs";
 import { commitOwnedChanges, inspectOwnedCheckpoint, restoreOwnedCommit } from "./safe-git.mjs";
 import {
   composeManagedBlock, inspectManagedRoutingBlock, inspectUserScopeRouting,
@@ -99,6 +100,26 @@ export function previewRename({ secretaryRoot, newName, home = null } = {}) {
     const count = [...content.matchAll(pattern)].length;
     if (!count) continue;
     const rel = relative(root, path).split(sep).join("/");
+    if (["AGENTS.md", "CLAUDE.md"].includes(rel)) {
+      const managed = updateIdentityManagedSection(content, {
+        kind: rel === "AGENTS.md" ? "agents" : "claude",
+        currentIdentity: identity,
+        nextIdentity,
+      });
+      if (managed.status !== "missing") {
+        const ownedNameCount = [...content.slice(content.indexOf("<!-- secretary:workspace-identity:v1:start -->"), content.indexOf("<!-- secretary:workspace-identity:v1:end -->") + "<!-- secretary:workspace-identity:v1:end -->".length).matchAll(pattern)].length;
+        if (managed.content !== content) matches.push({
+          classification: "current-config", path: rel, count: Math.max(1, ownedNameCount),
+          recommended: recommendation("current-config"), ownedField: "identity-managed-section",
+        });
+        const total = [...content.matchAll(pattern)].length;
+        if (total > ownedNameCount) matches.push({
+          classification: "unknown-or-conflict", path: rel, count: total - ownedNameCount,
+          recommended: recommendation("unknown-or-conflict"), ownedField: null,
+        });
+        continue;
+      }
+    }
     if (rel === "AGENTS.md") {
       const inspected = inspectAgentsIdentity(content, identity.display_name);
       if (inspected.ownedCount) matches.push({
@@ -127,10 +148,15 @@ export function previewRename({ secretaryRoot, newName, home = null } = {}) {
   const workspaceTargets = [];
   if (!sameName) {
     workspaceTargets.push(identityPath(root));
-    const agentsPath = join(root, "AGENTS.md");
-    if (existsSync(agentsPath)) {
-      const before = readFileSync(agentsPath, "utf8");
-      if (inspectAgentsIdentity(before, identity.display_name, nextIdentity.display_name).content !== before) workspaceTargets.push(agentsPath);
+    for (const [rel, kind] of [["AGENTS.md", "agents"], ["CLAUDE.md", "claude"]]) {
+      const guidancePath = join(root, rel);
+      if (!existsSync(guidancePath)) continue;
+      const before = readFileSync(guidancePath, "utf8");
+      const managed = updateIdentityManagedSection(before, { kind, currentIdentity: identity, nextIdentity });
+      const updated = managed.status === "missing" && rel === "AGENTS.md"
+        ? inspectAgentsIdentity(before, identity.display_name, nextIdentity.display_name).content
+        : managed.content;
+      if (updated !== before) workspaceTargets.push(guidancePath);
     }
   }
   const inspectedWorkspace = canonicalWorkspace(root);
@@ -194,11 +220,15 @@ export function applyRename({
   const targets = new Map();
   const idPath = identityPath(root);
   if (!sameName) targets.set(idPath, `${JSON.stringify(nextIdentity, null, 2)}\n`);
-  const agentsPath = join(root, "AGENTS.md");
-  if (existsSync(agentsPath)) {
-    const before = readFileSync(agentsPath, "utf8");
-    const inspected = inspectAgentsIdentity(before, identity.display_name, nextIdentity.display_name);
-    if (inspected.content !== before) targets.set(agentsPath, inspected.content);
+  for (const [rel, kind] of [["AGENTS.md", "agents"], ["CLAUDE.md", "claude"]]) {
+    const guidancePath = join(root, rel);
+    if (!existsSync(guidancePath)) continue;
+    const before = readFileSync(guidancePath, "utf8");
+    const managed = updateIdentityManagedSection(before, { kind, currentIdentity: identity, nextIdentity });
+    const updated = managed.status === "missing" && rel === "AGENTS.md"
+      ? inspectAgentsIdentity(before, identity.display_name, nextIdentity.display_name).content
+      : managed.content;
+    if (updated !== before) targets.set(guidancePath, updated);
   }
   for (const rel of selectedUserContent) {
     const path = resolve(root, rel);

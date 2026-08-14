@@ -42,6 +42,7 @@
     "plugins/secretary/rules/styles/agentic.md",
     "scripts/agentic-*",
     "scripts/lib/agentic-hosts.mjs",
+    "scripts/fixtures/sprint-039-patch-002/**",
     "scripts/sprint-033-test.mjs",
     "scripts/sprint-039-*.mjs",
     "scripts/sprint-039-*.sh",

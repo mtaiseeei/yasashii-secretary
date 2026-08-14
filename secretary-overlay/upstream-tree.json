@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "baseCommit": "3fa8d97e5dbfb2afa314f4ad179f17401b76d320",
+  "baseCommit": "3ef792819a4a445df089f70aa74ca09176762e5e",
   "files": [
     {
       "path": ".agents/plugins/marketplace.json",
@@ -10,7 +10,7 @@
     {
       "path": ".claude-plugin/marketplace.json",
       "classification": "metadata-overlay",
-      "sha256": "ec2bd334ae5ba48fd549ff0c89cf0b9784d3e5b590f495c5887d72c634b7160c"
+      "sha256": "3ccbab2958c5f8f24f8c31edbbc6d99be340a8e1e929477e3b551da83c7923e5"
     },
     {
       "path": ".github/workflows/windows-recording-regression.yml",
@@ -45,7 +45,7 @@
     {
       "path": "README.md",
       "classification": "repo-owned",
-      "sha256": "4923547de6dab19a2cab97e42445734df79f2fd0872b36f634a50faa65b801cf"
+      "sha256": "fb670b7bf838e47071a52981cb0038ce1c4b9c8ca86882993267fe6e9415496b"
     },
     {
       "path": "adapters/agentic-overlay.json",
@@ -105,7 +105,7 @@
     {
       "path": "adapters/downstream-identity-handoff.json",
       "classification": "upstream-only",
-      "sha256": "18c09cd474184fea802ed8ecc14b7b231e4187c95d7a58e40ceadf93b0ab2a36"
+      "sha256": "01d38d9811a5dccb78277c25a90ec01e4345623cd0e246b27317b64b85fee9c4"
     },
     {
       "path": "adapters/host-matrix.json",
@@ -1468,6 +1468,11 @@
       "sha256": "10cfd3fdc549c0c7092c93f5693f435defa133c6e595a498c3182015d28a676e"
     },
     {
+      "path": "docs/feedback/sprint-039-patch-001.md",
+      "classification": "repo-owned",
+      "sha256": "b3b5b5e1683fe82dd66a7aa50ce964a09c679c9e1ed9c303a6a4c7ece23e6bde"
+    },
+    {
       "path": "docs/feedback/sprint-039.md",
       "classification": "repo-owned",
       "sha256": "315aff81e7e0453266d06da6eee357fbfb9220df528f60f418e92e1524516cbc"
@@ -1795,42 +1800,42 @@
     {
       "path": "docs/spec.md",
       "classification": "repo-owned",
-      "sha256": "fff3f285e5aa82de14fda98a52d0c94330ae672344b4854315b9ee322adfe73b"
+      "sha256": "effafcbfce7692169a8124ee3b630c7aea19372389823aad65ad63ba2fb48852"
     },
     {
       "path": "docs/spec/constraints.md",
       "classification": "repo-owned",
-      "sha256": "d0dfe2f010a41fc1593173a63ecaf746e6db38e1a5285b19ec0106d50ec5159c"
+      "sha256": "6e510c20f14a1373e29896e53eb0bb750cac957aa9c0f91bd3dc6670868a9b41"
     },
     {
       "path": "docs/spec/domain.md",
       "classification": "repo-owned",
-      "sha256": "9248dad60a2695edb43662d1f406ae833f3b2c29930ef138fca115cd0f8a9e83"
+      "sha256": "417dbdbc3bb6575da3ad4c01852f9bd29e7b630f49a905fc35fd85ebf6bb41e2"
     },
     {
       "path": "docs/spec/editions.md",
       "classification": "repo-owned",
-      "sha256": "78bf281df48d8ff91320a27d65a6d820a27404da69f2e5318b7a14e7e17489bc"
+      "sha256": "c551b30796140675df3dbd2ceb23270c7f7283e4931c5447c3626226413e800c"
     },
     {
       "path": "docs/spec/features.md",
       "classification": "repo-owned",
-      "sha256": "b66fe5dfac470ee2257bfb68f38a1de9b1617ea526a89e2a87262035ad8f6b38"
+      "sha256": "fedb685dcdec2f4efa8b919d16de1f866042980715413afe9f3750429982f214"
     },
     {
       "path": "docs/spec/product.md",
       "classification": "repo-owned",
-      "sha256": "262ecfd399ffcc6ee696383d327c818b9428f1c87394ac84f60d1348cd56d842"
+      "sha256": "5b19f724dbdacd197d57583e707937c24fee7b6f44cff00dc33187a860da9fa2"
     },
     {
       "path": "docs/spec/rubric.md",
       "classification": "repo-owned",
-      "sha256": "44405f77f105fbc4775872734fd192d8753326904502efad7e0b3d43f8d7820d"
+      "sha256": "f924dbf8a15815dd145582a913eb6262ca98cf0d350990d315ee2d25072216dd"
     },
     {
       "path": "docs/spec/ui.md",
       "classification": "repo-owned",
-      "sha256": "3b18d44b41680c55b729e35ae3c874a65bd94dc11c65e135f616f45d2a575cdb"
+      "sha256": "5692c48cb29e0888f29a56cbb29afd21d0873bc2442b5ca15b886f187d64439c"
     },
     {
       "path": "docs/sprints/sprint-001-patch-001.md",
@@ -2108,6 +2113,11 @@
       "sha256": "da35610a01481cc1596ce5a22c8a3e91b22d9cce05b22669ab18902a5b406bc1"
     },
     {
+      "path": "docs/sprints/sprint-039-patch-002.md",
+      "classification": "repo-owned",
+      "sha256": "89c1c7adbe4c97e4d0c8b57bfbe69dfed83212869f86ac5e5d8065d10283828a"
+    },
+    {
       "path": "docs/sprints/sprint-039.md",
       "classification": "repo-owned",
       "sha256": "fcc645943f6eb169f92d20fdd02229183c665c1bfe4313bdc17a8903b869fea0"
@@ -2115,17 +2125,17 @@
     {
       "path": "docs/sprints/state.md",
       "classification": "repo-owned",
-      "sha256": "f1807fe110e69465acdcfb1f49a5df09e3295c099f2b98583b79b43bbae2ed3d"
+      "sha256": "2f6ba08ba4b574099c391fe3ebda426360f068da6ad479da86752b1a24ea31d1"
     },
     {
       "path": "plugins/secretary/.claude-plugin/plugin.json",
       "classification": "metadata-overlay",
-      "sha256": "442ea24b1a13ab47e97ec53d2aa15c86c9db23bcb0fec023d53dec04f2928093"
+      "sha256": "66650120004eaf03033d272a905dedfc1e3ffc6795840dceb1de25057b919e40"
     },
     {
       "path": "plugins/secretary/.codex-plugin/plugin.json",
       "classification": "metadata-overlay",
-      "sha256": "61092dfd10d3239558df472608fdf12b1c257263b7443c87d84aafd21687bbc2"
+      "sha256": "ea4845ada601eb2047da11ee6593c9e8817882138315441ea7f4e3d58f4b01f8"
     },
     {
       "path": "plugins/secretary/.mcp.json",
@@ -2135,7 +2145,7 @@
     {
       "path": "plugins/secretary/CHANGELOG.md",
       "classification": "anchor-overlay",
-      "sha256": "3b92ef50f12164e01065409c0dd9de067c899dfd28f9af94b15a7dcfdca71c2c"
+      "sha256": "efadf403e79fbeb3b731d9ed4d1a22501edb77dcecce5f3c15bbd7e0b6b2a754"
     },
     {
       "path": "plugins/secretary/edition.json",
@@ -2325,7 +2335,12 @@
     {
       "path": "plugins/secretary/scripts/lib/safe-git.mjs",
       "classification": "common",
-      "sha256": "5d81c44849a39cccc5f0cd95163e243e3e403cd1c8b8a18f474d0ac726d2223a"
+      "sha256": "1196f4a98bd28cabeee7f4ec22fd369b81bc491be5422c38b7eba6aa34ec3028"
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/secretary-identity-migration.mjs",
+      "classification": "common",
+      "sha256": "ddb9c1055e275ba77da5f949fc0cb58520422f29a9f81f04059dc70a45344716"
     },
     {
       "path": "plugins/secretary/scripts/lib/secretary-identity.mjs",
@@ -2335,7 +2350,7 @@
     {
       "path": "plugins/secretary/scripts/lib/secretary-rename.mjs",
       "classification": "common",
-      "sha256": "de5be639e9a34b8c15be5212edf95d3c05907439b57301e0b3c79d5f21542247"
+      "sha256": "685489e872eb2f26a93fe0a84b1091a0c8003c1c80cd15b1b05b2392190ac2bc"
     },
     {
       "path": "plugins/secretary/scripts/lib/secretary-store.mjs",
@@ -2405,7 +2420,7 @@
     {
       "path": "plugins/secretary/scripts/secretary-name.mjs",
       "classification": "common",
-      "sha256": "1778b858e7b8274a072e0261e5c78a2d3037ed0e8d4e4bff9c4950ccdb84ac95"
+      "sha256": "c6df143370bf4045b60399235bd014da45011c619020cc91d0b0b5b9b4ee886c"
     },
     {
       "path": "plugins/secretary/scripts/update-apply.mjs",
@@ -2420,7 +2435,7 @@
     {
       "path": "plugins/secretary/scripts/update-ledger.mjs",
       "classification": "common",
-      "sha256": "8791e83a107afcb524d4625dc4f5b21a8773ba2290952aba55e691562691b739"
+      "sha256": "be83087ebed6244065e7c14e438de2bcec9c7537f59f9d915e69b51f5bf3ea04"
     },
     {
       "path": "plugins/secretary/scripts/workspace-repo.mjs",
@@ -2615,7 +2630,7 @@
     {
       "path": "plugins/secretary/skills/name/SKILL.md",
       "classification": "anchor-overlay",
-      "sha256": "7c6cc068736c59af4e8c003825b299162548e0759d50bce80de4ab6a6cb48239"
+      "sha256": "3b09fc6c8659ee802c63320325b13cea5800b63a5396a31a1286515e5257e8fd"
     },
     {
       "path": "plugins/secretary/skills/onboarding/SKILL.md",
@@ -2630,7 +2645,7 @@
     {
       "path": "plugins/secretary/skills/secretary/SKILL.md",
       "classification": "anchor-overlay",
-      "sha256": "c8cc68d698a66215e38b0d3c76347507da74683574492833946c235a02a7fe2f"
+      "sha256": "b9f4c126088e97cf50592ce57c9b9a24288d6574d3f1168d9e4f68d411bb619c"
     },
     {
       "path": "plugins/secretary/skills/settings/SKILL.md",
@@ -2655,7 +2670,7 @@
     {
       "path": "plugins/secretary/skills/update/SKILL.md",
       "classification": "anchor-overlay",
-      "sha256": "c78da1021b12060afde7c48699f0574d4ba2d65cfce4342b0b2a74196f6a6ffc"
+      "sha256": "f54006559981491186b459aa9027bd780b6316d81398699ebe152f755a7de669"
     },
     {
       "path": "plugins/secretary/skills/weekly/SKILL.md",
@@ -2665,12 +2680,12 @@
     {
       "path": "plugins/secretary/templates/AGENTS.md",
       "classification": "common",
-      "sha256": "590627c0363c30be2d2532be7fa5b777cf7094dc4a0771d25f7794b4d1f89f64"
+      "sha256": "146ba63693b79998884866d3287863ff9a7900fd5c41c3941d147ca1ee1c4279"
     },
     {
       "path": "plugins/secretary/templates/CLAUDE.md",
       "classification": "common",
-      "sha256": "406d6aa02a57a485cf7195cee4c10d6a5260213831cf9e31eb41bee392848b72"
+      "sha256": "9a1299a134a823fc636486a7c93320588183c6af484a1d4d9ca231b5d36f165e"
     },
     {
       "path": "plugins/secretary/templates/docs/.gitkeep",
@@ -2775,7 +2790,7 @@
     {
       "path": "plugins/yasashii-secretary/CHANGELOG.md",
       "classification": "anchor-overlay",
-      "sha256": "3b92ef50f12164e01065409c0dd9de067c899dfd28f9af94b15a7dcfdca71c2c"
+      "sha256": "efadf403e79fbeb3b731d9ed4d1a22501edb77dcecce5f3c15bbd7e0b6b2a754"
     },
     {
       "path": "scripts/agentic-archive-gate.mjs",
@@ -2790,7 +2805,7 @@
     {
       "path": "scripts/agentic-codex-plugin-test.mjs",
       "classification": "upstream-only",
-      "sha256": "65f5ae25017f820ff2317d21a58594c0fd3eaf3918ca51b01072661a88362a5b"
+      "sha256": "b4f77942013f2b360ac607c577fd7cc4d24adb79d1303f0124dcf844405ada4b"
     },
     {
       "path": "scripts/agentic-host-gate.mjs",
@@ -2815,7 +2830,7 @@
     {
       "path": "scripts/archive-release-gate.mjs",
       "classification": "repo-owned",
-      "sha256": "43350a0bb193ba11372c69c7d63307c219e7622675f6c8ead1d918781cbabc6f"
+      "sha256": "ff63776bcf260b2b1b4cbd71e3f8a8f7c5f9de6732e956d3c4048c08fc154010"
     },
     {
       "path": "scripts/check-distribution-channel.py",
@@ -2830,7 +2845,7 @@
     {
       "path": "scripts/check-release-integrity.py",
       "classification": "repo-owned",
-      "sha256": "081feeace58446a51e4ceb06d6a6f891637971940844a826e2acbc02ba570212"
+      "sha256": "ab8285d654c33c83050c417c070d6e8a4848fe8a4d1fb61cf726f64115d6ba4d"
     },
     {
       "path": "scripts/check-report-schema.py",
@@ -3028,6 +3043,26 @@
       "sha256": "9f8a99ebb8f4ab59f1c3e7176973f41f4bf974d4197fcfd894c2a3968986163a"
     },
     {
+      "path": "scripts/fixtures/sprint-039-patch-002/v0.10.0/AGENTS.md",
+      "classification": "upstream-only",
+      "sha256": "590627c0363c30be2d2532be7fa5b777cf7094dc4a0771d25f7794b4d1f89f64"
+    },
+    {
+      "path": "scripts/fixtures/sprint-039-patch-002/v0.10.0/CLAUDE.md",
+      "classification": "upstream-only",
+      "sha256": "406d6aa02a57a485cf7195cee4c10d6a5260213831cf9e31eb41bee392848b72"
+    },
+    {
+      "path": "scripts/fixtures/sprint-039-patch-002/v0.9.2/AGENTS.md",
+      "classification": "upstream-only",
+      "sha256": "409c7b7ddd67bafbda2aad5867e7b7f3713cc6caea7dee0cf85e71185fab5ae3"
+    },
+    {
+      "path": "scripts/fixtures/sprint-039-patch-002/v0.9.2/CLAUDE.md",
+      "classification": "upstream-only",
+      "sha256": "406d6aa02a57a485cf7195cee4c10d6a5260213831cf9e31eb41bee392848b72"
+    },
+    {
       "path": "scripts/fixtures/yasashii-harness/claude-marketplace-good.json",
       "classification": "common",
       "sha256": "801040c1f47e85e945b1a83cf7a591391544bca456910967801e13413103e07f"
@@ -3105,7 +3140,7 @@
     {
       "path": "scripts/master-release-gate.mjs",
       "classification": "anchor-overlay",
-      "sha256": "c152d92eadd083a4e41b56d2e8da9543802b7ab673afc4e3334f8ad2dcb38052"
+      "sha256": "32c9a1ff49c9641ace86b83cedf55cacf1faaca7181a04a7656f22a89f85d810"
     },
     {
       "path": "scripts/master-release-gate.sh",
@@ -3435,12 +3470,12 @@
     {
       "path": "scripts/sprint-032-update-gate-test.mjs",
       "classification": "anchor-overlay",
-      "sha256": "197653800fa154bcde4726478247d1129bc322bf1c18cb56c175e2064a88efed"
+      "sha256": "8c427a9e1d51130f135033b3dfffc20338788edc80f87d20204ce96128475ebf"
     },
     {
       "path": "scripts/sprint-033-test.mjs",
       "classification": "upstream-only",
-      "sha256": "98be6d0155949983880f1e2b32b5564484a5a6c0e4428d6d74ce12d8ff9dc6f3"
+      "sha256": "158b52025689a35717b2d519a64bb4df813ce39ec8c9a528514e2d0bc5bc18cf"
     },
     {
       "path": "scripts/sprint-035-patch-001-ime-test.mjs",
@@ -3470,7 +3505,7 @@
     {
       "path": "scripts/sprint-035-test.mjs",
       "classification": "anchor-overlay",
-      "sha256": "5a881f1b8b0d4d9bd309a8b285a5b79021a1ff89ce54ae78aa9da9bcf15abdbf"
+      "sha256": "0c3aba4f73aa54180e676ca90fa37b4ffd6ffa1a5f2d8a352feb6b1c1d2c1079"
     },
     {
       "path": "scripts/sprint-037-patch-001-test.mjs",
@@ -3510,7 +3545,7 @@
     {
       "path": "scripts/sprint-038-patch-001-test.mjs",
       "classification": "anchor-overlay",
-      "sha256": "c0f6dd6042495eda55fa64fd1964c61896ab223fed98910bc7761149c2c1af33"
+      "sha256": "9a9bd53013a1d0cd17dcf09f4c6a4c63b2521d2188bbdd3c3ae80a6c54b76eca"
     },
     {
       "path": "scripts/sprint-038-patch-002-windows-test.mjs",
@@ -3530,7 +3565,7 @@
     {
       "path": "scripts/sprint-038-test.mjs",
       "classification": "anchor-overlay",
-      "sha256": "679d81975832e4490f9607e3e94ff79423a0c18f6c911d76e40f7ab0375b3d1e"
+      "sha256": "0eb53d3baec22499aee24f965d499fbee8914b4c676bb604ff2856f1e8c12c42"
     },
     {
       "path": "scripts/sprint-039-handoff.mjs",
@@ -3548,6 +3583,16 @@
       "sha256": "5c67d303f243ddaa735d74559e45bec1de10cc8c3239342998e416d1ecbed94d"
     },
     {
+      "path": "scripts/sprint-039-patch-002-regression.sh",
+      "classification": "upstream-only",
+      "sha256": "42446e8a3fef6472d92fae1109ec10f4faaff9c429bd678151ab905dcfbbc14f"
+    },
+    {
+      "path": "scripts/sprint-039-patch-002-test.mjs",
+      "classification": "upstream-only",
+      "sha256": "61a1a2cc71046578443e61eddb7f05321109fac54df8b86b4e7a51d6d5d5f889"
+    },
+    {
       "path": "scripts/sprint-039-regression.sh",
       "classification": "upstream-only",
       "sha256": "a26b8dade9352c0730ee9e52a6e97f10023fc7eae6365d01625110ee5d663c4b"
@@ -3555,7 +3600,7 @@
     {
       "path": "scripts/sprint-039-test.mjs",
       "classification": "upstream-only",
-      "sha256": "9114136ff14fd13b6b6668a8bf3f25d257d88a73fab60a04858143131d98b5de"
+      "sha256": "e3743f42c80f2e99dec891e5b385e8649e2e1ce5fa2a3bb75f7b737d2495c414"
     },
     {
       "path": "scripts/start-sprint-013-wizard-fixture.sh",

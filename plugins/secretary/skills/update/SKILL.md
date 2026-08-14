@@ -109,6 +109,17 @@ Claude CLIを呼ぶ前、かつworkspaceの保護commit、session、backupを作
 `未確認` のまま停止します。Codex経路ではClaude用の保護sessionを作らないため、直後に `resume` を実行しません。
 新しいsessionで `$update` を再度呼び、まず読み取り専用診断から現在版とworkspaceへの影響を確認します。
 
+pluginが`0.10.1`へ更新されたことと、既存workspaceのローカルidentity migration完了は別状態です。
+新しいsessionではcanonical workspaceを解決した後、次をread-only実行します。
+
+```text
+node "${SECRETARY_PLUGIN_ROOT}/scripts/secretary-name.mjs" migration-diagnose --workspace <canonical-workspace> --plugin-root "${SECRETARY_PLUGIN_ROOT}"
+```
+
+`identity-missing`／`identity-only`なら、plugin更新だけを完全移行と表示せず、name Skillの
+名前確認→migration preview→別確認へ案内します。`migration-current`だけがローカル移行済みです。
+見送り、衝突、診断不能ではworkspace、Git、user-scope、registryを変更しません。
+
 「やさしい秘書の更新を再開」と言われたら、新しい`${SECRETARY_PLUGIN_ROOT}`でversionと再開情報を確認し、dry-runだけを実行します。
 これは既にClaude Code用runnerが作成した更新sessionを再開する経路です。sessionが無ければ変更せず停止します。
 
@@ -140,6 +151,10 @@ workspaceは`git reset --hard`を使わず、更新が書いた後から利用�
 旧`0.7.0` updaterはチャット連携の標準生成fileをsecret候補として止める既知のblockerがあるため、
 診断結果だけで対応済みと説明したり、external recovery／bootstrapを推測で案内したりしません。
 最初の明示配布は`0.8.0`の新規導入として扱います。
+
+`0.10.1`は、公開済み`0.10.0`でplugin更新後も既存workspaceのidentity管理節と最小台帳が部分適用に
+なり得る欠陥を直す後方互換patchです。更新後のローカル移行はname Skillの別確認で行い、
+user-scope routing、rename、既存文書の置換、pushを同時に許可しません。
 
 ## 自動更新について
 
