@@ -414,3 +414,124 @@ Git commitは隔離fixture内だけで実行した。
 - historical master 5/6は開始candidateとRetry 1で同じ集計・同じ主因であり、product findingへ水増ししていない。
 - WindowsのDarwin実行をnative Windows証拠へ昇格していない。
 - Evaluatorは製品、test、spec、state、progress、Gitを変更せず、このfeedbackだけへ追記した。
+
+# Sprint 039 spec整合後 fresh最終評価
+
+## 判定
+
+**PASS**
+
+- 評価HEAD: `44449a6a7479a5fe52ace0748db08d6bbf208eea`
+- 製品／test／overlay candidate: `65dccf6cb333f11d3fac6bfab729fb993bc1a26f`
+- 固定Agentic製品candidate: `3fa8d97e5dbfb2afa314f4ad179f17401b76d320`
+- handoff common digest: `c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557`
+- product finding: **0件**
+- blocking verification-infra finding: **0件**
+- 未検証の必須内部項目: **0件**
+- failure route: **none**
+
+前回S1は **RESOLVED**。Planner正本の固定入力、digest、16 `commonPaths`、13 byte parity＋3宣言anchorが、すでに独立PASS済みのAgentic Patch製品candidateと一致した。`65dccf6..44449a6`の製品、test、overlay差分は0件で、今回の変化はspec／契約／state／progress／feedbackだけだった。
+
+## Findings
+
+| ID | 分類 | Severity | 状態 | 内容 |
+|---|---|---|---|---|
+| S1 | spec-issue | Major | RESOLVED | 固定入力を旧`3e08eb6`／`7498d...`からaccepted `3fa8d97`／`c810f60c...`へ更新し、16 paths、13 parity＋3 anchors、`external-ops.mjs`／`safe-git.mjs`を正本間で一致させた。 |
+
+新規product findingは0件。新規verification-infra findingも0件。前回記録したhistorical masterの既知6 FAILは、開始candidateでも同じだった非因果のverification-infraとして履歴を維持し、今回の製品PASSへ読み替えていない。
+
+## 独立評価環境
+
+- 実repoは評価開始時clean。評価HEADを`git clone --no-hardlinks`した隔離checkoutと、同じHEADを`git archive`で展開した`.git`なしarchiveを新規作成した。
+- Agentic入力も`3fa8d97...`のlocal Git archiveから新規作成し、moving checkoutを入力にしていない。
+- 実行環境: Darwin arm64、Node.js `v22.23.2`。
+- テストのHOME、workspace、Git repo、local bare remoteは一時fixtureだけ。実HOME、実workspace、実remoteへのwriteは0件。
+
+## 実行証拠
+
+### 固定入力、16 paths、overlay
+
+- 独立計算: `commonPaths=16`、SHA-256=`c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557`。`external-ops.mjs`と`safe-git.mjs`を含む。
+- `node scripts/sprint-039-overlay-test.mjs <agentic-3fa8-archive>`: checkout／Git-free archiveとも`SPRINT039_OVERLAY_PASS=6 FAIL=0`。
+- `node scripts/sync-secretary-overlay.mjs --check ...`: 両面ともPASS。`managed=277`、`handoffPaths=16`、handoff digest一致、未分類0。
+- 隔離checkoutで`--reapply`: `secondChanged=0`、reapply後の`git diff --exit-code`と`git status --short`がclean。
+- overlay definition digest `5850ef7b197e9f524891d0af5f71c3be1b39ed468fddae37d8044c04f58e37df`、reapply digest `3698b74e36909b1a3bee38fd2d2187758f4a8085481a44a32f3a0e30caa53ad5`。
+- 旧固定値`3e08eb6...`／`7498d...`は、履歴を保持する`docs/**`以外の実装所有面に0件。
+
+### checkout／Git-free archive回帰
+
+両面で`bash scripts/sprint-039-patch-001-regression.sh`を実行し、exit 0、同じ集計を得た。
+
+| 面 | 結果 |
+|---|---|
+| Patch専用 | `SPRINT039_PATCH001_PASS=16 FAIL=0` |
+| Sprint 039本体 | `SPRINT039_PASS=69 FAIL=0`、wrapper 7/0 |
+| Git safety | 71/0 |
+| Sprint 035 target | 15/0 |
+| report schema | 正式21 surfaces、1/0 |
+| release integrity | 正式16 Skills＋same-count unknown negative、2/0 |
+| wrapper全体 | 9/0 |
+
+この回帰で、所有pathだけのrequired local checkpoint、既存staged／unstaged／untracked保持、開始前dirty／親repo／nested repoのsafe stop、`before-write-2`／`before-checkpoint`／stage／commit／post-commit failureのHEAD・index・worktree・HOME完全rollback、commit failure後retry 1 commit、成功後再実行追加commit 0を確認した。実在commit工程の強制失敗も非0になりrollbackした。
+
+同じ回帰で、合成HOME上のCodex通常`AGENTS.md`／`AGENTS.override.md`優先、Claude `CLAUDE.md`、managed blockの明示確認前write 0、create／disable／冪等／部分失敗rollback、canonical resolver、registry異常停止、直接呼びかけ正caseと人間／顧客／著者／引用／code負case、rename P1〜P4、stable identity、AI authorを確認した。
+
+### protected surfaceとrelease境界
+
+- `65dccf6..44449a6`で`secretary-overlay/`、`plugins/`、`scripts/`の差分0件。
+- README、LICENSE、AGENTS、Yasashii copy／style、edition、rule manifest、Claude／Codex marketplace／plugin manifestの差分0件。
+- Agentic docs／progress／feedback／state／release記録の同期0件。private／my-vault対応済み表示0件。
+- release integrityは正式16 Skillsを受理し、`name`を`unknown`へ差し替えて件数を16に保つ負fixtureを、`unexpected`と`missing`の両方で拒否した。
+
+### Windowsとhistorical infraの分離
+
+- `node scripts/sprint-038-patch-002-windows-test.mjs`: `OS=darwin`、既存12 labelsが12/0。
+- Sprint 039の新identity／routing／renameを、新しいWindows identity上でnative実行した証拠は **not-run**。Darwin結果をWindows native PASSへ昇格していない。
+- 前回の長時間historical master 5/6は、開始HEADと同一のwizard固定digest、sandbox loopback `EPERM 127.0.0.1`、moving Agentic checkoutを読む旧Sprint 034 oracle、旧README期待が原因だった。今回のtarget／checkout／archiveがgreenで製品candidate不変のため再反復せず、verification-infra履歴として保持した。
+
+## Acceptance Criteria
+
+| AC | 判定 | 根拠 |
+|---:|---|---|
+| 1 | PASS | accepted `3fa8d97...`、fresh独立PASS履歴、`c810f60c...`が正本間で一致。 |
+| 2 | PASS | 16 paths、13 parity＋3 anchors、2安全path、未分類0、check／reapply追加差分0。 |
+| 3 | PASS | Yasashii固有surfaceとhandoff所有外metadataを保護し、Agentic repo正本同期0。 |
+| 4 | PASS | 指定／提案、保存前確認、拒否0 write、不適格名、owner呼び方分離がgreen。 |
+| 5 | PASS | stable identity、AI種別、aliases、AI author一貫性がgreen。 |
+| 6 | PASS | user-scope明示確認、Codex override、Claude file、拒否0 writeがgreen。 |
+| 7 | PASS | managed blockのatomic／rollback／冪等／既存本文保持／disable保持がgreen。 |
+| 8 | PASS | canonical workspaceとregistry異常、symlink、read-only、cwd副作用0がgreen。 |
+| 9 | PASS | 直接呼びかけ／委譲正case、人間文脈語を含む依頼、負case、曖昧確認がgreen。 |
+| 10 | PASS | A〜D preview、件数／推奨／非対象／rollback、snapshot一致、blind replacement 0。 |
+| 11 | PASS | 所有field／選択Bのみ変更、C保持＋alias、D不変、未作成／disabled routing保持。 |
+| 12 | PASS | dirty／衝突／部分失敗／commit／post-commitで完全rollback、retry追加差分0。 |
+| 13 | PASS | 正式16 Skillsと正式21 surfacesがPASS、同数unknown差替えが期待どおりFAIL。 |
+| 14 | PASS | clean checkout／Git-free archiveの必須回帰が0 FAIL。historical infraは別記。 |
+| 15 | PASS | Yasashii copy、identity、repository、marketplace、README、LICENSE、Harness導線を保持。 |
+| 16 | PASS | Darwin 12/0と新identity Windows native not-runを分離し、全環境PASSを主張していない。 |
+| 17 | PASS | 全重点Rubric 5/5、product 0、blocking infra 0、未検証必須内部項目0。 |
+| 18 | PASS | 実HOME、private、cache、実workspace、remote、release、Secret、Actions、OAuth、実API write 0。 |
+
+## Rubric score
+
+| ID | 基準 | Score | Threshold | 判定根拠 |
+|---|---|---:|---:|---|
+| C2 | 構文・整合 | 5/5 | 5 | schema 21 surfaces、正式16 Skills、同数unknown負例、両candidate面green。 |
+| C5 | 安全・規律 | 5/5 | 5 | 明示確認、所有path checkpoint、既存Git状態保持、全failure point rollback。 |
+| C6 | 無回帰 | 5/5 | 5 | checkout／archiveともPatch、Sprint 039、Git safety、Sprint 035、schema、releaseが0 FAIL。 |
+| C9 | 配布チャネル非依存 | 5/5 | 5 | Yasashii正式identity／manifest／marketplace／README／LICENSEを保持。 |
+| C10 | 更新の安全性 | 5/5 | 5 | user-scope／renameの確認、冪等、rollback、remote write 0。 |
+| C13 | edition分離・互換 | 5/5 | 5 | accepted 16-path handoff、13 parity、3 anchors、未分類0、固有surface保護。 |
+| C14 | 会話のMarkdown可読性 | 5/5 | 5 | Yasashii copy／style／serializer正本を維持し、対象回帰green。 |
+| C16 | Windows native保存・0.9.2下流同期 | 5/5 | 5 | 既存12 labels維持、Bash非依存、overlay保護、Windows native not-runを正直に分離。 |
+| C17 | 秘書identity・routing・安全な改名 | 5/5 | 5 | identity、managed routing、正負case、分類付きrename、checkpoint／rollbackがgreen。 |
+
+必須9基準はすべて5/5で閾値を満たす。
+
+## UI／外部操作／self-review
+
+- browser UI変更なし。契約のsafe harborに従い、URL、DOM、screenshotはnot applicable。
+- 実repoでcommit／push／PR／merge／tag／Release／marketplace／install／updateを行っていない。テスト内のcommit／local bare pushは隔離fixtureのみ。
+- 以前のFAILとS1を削除せず、解消確認を追記した。productとverification-infraを混同していない。
+- WindowsのDarwin実行をnative Windows証拠へ昇格していない。
+- Evaluatorが変更したのはこのfeedbackだけである。
