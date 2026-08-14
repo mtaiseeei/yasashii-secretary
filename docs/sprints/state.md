@@ -5,7 +5,7 @@
 - Current ID: sprint-039
 - Retry Count: 1
 - Spec-Issue Count: 0
-- Lineage Dispatches: 3
+- Lineage Dispatches: 4
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
@@ -69,13 +69,14 @@
 | sprint-037 | done | [contract](sprint-037.md) | [progress](../progress/sprint-037.md) | [feedback](../feedback/sprint-037.md) |
 | sprint-038 | done | [contract](sprint-038.md) | [progress](../progress/sprint-038.md) | [feedback](../feedback/sprint-038.md) |
 | sprint-038-patch-002 | done-by-user-decision | [contract](sprint-038-patch-002.md) | [progress](../progress/sprint-038-patch-002.md) | [feedback](../feedback/sprint-038-patch-002.md) |
-| sprint-039 | active | [contract](sprint-039.md) | [progress](../progress/sprint-039.md) | [feedback](../feedback/sprint-039.md) |
+| sprint-039 | awaiting-eval | [contract](sprint-039.md) | [progress](../progress/sprint-039.md) | [feedback](../feedback/sprint-039.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-14: Retry 1 strong Generatorが、fresh public Evaluator PASS済みの固定Agentic candidate `3fa8d97e5dbfb2afa314f4ad179f17401b76d320`、common digest `c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557` をoverlay正本へ再同期した。正式16 Skillsのexact inventoryと同数unknown差し替えnegative、所有pathだけの実Git checkpoint、commit失敗／commit後失敗rollbackを追加し、overlay未分類0・reapply `secondChanged=0`、Patch 16/16、Sprint 039 69/69＋wrapper 7/7、release integrity 2/2、schema、clean checkout相当とGit-free archiveを0 FAILで確認した。製品candidate `65dccf6` をfresh独立Evaluatorへ渡すため、Lineage Dispatchesを4、Statusをawaiting-eval、Model Tier strong、Rotate noneとする。実HOME、cache、private版、Mac mini、remote、release変更は0件を維持する。
 - 2026-08-14: Sprint 039初回fresh独立Evaluatorはimplementation-issueでFAIL。専用identity／routing／managed block／overlay／schemaはcheckoutとGit-free archiveで合格したが、P1としてrelease integrityが旧15 Skills固定のまま新しい`name` Skillを拒否し開始commit exit 0に対してcandidate checkout／archiveはexit 1、P2として`rename-apply --fail-at commit`がexit 0でrenameとdirty Git状態を残しcommit失敗rollback未実装を確認した。既知wizard digest、loopback `EPERM`、旧overlay current HEAD依存、README期待差はhistorical／verification-infraとして分離。共通P2はYasashiiだけへanchor化せずAgentic common coreの`sprint-039-patch-001`へ戻し、そのPASS後の新固定SHA／digestを再同期する。Yasashii側はP1と固定candidate前進だけを限定修正するためRetry Count 1、fresh strong Generator dispatch予約としてLineage Dispatches 3、Status active、Model Tier strong、Rotate noneとする。release holdを維持する。
 - 2026-08-14: fresh strong Generatorが固定Agentic製品candidate `3e08eb6d377392440e753bd5073c73d1d63399b6` とcommon digest `7498d3550734ba63b689463f01e2a52e16d2ce3f8eb31cebead16aef2181f883` を入力に、Yasashii candidate `e23bdafd4d853d30eecbfa8ed97b534f739fa78f` を作成した。overlayは712 filesを全分類、未分類0、managed 277、check／reapply PASS、`secondChanged=0`。handoff 14 pathsのうち11 pathをbyte一致、`name`／`secretary`／`settings`の3 Skillだけを宣言済みYasashii anchorとして維持した。Sprint 039は69/69＋wrapper 7/7、overlay専用6/6、report schema 21面、Sprint 011 68/68、Sprint 035 15/15、Sprint 038 64/64、既存Windows labels 12/12、Git-free候補をPASS。README、LICENSE、Yasashii copy／style、manifest、marketplace、edition、rule manifestのdigest不変。既知historical wrapperのwizard digest、loopback `EPERM`、旧overlay test、README期待差はbaseline／verification-infraとして分離し、新identityのWindows nativeはnot-runのままgreenへ昇格しない。private版、実HOME／cache、Mac mini、remote、release変更0。fresh独立Evaluator dispatch予約としてLineage Dispatchesを2、Status awaiting-eval、Model Tier strong、Rotate noneとする。
 - 2026-08-14: Agentic共通コアSprint 039が製品candidate `3e08eb6d377392440e753bd5073c73d1d63399b6`、common digest `7498d3550734ba63b689463f01e2a52e16d2ce3f8eb31cebead16aef2181f883` でfresh独立Evaluator PASS。Plannerが同固定SHAのhandoff commonPathsだけをoverlay正本経由で同期し、英語名、stable identity、AI author、name Skill、canonical resolver、user-scope routing、P1〜P4解消済みrenameをYasashii固有copy／style／rule manifest／README／identity／LICENSE保護と両立させるhigh-risk main Sprint 039を確定した。新main SprintとしてRetry Count／Spec-Issue Count／Lineage Dispatchesを0から開始し、fresh strong Generator dispatch予約としてLineage Dispatches 1、Model Tier strong、Rotate model-escalation、Status activeとする。private版、実HOME／cache、Mac mini、remote、releaseは本Sprint外で変更0件を維持する。
