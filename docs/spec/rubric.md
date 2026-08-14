@@ -224,8 +224,8 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 
 ### C18 既存workspace identity migration【ゼロ許容】
 
-- 5: Plugin更新とローカル移行を別状態として示し、4つの既存workspace状態をread-onlyで正しく診断する。英語名確認とapply確認を分け、確認後だけidentity、製品所有のAGENTS／CLAUDE identity管理節、最小台帳を新規導入相当へ一体更新する。利用者自由記述、他block、改行、mode、無関係record、開始前Git状態を保持し、所有pathだけのlocal checkpoint、全failure pointの完全rollback、failure後retry、成功後rerun差分0が成立する。固定Agentic HEAD／製品commit／20 commonPaths／digestが一致し、Yasashii固有surfaceと`0.10.0`以前の履歴が不変、user-scopeは別確認、3版PASS前のrelease関連write 0件である。
-- 4以下: Plugin更新だけの完了表示、状態誤判定、previewの副作用、名前了承とmigration許可の統合、identityだけの部分成功、AGENTS／CLAUDE全面上書き、自由記述・改行・mode・無関係recordの変化、台帳への名前／stable ID／本文／Secret保存、所有外commit、開始前Git状態の損失、rollback不完全、retry／rerun重複、user-scopeの同時有効化、fixed input不一致、commonPaths外同期、Yasashii固有surface／過去release履歴の変更、3版PASS前のrelease／Mac mini／受講者向け配布のいずれかが1件でもある。→不合格。
+- 5: Plugin更新とローカル移行を別状態として示し、4つの既存workspace状態をread-onlyで正しく診断する。英語名確認とapply確認を分け、確認後だけidentity、製品所有のAGENTS／CLAUDE identity管理節、最小台帳を新規導入相当へ一体更新する。利用者自由記述、他block、改行、mode、無関係record、開始前Git状態を保持し、所有pathだけのlocal checkpoint、全failure pointの完全rollback、failure後retry、成功後rerun差分0が成立する。固定Agentic HEAD／製品commit／20 commonPaths／digestが一致する。READMEはcurrent release／既存workspace migrationの製品所有段落だけが`0.10.1`へ更新され、同段落のYasashii固有の文体・構造とsemantic anchor、READMEのそれ以外のsection／段落のdigest、他のYasashii固有surface、`0.10.0`以前の履歴が不変である。user-scopeは別確認、3版PASS前のrelease関連write 0件である。
+- 4以下: Plugin更新だけの完了表示、状態誤判定、previewの副作用、名前了承とmigration許可の統合、identityだけの部分成功、AGENTS／CLAUDE全面上書き、自由記述・改行・mode・無関係recordの変化、台帳への名前／stable ID／本文／Secret保存、所有外commit、開始前Git状態の損失、rollback不完全、retry／rerun重複、user-scopeの同時有効化、fixed input不一致、commonPaths外同期、README許可段落以外の変化、README許可段落のYasashii固有文体・構造・semantic anchorの欠落、他のYasashii固有surface／過去release履歴の変更、3版PASS前のrelease／Mac mini／受講者向け配布のいずれかが1件でもある。→不合格。
 
 ## スプリント別の重点
 

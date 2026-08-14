@@ -364,7 +364,7 @@
 9. 改名、managed block、registry更新は1 transactionとして扱う。書込み、path guard、symlink、構文検証、commitの失敗では対象fileとGit状態を開始前へrollbackし、backup、一時file、半端な旧名／新名混在を残さない。
 10. Yasashiiへの同期入力はpublic `sprint-039-patch-001` のfresh独立評価でPASSしたAgentic製品candidate `3fa8d97e5dbfb2afa314f4ad179f17401b76d320` と、そのtreeにある `adapters/downstream-identity-handoff.json` に固定する。handoff digestは `c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557`、`commonPaths` は16件とし、Agenticのdocs、progress、feedback、state、release記録を同期しない。
 11. 16 commonPathsは13件のbyte parityと、`name`／`secretary`／`settings` の3宣言anchorに分類する。`external-ops.mjs` と `safe-git.mjs` を共通安全pathとして含め、除外・下流overrideしない。overlay check／apply／reapplyは未分類0件、二回目追加差分0件を満たす。
-12. overlay metadataはaccepted candidate、digest、16 commonPaths、13 parity／3 anchor分類を記録する所有fieldだけを更新できる。Yasashii固有copy、style、rule manifest、README、identity、repo-owned docs、LICENSEと、それ以外のoverlay metadataのdigestを保護し、Agentic値へ戻さない。
+12. overlay metadataはaccepted candidate、digest、16 commonPaths、13 parity／3 anchor分類を記録する所有fieldだけを更新できる。Yasashii固有copy、style、rule manifest、README、identity、repo-owned docs、LICENSEと、それ以外のoverlay metadataのdigestを保護し、Agentic値へ戻さない。後続Patchである§22が明示するREADMEのcurrent release／既存workspace migration製品所有段落だけは、同節の限定更新を優先する。
 13. 合成HOMEと隔離workspaceでrouting、resolver、managed block、改名、rollbackを検証する。実HOME、installed plugin／cache、private版、Mac mini、remote、releaseへは本機能同期中に書き込まない。
 14. Windows nativeの既存12 labelsと残余リスクは過去証拠の範囲で正直に扱う。本機能のportable code review、既存suite、実行できた環境証拠を分け、Windows未実行を全環境PASSや解消済みへ昇格させない。
 
@@ -383,5 +383,5 @@
 11. ローカルmigrationの確認にuser-scope registry／routing、rename、過去author、利用者コンテンツ、既存文書のGrep置換、pushを含めない。別repo routingはmigration完了後も効果と対象を示した別確認でだけ有効化する。
 12. 同期入力はAgentic固定候補HEAD `ba4fe4de39df483b984fef5045bb1e21fdde1373`、製品commit `3ef792819a4a445df089f70aa74ca09176762e5e`、common digest `a7d74a7a9bb42ea67815a75132acf588fe312314f98b7f9685cef97fdfca59c9`、20 `commonPaths` に固定する。後続docs-only commit、moving checkout、dirty treeへ読み替えない。
 13. 20 commonPathsは16件のbyte parityと、`name`／`secretary`／`settings`／`update` の4宣言anchorに分類する。新しいidentity migration、update-ledger、update Skill、CLAUDE templateを同期対象から外さず、未分類0件、check／apply／reapply二回目追加差分0件を満たす。
-14. Yasashii固有の文体、copy、style、rule manifest、README、配布identity、repository、marketplace、overlay所有field、repo-owned正本、Sprint／progress／feedback／evidence、LICENSE、公開済み`0.10.0`以前の履歴を保護する。Agentic docs／state／release記録を同期しない。
+14. Yasashii固有の文体、copy、style、rule manifest、配布identity、repository、marketplace、overlay所有field、repo-owned正本、Sprint／progress／feedback／evidence、LICENSE、公開済み`0.10.0`以前の履歴を保護する。READMEは全体digest固定の対象にせず、`0.10.1`のcurrent releaseと既存workspace migrationを説明する製品所有段落だけを更新できる。その段落でもYasashii固有の文体と構造を保ち、それ以外のsection／段落は開始前後digest不変、許可段落はversion、Plugin更新とローカル移行の分離、新session、別確認、任意のuser-scope routingというsemantic anchorを保つ。Agentic docs／state／release記録を同期しない。
 15. 本PatchはYasashii `0.10.1` candidateまでを扱う。Agentic／Yasashii／privateの3版がそれぞれfresh独立PASSする前に、tag、GitHub Release、marketplace公開、installed cache更新、Mac mini同期、受講者向け更新文の配布を行わない。

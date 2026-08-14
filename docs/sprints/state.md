@@ -4,8 +4,8 @@
 
 - Current ID: sprint-039-patch-001
 - Retry Count: 0
-- Spec-Issue Count: 0
-- Lineage Dispatches: 7
+- Spec-Issue Count: 1
+- Lineage Dispatches: 8
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
@@ -77,6 +77,8 @@
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-14: fresh PlannerがSprint 039 Patch 001のspec-issueを限定修正。AC3のREADME全体digest不変を撤回し、0.10.1 current release／既存workspace migrationを説明する製品所有段落だけを更新可能とした。同段落はYasashii固有の文体・構造とsemantic anchorを保持し、それ以外のREADME section／段落と他保護surfaceはdigest不変。Scope G／AC17／C18と整合し、新規AC・閾値追加はない。Retry Count 0、Spec-Issue Count 1、Model Tier strongを維持し、fresh strong Generator dispatch予約としてLineage Dispatchesを8、Status active、Rotate noneとする。
+- 2026-08-14: Sprint 039 Patch 001 Generatorの着手前確認で、契約AC3のREADME開始前後digest不変と、AC17／GのREADMEを0.10.1 current candidateへ整合する要求が明文衝突していることを検出した。現READMEは0.10.0と「workspace migrationはありません」を明記するため、全byte不変では今回の利用者向け事実を表せない。Generatorの独自解釈で進めずproduct編集を停止し、Retry Count／Model Tierを消費せずSpec-Issue Countを1、Lineage Dispatches 7、Status active、Model Tier strong、Rotate noneのままfresh Plannerへ戻す。PlannerはYasashii固有の文体・構造・範囲外段落を保護しつつ、current release／migration段落だけを0.10.1へ更新可能な契約へ矛盾なく直す。
 - 2026-08-14: public Agenticの既存workspace完全migration Patchがcandidate HEAD `ba4fe4de39df483b984fef5045bb1e21fdde1373`、product commit `3ef792819a4a445df089f70aa74ca09176762e5e`、common digest `a7d74a7a9bb42ea67815a75132acf588fe312314f98b7f9685cef97fdfca59c9` でfresh独立Evaluator PASS。fresh Plannerがこの固定入力とcommonPaths 20件を、16 byte parity＋4 Yasashii overlay anchorとして同期する通常high-risk Patch `sprint-039-patch-001` を確定した。既存v0.10.0 Yasashii workspaceの4状態診断、別確認、identity／AGENTS／CLAUDE／ledger移行、自由記述・Git状態保持、checkpoint／全rollback／retry／rerun、更新後handoff、0.10.1 candidateを要求し、Yasashii固有文体・README・overlay・正本・履歴を保護する。3版PASS前のrelease／Mac mini／受講者文面を禁止。fresh strong Generator dispatch予約としてLineage Dispatches 7、Retry／Spec-Issue 0、Status active、Model Tier strong、Rotate noneとする。
 - 2026-08-14: spec整合後のfresh独立EvaluatorはHEAD `44449a6`／製品candidate `65dccf6`をclean checkoutとGit-free archiveで再評価し、accepted Agentic `3fa8d97`、digest `c810f60c`、commonPaths 16件、overlay未分類0／二回目差分0、checkpoint全rollback、正式16 Skills、schema、release integrity、Yasashii保護面を確認した。product finding 0件、blocking verification-infra 0件、必須内部未検証0件、Rubric C2／C5／C6／C9／C10／C13／C14／C16／C17すべて5/5で最終PASS。新identityのWindows native not-runとhistorical master既知6 FAILは正直に分離した。Statusをdone、Retry Count 1、Spec-Issue Count 1、Lineage Dispatches 6、Model Tier strong、Rotate noneとして完了し、release運用phaseへ渡す。
 - 2026-08-14: spec修正後のfresh strong Generatorは製品candidate `65dccf6`を変更せず、Planner正本と実装がaccepted `3fa8d97`／`c810f60c`、commonPaths 16件、13 parity＋3 anchors、追加safe paths、overlay handoff所有fieldで整合し、旧値は履歴docs外0件と確認した。実repo、clean checkout、Git-free archiveでPatch 16/16、Sprint 039 69/69＋7/7、Git safety 71/71、release 2/2、schema、overlay 6/6、二回目差分0を確認。fresh独立Evaluator dispatch予約としてLineage Dispatchesを6、Statusをawaiting-eval、Model Tier strong、Rotate noneとする。release holdを維持する。

@@ -52,8 +52,10 @@ Plugin更新後の新session、または名前Skillの直接起動から、秘�
 - 現在のYasashii baseから固定candidateまでの追加・変更・削除を、common、anchor、upstream-only、
   repo-owned、downstream-ownedへ分類し、未分類を0件にする。
 - overlayはreview後にcheck／apply／reapplyし、二回目の追加差分を0件にする。
-- Yasashii固有の文体、copy、style、rule manifest、README、配布identity、repository、marketplace、
+- Yasashii固有の文体、copy、style、rule manifest、配布identity、repository、marketplace、
   overlayの下流所有field、repo-owned正本、Sprint／progress／feedback／evidence、LICENSEを保護する。
+- READMEは全体digest固定の対象にしない。`0.10.1`のcurrent releaseと既存workspace migrationを説明する
+  製品所有段落だけを更新でき、Yasashii固有の文体・構造と範囲外のsection／段落を保持する。
 
 ### B. 更新後のnew-session handoff
 
@@ -139,7 +141,7 @@ Plugin更新後の新session、または名前Skillの直接起動から、秘�
 
 1. 同期入力がfixed upstream HEAD `ba4fe4de39df483b984fef5045bb1e21fdde1373`、product commit `3ef792819a4a445df089f70aa74ca09176762e5e`、common digest `a7d74a7a9bb42ea67815a75132acf588fe312314f98b7f9685cef97fdfca59c9`へ固定され、後続docs-only commitやmoving checkoutへ読み替えていない。
 2. handoff inventoryの20 `commonPaths`を16 byte parity＋4宣言anchorへ全件分類し、identity migration、update-ledger、update Skill、CLAUDE templateを含む。未分類0、overlay check／apply／reapply成功、二回目追加差分0である。
-3. Yasashii固有の文体、copy、style、rule manifest、README、配布identity、repository、marketplace、overlay下流所有field、repo-owned正本、LICENSEの開始前後digestが不変。Agentic docs／state／release記録の同期0件である。
+3. Yasashii固有の文体、copy、style、rule manifest、配布identity、repository、marketplace、overlay下流所有field、repo-owned正本、LICENSEの開始前後digestが不変である。READMEは`0.10.1`のcurrent release／既存workspace migrationを説明する製品所有段落だけを限定変更でき、同段落のYasashii固有の文体・構造と、READMEのそれ以外のsection／段落を保持する。Agentic docs／state／release記録の同期0件である。
 4. `0.10.0` plugin更新済みのidentity未導入、identityだけ導入済み、完全適用済み、衝突workspaceをread-only診断し、状態、canonical root、edition、未完了理由を正しく区別する。診断前後のworkspace／Git／合成HOME変更0件である。
 5. Plugin更新後の新sessionはPlugin更新とローカルmigrationを別状態で示す。未導入／部分適用では名前オンボーディングを案内し、見送りを完全移行済みと表示しない。Claude Code、Codex、名前Skill直接起動で意味が一致する。
 6. identity未導入では希望名、おまかせ、取消、不適格名が契約どおり動く。正当な既存identityではdisplay name、stable ID、`ai-secretary`種別、created timeを再生成せず保持する。
@@ -176,7 +178,7 @@ Plugin更新後の新session、または名前Skillの直接起動から、秘�
 ## Evidence safe harbor
 
 - fixed upstream HEAD、product commit、common digest、Yasashii開始HEAD／candidate SHA。
-- 全path分類、overlay check／apply／reapply、byte parity、anchor適用、保護surface前後digest。
+- 全path分類、overlay check／apply／reapply、byte parity、anchor適用、README許可段落以外と他の保護surfaceの前後digest、README許可段落のsemantic anchor（`0.10.1` current release、Plugin更新とローカル移行の分離、新session、migrationの別確認、任意のuser-scope routing）。
 - 合成HOME／隔離Git workspaceのcase ID、command、exit、preview／apply結果、前後snapshot、commit path一覧。
 - failure matrix、rollback、retry、rerunの結果。
 - clean checkoutとGit-free archiveのPatch回帰、関係回帰、formal／schema／release、対象archive master集計。
