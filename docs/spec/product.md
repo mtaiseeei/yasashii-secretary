@@ -191,6 +191,11 @@ Yasashii固有の言葉遣い・identity・配布metadata・repo-owned正本は�
 配布物と現行製品正本は、正式な著作権・repository識別情報を除き、特定個人、特定端末の絶対path、
 私用workspaceが無ければ理解・実行できない状態にしない。
 
+公開済み`0.10.0`の既存workspaceは、Plugin更新だけを名前設定の完了と扱わない。更新後の新sessionまたは
+名前Skillから、canonical workspaceを読み取り専用で診断し、別の明示確認後だけidentity、製品所有の
+AGENTS／CLAUDE identity管理節、最小台帳を`0.10.1`新規導入相当へ揃える。利用者自由記述と既存Git状態を
+守り、失敗時は開始前へ戻す。別repoから呼ぶuser-scope routingは、このローカル移行とは別確認のままにする。
+
 ## ゴール
 
 1. 非エンジニアが説明に沿って導入し、初回5問以内で `secretary/` を安全に生成したうえで、1つのprivate GitHub repoを作成・初回pushできる。
@@ -216,6 +221,7 @@ Yasashii固有の言葉遣い・identity・配布metadata・repo-owned正本は�
 21. 各Secretaryが対応Harness 0.5.1を別Pluginとして正しく識別し、Claude Code／Codexごとの正規導入先を案内できる。Harness 0.5.1の停止上限、検証範囲の失敗分類、証拠再利用、基準変更gateをrepo内運用へ反映しつつ、Secretary固有の指示と2 editionの対象差を維持する。
 22. 共通15 skillsがhost固有の環境変数設定に依存せず同じplugin本体へ到達し、両editionがClaude CodeとCodexの正式manifest／marketplaceから共通skillsを配布できる。
 23. 初回の呼び方を4経路から選び、安全な候補を確認してから保存できる。既存変更では現役3正本を一括同期し、Yasashiiの言葉遣いとedition境界を保ったまま、配布物を利用者中立にできる。
+24. `0.10.0`を導入済みの利用者がPlugin更新後に残るローカルidentity移行を理解し、read-only診断と別確認を経て、自由記述を失わず`0.10.1`新規導入相当へ揃えられる。
 
 ## 成功状態
 
@@ -232,6 +238,7 @@ Yasashii固有の言葉遣い・identity・配布metadata・repo-owned正本は�
 - `agentic-secretary`／`yasashii-secretary` の対応Harness識別と導入案内が、GitHub `main` のClaude／Codex正式manifest・marketplaceの `0.5.1` と一致する。Secretary内にHarness実体・agents・Harness Git履歴はなく、repo固有の `CLAUDE.md`／`AGENTS.md`／ガイダンスを上書きしていない。
 - Agenticの合格済み固定candidateをreview済みbaseとして記録し、Yasashii overlayのapply／reapplyが追加差分0件である。共通の呼び方機能は一致し、Yasashii固有copy／identity／repo-owned正本は不変である。
 - 配布物と現行製品正本のactive surfaceに、unexpectedな個人名、利用者端末固有path、私用workspace依存がない。正式所有情報と合成fixtureは区別して維持する。
+- Plugin更新済み・identity未導入、identityだけ導入済み、完全適用済み、衝突ありを区別できる。移行前の診断とpreviewは副作用0件で、別確認後だけidentity／AGENTS／CLAUDE／台帳が一体更新され、成功後の再実行は差分・重複・追加commit 0件となる。
 - private GitHub repoの初回push後、秘書・プロジェクト・Chatwork設定が同じrepoにあり、別のChatwork専用repoを必要としない。
 - Chatwork API TokenがRepository Secret以外へ露出せず、参加room一覧から選んだRoom IDだけがGit管理される。
 - 初回取得が0件または最大100件でも正常完了し、以後の取得がmessage ID単位で重複せず蓄積される。
@@ -300,6 +307,7 @@ Yasashii固有の言葉遣い・identity・配布metadata・repo-owned正本は�
 - private `origin/main` の `4670438` より後にある未push commit `f285120`、`b9c0f3e` のschema v3 production collector／driver／attestorを完成候補へ含めない。
 - 任意の過去会話、別task、raw transcript、生session log、memory storeを直接探索して呼び方を推定しない。Git email、remote、credential、commit history、home directory列挙、外部人物検索も名前候補sourceにしない。
 - 呼び方候補の探索値、除外値、出典、推奨順位を永続化しない。初回決定ログを後日の現在値へ書き換えない。
+- 既存workspace identity migrationの確認を、user-scope routing、過去author書換え、利用者文書のGrep置換、pushの許可へ拡張しない。
 
 ## 承認済みの条件付き判断
 

@@ -289,6 +289,18 @@ Yasashii固有copy、identity、manifest、README、repo-owned docsを開始前�
 LICENSEと下流所有metadataはdigestを保護する。overlay metadataのうち、accepted candidate、digest、16-path分類を記録する
 handoff所有fieldだけは整合更新でき、それ以外の下流所有field、anchor、安全基準を変更しない。
 
+既存workspace identity migrationの下流同期では、Sprint 039の基礎identity履歴を保持したまま、Agentic固定候補HEAD
+`ba4fe4de39df483b984fef5045bb1e21fdde1373`、製品commit
+`3ef792819a4a445df089f70aa74ca09176762e5e`、common digest
+`a7d74a7a9bb42ea67815a75132acf588fe312314f98b7f9685cef97fdfca59c9` を新しい固定入力にする。
+handoff inventoryの20 `commonPaths`は、16 pathのbyte parityと、Yasashii版のhost／edition表現を保つ
+`name`／`secretary`／`settings`／`update` の4宣言anchorに分類する。identity migration、update-ledger、
+update Skill、CLAUDE templateを共通安全挙動として取り込み、Yasashii固有の文体、README、配布identity、
+repository、marketplace、overlay、repo-owned正本、公開済み履歴を上流値へ戻さない。
+
+Yasashii `0.10.1`候補はPlugin更新後handoffと既存workspace migrationを独立評価する。Agentic、Yasashii、
+privateの3版すべてがfresh独立PASSするまで、release、Mac mini同期、受講者向け更新文の配布へ進まない。
+
 ## 公開gate
 
 両editionを公開可能とするには、次がすべて必要である。
@@ -310,5 +322,6 @@ handoff所有fieldだけは整合更新でき、それ以外の下流所有field
 15. 共通15 skillsは各 `SKILL.md` の実パスからhost-neutralにplugin rootを解決し、未設定の `${CLAUDE_PLUGIN_ROOT}` を通常shellへ渡さない。Claude Code、Codex App、Codex CLIで代表scriptが同じ共通本体へ到達し、15 skills全件の参照が静的検査を通る。
 16. `agentic-secretary` と `yasashii-secretary` の双方にCodex正式manifest／repo marketplaceがあり、同じ共通skillsを参照しながらedition別identityを表す。agenticのmanifestやClaude legacy互換をyasashiiの正式配布証拠へ流用しない。
 17. `${CLAUDE_PLUGIN_ROOT}` 以外のClaude Code限定前提も15 skillsと配布面でinventoryし、slash command、Hook、Claude固有UI、Claude marketplace等の真にhost固有な面だけをadapter／案内へ分離する。共通skillsの意味内容をhost別に複製せず、静的inventory、任意path fixture、既存Codex正式installテスト、両edition全回帰を主証拠にする。
+18. 既存`0.10.0` workspaceのidentity migrationは、Plugin更新とローカル移行を別状態として示し、read-only診断、別確認、所有marker限定更新、local checkpoint、完全rollback、retry／rerun冪等性を満たす。Yasashii固有surfaceと`0.10.0`以前の履歴は不変である。
 
 許可不足や外部サービス未準備は `external-live-gate-unavailable` として不合格にし、実装不具合とは分けて記録する。

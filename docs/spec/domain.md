@@ -619,6 +619,26 @@ wizard copy、OAuth scope、workspace path、skill／command、migration filenam
 legacy fileはredirectの説明だけに置き換えない。正本と同じ `0.8.0` entryを持つ完全なraw互換contentとし、
 `0.7.0` の過去entryは書き換えない。このfile一致だけで旧0.7.0 updaterのlive互換を合格とはみなさない。
 
+## 既存workspace identity migration状態
+
+Pluginの導入版と、workspace内のidentity完成状態を別々に持つ。
+
+| 状態 | 条件 | 次の動作 |
+|---|---|---|
+| `migration-missing` | `identity.json`と製品所有identity管理節が未導入 | 英語名を確認後、read-only previewへ進む |
+| `identity-only` | 正当なidentityはあるがAGENTS／CLAUDE管理節または台帳が不足 | stable ID等を保持したpreviewへ進む |
+| `migration-current` | identity、AGENTS／CLAUDE管理節、台帳が`0.10.1`新規導入相当 | 変更不要を示し、追加commitなしで終了 |
+| `migration-conflict` | marker重複、利用者編集、所有不明、edition／path／Git境界不一致 | 理由を示してwrite 0件で停止 |
+
+migration transactionは、`diagnosed` → `previewed` → `confirmed` → `checkpointed` → `verified` の順に進む。
+英語名の確認だけでは`confirmed`へ進まない。いずれかの書込み・整合・Git工程が失敗した場合は
+`rollback-required`とし、workspace tree、HEAD、index、working treeが開始前snapshotへ戻ったことを確認してから
+`rolled-back`とする。rollback未完了は`verified`へ進めない。
+
+最小台帳のidentity関連recordは管理対象path、適用version、基準hash等だけを持つ。display name、stable ID、
+利用者本文、顧客名、記憶、Secretはidentity正本または利用者所有fileから台帳へ複製しない。user-scope routingの
+enabled stateは別domainであり、ローカルmigrationで変更しない。
+
 ### RepositoryTopology
 
 - upstream checkout: `<workspace-root>/agentic-secretary`

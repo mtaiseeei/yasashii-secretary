@@ -41,8 +41,23 @@ registryが無い場合だけ、現在のフォルダで初回オンボーディ
   読み込む: `${SECRETARY_PLUGIN_ROOT}/skills/onboarding/SKILL.md`
   onboardingの質問turnとして予告し、通常報告の途中メッセージにはしない。
 
-- **`secretary/` がある → 2回目以降**。まず下の「起動時のしおりチェック」を行い、そのあと「用件のふりわけ」へ進む。
+- **`secretary/` がある → 2回目以降**。plugin更新後のローカルidentity状態を下記のread-only診断で確認し、
+  そのあと「起動時のしおりチェック」→「用件のふりわけ」へ進む。
   はじめに `secretary/memory/MEMORY.md`（記憶の目次）を読み、前回までの文脈を思い出してから話し始める。
+
+## plugin更新後のidentity診断（2回目以降・read-only）
+
+canonical workspace rootで次を実行する。
+
+`node "${SECRETARY_PLUGIN_ROOT}/scripts/secretary-name.mjs" migration-diagnose --workspace <canonical-workspace> --plugin-root "${SECRETARY_PLUGIN_ROOT}"`
+
+- `migration-current`なら何も変更せず通常の用件へ進む。
+- `identity-missing`／`identity-only`なら、「pluginは更新済みですが、ローカルworkspaceの名前移行が残っています」と示し、
+  `${SECRETARY_PLUGIN_ROOT}/skills/name/SKILL.md` の既存利用者向けpreviewを案内する。見送りは移行完了と表示しない。
+- `migration-conflict`なら、衝突pathと理由、write 0件を示して自動移行を停止する。新規onboardingへ送らない。
+
+この診断はidentity、guidance、ledger、Git、user-scope、registryを変更しない。plugin更新済み、ローカル移行済み、
+別repo routing有効を別状態として扱う。
 
 ## 起動時のしおりチェック（2回目以降・最優先）
 

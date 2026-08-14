@@ -52,29 +52,40 @@ export function normalizeOwnedPaths(root, paths) {
   return [...new Set((paths || []).map((item) => normalizedPath(normalizedRoot, item)))].sort();
 }
 
-export function inspectOwnedCheckpoint(root, ownedPaths) {
+export function inspectOwnedCheckpoint(root, ownedPaths, { allowMissingPaths = [], allowUntrackedPaths = [] } = {}) {
   const normalizedRoot = realpathSync(resolve(root));
   const paths = normalizeOwnedPaths(normalizedRoot, ownedPaths);
+  const allowedMissing = new Set(normalizeOwnedPaths(normalizedRoot, allowMissingPaths));
+  const allowedUntracked = new Set(normalizeOwnedPaths(normalizedRoot, allowUntrackedPaths));
+  if ([...allowedMissing, ...allowedUntracked].some((path) => !paths.includes(path))) {
+    throw new GitSafetyError("owned-path-invalid", "新規作成を許可するpathはcommit対象に含めてください。");
+  }
   const topLevel = realpathSync(resolve(git(normalizedRoot, ["rev-parse", "--show-toplevel"]).trim()));
   if (topLevel !== normalizedRoot) {
     throw new GitSafetyError("git-root-mismatch", "Git top-levelがcanonical workspaceの正確なrootと一致しません。");
   }
+  const untrackedOwnedPaths = [];
   for (const path of paths) {
     let cursor = dirname(resolve(normalizedRoot, path));
     while (cursor !== normalizedRoot) {
       if (existsSync(join(cursor, ".git"))) throw new GitSafetyError("nested-repository", "nested別repo内のpathはcommit対象にできません。");
       cursor = dirname(cursor);
     }
-    git(normalizedRoot, ["ls-files", "--error-unmatch", "--", path]);
-  }
-  const ownedStatus = paths.length
-    ? git(normalizedRoot, ["status", "--porcelain=v1", "-z", "--untracked-files=all", "--", ...paths])
-    : "";
-  if (ownedStatus) {
-    throw new GitSafetyError("owned-path-dirty", "rename対象pathに開始前のGit変更があるため、自動checkpointへ含めません。");
+    const tracked = git(normalizedRoot, ["ls-files", "--error-unmatch", "--", path], { allowFailure: true });
+    const absolute = resolve(normalizedRoot, path);
+    if (tracked === null && !((allowedMissing.has(path) && !existsSync(absolute))
+      || (allowedUntracked.has(path) && existsSync(absolute) && lstatSync(absolute).isFile() && !lstatSync(absolute).isSymbolicLink()))) {
+      throw new GitSafetyError("owned-path-untracked", "開始前から存在する未追跡pathは自動checkpointへ含めません。");
+    }
+    if (tracked === null && allowedUntracked.has(path)) untrackedOwnedPaths.push(path);
+    const pathStatus = git(normalizedRoot, ["status", "--porcelain=v1", "-z", "--untracked-files=all", "--", path]);
+    const expectedUntracked = `?? ${path}\0`;
+    if (pathStatus && !(allowedUntracked.has(path) && pathStatus === expectedUntracked)) {
+      throw new GitSafetyError("owned-path-dirty", "対象pathに開始前のGit変更があるため、自動checkpointへ含めません。");
+    }
   }
   const currentHead = head(normalizedRoot);
-  if (!currentHead) throw new GitSafetyError("head-missing", "既存Git HEADがないためrename checkpointを作成できません。");
+  if (!currentHead) throw new GitSafetyError("head-missing", "既存Git HEADがないためlocal checkpointを作成できません。");
   return {
     root: normalizedRoot,
     topLevel,
@@ -85,6 +96,7 @@ export function inspectOwnedCheckpoint(root, ownedPaths) {
     remotes: git(normalizedRoot, ["remote", "-v"]),
     tags: git(normalizedRoot, ["show-ref", "--tags"], { allowFailure: true }) || "",
     ownedPaths: paths,
+    untrackedOwnedPaths,
   };
 }
 

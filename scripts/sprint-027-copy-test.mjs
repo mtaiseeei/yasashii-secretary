@@ -42,7 +42,7 @@ check("detailsはkeyboard開閉とvisible focusを持つ", files.common.includes
 check(".mcp.jsonの公式connector説明が現行", files.mcp.mcpServers && Object.keys(files.mcp.mcpServers).length === 0 && /Microsoft 365/.test(files.mcp._NOTE) && /Notion/.test(files.mcp._NOTE) && /Chatwork/.test(files.mcp._NOTE) && /Google Chat/.test(files.mcp._NOTE) && !/後続で対応予定|今のところ Google のみ/.test(files.mcp._NOTE));
 check("onboardingが両チャットとCloud準備を説明", /Chatwork／Google Chat/.test(files.onboarding) && /Cloud準備/.test(files.onboarding) && /Google Chatを設定したい/.test(files.onboarding));
 check("READMEが0.7.0と更新復元を説明", /0\.7\.0/.test(files.readme) && /更新/.test(files.readme) && /復元/.test(files.readme));
-check("READMEがCloud準備と安全境界を説明", /Google Cloud project/.test(files.readme) && /chat\.spaces\.readonly/.test(files.readme) && /選択した通常スペース/.test(files.readme) && /commit・pushを確認/.test(files.readme));
+check("READMEがCloud準備と安全境界を説明", /Google CloudでProject/.test(files.readme) && /chat\.spaces\.readonly/.test(files.readme) && /通常スペースだけ/.test(files.readme) && /commit・push/.test(files.readme) && /同意した場合だけ|確認した後だけ/.test(files.readme));
 check("公開guideが両チャット・Cloud・更新復元を説明", /Google Chat/.test(files.guide) && /Cloud/.test(files.guide) && /更新/.test(files.guide) && /復元/.test(files.guide));
 check("公開guideに古い後続予定説明がない", !/後続で対応予定|今のところ Google のみ/.test(files.guide));
 check("配布metadataのauthor・MIT・forkedFromが一致", JSON.stringify(files.marketplace.plugins?.[0]?.author) === JSON.stringify(files.plugin.author) && files.marketplace.plugins?.[0]?.license === "MIT" && files.plugin.license === "MIT" && files.marketplace.plugins?.[0]?.forkedFrom === "https://github.com/Shin-sibainu/cc-company");

@@ -24,6 +24,7 @@ const VARIABLE_FORMATS = {
 const STATIC_MANAGED_PATHS = new Set([
   "secretary/AGENTS.md",
   "secretary/CLAUDE.md",
+  "secretary/identity.json",
   "secretary/memory/MEMORY.md",
   "secretary/memory/preferences.md",
   ".github/workflows/chatwork-sync.yml",

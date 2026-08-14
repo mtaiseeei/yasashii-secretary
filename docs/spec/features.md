@@ -1,6 +1,6 @@
 # Features
 
-機能IDと、ユーザーから見える振る舞いの正本。F01〜F16 は受け入れ済みの既存機能、F17〜F22 は 2026-07-15 方針転換、F23〜F27 は 2026-07-16 のsingle-repo Git-first + Chatwork方針、F28 は 2026-07-17 の一般プロジェクト管理方針、F29 は配布チャネルから独立した製品説明、F30〜F31 は更新の説明と実行を分ける安全な更新体験、F32〜F35 は各社所有Google Cloudプロジェクトを使うGoogle Chat同期、F36〜F43 は `0.7.0` の配布前監査を閉じたrelease hardening、F44〜F50 は次候補 `0.8.0` で2 editionへ安全に分離する機能、F51は両edition共通の会話可読性、F52は4つの正式対象ホストへ拡張できるホスト非依存の共通本体と各ホストの正式配布adapter、F53は別Pluginの対応Harness 0.5.1へ安全に追随する機能、F54はhost-neutralなplugin root解決と両editionのCodex正式配布parity、F55は利用者中立の呼び方と配布物、F56はWindows native保存、F57は英語の秘書名とstable identityを合格済み上流candidateから安全に同期する機能である。
+機能IDと、ユーザーから見える振る舞いの正本。F01〜F16 は受け入れ済みの既存機能、F17〜F22 は 2026-07-15 方針転換、F23〜F27 は 2026-07-16 のsingle-repo Git-first + Chatwork方針、F28 は 2026-07-17 の一般プロジェクト管理方針、F29 は配布チャネルから独立した製品説明、F30〜F31 は更新の説明と実行を分ける安全な更新体験、F32〜F35 は各社所有Google Cloudプロジェクトを使うGoogle Chat同期、F36〜F43 は `0.7.0` の配布前監査を閉じたrelease hardening、F44〜F50 は次候補 `0.8.0` で2 editionへ安全に分離する機能、F51は両edition共通の会話可読性、F52は4つの正式対象ホストへ拡張できるホスト非依存の共通本体と各ホストの正式配布adapter、F53は別Pluginの対応Harness 0.5.1へ安全に追随する機能、F54はhost-neutralなplugin root解決と両editionのCodex正式配布parity、F55は利用者中立の呼び方と配布物、F56はWindows native保存、F57は英語の秘書名とstable identity、F58は既存`0.10.0` workspaceを`0.10.1`新規導入相当へ安全に移行する機能である。
 
 ## 既存機能（F01〜F16）
 
@@ -454,19 +454,37 @@ README、identity、LICENSE、repo-owned docsを維持する。overlay metadata�
 記録する所有fieldだけを更新でき、それ以外の下流所有metadataと安全基準を変えない。
 private版、実HOME、installed cache、Mac mini、releaseはこの機能同期自体の対象外とする。
 
+### F58 既存workspaceの完全identity migration
+
+公開済み`0.10.0`を利用中のworkspaceでは、Plugin更新、ローカルidentity migration、任意のuser-scope routingを
+別状態として扱う。更新後の新sessionまたは名前Skillはcanonical workspaceをread-only診断し、identity未作成、
+identityだけ作成済み、完全適用済み、衝突ありを区別する。変更予定はidentity、製品所有のAGENTS／CLAUDE identity管理節、
+最小台帳に限定してpreviewし、英語名の確認とは別の明示確認後だけ一体で適用する。
+
+適用は利用者自由記述、他managed block、改行、file mode、無関係な台帳record、開始前のGit状態を保護する。
+今回変更した製品所有pathだけをlocal checkpointへ含め、書込み、整合確認、台帳、stage、commit、commit後確認の
+失敗ではworkspaceとGit状態を開始前へ戻す。失敗後retryは一度の完全transactionとして成功し、成功後rerunは
+file差分、marker／台帳重複、stable ID変化、追加commit 0件とする。user-scope routingは移行後も別確認である。
+
+同期入力はAgentic固定候補HEAD `ba4fe4de39df483b984fef5045bb1e21fdde1373`、製品commit
+`3ef792819a4a445df089f70aa74ca09176762e5e`、common digest
+`a7d74a7a9bb42ea67815a75132acf588fe312314f98b7f9685cef97fdfca59c9` と20 `commonPaths` に固定する。
+16 pathをbyte parity、`name`／`secretary`／`settings`／`update`の4 Skillを宣言済みanchorとして扱い、
+Yasashii固有の文体、README、配布identity、overlay、repo-owned正本、履歴を保護する。
+
 ## Gテーマと機能の対応
 
 | テーマ | 主な機能 |
 |---|---|
 | G1 | F05 F06 F07 F08 F17 F18 F19 F21 F56 |
-| G2 | F04 F10 F20 F51 F55 F56 F57 |
+| G2 | F04 F10 F20 F51 F55 F56 F57 F58 |
 | G3 | F14 F15 F22 F53 |
 | G4 | F10 F14 F15 F20 F22 F51 F53 F55 F57 |
 | G5 | F04 F07 F23 F24 F25 F26 F27 |
 | G6 | F03 F05 F06 F07 F08 F15 F17 F18 F19 F28 F56 |
 | G7 | F01 F02 F04 F10 F16 F29 |
-| G8 | F01 F02 F07 F10 F16 F20 F30 F31 F56 |
+| G8 | F01 F02 F07 F10 F16 F20 F30 F31 F56 F58 |
 | G9 | F03 F07 F10 F16 F23 F32 F33 F34 F35 |
 | G10 | F01 F02 F04 F05 F07 F10 F16 F23 F24 F30 F31 F32 F33 F34 F35 F36 F37 F38 F39 F40 F41 F42 F43 |
-| G11 | F30 F31 F36 F40 F41 F42 F43 F44 F45 F46 F47 F48 F49 F50 F51 F52 F53 F54 F55 F56 F57 |
-| G12 | F04 F16 F20 F41 F42 F49 F55 F57 |
+| G11 | F30 F31 F36 F40 F41 F42 F43 F44 F45 F46 F47 F48 F49 F50 F51 F52 F53 F54 F55 F56 F57 F58 |
+| G12 | F04 F16 F20 F41 F42 F49 F55 F57 F58 |

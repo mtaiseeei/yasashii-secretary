@@ -151,7 +151,7 @@ assert "生成AGENTSにも節目プロトコルを配布" \
 assert "生成AGENTSの専門用語規約が現行specと一致" \
   "grep -q '一般的な技術用語はそのまま使う' '$AGENTS_TEMPLATE' && grep -q '馴染みの薄い語だけ、初出時に短い補足を添える' '$AGENTS_TEMPLATE' && ! grep -q '専門用語には、やさしい言い換えをカッコで併記する' '$AGENTS_TEMPLATE'"
 assert "内容依存の5応答状態を維持" \
-  "grep -q '最終応答serializer.*だけを正本' '$DAILY_SKILL' && grep -q 'styles/agentic.md' '$REPO/plugins/secretary/rules/plain-language.md' && node -e 'const c=require(\"./plugins/secretary/rules/copy/agentic.json\");const s=Object.keys(c.surfaces.report.states).sort().join(\",\");process.exit(s===\"answered,error,partial,question,saved\"&&!Object.hasOwn(c.surfaces.report,\"shortLines\")?0:1)'"
+  "grep -q '最終応答serializer.*だけを正本' '$DAILY_SKILL' && grep -q 'styles/yasashii.md' '$REPO/plugins/secretary/rules/plain-language.md' && node -e 'const c=require(\"./plugins/secretary/rules/copy/yasashii.json\");const s=Object.keys(c.surfaces.report.states).sort().join(\",\");process.exit(s===\"answered,error,partial,question,saved\"&&!Object.hasOwn(c.surfaces.report,\"shortLines\")?0:1)'"
 
 # morning→daily→eveningで使う正規シームを一続きで実行し、閲覧による増分がないことを確認する。
 FLOW="$WORK/flow-secretary"; cp -R "$TEMPLATES/." "$FLOW/"

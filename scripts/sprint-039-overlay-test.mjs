@@ -8,8 +8,9 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const candidate = resolve(process.argv[2] || "");
-const FIXED_SHA = "3fa8d97e5dbfb2afa314f4ad179f17401b76d320";
-const FIXED_DIGEST = "c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557";
+const FIXED_HEAD = "ba4fe4de39df483b984fef5045bb1e21fdde1373";
+const FIXED_PRODUCT = "3ef792819a4a445df089f70aa74ca09176762e5e";
+const FIXED_DIGEST = "a7d74a7a9bb42ea67815a75132acf588fe312314f98b7f9685cef97fdfca59c9";
 if (!candidate || !existsSync(candidate)) throw new Error("fixed Agentic archive path is required");
 
 const json = (path) => JSON.parse(readFileSync(path, "utf8"));
@@ -24,8 +25,9 @@ let pass = 0;
 const check = (label, fn) => { fn(); pass += 1; process.stdout.write(`PASS ${label}\n`); };
 
 check("fixed Agentic product candidate", () => {
-  assert.equal(base.baseCommit, FIXED_SHA);
-  assert.equal(snapshot.baseCommit, FIXED_SHA);
+  assert.equal(FIXED_HEAD, "ba4fe4de39df483b984fef5045bb1e21fdde1373");
+  assert.equal(base.baseCommit, FIXED_PRODUCT);
+  assert.equal(snapshot.baseCommit, FIXED_PRODUCT);
 });
 
 check("handoff common digest", () => {
@@ -48,6 +50,7 @@ check("handoff paths are managed with declared edition anchors only", () => {
     "plugins/secretary/skills/name/SKILL.md",
     "plugins/secretary/skills/secretary/SKILL.md",
     "plugins/secretary/skills/settings/SKILL.md",
+    "plugins/secretary/skills/update/SKILL.md",
   ]);
 });
 
@@ -58,7 +61,7 @@ check("unoverlaid handoff common bytes match Agentic", () => {
     assert.equal(sha(readFileSync(join(ROOT, path))), sha(readFileSync(join(candidate, path))), path);
     exact += 1;
   }
-  assert.equal(exact, 13);
+  assert.equal(exact, 16);
 });
 
 check("Agentic docs and Sprint 039 test assets are not synchronized", () => {

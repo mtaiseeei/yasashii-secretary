@@ -106,8 +106,8 @@ try {
   );
   check(
     "current canonical CHANGELOG URL is configured",
-    config.distribution.changelogUrl.endsWith("/plugins/secretary/CHANGELOG.md")
-      && config.distribution.changelogUrl.includes("/agentic-secretary/"),
+    config.distribution.changelogUrl.endsWith("/plugins/yasashii-secretary/CHANGELOG.md")
+      && config.distribution.changelogUrl.includes("/yasashii-secretary/"),
   );
 
   const fetchedUrls = [];
@@ -152,12 +152,12 @@ try {
   let diagnosisJson = {};
   try { diagnosisJson = JSON.parse(diagnosis.stdout); } catch { /* assertion reports malformed output */ }
   check(
-    "current raw URL diagnosis is read-only and keeps opposite-edition detection",
+    "current raw URL diagnosis is read-only and keeps legacy Yasashii detection",
     diagnosis.status === 0
       && diagnosisJson.mode === "diagnosis-read-only"
       && diagnosisJson.currentVersion === entry.version
       && diagnosisJson.latestVersion === entry.version
-      && diagnosisJson.workspaceEdition?.state === "opposite-edition"
+      && diagnosisJson.workspaceEdition?.state === "legacy-yasashii"
       && diagnosisJson.latest?.sections?.["変わること"]?.length > 0
       && diagnosisJson.latest?.sections?.["設定・ファイルへの影響"]?.length > 0
       && Object.values(diagnosisJson.sideEffects || {}).every((value) => value === 0)

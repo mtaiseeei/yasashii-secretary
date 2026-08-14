@@ -27,6 +27,18 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 
 ## 現在状態
 
+既存workspaceでは、最初にplugin更新とローカルidentity migrationを分けて診断する。
+
+```text
+node "${SECRETARY_PLUGIN_ROOT}/scripts/secretary-name.mjs" migration-diagnose --workspace <canonical-workspace> --plugin-root "${SECRETARY_PLUGIN_ROOT}"
+```
+
+これはread-onlyであり、identity、AGENTS／CLAUDE、最小台帳、Git、user-scope、registryを変更しない。
+`identity-missing`、`identity-only`、`migration-current`、`migration-conflict`を区別し、pluginだけが更新済みで
+ローカル移行が残る場合は、その状態を完了と表示しない。
+
+完全移行後の通常状態は次で確認できる。
+
 `node "${SECRETARY_PLUGIN_ROOT}/scripts/secretary-name.mjs" status --secretary <canonical-secretary> --home <合成または確認済みHOME>`
 
 別repoから起動された場合、cwdに `secretary/` が無いだけでonboardingへ進まない。先に
@@ -37,8 +49,22 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 
 1. 「希望の英語名」「おまかせ」を示す。おまかせは `suggest --seed <secretary_idまたはworkspace識別子>` の候補と短い理由を表示する。
 2. `validate <候補>` で英語名を検査する。空、メール、path／command風、制御文字、汎用bot名は保存しない。
-3. `保存する秘書名: <名前>。利用者の呼び方は変更しません。この名前で保存しますか？` と別turnで確認する。
-4. 明示了承後だけ `init --secretary <secretary> --name <名前> --confirm` を実行する。確認前はcommandを呼ばずwrite 0件。
+3. `保存する秘書名: <名前>。利用者の呼び方は変更しません。この名前で進めますか？` と別turnで確認する。
+4. 名前の明示了承後もまだ保存しない。次をread-only実行し、identity、AGENTS／CLAUDEの製品所有identity管理節、
+   最小台帳をpathごとに追加／更新／維持／衝突へ分類する。
+
+   `node "${SECRETARY_PLUGIN_ROOT}/scripts/secretary-name.mjs" migration-preview --workspace <canonical-workspace> --plugin-root "${SECRETARY_PLUGIN_ROOT}" --name <名前>`
+
+5. previewの対象path、理由、所有pathだけのlocal checkpoint、rollback、非対象を示す。user-scope registry／routing、
+   rename、利用者コンテンツ、既存文書のgrep置換、pushは含めない。
+6. `このローカル移行を適用しますか？` と名前確認とは別turnで確認する。拒否、取消、無回答ではwrite 0件で終了し、
+   完全移行済みと表示しない。
+7. migrationを明示了承した場合だけ次を実行する。
+
+   `node "${SECRETARY_PLUGIN_ROOT}/scripts/secretary-name.mjs" migration-apply --workspace <canonical-workspace> --plugin-root "${SECRETARY_PLUGIN_ROOT}" --name <名前> --confirm`
+
+既に正当なidentityがある場合は、希望名を再質問せず、display name、stable ID、`ai-secretary`種別、作成時刻を保持して
+同じpreview→別確認→applyへ進む。別名を指定された場合はmigrationへ混ぜずrenameへ送る。
 
 ## 別repo呼び出し
 
@@ -46,7 +72,8 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 `~/.codex/AGENTS.override.md` が存在すればそこだけ、無ければ `~/.codex/AGENTS.md`、Claude Codeは
 `~/.claude/CLAUDE.md` が対象になる。既存内容や他blockは保持する。
 
-推奨は有効化だが、自動適用しない。明示了承後だけ次を行う。
+ローカルidentity migrationの確認を、この有効化の了承として流用しない。移行完了後も任意であり、
+効果と対象をあらためて示す。明示了承後だけ次を行う。
 
 1. `registry-register --home <HOME> --workspace <workspace> --edition yasashii-secretary --confirm`
 2. `routing-enable --secretary <secretary> --home <HOME> --host codex --host claude --confirm`

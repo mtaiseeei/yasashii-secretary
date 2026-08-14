@@ -1,5 +1,31 @@
 # 変更履歴
 
+## [0.10.1] - 2026-08-14
+
+### 対象者
+
+- `0.10.0`へpluginを更新した後、既存のローカルworkspaceにも秘書名とidentity設定を安全に揃えたい方。
+
+### 変わること
+
+- plugin更新とローカルworkspaceの移行を別状態として診断し、identity未導入、identityだけ作成済み、完全適用済み、衝突を区別します。
+- 名前確認後もすぐには書き込まず、identity、AGENTS／CLAUDEの製品所有identity管理節、最小台帳のpreviewを示し、別の明示確認後だけ一体移行します。
+
+### 設定・ファイルへの影響
+
+- 移行対象は`secretary/identity.json`、`secretary/AGENTS.md`と`secretary/CLAUDE.md`の製品所有identity管理節、identity関連の最小台帳recordだけです。
+- 利用者の自由記述、記憶、プロジェクト、チャット履歴、Secret、既存の無関係なGit変更を保持し、今回の所有pathだけをpushなしのlocal checkpointへ記録します。
+
+### 必要な操作
+
+- plugin更新後に新しいsessionを開始します。read-only診断でローカル移行が残っている場合は`name` Skillを呼び、英語名、preview、適用内容を順に確認してください。
+- 別repoから名前で呼ぶuser-scope連携は移行に含まれません。ローカル移行完了後、効果と対象fileを確認して任意で有効化します。
+
+### 互換性上の注意
+
+- 途中失敗ではworkspaceとGit状態を開始前へ戻します。成功後の再実行は追加差分と追加commitを作りません。
+- `0.10.0`以前のrelease記録、migration、fixture、tagは履歴として維持します。
+
 ## [0.10.0] - 2026-08-14
 
 ### 対象者
