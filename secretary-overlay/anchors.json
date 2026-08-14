@@ -68,6 +68,18 @@
       "replacement": "- やさしいハーネス 0.5.1: `https://github.com/mtaiseeei/yasashii-harness`"
     },
     {
+      "id": "name-skill-yasashii-resolve-edition",
+      "path": "plugins/secretary/skills/name/SKILL.md",
+      "match": "resolve --home <HOME> --edition agentic-secretary",
+      "replacement": "resolve --home <HOME> --edition yasashii-secretary"
+    },
+    {
+      "id": "name-skill-yasashii-register-edition",
+      "path": "plugins/secretary/skills/name/SKILL.md",
+      "match": "registry-register --home <HOME> --workspace <workspace> --edition agentic-secretary --confirm",
+      "replacement": "registry-register --home <HOME> --workspace <workspace> --edition yasashii-secretary --confirm"
+    },
+    {
       "id": "projects-harness",
       "path": "plugins/secretary/skills/projects/SKILL.md",
       "match": "Agentic版ではClaude Codeが `harness@agentic-harness` の `/harness`、Codexが\n`harness@agentic-harness-local` の `$using-harness` または `$harness-loop` を使う。",
@@ -120,6 +132,30 @@
       "path": "scripts/sprint-011-regression.sh",
       "match": "grep -q '実コネクタ' '$EVIDENCE_RULES' && grep -q '接続状態.*未確認' '$EVIDENCE_RULES'",
       "replacement": "grep -q '実コネクタ' '$EVIDENCE_RULES' && grep -q 'edition.json.*4面copy' '$EVIDENCE_RULES'"
+    },
+    {
+      "id": "sprint-011-yasashii-serializer-usage",
+      "path": "scripts/sprint-011-regression.sh",
+      "match": "grep -q '全tool call後にserializerを1回だけ適用' '$RULES'",
+      "replacement": "grep -q 'すべてのtool実行後に1回だけ適用' '$RULES'"
+    },
+    {
+      "id": "sprint-011-yasashii-serializer-negative",
+      "path": "scripts/sprint-011-regression.sh",
+      "match": "perl -pi -e 's/全tool call後にserializerを1回だけ適用/serializerを適用/g' \"$WORK/bad-owner.md\"",
+      "replacement": "perl -pi -e 's/すべてのtool実行後に1回だけ適用/serializerを適用/g' \"$WORK/bad-owner.md\""
+    },
+    {
+      "id": "sprint-011-yasashii-serializer-contract",
+      "path": "scripts/sprint-011-regression.sh",
+      "match": "serializer_contract_ok(){\n  local file=\"$1\"\n  grep -q '最終応答serializer（通常報告の唯一の正本）' \"$file\" &&\n    grep -q '全tool call後にserializerを1回だけ適用' \"$file\" &&\n    grep -q '固定3項目' \"$file\" && grep -q '部分完了' \"$file\"\n}",
+      "replacement": "serializer_contract_ok(){\n  local file=\"$1\"\n  grep -q '最終応答serializer（通常報告の唯一の正本）' \"$file\" &&\n    grep -q 'すべてのtool実行後に1回だけ適用' \"$file\" &&\n    grep -q '固定項目' \"$file\" && grep -q '部分完了' \"$file\"\n}"
+    },
+    {
+      "id": "sprint-011-yasashii-active-style-path",
+      "path": "scripts/sprint-011-regression.sh",
+      "match": "RULES=\"$PLUGIN/rules/styles/agentic.md\"",
+      "replacement": "RULES=\"$PLUGIN/rules/styles/yasashii.md\""
     },
     {
       "id": "sprint-011-yasashii-style-entry",

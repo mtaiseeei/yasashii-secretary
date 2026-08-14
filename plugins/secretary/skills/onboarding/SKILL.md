@@ -43,11 +43,30 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 いきなり作り始めず、まず一言だけ予告する。例:
 
 > はじめまして。あなた専属の秘書になります。
-> まず5つだけ伺います。そのあと秘書ディレクトリ（secretary/）を用意し、private GitHub repoへの初回pushまで進めます。
+> まず6つだけ伺います。最初に私自身の英語名を決め、そのあと秘書ディレクトリ（secretary/）を用意し、private GitHub repoへの初回pushまで進めます。
 
-## ステップ1: やさしい5問（計画）
+## ステップ1: やさしい6問（計画）
 
 `AskUserQuestion` などで、1問ずつやさしく尋ねる。専門用語は使わない。各問に具体例を添える。
+
+### Q0: 秘書自身の英語名
+
+> この秘書自身の名前を決めます。どちらにしますか？
+>
+> - **希望の英語名**（例: Alex。入力した名前を確認します）
+> - **おまかせ**（呼びやすい英語名を1つ、短い理由つきで提案します）
+
+希望名は `node "${SECRETARY_PLUGIN_ROOT}/scripts/secretary-name.mjs" validate "<候補>"` で検査する。
+おまかせは同scriptの `suggest --seed <workspaceを特定しない非機密の一時seed>` をread-onlyで使う。
+空、メール、path／command風、制御文字、汎用bot名、日本語名は保存しない。候補を解決してもまだwriteしない。
+
+利用者の呼び方とは別設定であることを説明し、次を別turnで確認する。
+
+> 保存する秘書名: `<SECRETARY_NAME>`
+> あなたの呼び方は別に伺い、ここでは変更しません。この英語名で進めますか？
+
+明示了承までdirectory、identity、marker、registry、user-scope file、journal、commitを変更しない。
+了承後にstable `SECRETARY_ID`を1つ生成し、renameで変えない。既存利用者の後付けはname Skillを使う。
 
 ### Q1: 呼び方
 
@@ -155,7 +174,10 @@ node "${SECRETARY_PLUGIN_ROOT}/scripts/edition-guard.mjs" --workspace . --plugin
 
 | 変数 | 入る値 | 備考 |
 |---|---|---|
-| `{{OWNER_NAME}}` | Q1 の呼び方 | 未回答なら「あなた」 |
+| `{{SECRETARY_NAME}}` | Q0で確認済みの秘書自身の英語名 | 利用者の呼び方と別 |
+| `{{SECRETARY_ID}}` | Q0確認後に生成したUUID | renameで不変 |
+| `{{CREATED_AT_ISO}}` | identity作成時刻（ISO 8601） | author identity用 |
+| `{{OWNER_NAME}}` | Q1 の利用者の呼び方 | 未回答なら「あなた」 |
 | `{{PRIMARY_SERVICE}}` | Q2 の選択（`Google` / `Microsoft` / `まだ決めていない`） | |
 | `{{PRIMARY_SERVICE_DETAIL}}` | サービスの中身 | Google→「Gmail / Googleカレンダー / Googleドライブ」、Microsoft→「Outlook / 予定表 / OneDrive」、まだ決めていない→「あとで決める」 |
 | `{{TASKS}}` | Q3 の回答（読める文） | 例: 「今日やることの整理、調べもの・下書き」 |
@@ -173,6 +195,7 @@ node "${SECRETARY_PLUGIN_ROOT}/scripts/edition-guard.mjs" --workspace . --plugin
 2. `${SECRETARY_PLUGIN_ROOT}/templates/` の中身を `secretary/` にコピーする（雛形の実体化）。
    - `${SECRETARY_PLUGIN_ROOT}/templates/AGENTS.md` → `secretary/AGENTS.md`
    - `${SECRETARY_PLUGIN_ROOT}/templates/CLAUDE.md` → `secretary/CLAUDE.md`
+   - `${SECRETARY_PLUGIN_ROOT}/templates/identity.json` → `secretary/identity.json`
    - `${SECRETARY_PLUGIN_ROOT}/templates/inbox/`・`${SECRETARY_PLUGIN_ROOT}/templates/docs/`・`${SECRETARY_PLUGIN_ROOT}/templates/projects/`（`.gitkeep` ごと） → `secretary/` 配下へ
    - `${SECRETARY_PLUGIN_ROOT}/templates/memory/MEMORY.md` → `secretary/memory/MEMORY.md`
    - `${SECRETARY_PLUGIN_ROOT}/templates/memory/preferences.md` → `secretary/memory/preferences.md`
@@ -195,6 +218,7 @@ node "${SECRETARY_PLUGIN_ROOT}/scripts/edition-guard.mjs" --workspace . --plugin
        ├── topics/
        └── preferences.md
    ```
+   `secretary/identity.json` は `display_name`、stable `secretary_id`、`actor_type=ai-secretary`、`aliases` を持つ。
 5. `${SECRETARY_PLUGIN_ROOT}/workspace-templates/` の中身を、`secretary/` の中ではなく作業中フォルダのrootへコピーする。
    これにより `.github/workflows/chatwork-sync.yml` と `chatwork/` が通常project、`secretary/` と同じrepoに並ぶ。Google ChatはCloud準備と接続用JSONの取得後、専用wizardで選んだ通常スペースだけを同じrepoへ追加する。
    既存ファイルと重なる場合は無確認で上書きせず、変更前に対象を示して確認する。
@@ -204,7 +228,7 @@ node "${SECRETARY_PLUGIN_ROOT}/scripts/edition-guard.mjs" --workspace . --plugin
    氏名、役割、サービス、依頼内容、パスワード、token、API keyは渡さない。
 
    ```text
-   node "${SECRETARY_PLUGIN_ROOT}/scripts/update-ledger.mjs" init --workspace . --plugin-root "${SECRETARY_PLUGIN_ROOT}" --managed-path secretary/AGENTS.md --managed-path secretary/CLAUDE.md --managed-path secretary/memory/MEMORY.md --managed-path secretary/memory/preferences.md --managed-path secretary/memory/decisions/YYYY-MM-DD-decisions.md --managed-path .github/workflows/chatwork-sync.yml --managed-path chatwork/config.json --managed-path chatwork/rooms.json --managed-path chatwork/scripts/chatwork-sync.mjs --template-variable CREATED_DATE=YYYY-MM-DD --template-variable CREATED_AT="YYYY-MM-DD HH:mm" --template-variable REPORT_DETAIL=みじかく --new-install --confirm
+   node "${SECRETARY_PLUGIN_ROOT}/scripts/update-ledger.mjs" init --workspace . --plugin-root "${SECRETARY_PLUGIN_ROOT}" --managed-path secretary/AGENTS.md --managed-path secretary/CLAUDE.md --managed-path secretary/identity.json --managed-path secretary/memory/MEMORY.md --managed-path secretary/memory/preferences.md --managed-path secretary/memory/decisions/YYYY-MM-DD-decisions.md --managed-path .github/workflows/chatwork-sync.yml --managed-path chatwork/config.json --managed-path chatwork/rooms.json --managed-path chatwork/scripts/chatwork-sync.mjs --template-variable CREATED_DATE=YYYY-MM-DD --template-variable CREATED_AT="YYYY-MM-DD HH:mm" --template-variable REPORT_DETAIL=みじかく --new-install --confirm
    ```
 
    `YYYY-MM-DD` 等は実際に使った非機密の値へ置き換える。新規台帳は `schemaVersion` と `edition` を持つ。
@@ -237,6 +261,7 @@ git の英語エラーが出たら、そのまま見せず「何が起きて・�
 - `AGENTS.md`、`MEMORY.md`等を用意し、この初期設定が作成・管理するファイルだけを1つのprivate repoへ初回pushしたこと。作業前からある無関係なファイルは含めていないこと。
 - private状態、remote、初回push結果。
 - 新規生成workflowのbot名は `secretary[bot]`。既存workspaceのbot名やworkflowは変更しない。
+- 秘書名、stable ID、AI種別を設定し、利用者の呼び方とは別であること。別repo呼び出しはname Skillで効果と対象fileを示し、明示確認後だけ有効化できること。
 - 次に試せる操作として /chatwork でルーム接続、または「Google Chatを設定したい」でCloud準備へ進めることと、「設定はいつでも『設定変えたい』で変更できます」という案内。
 
 ここでは内容と安全条件だけをrouterへ返す。通常報告の項目数、prefix、Markdown構造、完成例は持たず、

@@ -22,7 +22,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const plugin = join(root, "plugins/secretary");
 const resolver = join(plugin, "scripts/resolve-plugin-root.mjs");
 const expectedSkills = [
-  "build", "chatwork", "connections", "daily", "google-chat", "memory-care", "onboarding",
+  "build", "chatwork", "connections", "daily", "google-chat", "memory-care", "name", "onboarding",
   "projects", "secretary", "settings", "setup-google", "setup-microsoft", "setup-notion", "update", "weekly",
 ];
 
@@ -52,7 +52,7 @@ const runResolver = (skillFile, cwd = tmpdir()) => spawnSync(
   { cwd, encoding: "utf8", env: { PATH: process.env.PATH || "" } },
 );
 
-check("15 skills use one host-neutral root contract", () => {
+check("16 skills use one host-neutral root contract", () => {
   const actual = expectedSkills.filter((name) => existsSync(join(plugin, "skills", name, "SKILL.md")));
   assert.deepEqual(actual, expectedSkills);
   for (const name of actual) {
@@ -178,7 +178,7 @@ check("host-specific inventory covers all skills and distribution surfaces", () 
   assert.equal(inventory.distributionSurfaces.codex.manifest, ".codex-plugin/plugin.json");
 });
 
-check("Codex and Claude formal manifests share the same 15 skills", () => {
+check("Codex and Claude formal manifests share the same 16 skills", () => {
   const edition = json(join(plugin, "edition.json"));
   const codex = json(join(plugin, ".codex-plugin/plugin.json"));
   const codexMarket = json(join(root, ".agents/plugins/marketplace.json"));

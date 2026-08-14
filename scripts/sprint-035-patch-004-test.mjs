@@ -84,7 +84,7 @@ check("missing PyYAML is reported as incomplete before any Skill is classified",
     ]);
     assert.equal(result.status, 2);
     assert.match(result.stdout, /GENERIC_SKILL_VALIDATE_INCOMPLETE status=dependency-unavailable/);
-    assert.match(result.stdout, /checked=0 passed=0 failed=0 total=15/);
+    assert.match(result.stdout, /checked=0 passed=0 failed=0 total=16/);
     assert.doesNotMatch(result.stdout, /^PASS |^FAIL /m);
   } finally {
     rmSync(fixture, { recursive: true, force: true });
@@ -99,7 +99,7 @@ if (validator && pythonPath) {
       "--pythonpath", pythonPath,
     ]);
     assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
-    assert.match(result.stdout, /status=pass checked=15 passed=15 failed=0 total=15/);
+    assert.match(result.stdout, /status=pass checked=16 passed=16 failed=0 total=16/);
   });
 
   check("system quick_validate still rejects an unsupported trigger field", () => {

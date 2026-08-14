@@ -93,6 +93,7 @@ function defaultInventory(root, mode) {
       { id: "sprint-038-conversation", command: "bash", args: [script("sprint-038-regression.sh")], archive: true },
       { id: "sprint-038-patch-001-harness-compat", command: "bash", args: [script("sprint-038-patch-001-regression.sh")], archive: true },
       { id: "sprint-038-patch-002-windows-storage", command: process.execPath, args: [script("sprint-038-patch-002-windows-test.mjs")], archive: true },
+      { id: "sprint-039-secretary-identity", command: "bash", args: [script("sprint-039-regression.sh")], archive: true },
       { id: "report-schema", command: "python3", args: [script("check-report-schema.py"), "--plugin-root", join(root, "plugins", "secretary")], archive: true },
     ];
   }
@@ -122,6 +123,7 @@ function defaultInventory(root, mode) {
     { id: "sprint-038-conversation", command: "bash", args: [script("sprint-038-regression.sh")], archive: false },
     { id: "sprint-038-patch-001-harness-compat", command: "bash", args: [script("sprint-038-patch-001-regression.sh")], archive: false },
     { id: "sprint-038-patch-002-windows-storage", command: process.execPath, args: [script("sprint-038-patch-002-windows-test.mjs")], archive: false },
+    { id: "sprint-039-secretary-identity", command: "bash", args: [script("sprint-039-regression.sh")], archive: false },
     { id: "report-schema", command: "python3", args: [script("check-report-schema.py"), "--plugin-root", join(root, "plugins", "secretary")], archive: false },
     { id: "current-release-integrity", command: "python3", args: [script("check-release-integrity.py"), "--root", root], archive: false },
   ];

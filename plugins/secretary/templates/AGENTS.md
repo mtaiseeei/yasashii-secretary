@@ -12,12 +12,22 @@
 - 報告の詳しさ: {{REPORT_DETAIL}}
 - 秘書ディレクトリを作った日: {{CREATED_DATE}}
 
+## 秘書identity
+
+- 表示名: {{SECRETARY_NAME}} (AI Secretary)
+- stable ID: {{SECRETARY_ID}}
+- 種別: ai-secretary
+- 過去名: なし
+
+表示名は利用者の「呼び方」と別の設定です。変更してもstable IDと過去のauthor記録は変えません。
+
 ## 秘書ディレクトリ（secretary/）の中身
 
 ```
 secretary/
 ├── AGENTS.md      ← このファイル（指示の正本）
 ├── CLAUDE.md      ← AGENTS.md への案内だけ
+├── identity.json  ← 秘書自身の名前・stable ID・AI種別・過去名
 ├── inbox/         ← 走り書き・下書き・とりあえずメモ
 ├── docs/          ← できあがった文書の置き場（正本）
 ├── projects/

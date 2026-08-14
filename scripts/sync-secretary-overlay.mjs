@@ -243,6 +243,31 @@ function overlayDefinitionDigest() {
   return digestEntries(overlayDefinitionPaths.map((path) => [path, readBytes(overlayRoot, path)]));
 }
 
+function verifyIdentityHandoff() {
+  const declared = base.identityHandoff;
+  if (!declared?.manifest || !declared?.commonTreeSha256) {
+    throw new Error("identity handoff declaration is missing");
+  }
+  const manifest = json(join(candidateRoot, declared.manifest));
+  if (!Array.isArray(manifest.commonPaths) || manifest.commonPaths.length === 0) {
+    throw new Error("identity handoff commonPaths is empty");
+  }
+  const hash = createHash("sha256");
+  for (const path of [...manifest.commonPaths].sort()) {
+    if (!existsSync(join(candidateRoot, path))) throw new Error(`identity handoff path is missing: ${path}`);
+    const classification = classify(path);
+    if (!["common", "anchor-overlay", "metadata-overlay"].includes(classification)) {
+      throw new Error(`identity handoff path is not managed: ${path} (${classification})`);
+    }
+    hash.update(`${path}\0`).update(readBytes(candidateRoot, path)).update("\0");
+  }
+  const digest = hash.digest("hex");
+  if (digest !== declared.commonTreeSha256) {
+    throw new Error(`identity handoff digest mismatch: expected ${declared.commonTreeSha256}, observed ${digest}`);
+  }
+  return { digest, paths: manifest.commonPaths };
+}
+
 function expectedJson(expected, path) {
   const bytes = expected.get(path);
   if (!bytes) throw new Error(`required Yasashii identity surface is unmanaged: ${path}`);
@@ -333,10 +358,11 @@ function writeExpected(expected) {
 function prepare() {
   if (!existsSync(candidateRoot) || !lstatSync(candidateRoot).isDirectory()) throw new Error(`candidate directory is missing: ${candidateRoot}`);
   const snapshot = verifySnapshot();
+  const handoff = verifyIdentityHandoff();
   verifyNeutralizationAncestor();
   const expected = expectedManaged(snapshot);
   verifyYasashiiExpected(expected);
-  return { snapshot, expected };
+  return { snapshot, expected, handoff };
 }
 
 function applyOnce() {
@@ -359,10 +385,10 @@ try {
   if (mode === "--record") {
     recordSnapshot();
   } else if (mode === "--check") {
-    const { snapshot, expected } = prepare();
+    const { snapshot, expected, handoff } = prepare();
     verifyDownstreamInventory(snapshot);
     compareExpected(expected);
-    console.log(`OVERLAY_CHECK_PASS base=${base.baseCommit} managed=${expected.size} repoOwnedDigest=${ownedDigest()} overlayDigest=${overlayDefinitionDigest()}`);
+    console.log(`OVERLAY_CHECK_PASS base=${base.baseCommit} managed=${expected.size} handoffPaths=${handoff.paths.length} handoffDigest=${handoff.digest} repoOwnedDigest=${ownedDigest()} overlayDigest=${overlayDefinitionDigest()}`);
     console.log(`REMOTE_GATE ${base.externalLiveGate} origin=${base.remoteContract.originRepository} upstreamFetch=${base.remoteContract.upstreamFetchRepository} upstreamPush=${base.remoteContract.upstreamPush}`);
   } else if (mode === "--apply") {
     const result = applyOnce();

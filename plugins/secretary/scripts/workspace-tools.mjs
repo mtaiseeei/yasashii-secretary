@@ -2,6 +2,7 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
+import { authorMetadata, identityPath, readIdentity } from "./lib/secretary-identity.mjs";
 import {
   SecretaryStoreError,
   dateParts,
@@ -16,6 +17,16 @@ import {
   usage,
   validDate,
 } from "./lib/secretary-store.mjs";
+
+function optionalAuthorMetadata(root) {
+  const path = identityPath(root);
+  if (!existsSync(path)) return null;
+  const source = readFileSync(path, "utf8");
+  // 配布templateを直接copyしただけの旧fixture/workspaceは、name onboarding前として扱う。
+  // それ以外の壊れたidentityは黙って無視せず、readIdentityの検証で安全停止する。
+  if (source.includes("{{SECRETARY_NAME}}") && source.includes("{{SECRETARY_ID}}")) return null;
+  return authorMetadata(readIdentity(root));
+}
 
 function stdin() { return readFileSync(0, "utf8"); }
 
@@ -35,7 +46,11 @@ function saveDeliverable(args) {
   const journal = safePath(root, `memory/journal/${dateParts().day}.md`);
   const index = safePath(root, "memory/MEMORY.md");
   const tagLines = tags.split(",").map((tag) => tag.trim()).filter(Boolean);
-  const markdown = `---\ncreatedAt: ${date} ${dateParts().time}\ntags:\n${(tagLines.length ? tagLines : ["成果物"]).map((tag) => `  - ${tag}`).join("\n")}\n---\n\n# ${title}\n\n${body.trimEnd()}\n`;
+  const author = optionalAuthorMetadata(root);
+  const authorLines = author
+    ? `author: ${author.author}\nauthor_id: ${author.author_id}\nauthor_type: ${author.author_type}\n`
+    : "";
+  const markdown = `---\ncreatedAt: ${date} ${dateParts().time}\n${authorLines}tags:\n${(tagLines.length ? tagLines : ["成果物"]).map((tag) => `  - ${tag}`).join("\n")}\n---\n\n# ${title}\n\n${body.trimEnd()}\n`;
   const result = transaction([target, journal, index], () => {
     if (existsSync(target)) {
       if (readFileSync(target, "utf8") !== markdown) refuse(`同名の成果物が既にあります。上書きしません: ${rel}`);
