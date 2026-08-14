@@ -367,3 +367,21 @@
 12. overlay metadataはaccepted candidate、digest、16 commonPaths、13 parity／3 anchor分類を記録する所有fieldだけを更新できる。Yasashii固有copy、style、rule manifest、README、identity、repo-owned docs、LICENSEと、それ以外のoverlay metadataのdigestを保護し、Agentic値へ戻さない。
 13. 合成HOMEと隔離workspaceでrouting、resolver、managed block、改名、rollbackを検証する。実HOME、installed plugin／cache、private版、Mac mini、remote、releaseへは本機能同期中に書き込まない。
 14. Windows nativeの既存12 labelsと残余リスクは過去証拠の範囲で正直に扱う。本機能のportable code review、既存suite、実行できた環境証拠を分け、Windows未実行を全環境PASSや解消済みへ昇格させない。
+
+## 22. 既存workspace identity migrationと0.10.1下流同期
+
+1. Plugin更新、ローカルidentity migration、任意のuser-scope routingを別状態として扱う。Pluginが`0.10.1`でも、既存workspaceのidentity面が未導入または部分適用なら完全移行済みと表示しない。
+2. 診断とpreviewはread-onlyとし、canonical root、edition marker、identity、製品所有のAGENTS／CLAUDE identity管理節、最小台帳、正確なGit rootを確認する。cwdだけを根拠に新規onboardingへ送らない。
+3. identity未作成、`0.10.0`でidentityだけ作成済み、`0.10.1`新規導入相当、marker重複・利用者編集・所有不明等の衝突状態を区別する。正当な既存identityのdisplay name、stable ID、AI種別、作成時刻を再生成しない。
+4. 英語名の保存確認とmigration apply確認は分ける。migration確認前、拒否、取消、無回答ではworkspace、Git、台帳、registry、user-scope fileを変更しない。
+5. apply対象はidentity、製品所有のAGENTS／CLAUDE identity管理節、最小台帳だけである。利用者自由記述、他managed block、周辺行、改行、file mode、無関係な台帳recordを保持し、file全面上書きとblind replacementを禁止する。
+6. 最小台帳は管理対象path、適用version、基準hash等の更新判断metadataだけを持つ。秘書名、stable ID、利用者本文、顧客名、記憶、Secretを保存しない。
+7. local checkpointは今回変更した製品所有pathだけを正確なGit rootから1 commitへ含める。開始前のstage／unstaged／untracked、対象外path、別repo、remote状態を保持し、push、fetch、remote、branch、tagを操作しない。
+8. file write、構文／identity整合、台帳、stage、commit、commit後確認の失敗では、今回の変更とHEAD／index／working treeを開始前へ戻す。部分file、部分stage、部分commit、backup、一時fileを残さず、rollback未完了を成功と表示しない。
+9. failure後retryは一度の完全transactionとして成功でき、成功後rerunと完全適用済みworkspaceの再実行はfile差分、marker／台帳重複、stable ID変化、追加commit 0件とする。
+10. marker重複、利用者編集衝突、edition不一致、symlink／junction、read-only、別Git root、target所有pathの開始前dirty、Git-free targetは理由を示して副作用0件で停止する。
+11. ローカルmigrationの確認にuser-scope registry／routing、rename、過去author、利用者コンテンツ、既存文書のGrep置換、pushを含めない。別repo routingはmigration完了後も効果と対象を示した別確認でだけ有効化する。
+12. 同期入力はAgentic固定候補HEAD `ba4fe4de39df483b984fef5045bb1e21fdde1373`、製品commit `3ef792819a4a445df089f70aa74ca09176762e5e`、common digest `a7d74a7a9bb42ea67815a75132acf588fe312314f98b7f9685cef97fdfca59c9`、20 `commonPaths` に固定する。後続docs-only commit、moving checkout、dirty treeへ読み替えない。
+13. 20 commonPathsは16件のbyte parityと、`name`／`secretary`／`settings`／`update` の4宣言anchorに分類する。新しいidentity migration、update-ledger、update Skill、CLAUDE templateを同期対象から外さず、未分類0件、check／apply／reapply二回目追加差分0件を満たす。
+14. Yasashii固有の文体、copy、style、rule manifest、README、配布identity、repository、marketplace、overlay所有field、repo-owned正本、Sprint／progress／feedback／evidence、LICENSE、公開済み`0.10.0`以前の履歴を保護する。Agentic docs／state／release記録を同期しない。
+15. 本PatchはYasashii `0.10.1` candidateまでを扱う。Agentic／Yasashii／privateの3版がそれぞれfresh独立PASSする前に、tag、GitHub Release、marketplace公開、installed cache更新、Mac mini同期、受講者向け更新文の配布を行わない。

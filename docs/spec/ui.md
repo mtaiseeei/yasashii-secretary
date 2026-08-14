@@ -319,6 +319,15 @@ Chatworkと同じ共通wizard骨格を使い、全画面の可視見出しとacc
 - plugin更新後にreload／restartが必要なら、理由と再開方法を示す。再開後はversion、migration、主要導線を検証してから成功を報告する。
 - 失敗時はpluginとworkspaceのどちらが変わったかを分け、直前commitと更新前versionを使うrollback手順を示す。pushは別操作として確認なしに行わない。
 
+### Plugin更新後の既存workspace名前移行
+
+- Plugin更新完了、reload／新session、ローカルidentity migrationを別の進捗として示す。未導入または部分適用なら「Pluginは更新済みですが、秘書名のローカル設定が残っています」と伝え、名前Skillへ案内する。
+- 最初はread-only診断とし、`未導入`、`名前だけ設定済み`、`移行済み`、`安全に自動移行できない`を平易に示す。技術詳細が必要な場合だけcanonical root、edition、Git root、管理markerを補足する。
+- previewはpathごとに「追加」「更新」「そのまま」「要確認」を示し、短い理由、local checkpoint、失敗時の戻し方、今回変更しないものをまとめる。秘書名やstable IDの証拠用複製、Secret、file全文の大量表示はしない。
+- 英語名の保存確認とmigration apply確認を別にする。名前を了承しただけでAGENTS／CLAUDE／台帳へ書き込まない。
+- 成功時は、ローカル移行が完了したこと、変更した管理対象、local checkpoint、別repoから呼ぶ設定はまだ任意であることを分けて示す。user-scope routingを希望する場合だけ、対象host／fileと無効化方法を説明して別確認へ進む。
+- 見送り、衝突、失敗では完全移行済みと表示しない。変更0件またはrollback結果、残っている状態、次に安全にできることを先に伝える。
+
 ## 公開済み0.7.0で確定した配布前の操作体験
 
 ### wizardのsessionとfocus

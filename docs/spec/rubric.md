@@ -9,7 +9,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 ## 合格の基本条件
 
 - Evaluatorは対象スプリントの実物を動かし、実行コマンド、結果、対象ファイル／repo、模擬会話の入力と観測結果を feedback に残す。
-- C2・C5・C6・C9・C10・C11・C12・C13・C14・C15・C16・C17 は5/5必須。対象Sprintの保証範囲で、1件でも構文欠陥、secret露出、安全違反、新規回帰、現行面の配布チャネル依存、無確認の更新副作用、Google ChatのOAuth／選択スペース境界違反、配布前gateの未達、edition境界違反、会話可読性の必須条件違反、正式ホスト配布面の欠落、Windows native保存／0.9.2下流同期の欠落、または秘書identity／routing／改名境界違反があれば不合格。
+- C2・C5・C6・C9・C10・C11・C12・C13・C14・C15・C16・C17・C18 は5/5必須。対象Sprintの保証範囲で、1件でも構文欠陥、secret露出、安全違反、新規回帰、現行面の配布チャネル依存、無確認の更新副作用、Google ChatのOAuth／選択スペース境界違反、配布前gateの未達、edition境界違反、会話可読性の必須条件違反、正式ホスト配布面の欠落、Windows native保存／0.9.2下流同期の欠落、秘書identity／routing／改名境界違反、または既存workspace identity migrationの部分適用・履歴破壊があれば不合格。
 - Sprint 021は、Google Chatのlocal wizard session memory→`gh` stdin→Repository Secretと、Chatworkの利用者本人によるGitHub Repository Secret画面への直接入力という既存の2導線、および製品管理対象／初回publish inventoryにおける合理的な誤混入を0許容で評価する。Chatwork wizardへToken取得・受領・登録機能を要求しない。利用者が任意のJS／TS／shell／JSONを意図的に特殊構文・難読化・computed／escaped key・偽placeholderへ改変したケースの未検出だけでは不合格にしない。その形式を製品が生成する、または通常導線が実値を残すなら不合格とする。
 - 1軸でも閾値を下回ればスプリント全体を不合格にする。
 - やさしさの得点で安全・規律・回帰の欠陥を相殺しない。
@@ -103,6 +103,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 31. **同一版とdowngradeを拒否**: `0.8.0 → 0.8.0` と `0.8.0 → 0.7.0` を依頼し、現在版／候補版と停止理由を示す。保護commit、plugin update、workspace書込み、migration、ledger変更、push、same-version bridgeが0件である。
 32. **読みやすい複数要素の返答**: agentic／yasashiiで同じ複数手順、複数結果、部分失敗、handoffを返し、改行なしの平文が0件、必要な段落／箇条書きがあり、両editionの内容差が残る。1要点の短い確認は過剰なbulletにならない。
 33. **Codex正式pluginの新規導入**: Codex App／CLIを未導入状態から正式marketplace経由で導入し、新しいchat／sessionで正本15 skillが一意に見え、`$secretary` 等の明示呼出または「秘書を設定したい」の自然言語triggerからonboardingへ進む。legacy互換または手動skillsだけの構成では正式配布PASSを返さない。
+34. **既存`0.10.0`の名前移行**: Plugin更新済みでidentity未導入、identityだけ作成済み、完全適用済み、衝突ありの4 workspaceを新sessionまたは名前Skillから診断する。previewと英語名確認だけではwrite 0件、別確認後の成功ではidentity／AGENTS／CLAUDE／台帳が新規導入相当となる。利用者自由記述と開始前Git状態を保ち、代表failureは完全rollback、retryは1 checkpoint、rerunは差分・重複・追加commit 0件、user-scope routingは別確認のままである。
 
 個人化された文面の完全一致はassertしない。設定の読込、許可された分岐、既定へのフォールバック、確認フローを評価する。
 
@@ -127,6 +128,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 | C15 | 4ホスト正式配布 | Claude／Codex両manifest、marketplace、新規導入、skill一意発見、新規session、更新・cache、host別実証 | **5** |
 | C16 | Windows native保存・0.9.2下流同期 | 12 labels、Bash非依存、CRLF、rollback／path guard、overlay保護、release整合、外部write禁止 | **5** |
 | C17 | 秘書identity・routing・安全な改名 | 英語名、stable identity、AI author、canonical resolver、managed block、人名誤routing防止、分類付き改名、overlay保護 | **5** |
+| C18 | 既存workspace identity migration | 更新後handoff、read-only診断、別確認、identity／AGENTS／CLAUDE／台帳、自由記述保護、local checkpoint、rollback、冪等性、履歴保護 | **5** |
 
 ## スコアアンカー
 
@@ -220,6 +222,11 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 - 5: 英語の秘書名と利用者の呼び方が分離し、指定／提案の両経路、stable identity不変、AI author、既存利用者向け名前Skill、canonical resolverが成立する。user-scope managed blockはopt-in、冪等、既存内容保護で、直接呼びかけだけをroutingし、人名文脈は除外、曖昧時は一度確認する。改名は候補を分類・提示して確認後だけ現行設定と製品所有blockを変更し、過去author／履歴を保ち、失敗時は完全rollbackする。固定handoffのcommonPathsだけがbyte一致し、Yasashii固有surfaceは不変、外部write 0件、Windows残余は正直に区別される。
 - 4以下: 利用者の呼び方との混同、非英語名の無確認保存、stable identity再発行、人のauthorとの識別不能、cwdへの別workspace誤作成、user-scope fileの無確認／全置換、managed block重複、`AGENTS.override.md` 無視の成功表示、人名文脈の誤routing、曖昧確認の反復、blind global replace、履歴改変、partial state、commonPaths外同期、Yasashii固有surface変化、実HOME／cache／private／remote／release write、Windows未実行の全環境PASS表示のいずれかが1件でもある。→不合格。
 
+### C18 既存workspace identity migration【ゼロ許容】
+
+- 5: Plugin更新とローカル移行を別状態として示し、4つの既存workspace状態をread-onlyで正しく診断する。英語名確認とapply確認を分け、確認後だけidentity、製品所有のAGENTS／CLAUDE identity管理節、最小台帳を新規導入相当へ一体更新する。利用者自由記述、他block、改行、mode、無関係record、開始前Git状態を保持し、所有pathだけのlocal checkpoint、全failure pointの完全rollback、failure後retry、成功後rerun差分0が成立する。固定Agentic HEAD／製品commit／20 commonPaths／digestが一致し、Yasashii固有surfaceと`0.10.0`以前の履歴が不変、user-scopeは別確認、3版PASS前のrelease関連write 0件である。
+- 4以下: Plugin更新だけの完了表示、状態誤判定、previewの副作用、名前了承とmigration許可の統合、identityだけの部分成功、AGENTS／CLAUDE全面上書き、自由記述・改行・mode・無関係recordの変化、台帳への名前／stable ID／本文／Secret保存、所有外commit、開始前Git状態の損失、rollback不完全、retry／rerun重複、user-scopeの同時有効化、fixed input不一致、commonPaths外同期、Yasashii固有surface／過去release履歴の変更、3版PASS前のrelease／Mac mini／受講者向け配布のいずれかが1件でもある。→不合格。
+
 ## スプリント別の重点
 
 | Sprint | 重点 |
@@ -260,6 +267,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 | 037 | Agentic固定candidate `d9a62755`、review済みbase record、overlay冪等、呼び方4経路、候補探索・非保存、値を履歴メタデータへ再掲しない現役3正本transaction、利用者中立scan、Yasashii固有surface保護、Sprint 045無回帰 |
 | 038-patch-002 | 固定Agentic `24520a1d...`、Windows native同一12 labels、project／journal／memory／TODO／settings／文書、recursive copy、CRLF、rollback／path guard、overlay byte parity・固有surface保護、0.9.2整合、macOS／Linux・archive無回帰、独立PASS前の公開禁止 |
 | 039 | accepted Agentic `3fa8d97e...`／digest `c810f60c...`、16 commonPaths（13 byte parity＋3 anchors、`external-ops.mjs`／`safe-git.mjs`を含む）、英語名／stable identity／AI author、名前Skill、canonical resolver、user-scope managed block、direct／human routing、分類付き改名／rollback、Yasashii固有surface保護、Windows残余の正直な区別、外部write禁止 |
+| 039-patch-001 | fixed Agentic HEAD `ba4fe4de...`／製品commit `3ef7928...`／digest `a7d74a7...`、20 commonPaths（16 byte parity＋4 anchors）、既存`0.10.0`のread-only診断、更新後handoff、別確認、identity／AGENTS／CLAUDE／台帳、自由記述保護、所有path checkpoint、完全rollback、retry／rerun、user-scope別確認、Yasashii `0.10.1`候補、3版PASS前release hold |
 
 ## 差し戻し分類
 
@@ -271,6 +279,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 
 ## 更新履歴
 
+- 2026-08-14: 既存`0.10.0`利用者はPlugin更新だけではローカルidentity面が新規導入相当へ揃わないことを受け、C18と必須会話34を追加した。read-only診断、英語名確認とapply確認の分離、identity／AGENTS／CLAUDE／台帳のatomic migration、自由記述・Git状態保護、完全rollback、retry／rerun、user-scope別確認、固定下流handoff、3版PASS前release holdを5/5条件とする。
 - 2026-07-21: ユーザー決定により、Sprint 033の過剰なformal gateを実用的な出荷受入へ戻した。private `origin/main` の `4670438` を完成候補とし、同一current bytesで取得済みの4 host固有証拠を再利用可能にした。検証方法43・44とC15は、正式manifest／marketplace、0.8.0／identity／skill、host別実会話8面、wizard、workspace変更0件、Secret露出0件、更新／再導入、全回帰・archive・validatorを5/5条件とする。`f285120`／`b9c0f3e` のschema v3 collector／driver／attestorはNon-scope／将来のoptional internal QAへ移した。品質基準を弱めたのではなく、製品動作と安全性の直接証拠を維持したまま、証明基盤だけを製品scopeから外した。
 - 2026-07-21: （直上の再改訂でsuperseded）current bytesの4 host実会話は個別PASSした一方、既存live gateに実host証拠を取得・固定するproduction driver／attestorがなく、合成fixtureのdriverしかformal schemaを完走できないspec-issueを受けて検証方法44とC15を改訂した。当時は実host層と隔離層の二層、CLI／App別collector、GUI AppのWrite／Editなし＋別隔離probe、approval／challenge／digest拘束、12 check／8 scenario exact coverage、secret／実path非保持、全失敗経路cleanup、fixture／事後result非昇格を必須化したが、製品scopeに対して過剰だったため現在の必須条件ではない。
 - 2026-07-21: OpenAI公式のplugin／skill仕様とCodex CLI 0.144.6の実機確認を受け、Sprint 033のCodex配布面を手動 `config.toml`／`AGENTS.md`／skillsコピーから正式 `.codex-plugin/plugin.json`＋marketplaceへ改訂。検証方法43とC15を追加し、GitHub marketplace、Plugins Directory／CLI browser、新規chat／session、15 skill一意discover、明示／暗黙trigger、更新・cache、legacy互換非代替を必須化した。
