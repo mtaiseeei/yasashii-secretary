@@ -93,3 +93,50 @@ Agenticの現在HEADや後続docs-only commitへ読み替えていない。Agent
 5. P1〜P4、rename A〜D、stable ID、過去author、選択B、D不変、部分失敗rollbackを操作する。
 6. working candidateのclean checkoutと同一commit Git archiveでSprint 039、overlay、schema、既存target回帰を再実行する。
 7. README、LICENSE、Yasashii copy/style、manifest、marketplace、edition、rule manifestのdigestを比較する。
+
+## Retry 1 — Evaluator P1/P2修正
+
+Evaluatorが指摘したP1（release integrityの正式Skill inventory）とP2（renameの実commit checkpoint）だけを修正した。初回candidateの評価根拠は上記に残し、Retry 1の固定入力と結果を以下へ追記する。
+
+### 固定入力とoverlay
+
+- accepted Agentic製品candidate: `3fa8d97e5dbfb2afa314f4ad179f17401b76d320`
+- 入力形: 上記commitのGit archive（read-only、`.git`なし）。Agenticの現在HEADには追従していない。
+- handoff common digest: `c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557`
+- handoff: 16 paths。`safe-git.mjs`と`external-ops.mjs`を含む。
+- upstream snapshot: 716 files、managed: 277 files、未分類: 0。
+- Retry 1初回apply: 4 files changed。最終check: PASS、reapply: `secondChanged=0`。
+- handoffの13 common pathsはAgenticとbyte一致。`name`、`secretary`、`settings` Skillは宣言済みYasashii anchorで、製品identity／copy／styleを保持した。
+- overlay適用直後のrepo-owned digest: `2ddb5fc205e1433a113f4e358c45d944c1b6ce95b348199ef915420dfd9950c2`。このprogress自体がrepo-ownedなので、追記後のdigest値は変わるがoverlay checkはPASSを維持する。
+- final overlay definition digest: `5850ef7b197e9f524891d0af5f71c3be1b39ed468fddae37d8044c04f58e37df`
+- final reapply digest: `3698b74e36909b1a3bee38fd2d2187758f4a8085481a44a32f3a0e30caa53ad5`
+
+Agenticのdocs、progress、feedback、state、release記録は同期していない。README、LICENSE、Yasashii copy/style、製品identity、manifest、marketplace、rule manifest、overlay metadata、Harness導線も初回記録の保護digestを維持した。
+
+### P1 — 正式16 Skills inventory
+
+- `scripts/check-release-integrity.py`へ正式16 Skillsの明示集合を追加した。`name`を含むexact inventoryで判定し、件数だけでは合格させない。
+- 16件のまま`name`を`unknown`へ差し替えるnegative fixtureを追加した。`unexpected formal Skill`と`expected formal Skill missing`の両方を要求する。
+- Skill件数条件を緩和していない。
+
+### P2 — rename checkpointとrollback
+
+- renameがcanonical workspaceのGit rootを確定し、製品所有pathだけをstageしてrequired checkpointを1 commit作成するよう同期した。
+- checkpoint前、stage失敗、commit失敗、commit後失敗の各段階で、HEAD、index、worktree、HOME側managed blockを開始前へ戻す。
+- 既存stage／unstaged／untrackedはbyte単位で保持する。rename対象自身が開始前dirty、親repo誤採用、nested別repoはsafe stopする。
+- 成功後の再実行は差分0、追加commit 0。実remote、push、tag、releaseは0。
+
+### Retry 1実行結果
+
+- `node scripts/sprint-039-patch-001-test.mjs`: 16 PASS / 0 FAIL。
+- `bash scripts/sprint-039-regression.sh`: 69 PASS / 0 FAIL、wrapper 7 PASS / 0 FAIL。
+- `bash scripts/sprint-039-patch-001-regression.sh`: wrapper 9 PASS / 0 FAIL。内訳にGit safety 71/0、Sprint 035 15/0、schema 1/0、release integrity 2/0を含む。
+- `node scripts/sprint-039-release-integrity-test.mjs`: 2 PASS / 0 FAIL。
+- `node scripts/sprint-039-overlay-test.mjs <fixed-agentic-archive>`: 6 PASS / 0 FAIL。
+- `python3 scripts/check-report-schema.py --plugin-root plugins/secretary`: 21 surfaces、1 PASS / 0 FAIL。
+- clean checkout相当candidate: Patch 16/0、Sprint 039 69/0＋wrapper 7/0、release integrity 2/0、schema 1/0、overlay 6/0。
+- 同じclean candidateの`git archive HEAD`（`.git`なし）: Patch 16/0、Sprint 039 69/0＋wrapper 7/0、release integrity 2/0、schema 1/0、overlay 6/0。
+
+Retry 1では長いhistorical master全体を再実行していない。上記「既知baseline／verification-infra」の6件は初回実行時の記録を維持し、baseline変更で隠していない。Windowsの新identity面native実行も引き続き **not-run** であり、既存Darwin実行結果だけを記録する。
+
+実HOME、installed cache、private版、Mac mini、external service、remote、Secret、Actions、OAuth、実APIへのwriteは0。実Yasashii repoではcommit／push／tag／releaseを行っていない。テスト内のcommitは隔離した一時fixtureだけである。

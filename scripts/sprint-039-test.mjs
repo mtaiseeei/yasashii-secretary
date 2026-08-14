@@ -29,6 +29,7 @@ function treeSnapshot(root) {
   const rows = [];
   function walk(path) {
     for (const entry of readdirSync(path, { withFileTypes: true })) {
+      if (entry.name === ".git") continue;
       const target = join(path, entry.name);
       const rel = target.slice(root.length + 1);
       if (entry.isSymbolicLink()) rows.push([rel, "symlink"]);
@@ -46,6 +47,10 @@ function throwsNoMutation(label, root, fn, pattern) {
   check(label, () => { const before = treeSnapshot(root); assert.throws(fn, pattern); assert.deepEqual(treeSnapshot(root), before); });
 }
 function makeHome(name) { const home = join(sandbox, name); mkdirSync(home, { recursive: true }); return home; }
+function commitFixture(workspace, message = "fixture baseline") {
+  execFileSync("git", ["add", "-A"], { cwd: workspace, stdio: "ignore" });
+  execFileSync("git", ["commit", "-q", "-m", message], { cwd: workspace, stdio: "ignore" });
+}
 function makeWorkspace(name, { edition = "yasashii-secretary", secretaryId = randomUUID(), displayName = "Alex" } = {}) {
   const workspace = join(sandbox, name);
   const secretary = join(workspace, "secretary");
@@ -59,6 +64,10 @@ function makeWorkspace(name, { edition = "yasashii-secretary", secretaryId = ran
   writeFileSync(join(secretary, "AGENTS.md"), `# Secretary\n\n- owner-call-name: Taisei\n- 表示名: ${displayName} (AI Secretary)\n`);
   writeFileSync(join(secretary, "memory", "MEMORY.md"), "# Memory\n\n- owner-call-name: Taisei\n");
   writeFileSync(join(secretary, "identity.json"), `${JSON.stringify(createIdentity({ displayName, secretaryId, createdAt: "2026-08-14T00:00:00.000Z" }), null, 2)}\n`);
+  execFileSync("git", ["init", "-q"], { cwd: workspace });
+  execFileSync("git", ["config", "user.name", "Fixture User"], { cwd: workspace });
+  execFileSync("git", ["config", "user.email", "fixture@example.invalid"], { cwd: workspace });
+  commitFixture(workspace);
   return { workspace, secretary, secretaryId };
 }
 
@@ -136,21 +145,22 @@ try {
   writeFileSync(join(renameFixture.secretary, "docs", "note.md"), "Alexが作った現在の案です。\n");
   writeFileSync(join(renameFixture.secretary, "memory", "journal", "2026-08-14.md"), "author: Alex (AI Secretary)\nauthor_id: stable\n");
   writeFileSync(join(renameFixture.secretary, "misc.txt"), "所有不明 Alex\n");
+  commitFixture(renameFixture.workspace, "rename fixture content");
   const previewBefore = treeSnapshot(renameFixture.workspace); const homePreviewBefore = treeSnapshot(renameHome); const preview = previewRename({ secretaryRoot: renameFixture.secretary, newName: "Morgan", home: renameHome });
   check("rename previewはA-D分類とrollbackを示す", () => { assert.equal(preview.readOnly, true); for (const key of ["current-config", "user-content", "historical-author", "unknown-or-conflict"]) assert.ok(preview.counts[key] >= 1); assert.ok(preview.rollback); });
   check("rename preview前後snapshot一致", () => { assert.deepEqual(treeSnapshot(renameFixture.workspace), previewBefore); assert.deepEqual(treeSnapshot(renameHome), homePreviewBefore); });
   throwsNoMutation("rename apply確認前write 0", renameFixture.workspace, () => applyRename({ secretaryRoot: renameFixture.secretary, newName: "Morgan", home: renameHome }), /明示確認前/u);
   const historicalBefore = readFileSync(join(renameFixture.secretary, "memory", "journal", "2026-08-14.md")); const unknownBefore = readFileSync(join(renameFixture.secretary, "misc.txt"));
   check("renameはtemplateのidentity fieldだけを構造更新しcustom本文を保持", () => { assert.ok(preview.matches.some((item) => item.path === "AGENTS.md" && item.classification === "current-config" && item.ownedField === "display-name")); assert.ok(preview.matches.some((item) => item.path === "AGENTS.md" && item.classification === "unknown-or-conflict")); const result = applyRename({ secretaryRoot: renameFixture.secretary, newName: "Morgan", home: renameHome, confirm: true, confirmedClasses: ["current-config", "user-content"], selectedUserContent: ["docs/note.md"] }); const after = readIdentity(renameFixture.secretary); const agentsAfter = readFileSync(join(renameFixture.secretary, "AGENTS.md"), "utf8"); assert.equal(after.secretary_id, renameFixture.secretaryId); assert.deepEqual(after.aliases, ["Alex"]); assert.match(agentsAfter, /- 表示名: Morgan \(AI Secretary\)/u); assert.match(agentsAfter, /顧客Alexの案件は変更しない/u); assert.doesNotMatch(agentsAfter, /顧客Morgan/u); assert.match(readFileSync(join(renameFixture.secretary, "docs", "note.md"), "utf8"), /Morgan/u); assert.deepEqual(readFileSync(join(renameFixture.secretary, "memory", "journal", "2026-08-14.md")), historicalBefore); assert.deepEqual(readFileSync(join(renameFixture.secretary, "misc.txt")), unknownBefore); assert.match(readFileSync(join(renameHome, ".codex", "AGENTS.md"), "utf8"), /Morgan/u); assert.equal(result.preservedHistorical >= 1, true); });
-  throwsNoMutation("同名renameは安全停止し差分0", renameFixture.workspace, () => applyRename({ secretaryRoot: renameFixture.secretary, newName: "Morgan", confirm: true, confirmedClasses: ["current-config"] }), /同じ名前/u);
+  check("成功後の同名renameは差分と追加commit 0", () => { const beforeTree = treeSnapshot(renameFixture.workspace); const beforeHead = execFileSync("git", ["rev-parse", "HEAD"], { cwd: renameFixture.workspace, encoding: "utf8" }); const result = applyRename({ secretaryRoot: renameFixture.secretary, newName: "Morgan", confirm: true, confirmedClasses: ["current-config"] }); assert.equal(result.status, "unchanged"); assert.equal(result.checkpoint.status, "not-applicable"); assert.deepEqual(treeSnapshot(renameFixture.workspace), beforeTree); assert.equal(execFileSync("git", ["rev-parse", "HEAD"], { cwd: renameFixture.workspace, encoding: "utf8" }), beforeHead); });
   throwsNoMutation("alias衝突renameは安全停止", renameFixture.workspace, () => applyRename({ secretaryRoot: renameFixture.secretary, newName: "Alex", confirm: true, confirmedClasses: ["current-config"] }), /alias/u);
-  const rollbackRename = makeWorkspace("rename-rollback"); const rollbackRenameHome = makeHome("rename-rollback-home"); mkdirSync(join(rollbackRenameHome, ".codex")); mkdirSync(join(rollbackRenameHome, ".claude")); updateUserScopeRouting({ home: rollbackRenameHome, identity: readIdentity(rollbackRename.secretary), confirm: true }); writeFileSync(join(rollbackRename.secretary, "docs", "b.md"), "Alex text\n"); const rrBefore = treeSnapshot(rollbackRename.workspace); const rrhBefore = treeSnapshot(rollbackRenameHome);
+  const rollbackRename = makeWorkspace("rename-rollback"); const rollbackRenameHome = makeHome("rename-rollback-home"); mkdirSync(join(rollbackRenameHome, ".codex")); mkdirSync(join(rollbackRenameHome, ".claude")); updateUserScopeRouting({ home: rollbackRenameHome, identity: readIdentity(rollbackRename.secretary), confirm: true }); writeFileSync(join(rollbackRename.secretary, "docs", "b.md"), "Alex text\n"); commitFixture(rollbackRename.workspace, "rollback fixture content"); const rrBefore = treeSnapshot(rollbackRename.workspace); const rrhBefore = treeSnapshot(rollbackRenameHome);
   check("rename途中失敗はworkspaceとuser-scopeをrollback", () => { assert.throws(() => applyRename({ secretaryRoot: rollbackRename.secretary, newName: "Taylor", home: rollbackRenameHome, confirm: true, confirmedClasses: ["current-config", "user-content"], selectedUserContent: ["docs/b.md"], failAt: "before-write-3" }), /部分書込み/u); assert.deepEqual(treeSnapshot(rollbackRename.workspace), rrBefore); assert.deepEqual(treeSnapshot(rollbackRenameHome), rrhBefore); });
 
   const authorWorkspace = makeWorkspace("author-workspace"); const body = "本文です。\n"; execFileSync(process.execPath, [join(ROOT, "plugins/secretary/scripts/workspace-tools.mjs"), "save-deliverable", authorWorkspace.secretary, "2026-08-14", "テスト成果物", "test"], { input: body, encoding: "utf8", env: { ...process.env, CC_SECRETARY_NOW: "2026-08-14T10:00:00+09:00" } });
   check("成果物frontmatterにAI author構造化metadata", () => { const text = readFileSync(join(authorWorkspace.secretary, "docs", "2026", "08", "2026-08-14_テスト成果物.md"), "utf8"); assert.match(text, /author: Alex \(AI Secretary\)/u); assert.match(text, /author_id: [0-9a-f-]{36}/u); assert.match(text, /author_type: ai-secretary/u); });
 
-  check("固定Agentic handoffとoverlay snapshotを宣言", () => { const base = JSON.parse(readFileSync(join(ROOT, "secretary-overlay/upstream-base.json"), "utf8")); const snapshot = JSON.parse(readFileSync(join(ROOT, "secretary-overlay/upstream-tree.json"), "utf8")); assert.equal(base.baseCommit, "3e08eb6d377392440e753bd5073c73d1d63399b6"); assert.equal(base.identityHandoff.commonTreeSha256, "7498d3550734ba63b689463f01e2a52e16d2ce3f8eb31cebead16aef2181f883"); assert.equal(snapshot.baseCommit, base.baseCommit); const nameSkill = snapshot.files.find((item) => item.path === "plugins/secretary/skills/name/SKILL.md"); assert.ok(nameSkill); assert.equal(nameSkill.classification, "anchor-overlay"); assert.match(readFileSync(join(ROOT, nameSkill.path), "utf8"), /--edition yasashii-secretary/u); assert.equal(snapshot.files.some((item) => item.path.startsWith("docs/progress/") && item.classification !== "repo-owned"), false); });
+  check("固定Agentic handoffとoverlay snapshotを宣言", () => { const base = JSON.parse(readFileSync(join(ROOT, "secretary-overlay/upstream-base.json"), "utf8")); const snapshot = JSON.parse(readFileSync(join(ROOT, "secretary-overlay/upstream-tree.json"), "utf8")); assert.equal(base.baseCommit, "3fa8d97e5dbfb2afa314f4ad179f17401b76d320"); assert.equal(base.identityHandoff.commonTreeSha256, "c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557"); assert.equal(snapshot.baseCommit, base.baseCommit); const nameSkill = snapshot.files.find((item) => item.path === "plugins/secretary/skills/name/SKILL.md"); assert.ok(nameSkill); assert.equal(nameSkill.classification, "anchor-overlay"); assert.match(readFileSync(join(ROOT, nameSkill.path), "utf8"), /--edition yasashii-secretary/u); assert.equal(snapshot.files.some((item) => item.path.startsWith("docs/progress/") && item.classification !== "repo-owned"), false); });
   check("実HOME・cache・実下流・remoteへwrite 0", () => assert.deepEqual(realHomeTargets.map((path) => [path, sha(path)]), realHomeBefore));
   check("name Skillはowner呼び方とidentityを分離", () => { const skill = readFileSync(join(ROOT, "plugins/secretary/skills/name/SKILL.md"), "utf8"); assert.match(skill, /利用者の「呼び方」と秘書自身の名前は別設定/u); assert.match(skill, /無条件grep置換/u); });
   check("onboardingは英語名確認前write 0を明記", () => { const skill = readFileSync(join(ROOT, "plugins/secretary/skills/onboarding/SKILL.md"), "utf8"); assert.match(skill, /明示了承までdirectory、identity、marker、registry、user-scope file、journal、commitを変更しない/u); });

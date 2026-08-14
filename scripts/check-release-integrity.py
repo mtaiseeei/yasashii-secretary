@@ -17,6 +17,11 @@ PLUGIN_SOURCE = "./plugins/secretary"
 REPOSITORY = "https://github.com/mtaiseeei/yasashii-secretary"
 FORKED_FROM = "https://github.com/Shin-sibainu/cc-company"
 AUTHOR = "mtaiseeei"
+EXPECTED_SKILLS = {
+    "build", "chatwork", "connections", "daily", "google-chat", "memory-care", "name",
+    "onboarding", "projects", "secretary", "settings", "setup-google", "setup-microsoft",
+    "setup-notion", "update", "weekly",
+}
 
 
 def version_key(value: str) -> tuple[int, int, int]:
@@ -114,13 +119,13 @@ def validate(root: Path) -> list[str]:
         errors.append("Codex plugin interface metadata is incomplete")
 
     skills_root = root / "plugins/secretary/skills"
-    skill_names = sorted(path.parent.name for path in skills_root.glob("*/SKILL.md"))
-    expected_skills = sorted([
-        "build", "chatwork", "connections", "daily", "google-chat", "memory-care", "onboarding",
-        "projects", "secretary", "settings", "setup-google", "setup-microsoft", "setup-notion", "update", "weekly",
-    ])
-    if skill_names != expected_skills:
-        errors.append("Codex plugin must reference the 15 unique shared skills")
+    skill_names = {path.parent.name for path in skills_root.glob("*/SKILL.md")}
+    for name in sorted(skill_names - EXPECTED_SKILLS):
+        errors.append(f"unexpected formal Skill: {name}")
+    for name in sorted(EXPECTED_SKILLS - skill_names):
+        errors.append(f"expected formal Skill missing: {name}")
+    if len(skill_names) != 16:
+        errors.append(f"Codex plugin must reference the 16 unique shared skills (found {len(skill_names)})")
     if (root / ".agents/skills").exists():
         errors.append("repo-local .agents/skills duplicates the formal bundled skills")
 

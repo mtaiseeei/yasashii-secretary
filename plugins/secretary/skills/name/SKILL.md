@@ -59,11 +59,11 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 ## rename
 
 1. `rename-preview --secretary <secretary> --name <新名> --home <HOME>` をread-only実行する。
-2. A=current-config、B=user-content、C=historical-author、D=unknown-or-conflictの件数、path、推奨処理、非対象、rollbackを示す。本文を大量表示しない。
+2. A=current-config、B=user-content、C=historical-author、D=unknown-or-conflictの件数、path、推奨処理、非対象、rollbackを示す。本文を大量表示しない。あわせてcanonical workspace root、Git top-level、今回の所有path、local checkpointが `required` か `not-applicable` か、pushしないことを表示する。
 3. Aは一体更新を必須確認する。Bはfileごとに選択を確認する。Cは保持して旧名をaliasへ追加する。Dは変更しない。
-4. 明示了承後だけ `rename-apply --confirm --confirm-class current-config` を実行する。Bを許可した場合だけ `--confirm-class user-content --user-content <preview済みpath>` を追加する。
+4. 明示了承後だけ `rename-apply --confirm --confirm-class current-config` を実行する。Bを許可した場合だけ `--confirm-class user-content --user-content <preview済みpath>` を追加する。workspace所有fileが変わる場合は、その所有pathだけのlocal checkpoint commitまで成功して初めて完了とする。workspace変更0件で有効なuser-scope managed blockだけを直す場合は `not-applicable` とし、commitを作らない。
 
-無条件grep置換、Git履歴書換え、過去author変更は行わない。途中失敗はtransactionで開始前へrollbackし、部分成功を完了表示しない。
+無条件grep置換、Git履歴書換え、過去author変更、push／fetch／remote／branch／tag操作は行わない。途中失敗はworkspace、user-scope、Git HEAD／index／working treeをtransaction開始前へrollbackし、部分成功を完了表示しない。
 同名、alias衝突、read-only、registry異常、symlink／junctionは安全停止する。
 
 ## author metadata

@@ -1,6 +1,6 @@
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, posix, relative, resolve, sep } from "node:path";
+import { dirname, join, posix, relative, resolve, sep } from "node:path";
 import { runExternalSync } from "./external-ops.mjs";
 
 const MAX_INSPECTABLE_BYTES = 5 * 1024 * 1024;
@@ -18,7 +18,7 @@ function git(root, args, { env = {}, allowFailure = false, encoding = "utf8" } =
     return runExternalSync(process.env.YASASHII_GIT_BIN || "git", args, {
       cwd: root,
       encoding,
-      env: { ...process.env, ...env },
+      env: { ...process.env, GIT_OPTIONAL_LOCKS: "0", ...env },
       maxBuffer: 16 * 1024 * 1024,
       timeoutMs: Number(process.env.YASASHII_GIT_TIMEOUT_MS || 30_000),
       label: "Git",
@@ -50,6 +50,42 @@ function normalizedPath(root, input) {
 export function normalizeOwnedPaths(root, paths) {
   const normalizedRoot = resolve(root);
   return [...new Set((paths || []).map((item) => normalizedPath(normalizedRoot, item)))].sort();
+}
+
+export function inspectOwnedCheckpoint(root, ownedPaths) {
+  const normalizedRoot = realpathSync(resolve(root));
+  const paths = normalizeOwnedPaths(normalizedRoot, ownedPaths);
+  const topLevel = realpathSync(resolve(git(normalizedRoot, ["rev-parse", "--show-toplevel"]).trim()));
+  if (topLevel !== normalizedRoot) {
+    throw new GitSafetyError("git-root-mismatch", "Git top-levelがcanonical workspaceの正確なrootと一致しません。");
+  }
+  for (const path of paths) {
+    let cursor = dirname(resolve(normalizedRoot, path));
+    while (cursor !== normalizedRoot) {
+      if (existsSync(join(cursor, ".git"))) throw new GitSafetyError("nested-repository", "nested別repo内のpathはcommit対象にできません。");
+      cursor = dirname(cursor);
+    }
+    git(normalizedRoot, ["ls-files", "--error-unmatch", "--", path]);
+  }
+  const ownedStatus = paths.length
+    ? git(normalizedRoot, ["status", "--porcelain=v1", "-z", "--untracked-files=all", "--", ...paths])
+    : "";
+  if (ownedStatus) {
+    throw new GitSafetyError("owned-path-dirty", "rename対象pathに開始前のGit変更があるため、自動checkpointへ含めません。");
+  }
+  const currentHead = head(normalizedRoot);
+  if (!currentHead) throw new GitSafetyError("head-missing", "既存Git HEADがないためrename checkpointを作成できません。");
+  return {
+    root: normalizedRoot,
+    topLevel,
+    head: currentHead,
+    branch: currentRef(normalizedRoot),
+    status: git(normalizedRoot, ["status", "--porcelain=v1", "-z", "--untracked-files=all"]),
+    staged: stagedSnapshot(normalizedRoot),
+    remotes: git(normalizedRoot, ["remote", "-v"]),
+    tags: git(normalizedRoot, ["show-ref", "--tags"], { allowFailure: true }) || "",
+    ownedPaths: paths,
+  };
 }
 
 function belongsTo(path, ownedPaths) {
@@ -391,7 +427,7 @@ export function restoreOwnedCommit({ root, oldHead, newHead, ownedPaths }) {
   if (oldHead) git(normalizedRoot, ["reset", "-q", oldHead, "--", ...paths]);
 }
 
-export function commitOwnedChanges({ root, ownedPaths, message, afterScan = null }) {
+export function commitOwnedChanges({ root, ownedPaths, message, afterScan = null, failAt = null }) {
   const normalizedRoot = resolve(root);
   const paths = normalizeOwnedPaths(normalizedRoot, ownedPaths);
   if (paths.length === 0) throw new GitSafetyError("owned-path-empty", "commit対象がありません。");
@@ -407,6 +443,9 @@ export function commitOwnedChanges({ root, ownedPaths, message, afterScan = null
   try {
     if (oldHead) git(normalizedRoot, ["read-tree", oldHead], { env });
     else git(normalizedRoot, ["read-tree", "--empty"], { env });
+    if (failAt === "stage") {
+      git(normalizedRoot, ["add", "--", ".secretary-intentional-missing-stage-fixture"], { env });
+    }
     git(normalizedRoot, ["add", "-A", "--", ...paths], { env });
     const candidates = changedPaths(normalizedRoot, env);
     if (candidates.length === 0) return { status: "unchanged", oldHead, newHead: oldHead, candidates: [] };
@@ -422,9 +461,13 @@ export function commitOwnedChanges({ root, ownedPaths, message, afterScan = null
     }
 
     // 利用者のGit hookが検査後の一時indexを書き換えないよう、このcommitだけ空のhook領域を使う。
-    git(normalizedRoot, ["-c", `core.hooksPath=${hooksDirectory}`, "commit", "-q", "-m", message], { env });
+    const commitArgs = failAt === "commit"
+      ? ["commit", "--secretary-intentional-invalid-option"]
+      : ["-c", `core.hooksPath=${hooksDirectory}`, "commit", "-q", "-m", message];
+    git(normalizedRoot, commitArgs, { env });
     newHead = head(normalizedRoot);
     if (!newHead || newHead === oldHead) throw new GitSafetyError("commit-failed", "安全なcommitを作成できませんでした。");
+    if (failAt === "post-commit") throw new GitSafetyError("post-commit-failed", "テスト用のcommit後確認失敗");
     const committed = git(normalizedRoot, ["diff-tree", "--root", "--no-commit-id", "--name-only", "-r", "-z", newHead])
       .split("\0")
       .filter(Boolean);
@@ -439,7 +482,13 @@ export function commitOwnedChanges({ root, ownedPaths, message, afterScan = null
     return { status: "committed", oldHead, newHead, candidates: committed };
   } catch (error) {
     if (newHead && head(normalizedRoot) === newHead) {
-      try { restoreOwnedCommit({ root: normalizedRoot, oldHead, newHead, ownedPaths: paths }); } catch { /* 元の例外を優先する */ }
+      try {
+        restoreOwnedCommit({ root: normalizedRoot, oldHead, newHead, ownedPaths: paths });
+      } catch (rollbackError) {
+        const wrapped = new GitSafetyError("rollback-failed", `commit失敗後のGit rollbackを完了できませんでした。手動確認が必要です: ${normalizedRoot}`);
+        wrapped.cause = rollbackError;
+        throw wrapped;
+      }
     }
     throw error;
   } finally {

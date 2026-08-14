@@ -8,8 +8,8 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const candidate = resolve(process.argv[2] || "");
-const FIXED_SHA = "3e08eb6d377392440e753bd5073c73d1d63399b6";
-const FIXED_DIGEST = "7498d3550734ba63b689463f01e2a52e16d2ce3f8eb31cebead16aef2181f883";
+const FIXED_SHA = "3fa8d97e5dbfb2afa314f4ad179f17401b76d320";
+const FIXED_DIGEST = "c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557";
 if (!candidate || !existsSync(candidate)) throw new Error("fixed Agentic archive path is required");
 
 const json = (path) => JSON.parse(readFileSync(path, "utf8"));
@@ -58,7 +58,7 @@ check("unoverlaid handoff common bytes match Agentic", () => {
     assert.equal(sha(readFileSync(join(ROOT, path))), sha(readFileSync(join(candidate, path))), path);
     exact += 1;
   }
-  assert.equal(exact, 11);
+  assert.equal(exact, 13);
 });
 
 check("Agentic docs and Sprint 039 test assets are not synchronized", () => {

@@ -1,12 +1,14 @@
 import { createHash, randomUUID } from "node:crypto";
 import {
-  existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync,
+  existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, renameSync, rmSync, writeFileSync,
 } from "node:fs";
 import { dirname, extname, join, relative, resolve, sep } from "node:path";
-import { identityPath, readIdentity, renamedIdentity } from "./secretary-identity.mjs";
+import { foldName, identityPath, readIdentity, renamedIdentity } from "./secretary-identity.mjs";
+import { commitOwnedChanges, inspectOwnedCheckpoint, restoreOwnedCommit } from "./safe-git.mjs";
 import {
   composeManagedBlock, inspectManagedRoutingBlock, inspectUserScopeRouting,
 } from "./user-scope-routing.mjs";
+import { inspectCanonicalWorkspace } from "./workspace-registry.mjs";
 
 const TEXT_EXTENSIONS = new Set([".md", ".txt", ".json", ".yaml", ".yml", ".toml"]);
 
@@ -55,14 +57,44 @@ function recommendation(kind) {
   }[kind];
 }
 
+function nextIdentityForRename(identity, newName) {
+  return foldName(identity.display_name) === foldName(newName) ? identity : renamedIdentity(identity, newName);
+}
+
+function canonicalWorkspace(root) {
+  const workspace = dirname(root);
+  const inspected = inspectCanonicalWorkspace(workspace);
+  if (inspected.status !== "valid") throw new Error(`canonical workspaceを確認できません: ${inspected.status}`);
+  if (resolve(join(inspected.workspace, "secretary")) !== root) throw new Error("secretary pathがcanonical workspaceの正確なrootを指していません。");
+  return inspected;
+}
+
+function workspaceRelativePaths(workspace, paths) {
+  return paths.map((path) => relative(workspace, path).split(sep).join("/"));
+}
+
+function checkpointSummary(inspected, gitState) {
+  return {
+    status: gitState.ownedPaths.length ? "required" : "not-applicable",
+    reason: gitState.ownedPaths.length ? "workspace所有fileが変更対象です。" : "workspace変更0件です。",
+    workspaceRoot: inspected.workspace,
+    gitTopLevel: gitState.topLevel,
+    edition: inspected.edition,
+    ownedPaths: gitState.ownedPaths,
+    push: "not-run",
+  };
+}
+
 export function previewRename({ secretaryRoot, newName, home = null } = {}) {
-  const root = resolve(secretaryRoot);
-  if (!existsSync(root) || lstatSync(root).isSymbolicLink() || !lstatSync(root).isDirectory()) throw new Error("secretary directoryを安全に確認できません。");
+  const requestedRoot = resolve(secretaryRoot);
+  if (!existsSync(requestedRoot) || lstatSync(requestedRoot).isSymbolicLink() || !lstatSync(requestedRoot).isDirectory()) throw new Error("secretary directoryを安全に確認できません。");
+  const root = realpathSync(requestedRoot);
   const identity = readIdentity(root);
-  const nextIdentity = renamedIdentity(identity, newName);
+  const nextIdentity = nextIdentityForRename(identity, newName);
+  const sameName = foldName(identity.display_name) === foldName(nextIdentity.display_name);
   const pattern = namePattern(identity.display_name);
   const matches = [];
-  for (const path of walk(root)) {
+  for (const path of sameName ? [] : walk(root)) {
     const content = readFileSync(path, "utf8");
     const count = [...content.matchAll(pattern)].length;
     if (!count) continue;
@@ -87,10 +119,22 @@ export function previewRename({ secretaryRoot, newName, home = null } = {}) {
       if (!target.enabled) continue;
       const content = readFileSync(target.path, "utf8");
       const managed = inspectManagedRoutingBlock(content);
+      const composed = composeManagedBlock(content, nextIdentity, { operation: "enable" });
       const count = [...managed.content.matchAll(pattern)].length;
-      if (count) matches.push({ classification: "current-config", path: target.path, count, recommended: recommendation("current-config"), scope: "user" });
+      if (composed.content !== content) matches.push({ classification: "current-config", path: target.path, count: Math.max(1, count), recommended: recommendation("current-config"), scope: "user" });
     }
   }
+  const workspaceTargets = [];
+  if (!sameName) {
+    workspaceTargets.push(identityPath(root));
+    const agentsPath = join(root, "AGENTS.md");
+    if (existsSync(agentsPath)) {
+      const before = readFileSync(agentsPath, "utf8");
+      if (inspectAgentsIdentity(before, identity.display_name, nextIdentity.display_name).content !== before) workspaceTargets.push(agentsPath);
+    }
+  }
+  const inspectedWorkspace = canonicalWorkspace(root);
+  const gitState = inspectOwnedCheckpoint(inspectedWorkspace.workspace, workspaceRelativePaths(inspectedWorkspace.workspace, workspaceTargets));
   const counts = Object.fromEntries(["current-config", "user-content", "historical-author", "unknown-or-conflict"].map((kind) => [kind, matches.filter((item) => item.classification === kind).reduce((sum, item) => sum + item.count, 0)]));
   return {
     status: "preview",
@@ -100,8 +144,9 @@ export function previewRename({ secretaryRoot, newName, home = null } = {}) {
     secretary_id: identity.secretary_id,
     counts,
     matches,
-    nonTargets: ["Git履歴", "historical-author", "unknown-or-conflict", "選択されていないuser-content"],
-    rollback: "identity、現行設定、選択済み本文を開始前snapshotへ戻します。",
+    checkpoint: checkpointSummary(inspectedWorkspace, gitState),
+    nonTargets: ["開始前のstage／unstaged／untracked", "remote／push／fetch／branch／tag", "Git履歴", "historical-author", "unknown-or-conflict", "選択されていないuser-content"],
+    rollback: "identity、現行設定、選択済み本文、Git HEAD／index／working treeを開始前snapshotへ戻します。",
   };
 }
 
@@ -135,17 +180,20 @@ export function applyRename({
   if (!confirm) throw new Error("rename applyは明示確認前のため変更しません。--confirm が必要です。");
   if (!confirmedClasses.includes("current-config")) throw new Error("current-config一体更新の確認がありません。");
   if (confirmedClasses.some((kind) => !["current-config", "user-content"].includes(kind))) throw new Error("履歴または所有不明の自動変更はできません。");
-  const root = resolve(secretaryRoot);
+  const requestedRoot = resolve(secretaryRoot);
+  if (!existsSync(requestedRoot) || lstatSync(requestedRoot).isSymbolicLink() || !lstatSync(requestedRoot).isDirectory()) throw new Error("secretary directoryを安全に確認できません。");
+  const root = realpathSync(requestedRoot);
   const preview = previewRename({ secretaryRoot: root, newName, home });
   const identity = readIdentity(root);
-  const nextIdentity = renamedIdentity(identity, newName);
+  const nextIdentity = nextIdentityForRename(identity, newName);
+  const sameName = foldName(identity.display_name) === foldName(nextIdentity.display_name);
   const availableB = new Set(preview.matches.filter((item) => item.classification === "user-content").map((item) => item.path));
   if (selectedUserContent.length && !confirmedClasses.includes("user-content")) throw new Error("user-content変更の分類確認がありません。");
   if (selectedUserContent.some((path) => !availableB.has(path))) throw new Error("previewにないuser-contentは変更できません。");
 
   const targets = new Map();
   const idPath = identityPath(root);
-  targets.set(idPath, `${JSON.stringify(nextIdentity, null, 2)}\n`);
+  if (!sameName) targets.set(idPath, `${JSON.stringify(nextIdentity, null, 2)}\n`);
   const agentsPath = join(root, "AGENTS.md");
   if (existsSync(agentsPath)) {
     const before = readFileSync(agentsPath, "utf8");
@@ -167,7 +215,27 @@ export function applyRename({
     }
   }
 
+  for (const [path, content] of [...targets]) {
+    const before = readFileSync(path);
+    if (digest(before) === digest(Buffer.from(content))) targets.delete(path);
+  }
+
+  const inspectedWorkspace = canonicalWorkspace(root);
+  const workspaceTargets = [...targets.keys()].filter((path) => {
+    const rel = relative(inspectedWorkspace.workspace, path);
+    return rel && rel !== ".." && !rel.startsWith(`..${sep}`);
+  });
+  const ownedPaths = workspaceRelativePaths(inspectedWorkspace.workspace, workspaceTargets);
+  const gitBefore = inspectOwnedCheckpoint(inspectedWorkspace.workspace, ownedPaths);
+  const allowedFailures = new Set(["before-checkpoint", "stage", "commit", "post-commit"]);
+  for (let index = 1; index <= targets.size; index += 1) allowedFailures.add(`before-write-${index}`);
+  if (failAt && !allowedFailures.has(failAt)) throw new Error(`未知のrename failure pointです: ${failAt}`);
+  if (failAt && ["before-checkpoint", "stage", "commit", "post-commit"].includes(failAt) && !workspaceTargets.length) {
+    throw new Error(`workspace変更0件のためfailure pointへ到達できません: ${failAt}`);
+  }
+
   const states = new Map([...targets.keys()].map((path) => [path, snapshot(path)]));
+  let checkpoint = null;
   try {
     let index = 0;
     for (const [path, content] of targets) {
@@ -177,18 +245,57 @@ export function applyRename({
       if (failAt === `before-write-${index}`) throw new Error("テスト用のrename部分書込み失敗");
       atomicReplace(path, bytes, states.get(path).mode);
     }
+    if (failAt === "before-checkpoint") throw new Error("テスト用のcheckpoint前失敗");
+    if (workspaceTargets.length) {
+      checkpoint = commitOwnedChanges({
+        root: inspectedWorkspace.workspace,
+        ownedPaths,
+        message: "[secretary-name] Record local rename checkpoint",
+        failAt: ["stage", "commit", "post-commit"].includes(failAt) ? failAt : null,
+      });
+      if (checkpoint.status !== "committed") throw new Error("required local checkpointを作成できませんでした。");
+      const gitAfter = inspectOwnedCheckpoint(inspectedWorkspace.workspace, ownedPaths);
+      if (gitAfter.head !== checkpoint.newHead || gitAfter.status !== gitBefore.status || gitAfter.staged !== gitBefore.staged
+        || gitAfter.branch !== gitBefore.branch || gitAfter.remotes !== gitBefore.remotes || gitAfter.tags !== gitBefore.tags) {
+        throw new Error("checkpoint後のGit状態が契約どおりではありません。");
+      }
+    } else {
+      checkpoint = { status: "not-applicable", oldHead: gitBefore.head, newHead: null, candidates: [] };
+    }
     return {
-      status: "renamed",
+      status: targets.size ? "renamed" : "unchanged",
       secretary_id: nextIdentity.secretary_id,
       oldName: identity.display_name,
       newName: nextIdentity.display_name,
       aliases: nextIdentity.aliases,
       updated: [...targets.keys()],
+      checkpoint: {
+        status: checkpoint.status === "committed" ? "required-completed" : "not-applicable",
+        reason: checkpoint.status === "committed" ? "workspace所有pathだけをlocal commitへ記録しました。" : "workspace変更0件のためlocal commitは作成していません。",
+        commit: checkpoint.status === "committed" ? checkpoint.newHead : null,
+        ownedPaths,
+        push: "not-run",
+      },
       preservedHistorical: preview.counts["historical-author"],
       unchangedUnknown: preview.counts["unknown-or-conflict"],
     };
   } catch (error) {
-    for (const [path, state] of [...states.entries()].reverse()) restore(path, state);
+    let rollbackError = null;
+    try {
+      if (checkpoint?.status === "committed") {
+        restoreOwnedCommit({ root: inspectedWorkspace.workspace, oldHead: checkpoint.oldHead, newHead: checkpoint.newHead, ownedPaths });
+      }
+      for (const [path, state] of [...states.entries()].reverse()) restore(path, state);
+      const gitRestored = inspectOwnedCheckpoint(inspectedWorkspace.workspace, ownedPaths);
+      if (gitRestored.head !== gitBefore.head || gitRestored.status !== gitBefore.status || gitRestored.staged !== gitBefore.staged) {
+        throw new Error("Git rollback後の状態が開始前と一致しません。");
+      }
+    } catch (failedRollback) {
+      rollbackError = failedRollback;
+    }
+    if (rollbackError) {
+      throw new Error(`rename rollbackを完了できませんでした。確認してください: ${[...states.keys()].join(", ")} / ${inspectedWorkspace.workspace}; ${rollbackError.message}`);
+    }
     throw error;
   }
 }
