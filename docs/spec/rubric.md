@@ -9,7 +9,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 ## 合格の基本条件
 
 - Evaluatorは対象スプリントの実物を動かし、実行コマンド、結果、対象ファイル／repo、模擬会話の入力と観測結果を feedback に残す。
-- C2・C5・C6・C9・C10・C11・C12・C13・C14・C15・C16・C17・C18 は5/5必須。対象Sprintの保証範囲で、1件でも構文欠陥、secret露出、安全違反、新規回帰、現行面の配布チャネル依存、無確認の更新副作用、Google ChatのOAuth／選択スペース境界違反、配布前gateの未達、edition境界違反、会話可読性の必須条件違反、正式ホスト配布面の欠落、Windows native保存／0.9.2下流同期の欠落、秘書identity／routing／改名境界違反、または既存workspace identity migrationの部分適用・履歴破壊があれば不合格。
+- C2・C5・C6・C9・C10・C11・C12・C13・C14・C15・C16・C17・C18・C19 は5/5必須。対象Sprintの保証範囲で、1件でも構文欠陥、secret露出、安全違反、新規回帰、現行面の配布チャネル依存、無確認の更新副作用、Google ChatのOAuth／選択スペース境界違反、配布前gateの未達、edition境界違反、会話可読性の必須条件違反、正式ホスト配布面の欠落、Windows native保存／0.9.2下流同期の欠落、秘書identity／routing／改名境界違反、既存workspace identity migrationの部分適用・履歴破壊、または明示memory依頼の重複実行・内容推測・scope逸脱・Yasashii下流境界違反があれば不合格。
 - Sprint 021は、Google Chatのlocal wizard session memory→`gh` stdin→Repository Secretと、Chatworkの利用者本人によるGitHub Repository Secret画面への直接入力という既存の2導線、および製品管理対象／初回publish inventoryにおける合理的な誤混入を0許容で評価する。Chatwork wizardへToken取得・受領・登録機能を要求しない。利用者が任意のJS／TS／shell／JSONを意図的に特殊構文・難読化・computed／escaped key・偽placeholderへ改変したケースの未検出だけでは不合格にしない。その形式を製品が生成する、または通常導線が実値を残すなら不合格とする。
 - 1軸でも閾値を下回ればスプリント全体を不合格にする。
 - やさしさの得点で安全・規律・回帰の欠陥を相殺しない。
@@ -65,6 +65,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 47. **呼び方・利用者中立性・下流同期**: Claude Code／Codexの4経路、account-name選択時だけのhost-task-context→Git→OS、正規化・全除外値・Unicode case-fold・hostname拒否、出典と推奨、候補なし、探索結果非保存、保存前確認を合成fixtureで確認する。既存変更は3正本一致、初回decision不変、失敗時完全rollbackを一時Git workspaceで確認する。Agentic完全SHA、review済みbase record、overlay apply／reapply、共通path byte一致、Yasashii固有surface不変、active surface scanと固定allowlistを証拠化する。
 48. **Windows native保存と0.9.2下流同期**: Agenticの固定完全SHA `24520a1d06f8d3833568a1386bf814e1085f5da9` と独立PASS記録を入力にし、Yasashiiのclean candidateで同じ12 Windows labelsを実行する。日本語・空白path、project作成／journal／memory／TODO／settings／文書保存、recursive copy、CRLF preferences、rollback、path guardを実動作で確認し、exit codeと `0xC0000005` の有無を記録する。macOS／Linux対象回帰、Git-free archive、overlay record／apply／check／reapply、common byte parity、Yasashii固有surface digest、0.9.2 manifest／marketplace／edition／CHANGELOG／release integrityも確認する。Windows証跡はcleanな固定SHAに対するユーザー所有実機の宣言を採用でき、関係コード変更時だけ失効する。UI、private版、cache、利用者workspace、service writeは対象外／0件であり、新しいcollectorを要求しない。
 49. **秘書identityと下流同期**: accepted Agentic candidate `3fa8d97e5dbfb2afa314f4ad179f17401b76d320`、digest `c810f60c3664ca331338e34680eec9bb6d21f8d850b97a39eef29f1a24f58557` のhandoff manifestに列挙された16 `commonPaths` だけを同期する。13 pathのbyte parity、`name`／`secretary`／`settings` の3宣言anchor、共通安全path `external-ops.mjs`／`safe-git.mjs`、overlay check／apply／reapply、未分類0件、保護surface digestを確認する。overlay metadataはcandidate／digest／16-path分類のhandoff所有fieldだけを整合更新し、他fieldと安全基準を保護する。合成HOMEと隔離workspaceで英語名の指定／提案、stable identity不変、AI author、名前Skill、canonical resolver、Codex／Claude user-scope managed block、direct／human／ambiguous routing、改名分類、確認、rollbackを実動作で検証する。実HOME、cache、private版、Mac mini、remote、releaseへのwriteは0件とし、Windowsはportable review、既存suite、実行済み環境証拠、残余リスクを分けて記録する。
+50. **明示memory authorizationとYasashii下流独立評価**: 固定base `3c472dd9a2b5299f27741ae2c418094486b7d035`、公開製品commit `09267e352db51227e3f1375d861df53139797249`、共通candidate ID `428b3ff435ee63bf47837e38792873264e14336e85ca1190bd823e80cbc67e0a`、Yasashii隔離product candidate ID `bb194d55a3cff4fe6fbfdb588f1db665d4fcd2ed4446482410ca9dc525490cfd` を固定する。handoff宣言common／adapted pathだけの適用、common byte parityまたはadapted marker、未分類0件、overlay record／apply／check／reapply二回目差分0件、Yasashii固有surface不変を確認する。実Yasashii sourceで専用15/15、Sprint 038／010／safety、release integrity、Git-free archive、conversation core inventory 17/17を実行し、実runtime goldenでrun-once、request／content hedge、pending、append-only訂正、内容dedupe、checkpoint partial、memory scope gate、既存6操作を確認する。公開PASSをYasashii PASSへ流用せず、UI変更と外部writeが0件であることを記録する。
 
 ## 必須の模擬会話
 
@@ -104,6 +105,13 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 32. **読みやすい複数要素の返答**: agentic／yasashiiで同じ複数手順、複数結果、部分失敗、handoffを返し、改行なしの平文が0件、必要な段落／箇条書きがあり、両editionの内容差が残る。1要点の短い確認は過剰なbulletにならない。
 33. **Codex正式pluginの新規導入**: Codex App／CLIを未導入状態から正式marketplace経由で導入し、新しいchat／sessionで正本15 skillが一意に見え、`$secretary` 等の明示呼出または「秘書を設定したい」の自然言語triggerからonboardingへ進む。legacy互換または手動skillsだけの構成では正式配布PASSを返さない。
 34. **既存`0.10.0`の名前移行**: Plugin更新済みでidentity未導入、identityだけ作成済み、完全適用済み、衝突ありの4 workspaceを新sessionまたは名前Skillから診断する。previewと英語名確認だけではwrite 0件、別確認後の成功ではidentity／AGENTS／CLAUDE／台帳が新規導入相当となる。利用者自由記述と開始前Git状態を保ち、代表failureは完全rollback、retryは1 checkpoint、rerunは差分・重複・追加commit 0件、user-scope routingは別確認のままである。
+35. **明示memoryの一度限り実行**: 「この方針を覚えて」と明示し、内部分類の再確認なしで同turnに1回だけ保存される。同じturn、retry、resumeで記録とcommitが増えない。
+36. **request／content uncertainty分離**: 保存依頼は明確だが期限または対象だけが曖昧な文を与え、確実部分だけが保存され、曖昧部分だけが質問またはpendingになる。推測値は保存されない。
+37. **pendingの再開**: pendingを作った後に不足情報を答え、完了済みcheckpointを重ねず未完了だけが完了する。無回答、拒否、別話題では勝手に補完しない。
+38. **訂正と内容dedupe**: 同じ意味の言い換えを再依頼して重複0件とし、後から内容を訂正して旧記録を残したappend-only新記録が現役になる。表記差と意味変更を区別する。
+39. **checkpoint partial**: 複数保存先の途中に代表failureを入れ、成功済み、未完了、失敗理由が区別される。retryでは未完了だけを実行し、最終状態に重複・partial残骸がない。
+40. **memory scope gateと既存6操作**: memory保存は一度で進む一方、削除、外部送信、公開、権限拡張、Secret、プロジェクト化を含む既存の確認対象は確認前副作用0件を保つ。
+41. **負ケースとYasashii分離**: 明示依頼でない相談、引用、否定、第三者の発話をmemory依頼へ昇格しない。Yasashiiの平易なcopyを実runtimeで確認し、公開Agentic出力や公開PASSだけでYasashii合格を作らない。
 
 個人化された文面の完全一致はassertしない。設定の読込、許可された分岐、既定へのフォールバック、確認フローを評価する。
 
@@ -129,6 +137,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 | C16 | Windows native保存・0.9.2下流同期 | 12 labels、Bash非依存、CRLF、rollback／path guard、overlay保護、release整合、外部write禁止 | **5** |
 | C17 | 秘書identity・routing・安全な改名 | 英語名、stable identity、AI author、canonical resolver、managed block、人名誤routing防止、分類付き改名、overlay保護 | **5** |
 | C18 | 既存workspace identity migration | 更新後handoff、read-only診断、別確認、identity／AGENTS／CLAUDE／台帳、自由記述保護、local checkpoint、rollback、冪等性、履歴保護 | **5** |
+| C19 | 明示memory authorization・内容冪等性・Yasashii下流分離 | run-once、不確実性分離、pending、純追加訂正、内容dedupe、partial、scope gate、固定handoff、固有surface保護、独立評価 | **5** |
 
 ## スコアアンカー
 
@@ -227,6 +236,11 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 - 5: Plugin更新とローカル移行を別状態として示し、4つの既存workspace状態をread-onlyで正しく診断する。英語名確認とapply確認を分け、確認後だけidentity、製品所有のAGENTS／CLAUDE identity管理節、最小台帳を新規導入相当へ一体更新する。利用者自由記述、他block、改行、mode、無関係record、開始前Git状態を保持し、所有pathだけのlocal checkpoint、全failure pointの完全rollback、failure後retry、成功後rerun差分0が成立する。固定Agentic HEAD／製品commit／20 commonPaths／digestが一致する。READMEはcurrent release／既存workspace migrationの製品所有段落だけが`0.10.1`へ更新され、同段落のYasashii固有の文体・構造とsemantic anchor、READMEのそれ以外のsection／段落のdigest、他のYasashii固有surface、`0.10.0`以前の履歴が不変である。user-scopeは別確認、3版PASS前のrelease関連write 0件である。
 - 4以下: Plugin更新だけの完了表示、状態誤判定、previewの副作用、名前了承とmigration許可の統合、identityだけの部分成功、AGENTS／CLAUDE全面上書き、自由記述・改行・mode・無関係recordの変化、台帳への名前／stable ID／本文／Secret保存、所有外commit、開始前Git状態の損失、rollback不完全、retry／rerun重複、user-scopeの同時有効化、fixed input不一致、commonPaths外同期、README許可段落以外の変化、README許可段落のYasashii固有文体・構造・semantic anchorの欠落、他のYasashii固有surface／過去release履歴の変更、3版PASS前のrelease／Mac mini／受講者向け配布のいずれかが1件でもある。→不合格。
 
+### C19 明示memory authorization・内容冪等性・Yasashii下流分離【ゼロ許容】
+
+- 5: 明示された低リスクmemory依頼が再確認なしで一度だけ実行され、request／content uncertainty、pending、append-only訂正、意味内容dedupe、checkpoint partial、memory scope gate、既存6操作が実runtime goldenで成立する。固定base／公開製品commit／両candidate IDが一致し、宣言common／adapted path以外0件、common byte parityまたはadapted marker、overlay二回目差分0件、Yasashii固有surface不変である。実Yasashii sourceの専用15/15、Sprint 038／010／safety、release integrity、Git-free archive、inventory 17/17が全PASSし、公開PASSを流用せず、UI／external write 0件である。
+- 4以下: 明示依頼の再確認または複数実行、依頼でない発話の保存、曖昧内容の推測保存、pending消失、訂正の破壊的置換、同義内容の重複、partialの完全成功表示、retryの成功済み再実行、memory scope外の確認省略、既存6操作の後退、fixed input不一致、未分類path、parity／marker不一致、overlay再適用差分、Yasashii固有surface変化、必須suite／inventory未達、公開PASSによる代替、UI変更、外部writeのいずれかが1件でもある。→不合格。
+
 ## スプリント別の重点
 
 | Sprint | 重点 |
@@ -268,6 +282,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 | 038-patch-002 | 固定Agentic `24520a1d...`、Windows native同一12 labels、project／journal／memory／TODO／settings／文書、recursive copy、CRLF、rollback／path guard、overlay byte parity・固有surface保護、0.9.2整合、macOS／Linux・archive無回帰、独立PASS前の公開禁止 |
 | 039 | accepted Agentic `3fa8d97e...`／digest `c810f60c...`、16 commonPaths（13 byte parity＋3 anchors、`external-ops.mjs`／`safe-git.mjs`を含む）、英語名／stable identity／AI author、名前Skill、canonical resolver、user-scope managed block、direct／human routing、分類付き改名／rollback、Yasashii固有surface保護、Windows残余の正直な区別、外部write禁止 |
 | 039-patch-001 | fixed Agentic HEAD `ba4fe4de...`／製品commit `3ef7928...`／digest `a7d74a7...`、20 commonPaths（16 byte parity＋4 anchors）、既存`0.10.0`のread-only診断、更新後handoff、別確認、identity／AGENTS／CLAUDE／台帳、自由記述保護、所有path checkpoint、完全rollback、retry／rerun、user-scope別確認、Yasashii `0.10.1`候補、3版PASS前release hold |
+| 040 | fixed base `3c472dd...`／公開製品commit `09267e3...`／common candidate `428b3ff...`／Yasashii isolated candidate `bb194d5...`、宣言common／adapted path、run-once、request／content hedge、pending、append-only訂正、内容dedupe、checkpoint partial、scope gate、既存6操作、実runtime golden、専用15/15、Sprint 038／010／safety、overlay冪等、release integrity、Git-free archive、inventory 17/17、Yasashii固有surface保護、独立PASS、UI／外部write 0件 |
 
 ## 差し戻し分類
 
@@ -279,6 +294,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 
 ## 更新履歴
 
+- 2026-08-26: 公開Agentic Sprint 040の独立PASS済み明示memory authorizationをYasashiiの次メインSprintとして契約化し、検証方法50、必須会話35〜41、C19を追加した。固定handoff、実runtime golden、下流固有surface保護、専用15/15と既存回帰、inventory 17/17、公開PASS非継承を5/5条件とする。
 - 2026-08-14: 既存`0.10.0`利用者はPlugin更新だけではローカルidentity面が新規導入相当へ揃わないことを受け、C18と必須会話34を追加した。read-only診断、英語名確認とapply確認の分離、identity／AGENTS／CLAUDE／台帳のatomic migration、自由記述・Git状態保護、完全rollback、retry／rerun、user-scope別確認、固定下流handoff、3版PASS前release holdを5/5条件とする。
 - 2026-07-21: ユーザー決定により、Sprint 033の過剰なformal gateを実用的な出荷受入へ戻した。private `origin/main` の `4670438` を完成候補とし、同一current bytesで取得済みの4 host固有証拠を再利用可能にした。検証方法43・44とC15は、正式manifest／marketplace、0.8.0／identity／skill、host別実会話8面、wizard、workspace変更0件、Secret露出0件、更新／再導入、全回帰・archive・validatorを5/5条件とする。`f285120`／`b9c0f3e` のschema v3 collector／driver／attestorはNon-scope／将来のoptional internal QAへ移した。品質基準を弱めたのではなく、製品動作と安全性の直接証拠を維持したまま、証明基盤だけを製品scopeから外した。
 - 2026-07-21: （直上の再改訂でsuperseded）current bytesの4 host実会話は個別PASSした一方、既存live gateに実host証拠を取得・固定するproduction driver／attestorがなく、合成fixtureのdriverしかformal schemaを完走できないspec-issueを受けて検証方法44とC15を改訂した。当時は実host層と隔離層の二層、CLI／App別collector、GUI AppのWrite／Editなし＋別隔離probe、approval／challenge／digest拘束、12 check／8 scenario exact coverage、secret／実path非保持、全失敗経路cleanup、fixture／事後result非昇格を必須化したが、製品scopeに対して過剰だったため現在の必須条件ではない。

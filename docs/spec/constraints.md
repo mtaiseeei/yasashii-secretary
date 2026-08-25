@@ -385,3 +385,16 @@
 13. 20 commonPathsは16件のbyte parityと、`name`／`secretary`／`settings`／`update` の4宣言anchorに分類する。新しいidentity migration、update-ledger、update Skill、CLAUDE templateを同期対象から外さず、未分類0件、check／apply／reapply二回目追加差分0件を満たす。
 14. Yasashii固有の文体、copy、style、rule manifest、配布identity、repository、marketplace、overlay所有field、repo-owned正本、Sprint／progress／feedback／evidence、LICENSE、公開済み`0.10.0`以前の履歴を保護する。READMEは全体digest固定の対象にせず、`0.10.1`のcurrent releaseと既存workspace migrationを説明する製品所有段落だけを更新できる。その段落でもYasashii固有の文体と構造を保ち、それ以外のsection／段落は開始前後digest不変、許可段落はversion、Plugin更新とローカル移行の分離、新session、別確認、任意のuser-scope routingというsemantic anchorを保つ。Agentic docs／state／release記録を同期しない。
 15. 本PatchはYasashii `0.10.1` candidateまでを扱う。Agentic／Yasashii／privateの3版がそれぞれfresh独立PASSする前に、tag、GitHub Release、marketplace公開、installed cache更新、Mac mini同期、受講者向け更新文の配布を行わない。
+
+## 23. 明示memory authorizationとSprint 040下流同期
+
+1. 「覚えて」「記憶して」等で低リスクのmemory保存が明示された場合、保存依頼そのものを内部分類のために再確認せず、そのturnで一度だけ実行する。無回答や曖昧な依頼を明示依頼へ昇格しない。
+2. request uncertaintyとcontent uncertaintyを分ける。依頼が明確でも内容が不確実なら、不確実な項目だけを質問またはpendingとして分離し、推測した内容を恒久記憶へ保存しない。
+3. 訂正はappend-only、つまり過去記録を消さず新しい記録を追加して現役内容を示す。同じ意味内容の再依頼、言い換え、retry、resumeは意味内容keyで重複抑止し、表記差だけで別の恒久記憶を増やさない。
+4. 複数保存先・複数段階の処理はcheckpoint単位で完了状態を持つ。途中失敗は成功済み、未完了、失敗理由を区別し、再開時は未完了だけを実行する。partialを完全成功と表示せず、成功済みをrollbackなしに重複実行しない。
+5. 確認省略はmemory scope gateの内側だけに適用する。既存6操作、削除、外部送信、公開、権限拡張、Secret、プロジェクト化、破壊的変更が要求する確認・停止条件を弱めない。
+6. 同期入力は固定base `3c472dd9a2b5299f27741ae2c418094486b7d035`、公開製品commit `09267e352db51227e3f1375d861df53139797249`、共通candidate ID `428b3ff435ee63bf47837e38792873264e14336e85ca1190bd823e80cbc67e0a`、Yasashii隔離product candidate ID `bb194d55a3cff4fe6fbfdb588f1db665d4fcd2ed4446482410ca9dc525490cfd` に固定する。公開PASSは入力の妥当性を示すだけで、Yasashii PASSへ昇格しない。
+7. handoffで宣言されたcommon／adapted pathだけを固定baseから適用する。common pathは公開candidateとのbyte parity、adapted pathはhandoffの宣言markerを満たし、未分類追加・変更・削除は0件、overlay record／apply／check／reapplyの二回目追加差分は0件とする。
+8. Yasashii固有の文体、copy、style、`edition.json`、overlay正本／metadata、README、LICENSE、repo-owned docs、Harness履歴を保護する。Agenticのdocs／state／progress／feedback／release記録をYasashii正本へ同期しない。
+9. 実Yasashii sourceで専用15/15、Sprint 038、Sprint 010、安全回帰、overlay record／apply／check／reapply、release integrity、Git-free archive、conversation core inventory 17/17を実行し、固定candidateとclean treeに結びつくcommand／結果を記録する。
+10. Sprint 040ではUIを変更しない。push、tag、Release、marketplace、installed plugin／cache、利用者workspace、Mac mini、remote、external serviceへのwriteはNon-scopeとする。private版は別repoの別Sprintで独立適用・独立評価する。

@@ -2,12 +2,12 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-039-patch-001
+- Current ID: sprint-040
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 9
-- Model Tier: standard
-- Rotate: none
+- Lineage Dispatches: 1
+- Model Tier: strong
+- Rotate: model-escalation
 - Next Planned: TBD
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
@@ -71,12 +71,14 @@
 | sprint-038-patch-002 | done-by-user-decision | [contract](sprint-038-patch-002.md) | [progress](../progress/sprint-038-patch-002.md) | [feedback](../feedback/sprint-038-patch-002.md) |
 | sprint-039 | done | [contract](sprint-039.md) | [progress](../progress/sprint-039.md) | [feedback](../feedback/sprint-039.md) |
 | sprint-039-patch-001 | done | [contract](sprint-039-patch-001.md) | [progress](../progress/sprint-039-patch-001.md) | [feedback](../feedback/sprint-039-patch-001.md) |
+| sprint-040 | active | [contract](sprint-040.md) | - | - |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-26: 公開Agentic Sprint 040がproduct commit `09267e352db51227e3f1375d861df53139797249`、共通candidate `428b3ff435ee63bf47837e38792873264e14336e85ca1190bd823e80cbc67e0a` でfresh独立Evaluator PASS。ユーザー承認済みの3版反映として、Yasashii固定base `3c472dd9a2b5299f27741ae2c418094486b7d035` へhandoffの23 common＋5 Yasashii exactを限定適用し、隔離candidate `bb194d55a3cff4fe6fbfdb588f1db665d4fcd2ed4446482410ca9dc525490cfd`を実sourceへ反映する次メインSprint `sprint-040` を開始する。公開PASSはYasashii PASSへ昇格せず、Yasashii固有文体／overlay／README／LICENSE／repo-owned docsを保護して別評価する。high risk routeのfresh Generator予約としてLineage Dispatches 1、Model Tier strong、Rotate model-escalation、Status activeとする。push、tag、Release、marketplace、cache、workspace、external writeは対象外。
 - 2026-08-14: Sprint 039 Patch 001はproduct／test candidate `372791fdcd99eb5deb42199a97257ff53b63612e` でfresh独立Evaluator PASS。overlay fixed upstream product `3ef792819a4a445df089f70aa74ca09176762e5e`、digest `a7d74a7a9bb42ea67815a75132acf588fe312314f98b7f9685cef97fdfca59c9`、20 paths＝16 parity＋4 anchors、secondChanged=0。独自workspaceでread-only digest一致、post-commit完全rollback、retryの4 owned paths限定commit、CRLF／mode／自由記述／Git状態／user-scope不変、rerun commit0、README許可1段落以外のsentinel digest一致を確認。clean checkout／Git-free archive wrapper各0 FAIL、archive master required17/17・308 PASS／0 FAIL・infra0。product finding 0、blocking verification-infra0、必須内部未検証0、C2／C5／C6／C9／C10／C13／C14／C16／C17／C18は全5/5。Windows nativeはnot-runのまま、external write0。Status done、Retry／Spec-Issue0、Lineage Dispatches9、全計画完了のためModel Tier standard、Rotate noneとしてrelease運用phaseへ渡す。
 - 2026-08-14: Sprint 039 Patch 001 Generatorが最終product／test candidate `372791fdcd99eb5deb42199a97257ff53b63612e`、progress commit `eb74e799999a093032bd0dac13c53afb5bf74eee` を作成。accepted upstream20 pathsを16 byte parity＋4 Yasashii anchorsとしてoverlay同期し、既存v0.10.0完全migration、update handoff、0.10.1 current、checkpoint／rollback／retry／rerunを実装。READMEは許可されたcurrent／migration段落だけ更新し、Yasashii文体・構造・semantic anchorを保持、他段落と0.10.0以前の履歴bytesを不変とした。clean checkout／Git-free archive両面でoverlay check／reapply、secondChanged=0、overlay6/6、Patch wrapper10/10、migration23/23、rename16/16、Sprint039 69/69、Git safety71/71、Sprint035 15/15、schema、release integrityを0 FAIL。archive master required17/17、308 PASS／0 FAIL、verification-infra0。開始HEADのhistorical stale10 FAILは同じ7 suiteで再現し、正式anchor追随後0 FAIL、製品意味・安全境界・履歴bytesを緩和していない。実HOME、cache、private、Mac mini、remote、release write 0。fresh独立Evaluator予約としてLineage Dispatches 9、Status awaiting-eval、Retry 0、Spec-Issue 1、Model Tier strong、Rotate noneとする。
 - 2026-08-14: fresh PlannerがSprint 039 Patch 001のspec-issueを限定修正。AC3のREADME全体digest不変を撤回し、0.10.1 current release／既存workspace migrationを説明する製品所有段落だけを更新可能とした。同段落はYasashii固有の文体・構造とsemantic anchorを保持し、それ以外のREADME section／段落と他保護surfaceはdigest不変。Scope G／AC17／C18と整合し、新規AC・閾値追加はない。Retry Count 0、Spec-Issue Count 1、Model Tier strongを維持し、fresh strong Generator dispatch予約としてLineage Dispatchesを8、Status active、Rotate noneとする。
