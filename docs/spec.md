@@ -84,15 +84,17 @@ release、Mac mini同期、受講者向け更新文を開始しない。
 候補は名前らしい値だけを出典つきで提案し、探索結果ではなく確認済みの呼び方だけを保存する。
 Agenticの合格済み固定candidateをreview済みbaseとしてYasashiiの宣言済みoverlayへ同期し、
 Yasashii固有の言葉遣い・identity・repo-owned正本を維持する。
-2026-08-26、公開Agentic Sprint 040で独立評価PASSした明示memory authorizationを、固定base
-`3c472dd9a2b5299f27741ae2c418094486b7d035` から宣言済みcommon／adapted pathだけへ適用し、
-Yasashiiの次メインSprint 040として独立評価する方針を確定した。公開製品commitは
-`09267e352db51227e3f1375d861df53139797249`、共通candidate IDは
-`428b3ff435ee63bf47837e38792873264e14336e85ca1190bd823e80cbc67e0a`、Yasashii隔離product candidate IDは
-`bb194d55a3cff4fe6fbfdb588f1db665d4fcd2ed4446482410ca9dc525490cfd` に固定する。公開版のPASSはYasashii版へ
-引き継がず、明示memory依頼の一度限り実行、依頼と内容の不確実性分離、pending、純追加訂正、内容重複抑止、
-checkpoint partial、memory scope gate、既存6操作を実Yasashii sourceで検証する。Yasashii固有の文体、copy、
-`edition.json`、overlay正本／metadata、README、LICENSE、repo-owned docs、Harness履歴を保護する。
+2026-08-26、公開Agentic Sprint 040と、その下流handoffを実行正本へ接続したPatch 001で独立評価PASSした
+明示memory authorizationを、固定base `3c472dd9a2b5299f27741ae2c418094486b7d035` からYasashiiへ適用し、
+次メインSprint 040として独立評価する方針を確定した。製品bytesの公開正本は
+`9acea13477cd7730bf064a32c170b752586fa116`、公開candidate IDは
+`36a5c5f5482fcd510e5b361bdf9e24620be696046e248fb29b3b557800cc083d`、Yasashii隔離product candidate IDは
+`4bc87169d87baf90f9681f7ba07d3154c71df34eac78bad15b435732e876faf2`、schema 3 handoff digestは
+`e515842b147393ac77dddfb94d000188916d4aa837fda17d7e8fb4015f844982` に固定する。公開repoの後続docs／state HEADは
+PASSの参照記録であってYasashiiへ適用する製品bytesではない。parity／adapted／supportingの排他的な集合と実action traceを
+manifest／builder runから機械導出し、公開版のPASSはYasashii版へ引き継がない。明示memory依頼の一度限り実行、依頼と内容の
+不確実性分離、pending、純追加訂正、内容重複抑止、checkpoint partial、memory scope gate、既存6操作を実Yasashii sourceで
+検証する。Yasashii固有の文体、copy、`edition.json`、overlay正本／metadata、README、LICENSE、repo-owned docs、Harness履歴を保護する。
 
 ## ひとことで
 

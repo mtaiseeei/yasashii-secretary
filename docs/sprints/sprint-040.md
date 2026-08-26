@@ -15,14 +15,15 @@ Yasashiiのローカルsource反映とoffline独立評価は承認範囲であ�
 
 | 項目 | 値 |
 |---|---|
-| 公開製品commit | `09267e352db51227e3f1375d861df53139797249` |
-| 公開共通candidate ID | `428b3ff435ee63bf47837e38792873264e14336e85ca1190bd823e80cbc67e0a` |
+| 公開製品candidate commit | `9acea13477cd7730bf064a32c170b752586fa116` |
+| 公開candidate ID | `36a5c5f5482fcd510e5b361bdf9e24620be696046e248fb29b3b557800cc083d` |
 | Yasashii固定base | `3c472dd9a2b5299f27741ae2c418094486b7d035` |
-| Yasashii隔離product candidate ID | `bb194d55a3cff4fe6fbfdb588f1db665d4fcd2ed4446482410ca9dc525490cfd` |
-| handoff | 公開版 `scripts/fixtures/sprint-040/downstream-handoff.json` schema 2 |
+| Yasashii隔離product candidate ID | `4bc87169d87baf90f9681f7ba07d3154c71df34eac78bad15b435732e876faf2` |
+| handoff | 公開版 `scripts/fixtures/sprint-040/downstream-handoff.json` schema 3、SHA-256 `e515842b147393ac77dddfb94d000188916d4aa837fda17d7e8fb4015f844982` |
 | inventory | 公開版 `plugins/secretary/conversation-core-inventory.json` schema 1、17 unique surface |
 
 公開版はfresh独立Evaluator PASS済みだが、そのPASSをYasashii版へ昇格しない。
+公開repoの最終docs／state HEADはPASSの参照記録に限り、Yasashiiへ適用する製品bytesは上記commitだけを正本とする。
 隔離candidate IDは固定baseへhandoffの製品・回帰pathだけを適用した識別であり、
 Yasashiiが所有するspec、state、progress、feedback、overlay記録を含む最終repo全体IDではない。
 
@@ -41,10 +42,14 @@ Yasashiiが所有するspec、state、progress、feedback、overlay記録を含�
 ### A. handoff検証と限定適用
 
 1. 公開製品commit、公開candidate ID、Yasashii固定base、隔離candidate ID、handoff／inventory schemaとdigestを適用前に照合する。不一致ではwrite前に停止する。
-2. `downstream-handoff.json`の`exactCommonPaths` 23件と`yasashiiExactPaths` 5件を製品・回帰の入力母集団とする。重複する`secretary/SKILL.md` 1件を除くunionは27件で、公開builderが宣言するYasashii適応3件を同じpathの宣言anchorとして扱う。
-3. 固定baseからの製品・回帰差分は、最終byte parity 24件と宣言adapted 3件のunion 27件だけに限定する。canonical docsとhandoffを適用するためのrepo-owned overlay metadata／回帰入口は別classとして明示し、未分類pathを0件にする。
-4. common pathは公開candidateとmode／bytes一致、adapted pathは公開意味契約を保った宣言anchor／marker一致を要求する。anchorが0件または複数件なら部分適用せず停止する。
-5. 一回適用後の`check`、二回目の`reapply`で追加差分0件とし、fixed inputから隔離product candidate ID `bb194d55...`を再現する。repo-owned docsを含む最終treeへ同IDを要求しない。
+2. schema 3 manifestの`sharedParity`とYasashii editionの`parity`／`adapted`／`supporting`を、同一edition内で排他的な3役として扱う。declared input union、各intersection、builderのread／copy／write／execute／protect、固定baseからのactual diffを同じbuilder runから機械導出し、manifestの固定件数を書き写して合否を決めない。
+3. parityは公開candidateとのpath／mode／bytes一致、adaptedは宣言transformer、入力anchorの出現回数、実変換の適用回数、最終digest一致、supportingは製品差分0かつ実read／execute／protectを要求する。copy後にadaptするpathはcopyとwriteの両actionをtraceへ記録しつつadaptedへ一度だけ分類する。`scripts/sprint-038-test.mjs`はYasashiiのadaptedでありparityへ二重計上しない。
+4. builderの実actionまたはactual diffに対する未分類、role重複、未利用宣言、stale path、未収載mutationを0件にする。`publicWholeTree`のroot／exclusions、存在しない・複数出現・実変換点でないanchor、transformer不一致、copy後adaptのtrace欠落を負fixtureで検出し、下流write前に停止する。
+5. 一回適用後の`check`、二回目の`reapply`で追加差分0件とし、fixed inputから隔離product candidate ID `4bc87169...`を再現する。repo-owned docsを含む最終treeへ同IDを要求しない。
+
+公開PASS runで観測されたYasashiiの集計はparity 29、adapted 3、supporting 5、declared union 37、
+actual diff 28、copy action 31である。この集計は入力の取り違えを診断する参照値であり、固定件数そのものを
+合格正本にしない。合否は上記manifest／実action／actual diffから同じrunで再算出した集合と関係で決める。
 
 ### B. memory authorizationのrun-once
 
@@ -111,9 +116,9 @@ Yasashii適応対象では、公開版の技術的表現を無条件にbyte copy
 ## Acceptance Criteria
 
 1. 固定入力5点を適用前に照合し、公開commit／candidate、Yasashii base／candidate、handoff／inventoryの不一致ではwrite 0件で停止する。
-2. handoffの23 common＋5 Yasashii exact（重複1、union 27）を固定し、固定baseからの製品・回帰差分は宣言common／adapted pathだけで、repo-owned supporting pathを含む全差分の分類漏れが0件である。
-3. union 27件は最終byte parity 24件、宣言adapted 3件となり、adapted pathは宣言anchor／marker一致、anchor欠落／重複、部分適用、共通byte不一致が0件である。
-4. overlayの`record`、`apply`、`check`、`reapply`がすべて成功し、二回目の変更0件、未分類path 0件、隔離product candidate ID `bb194d55...`再現となる。最終repo全体IDへ同値を誤要求しない。
+2. schema 3 manifestと同じrunからYasashiiのparity／adapted／supporting、declared input union、各intersectionを機械算出でき、3役の重複、未利用宣言、stale pathが0件である。観測件数の固定値だけではPASSにしない。
+3. builderのread／copy／write／execute／protect集合とrole actionが一致し、actual diffはparityまたはadaptedだけ、supportingとのintersectionと未分類mutationは空集合である。parityのmode／bytes、adaptedのtransformer／anchor occurrence／実application／final digest、copy後adaptのtraceが全件一致し、`scripts/sprint-038-test.mjs`の二重分類が0件である。
+4. `publicWholeTree`のroot／exclusions、anchor不存在／複数出現／実変換点不一致、transformer不一致、copy後adapt trace欠落の各負fixtureがwrite前に非0で停止する。overlayの`record`、`apply`、`check`、`reapply`はすべて成功し、二回目の変更0件、隔離product candidate ID `4bc87169...`再現となる。最終repo全体IDへ同値を誤要求しない。
 5. 「これ覚えて」をdecision相当／topic相当で実行し、内部分類、file、要約案の質問0件、同じassistant turnの保存各1件となる。
 6. request hedgeは質問前write 0件、推量／伝聞を含む明示保存は同じturnで各1件となり、情報源・確実性・否定・条件・訂正関係の欠落・反転・入力にない追加が0件である。
 7. 依頼語の引用、現在依頼ではない仮定、取消、過去照会はwrite 0件で、保存済み取消は削除2段階を維持する。
@@ -135,7 +140,7 @@ Yasashii適応対象では、公開版の技術的表現を無条件にbyte copy
 
 - 対象環境: Yasashii実source、固定baseから作る同一bytes隔離candidate、同candidateのGit-free archive。
 - 必須シナリオ: AC1〜20、rubricの必須模擬会話35〜41、既存Secret／削除／external／一括負例。
-- 対象surface: handoffの宣言common／adapted path、conversation-core inventory 17 entry、実memory／journal／checkpointシーム、Yasashii保護surface。
+- 対象surface: schema 3 handoffのparity／adapted／supportingと実action／actual diff、conversation-core inventory 17 entry、実memory／journal／checkpointシーム、Yasashii保護surface。
 - 必須offline gate: 専用15/15、Sprint 038／010、安全回帰、overlay record／apply／check／reapply、release integrity、Git-free archive、inventory 17/17。
 - UI: 対象なし。browser操作・screenshotを合格条件にしない。
 - 外部操作: remote fetch／push、tag、Release、marketplace、install／update、workspace migration、Mac mini同期、external serviceは0件。
@@ -143,8 +148,9 @@ Yasashii適応対象では、公開版の技術的表現を無条件にbyte copy
 ### Evidence safe harbor
 
 - 固定入力のcommit／candidate ID／schema／digest照合、source root、開始・終了HEAD、`git status --short`。
-- fixed base→candidateの全変更pathと分類（common／adapted／repo-owned supporting）、mode／digest、未分類件数。
-- common byte parity一覧、adapted pathのanchor／marker、overlay `record`／`apply`／`check`／`reapply`結果、`secondChanged=0`、隔離candidate ID。
+- manifest／runから機械導出したparity／adapted／supporting／declared union、各intersection、builderのread／copy／write／execute／protect、fixed base→candidateのactual diff、mode／before-after digest、未分類件数。
+- parity byte／mode一覧、adapted pathのtransformer／anchor occurrence／実application／final digest、copy後adapt trace、supportingの実利用、overlay `record`／`apply`／`check`／`reapply`結果、`secondChanged=0`、隔離candidate ID。
+- `publicWholeTree`のroot／exclusions、anchor不存在／複数出現／実変換点不一致、transformer不一致、copy後adapt trace欠落を拒否する負fixture結果。
 - 実行command、exit code、PASS／FAIL／NOT-RUN件数、失敗内容。suite名とassert数を分ける。
 - case ID、入力、期待／観測authorization、meaning tuple、response state、memory／decision／topic／journal／commitの前後件数とdigest。
 - pendingのcontent／scope／anchor／失効、topic訂正の旧内容digestと新event、content keyの同一／差異。

@@ -480,10 +480,13 @@ Yasashii固有の文体、README、配布identity、overlay、repo-owned正本�
 成功済みと未完了を区別し、再開時は未完了だけを実行する。memory scope gateの外にある操作と既存6操作は従来の確認を保つ。
 
 Yasashiiへの入力は、固定base `3c472dd9a2b5299f27741ae2c418094486b7d035`、公開製品commit
-`09267e352db51227e3f1375d861df53139797249`、共通candidate ID
-`428b3ff435ee63bf47837e38792873264e14336e85ca1190bd823e80cbc67e0a`、Yasashii隔離product candidate ID
-`bb194d55a3cff4fe6fbfdb588f1db665d4fcd2ed4446482410ca9dc525490cfd` に固定する。handoffで宣言されたcommon pathは
-byte parity、adapted pathは宣言済みmarkerを満たし、未分類pathは0件、二回適用後の差分は0件でなければならない。
+`9acea13477cd7730bf064a32c170b752586fa116`、公開candidate ID
+`36a5c5f5482fcd510e5b361bdf9e24620be696046e248fb29b3b557800cc083d`、Yasashii隔離product candidate ID
+`4bc87169d87baf90f9681f7ba07d3154c71df34eac78bad15b435732e876faf2`、schema 3 handoff digest
+`e515842b147393ac77dddfb94d000188916d4aa837fda17d7e8fb4015f844982` に固定する。公開repoの後続docs／state HEADは
+参照記録に限り、製品bytes入力へ読み替えない。handoffのparity／adapted／supportingは排他的で、manifestと実runから
+集合、action、差分を機械導出する。parityはbyte／mode一致、adaptedは宣言transformer／anchorの実測一致、supportingは
+製品差分0かつ実利用を満たし、未分類pathは0件、二回適用後の差分は0件でなければならない。
 Yasashii固有の文体、copy、style、`edition.json`、overlay正本／metadata、README、LICENSE、repo-owned docs、
 Harness履歴を保護し、公開版のPASSをYasashii版へ昇格しない。
 
