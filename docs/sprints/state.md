@@ -5,7 +5,7 @@
 - Current ID: sprint-040
 - Retry Count: 0
 - Spec-Issue Count: 1
-- Lineage Dispatches: 2
+- Lineage Dispatches: 3
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
@@ -71,13 +71,14 @@
 | sprint-038-patch-002 | done-by-user-decision | [contract](sprint-038-patch-002.md) | [progress](../progress/sprint-038-patch-002.md) | [feedback](../feedback/sprint-038-patch-002.md) |
 | sprint-039 | done | [contract](sprint-039.md) | [progress](../progress/sprint-039.md) | [feedback](../feedback/sprint-039.md) |
 | sprint-039-patch-001 | done | [contract](sprint-039-patch-001.md) | [progress](../progress/sprint-039-patch-001.md) | [feedback](../feedback/sprint-039-patch-001.md) |
-| sprint-040 | active | [contract](sprint-040.md) | - | - |
+| sprint-040 | awaiting-eval | [contract](sprint-040.md) | [progress](../progress/sprint-040.md) | - |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-26: schema 3整合後のfresh Generatorがproduct／test candidate `9089a05f85b307d52aba0b02b54a9670c60d4fad` を実Yasashiiへ同期。accepted actual diff 28 path、overlay正本4、Yas実source fixture1、既存progress追記1の34 filesを所有範囲commitとした。pre-write handoff 12/12、inventory 8/8、Yas ID `4bc87169...`再現、実source Sprint 040 15/15、Yas fixture 9/9、Sprint 038 67/67＋14/14＋3/3、Sprint 010 56/56、Git／Secret 71/71、release integrity、accepted Git-free candidate full suiteがPASS。overlay record 628／check PASS／apply changed0／reapply secondChanged0。staged-tree Git-freeはrelease 14/14、source fixture 9/9、Sprint 040 15/15。初回実source wrapperの固定base旧docs digest比較FAILは、承認済みPlanner docs保持との検証面不一致として分離し、固定candidate edition 3/3と実source fixture 9/9で適用面を別証明した。protected bytes不変、private／external write0。fresh独立Evaluator予約としてLineage Dispatches 3、Status awaiting-eval、Retry 0、Spec-Issue 1、Model Tier strong、Rotate noneへ更新する。
 - 2026-08-26: ユーザーが「Yasashii Sprint 040のactive契約とrubricに残る旧schema 2条件を、公開PASS済みschema 3条件へ置換してよい」と明示承認。fresh Plannerがcommit `4a9a913` で固定入力を公開product `9acea13477cd7730bf064a32c170b752586fa116`、public ID `36a5c5f5482fcd510e5b361bdf9e24620be696046e248fb29b3b557800cc083d`、Yasashii ID `4bc87169d87baf90f9681f7ba07d3154c71df34eac78bad15b435732e876faf2`、schema 3 digest `e515842b147393ac77dddfb94d000188916d4aa837fda17d7e8fb4015f844982`へ更新し、parity／adapted／supporting排他、manifest／実action／actual diff同一run照合、anchor実測、copy後adapt trace、pre-write負例をactive契約／rubricへ整合した。memory AC、rubric閾値、Yasashii保護境界は不変。旧schema 2期待のactive残存0。Spec-Issue Count 1を履歴として保持し、fresh Generator予約でLineage Dispatches 2、Status active、Model Tier strong、Rotate noneとする。
 - 2026-08-26: Sprint 040 Generatorのpre-write停止を`spec-issue`として受理。旧公開入力 `09267e3`／schema 2／Yasashii candidate `bb194d55...` は、path union 28に対する未宣言mutation 1件のため適用不能だった。公開Agentic `sprint-040-patch-001`が最終product candidate `9acea13477cd7730bf064a32c170b752586fa116`、schema 3 manifest digest `e515842b147393ac77dddfb94d000188916d4aa837fda17d7e8fb4015f844982`、accepted Yasashii ID `4bc87169d87baf90f9681f7ba07d3154c71df34eac78bad15b435732e876faf2` でfresh独立Evaluator PASSしたため、Spec-Issue Count 1、Lineage Dispatches 1、Status active、Model Tier strongを維持してfresh Plannerへ正本修正を戻す。Plannerはparity／adapted／supportingの排他分類、実trace、anchor実測、固定base archive、下流pre-write gateを契約へ反映する。Yasashii製品write、private、release、cache、workspace、external writeは0件のまま。
 - 2026-08-26: 公開Agentic Sprint 040がproduct commit `09267e352db51227e3f1375d861df53139797249`、共通candidate `428b3ff435ee63bf47837e38792873264e14336e85ca1190bd823e80cbc67e0a` でfresh独立Evaluator PASS。ユーザー承認済みの3版反映として、Yasashii固定base `3c472dd9a2b5299f27741ae2c418094486b7d035` へhandoffの23 common＋5 Yasashii exactを限定適用し、隔離candidate `bb194d55a3cff4fe6fbfdb588f1db665d4fcd2ed4446482410ca9dc525490cfd`を実sourceへ反映する次メインSprint `sprint-040` を開始する。公開PASSはYasashii PASSへ昇格せず、Yasashii固有文体／overlay／README／LICENSE／repo-owned docsを保護して別評価する。high risk routeのfresh Generator予約としてLineage Dispatches 1、Model Tier strong、Rotate model-escalation、Status activeとする。push、tag、Release、marketplace、cache、workspace、external writeは対象外。
