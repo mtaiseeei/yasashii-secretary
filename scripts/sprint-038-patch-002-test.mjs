@@ -18,7 +18,7 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
-const FIXED_UPSTREAM = "24520a1d06f8d3833568a1386bf814e1085f5da9";
+const FIXED_UPSTREAM = "9acea13477cd7730bf064a32c170b752586fa116";
 const candidateValue = process.argv.find((value, index) => process.argv[index - 1] === "--candidate")
   || process.env.AGENTIC_SECRETARY_CANDIDATE;
 const requireWindows = process.argv.includes("--require-windows");
@@ -137,8 +137,8 @@ function countLabels(source, prefix) {
 check("fixed upstream base, release candidate and complete tree are recorded", () => {
   const base = JSON.parse(readFileSync(join(overlayRoot, "upstream-base.json"), "utf8"));
   assert.equal(base.baseCommit, FIXED_UPSTREAM);
-  assert.equal(base.releaseCandidate, "0.9.2");
-  assert.equal(base.externalLiveGate, "upstream-0.9.2-release-verified");
+  assert.equal(base.releaseCandidate, "0.10.2");
+  assert.equal(base.externalLiveGate, "upstream-sprint-040-patch-001-product-pass-verified");
   assert.equal(base.remoteContract.upstreamPush, "disabled");
   assert.equal(snapshot.baseCommit, FIXED_UPSTREAM);
   assert.equal(snapshot.files.length, walkFiles(candidate).length);
@@ -166,7 +166,7 @@ check("current overlay check protects owned and definition digests", () => {
   assert.match(text, /upstreamPush=disabled/u);
 });
 
-check("Yasashii identity, copy, Harness route, rule graph and 0.10.1 release surfaces are intact", () => {
+check("Yasashii identity, copy, Harness route, rule graph and 0.10.2 release surfaces are intact", () => {
   const claudeMarket = JSON.parse(readFileSync(join(ROOT, ".claude-plugin/marketplace.json"), "utf8"));
   const codexMarket = JSON.parse(readFileSync(join(ROOT, ".agents/plugins/marketplace.json"), "utf8"));
   const claudePlugin = JSON.parse(readFileSync(join(ROOT, "plugins/secretary/.claude-plugin/plugin.json"), "utf8"));
@@ -174,12 +174,12 @@ check("Yasashii identity, copy, Harness route, rule graph and 0.10.1 release sur
   const edition = JSON.parse(readFileSync(join(ROOT, "plugins/secretary/edition.json"), "utf8"));
   const ruleManifest = JSON.parse(readFileSync(join(ROOT, "plugins/secretary/rules/rule-manifest.json"), "utf8"));
   assert.equal(claudeMarket.name, "yasashii-secretary");
-  assert.equal(claudeMarket.plugins[0].version, "0.10.1");
+  assert.equal(claudeMarket.plugins[0].version, "0.10.2");
   assert.equal(codexMarket.name, "yasashii-secretary");
   assert.equal(claudePlugin.name, "yasashii-secretary");
-  assert.equal(claudePlugin.version, "0.10.1");
+  assert.equal(claudePlugin.version, "0.10.2");
   assert.equal(codexPlugin.name, "yasashii-secretary");
-  assert.equal(codexPlugin.version, "0.10.1");
+  assert.equal(codexPlugin.version, "0.10.2");
   assert.equal(edition.edition, "yasashii-secretary");
   assert.equal(edition.copy.path, "rules/copy/yasashii.json");
   assert.equal(edition.harness.repository, "https://github.com/mtaiseeei/yasashii-harness");
@@ -200,7 +200,8 @@ check("Yasashii identity, copy, Harness route, rule graph and 0.10.1 release sur
   const canonical = readFileSync(join(ROOT, "plugins/secretary/CHANGELOG.md"));
   const legacy = readFileSync(join(ROOT, "plugins/yasashii-secretary/CHANGELOG.md"));
   assert.ok(canonical.equals(legacy));
-  assert.match(canonical.toString("utf8"), /^# 変更履歴\n\n## \[0\.9\.2\]/u);
+  assert.match(canonical.toString("utf8"), /^# 変更履歴\n\n## \[0\.10\.2\]/u);
+  assert.match(canonical.toString("utf8"), /## \[0\.10\.1\] - 2026-08-14/u);
   const privateEditionPhrase = ["my", "vault"].join("-");
   assert.doesNotMatch(canonical.toString("utf8"), new RegExp(`対応済み.*${privateEditionPhrase}|${privateEditionPhrase}.*対応済み`, "u"));
 });

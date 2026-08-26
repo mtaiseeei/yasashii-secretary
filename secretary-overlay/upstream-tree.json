@@ -2914,7 +2914,7 @@
     },
     {
       "path": "scripts/sprint-032-patch-001-readability-test.mjs",
-      "classification": "common",
+      "classification": "anchor-overlay",
       "sha256": "c4c34f9cefd5a18bc6e6c916e518c23719bc086d479c9573fde079da01cd02b8"
     },
     {

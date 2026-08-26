@@ -33,7 +33,8 @@
     "scripts/master-release-gate.mjs",
     "scripts/sprint-035-test.mjs",
     "scripts/sprint-038-patch-001-test.mjs",
-    "scripts/sprint-037-test.mjs"
+    "scripts/sprint-037-test.mjs",
+    "scripts/sprint-032-patch-001-readability-test.mjs"
   ],
   "upstreamOnly": [
     ".agents/**",

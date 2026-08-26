@@ -83,7 +83,7 @@ function makeDownstreamFixture(parent) {
 check("recorded upstream base and local candidate are exact", () => {
   const output = run(["--check", "--candidate", candidate]);
   assert.match(output, /OVERLAY_CHECK_PASS/);
-  assert.match(output, /upstream-0\.9\.2-release-verified/);
+  assert.match(output, /upstream-sprint-040-patch-001-product-pass-verified/);
 });
 
 check("common safety and wizard implementation match upstream bytes", () => {
@@ -119,12 +119,13 @@ check("yasashii settings display keeps readable keys and confirmation boundaries
   const agentic = readFileSync(join(candidate, "plugins/secretary/skills/settings/SKILL.md"), "utf8");
   assert(agentic.includes("<変更項目>=<値>"), "agentic direct display must remain upstream-owned");
   assert(yasashii.includes("この設定で反映しますか: <変更項目>=<値>"));
-  assert(yasashii.includes("| セクション | 日本語の項目名 | 内部の正式key | 入力の種類 |"));
-  assert(yasashii.includes("`言葉遣い.報告の詳しさ`"));
+  assert(yasashii.includes("| セクション | キー | 値 |"));
+  assert(yasashii.includes("| 言葉遣い | 報告の詳しさ | みじかく／くわしく |"));
+  assert(yasashii.includes("現在の依頼で保存内容と操作が明示された低リスクな追記は同じturnで1回実行する"));
   assert(yasashii.includes('journal-add <secretary> did "設定を変更: <変更項目>=<値>"'));
 });
 
-check("edition metadata stays yasashii and current release is 0.10.1", () => {
+check("edition metadata stays yasashii and current release is 0.10.2", () => {
   const edition = JSON.parse(readFileSync(join(root, "plugins/secretary/edition.json"), "utf8"));
   const marketplace = JSON.parse(readFileSync(join(root, ".claude-plugin/marketplace.json"), "utf8"));
   const manifest = JSON.parse(readFileSync(join(root, "plugins/secretary/.claude-plugin/plugin.json"), "utf8"));
@@ -138,12 +139,12 @@ check("edition metadata stays yasashii and current release is 0.10.1", () => {
   assert.equal(edition.harness.repository, "https://github.com/mtaiseeei/yasashii-harness");
   assert.equal(edition.harness.hosts.claudeCode.installId, "harness@yasashii-harness");
   assert.equal(edition.harness.hosts.codex.installId, "harness@yasashii-harness");
-  assert.equal(marketplace.plugins[0].version, "0.10.1");
-  assert.equal(manifest.version, "0.10.1");
+  assert.equal(marketplace.plugins[0].version, "0.10.2");
+  assert.equal(manifest.version, "0.10.2");
   assert.equal(codexMarketplace.name, "yasashii-secretary");
   assert.equal(codexMarketplace.plugins[0].name, "yasashii-secretary");
   assert.equal(codexManifest.name, "yasashii-secretary");
-  assert.equal(codexManifest.version, "0.10.1");
+  assert.equal(codexManifest.version, "0.10.2");
   assert.equal(codexManifest.skills, "./skills/");
   assert.equal(marketplace.plugins[0].forkedFrom, "https://github.com/Shin-sibainu/cc-company");
 });

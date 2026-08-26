@@ -29,7 +29,7 @@ try {
   const codexPlugin = JSON.parse(readFileSync(codexPluginPath, "utf8"));
   const entry = market.plugins?.[0] || {};
   const codexEntry = codexMarket.plugins?.[0] || {};
-  check("current Claude and Codex candidate version is 0.10.1", entry.version === "0.10.1" && plugin.version === "0.10.1" && codexPlugin.version === "0.10.1");
+  check("current Claude and Codex candidate version is 0.10.2", entry.version === "0.10.2" && plugin.version === "0.10.2" && codexPlugin.version === "0.10.2");
   check("author and MIT are present", JSON.stringify(entry.author) === JSON.stringify({ name: "mtaiseeei" }) && JSON.stringify(plugin.author) === JSON.stringify({ name: "mtaiseeei" }) && entry.license === "MIT" && plugin.license === "MIT");
   check("forkedFrom uses the single credit", entry.forkedFrom === "https://github.com/Shin-sibainu/cc-company");
   check("plugin source is present", entry.source === "./plugins/secretary" && existsSync(join(root, entry.source.slice(2))));

@@ -22,13 +22,14 @@ function check(label, fn) {
   }
 }
 
-check("0.9.2 history remains and current release surfaces are exactly 0.10.1", () => {
-  assert.equal(json(join(root, ".claude-plugin/marketplace.json")).plugins[0].version, "0.10.1");
-  assert.equal(json(join(plugin, ".claude-plugin/plugin.json")).version, "0.10.1");
-  assert.equal(json(join(plugin, ".codex-plugin/plugin.json")).version, "0.10.1");
+check("0.10.1 history remains and current release surfaces are exactly 0.10.2", () => {
+  assert.equal(json(join(root, ".claude-plugin/marketplace.json")).plugins[0].version, "0.10.2");
+  assert.equal(json(join(plugin, ".claude-plugin/plugin.json")).version, "0.10.2");
+  assert.equal(json(join(plugin, ".codex-plugin/plugin.json")).version, "0.10.2");
   const canonical = readFileSync(join(plugin, "CHANGELOG.md"), "utf8");
   const legacy = readFileSync(join(root, "plugins/yasashii-secretary/CHANGELOG.md"), "utf8");
-  assert.match(canonical, /^# 変更履歴\n\n## \[0\.10\.1\] - 2026-08-14/);
+  assert.match(canonical, /^# 変更履歴\n\n## \[0\.10\.2\] - 2026-08-26/);
+  assert.match(canonical, /## \[0\.10\.1\] - 2026-08-14/);
   assert.match(canonical, /## \[0\.9\.2\] - 2026-08-10/);
   assert.match(canonical, /## \[0\.9\.1\] - 2026-08-03/);
   assert.equal(legacy, canonical);

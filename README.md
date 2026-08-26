@@ -174,7 +174,7 @@ Google People APIの `contacts.readonly` では、連絡先にない同僚名を
 
 ### 更新を確認する
 
-現在のmanifest candidateは`0.10.1`です。Plugin更新と既存workspaceのローカルidentity移行は別の状態です。更新後は新しいsessionを開始し、read-only診断で移行が残っている場合は、英語名を確認した後に変更予定をpreviewします。migrationはさらに別の明示確認後だけ、identity、AGENTS／CLAUDEの製品所有節、最小台帳をまとめて更新します。別repoから名前で呼ぶuser-scope routingは移行に含めず、必要な方だけ別の確認で有効にできます。
+現在のmanifest candidateは`0.10.2`です。「これ覚えて」のような危険のない明示的な記憶依頼は、その依頼を一度だけ保存する許可として扱い、同じ了承を聞き返さずに記録まで進めます。削除、外部送信・公開、Secret、権限変更、一括処理などは、これまでどおり別の確認が必要です。Plugin更新後は新しいsessionを開始してください。今回の更新にworkspace migrationはありません。`0.10.1`のidentity migrationが未適用の場合は、従来どおりread-only診断、名前確認、preview、適用確認を分けて進めます。
 「更新ある？」と話しかけると、現在版・最新版、主な変更、設定やファイルへの影響を確認できます。この診断はplugin、workspace、Git、Claude Code設定を変更しません。
 公開済み`0.7.0`の旧updaterにはGoogle Chat標準生成fileで止まる既知のblockerがあるため、`0.7.0 → 0.8.0`のlive updateは配布保証に含めていません。
 失敗時はworkspaceとpluginを別々に復元し、片方しか戻っていない状態を完了と表示しません。
