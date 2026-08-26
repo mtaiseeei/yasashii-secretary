@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "baseCommit": "3ef792819a4a445df089f70aa74ca09176762e5e",
+  "baseCommit": "9acea13477cd7730bf064a32c170b752586fa116",
   "files": [
     {
       "path": ".agents/plugins/marketplace.json",
@@ -1208,276 +1208,6 @@
       "sha256": "ea3b878429f8a74208e7e03b1ddc9601372d68991cc44cbd6066ec6f41f79df1"
     },
     {
-      "path": "docs/feedback/sprint-001-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "ddbdeb27dd53c2a9f6ca0ee53e2a0d6d1403c499629f64ede057cfc058330c2f"
-    },
-    {
-      "path": "docs/feedback/sprint-001-patch-002.md",
-      "classification": "repo-owned",
-      "sha256": "e0dafbe1f88b0e9dfe6667e903f48569973fd5d44d65d426ca95c6bc7aef56ae"
-    },
-    {
-      "path": "docs/feedback/sprint-001.md",
-      "classification": "repo-owned",
-      "sha256": "ffb7931c2d5469f6b103351d69abb1c81107f477a25a157c1318028923043aef"
-    },
-    {
-      "path": "docs/feedback/sprint-002-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "fb0e6c75bf5b58aa1f449ef86a6d7d27e616557195a90423aaf094427330b8ba"
-    },
-    {
-      "path": "docs/feedback/sprint-002.md",
-      "classification": "repo-owned",
-      "sha256": "5b7f7a2fe65fbc237692d3ca14524c9146ca4bab3dc6e9f01ca4eeed71324318"
-    },
-    {
-      "path": "docs/feedback/sprint-003-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "b89d6885edc69f444705c4225157dec86f9fe3c20e8baf817115f407aa9924a5"
-    },
-    {
-      "path": "docs/feedback/sprint-003.md",
-      "classification": "repo-owned",
-      "sha256": "f79bc22d32e3795b7b0a4fb44b86ed7d96e3cd24c4c8cde950599c7c18845b20"
-    },
-    {
-      "path": "docs/feedback/sprint-004.md",
-      "classification": "repo-owned",
-      "sha256": "e9a6692185959c539a962938533b889a61d0cf0e760f9c5fecc4937f45f194f3"
-    },
-    {
-      "path": "docs/feedback/sprint-005.md",
-      "classification": "repo-owned",
-      "sha256": "58b7b5428446e299e8ddcd1d5c6524f77fe7631742da5c73d3a74abc5c88edc4"
-    },
-    {
-      "path": "docs/feedback/sprint-006.md",
-      "classification": "repo-owned",
-      "sha256": "befbc9ddcd7ecf017dfe5f1b0521ebe61900480fc1872bf4c03734f5dad7d50e"
-    },
-    {
-      "path": "docs/feedback/sprint-008.md",
-      "classification": "repo-owned",
-      "sha256": "c84bf23aa378da895e82905bb77f74cb799c0b14e3554d8c5f719461767a190b"
-    },
-    {
-      "path": "docs/feedback/sprint-009.md",
-      "classification": "repo-owned",
-      "sha256": "5f42324c2d8eb277e20d7ca53507718f4f33a84e927c4a441e3b47f7945af1db"
-    },
-    {
-      "path": "docs/feedback/sprint-010.md",
-      "classification": "repo-owned",
-      "sha256": "a4dc8edaf3355d7d33143ee994e63df33cf8ad8eab5322e35f0e976e1b5d5ca9"
-    },
-    {
-      "path": "docs/feedback/sprint-011.md",
-      "classification": "repo-owned",
-      "sha256": "66c8f534cea9b10c3c1842ddf810706467c3e49173b0af4236f34f93299bff69"
-    },
-    {
-      "path": "docs/feedback/sprint-012-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "0d4a8d6a42df484343833d745d08416d1c57765bd900af638c95412d6b09da71"
-    },
-    {
-      "path": "docs/feedback/sprint-012.md",
-      "classification": "repo-owned",
-      "sha256": "4a2bfdfcb2eb786f05417a8c8b667edaa1e1c3e68c2c36261e9e1c507be0de29"
-    },
-    {
-      "path": "docs/feedback/sprint-013.md",
-      "classification": "repo-owned",
-      "sha256": "5cd8cd99553d7bbc75009785d36237844ee080a217bcc1999e359c8cd4702719"
-    },
-    {
-      "path": "docs/feedback/sprint-014-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "3781519a3e559bc402d4f6a0ef8b42619c77644043d1d7bdada768c6df9a528f"
-    },
-    {
-      "path": "docs/feedback/sprint-014.md",
-      "classification": "repo-owned",
-      "sha256": "1ee7e8171164c81d9c40a02ba97b6f7ae10904115b945d941a8521095f3ed279"
-    },
-    {
-      "path": "docs/feedback/sprint-015.md",
-      "classification": "repo-owned",
-      "sha256": "c2720eebe44e7acd35bc4266ef6186589144deba6217872e5ae54c24802ea234"
-    },
-    {
-      "path": "docs/feedback/sprint-016.md",
-      "classification": "repo-owned",
-      "sha256": "4e2cd74b4a5e7294e523df6565e34ed5b34ef9e812c2db1d427184112e55d338"
-    },
-    {
-      "path": "docs/feedback/sprint-017.md",
-      "classification": "repo-owned",
-      "sha256": "da5dc64cf3d3fc0f803f35acbcd8d3af778560685e60a7f50f8811dba5743342"
-    },
-    {
-      "path": "docs/feedback/sprint-018.md",
-      "classification": "repo-owned",
-      "sha256": "6a02444db50375eacbdc435c867c00cc15c423ca8d6504ecc38728a99528ee7c"
-    },
-    {
-      "path": "docs/feedback/sprint-019.md",
-      "classification": "repo-owned",
-      "sha256": "3830a8074bfc21d10581c04ff0f39fafc274e5f92ab9346bd21b2d6037bd80e3"
-    },
-    {
-      "path": "docs/feedback/sprint-020-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "ce4bdb2d9113aa811310019695f6e8e2cf648d7c70ffa115ab243ebf52695ff2"
-    },
-    {
-      "path": "docs/feedback/sprint-020-patch-002.md",
-      "classification": "repo-owned",
-      "sha256": "a8bb198821e3dd88ebf330d85e701549e338846dbe4cacbcf29fbe4f0a754c1e"
-    },
-    {
-      "path": "docs/feedback/sprint-020.md",
-      "classification": "repo-owned",
-      "sha256": "1d1bad69a6cefa4f81204e96de4cdfd2f932b791bededf6071722ec7038937b2"
-    },
-    {
-      "path": "docs/feedback/sprint-021.md",
-      "classification": "repo-owned",
-      "sha256": "e510da1352b9006a7b6529e3fd03b0af600f532fb1d0731bc21a0d4126eecefd"
-    },
-    {
-      "path": "docs/feedback/sprint-022.md",
-      "classification": "repo-owned",
-      "sha256": "0d1d7fc9545b70c849f66d8b6828057f752a49221932ff538b8cf9748398891c"
-    },
-    {
-      "path": "docs/feedback/sprint-023.md",
-      "classification": "repo-owned",
-      "sha256": "2dfb3ac959094afc6496d5729a064e3a87cfdc49a3b4ae9081c3f1c6b6291def"
-    },
-    {
-      "path": "docs/feedback/sprint-024.md",
-      "classification": "repo-owned",
-      "sha256": "86ab9e12670b5a9b011fd1e3c7d89792f0c247a6bb8d548ee5cd143a2e552730"
-    },
-    {
-      "path": "docs/feedback/sprint-025.md",
-      "classification": "repo-owned",
-      "sha256": "3b97c24fecacc47800520af5f932bb0e5f6dc04a4489dd32d5c84cd5cec1f207"
-    },
-    {
-      "path": "docs/feedback/sprint-026.md",
-      "classification": "repo-owned",
-      "sha256": "fe461d83d60882a5a04bb354ba9ddd3ea91896262d55c14a85bdbab533b0ff8a"
-    },
-    {
-      "path": "docs/feedback/sprint-027.md",
-      "classification": "repo-owned",
-      "sha256": "7b80a9da8ec42d102f4310a951cebbba6c5bf132076ecec978d1a5f684b5a85e"
-    },
-    {
-      "path": "docs/feedback/sprint-028.md",
-      "classification": "repo-owned",
-      "sha256": "f7f5ac64aafcb7781f4efc027de80aab4477d9ca5d10ee8bbdf42dc1e2830a79"
-    },
-    {
-      "path": "docs/feedback/sprint-029.md",
-      "classification": "repo-owned",
-      "sha256": "311c1babe5fbb1d81ed893b34f7682ee9d5c5a2c90e7fedb46d50a603b312696"
-    },
-    {
-      "path": "docs/feedback/sprint-030.md",
-      "classification": "repo-owned",
-      "sha256": "b1824dff0213c43a9648b17a86d86c23e3f74245f1396df354a4742e1f630093"
-    },
-    {
-      "path": "docs/feedback/sprint-031.md",
-      "classification": "repo-owned",
-      "sha256": "4e577f7f41ed9419e856318d885b5f6f5b6a831e4bb09f841979a1b8758986d4"
-    },
-    {
-      "path": "docs/feedback/sprint-032-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "d5982264af4633989dc096c1225cdf6f5a88c2c13ce10cb7f6ea44b3d24a438c"
-    },
-    {
-      "path": "docs/feedback/sprint-032-patch-002.md",
-      "classification": "repo-owned",
-      "sha256": "c9920dfdf27cad994050ce683de9b47f6596266d12a504b06ac3f93be8b42738"
-    },
-    {
-      "path": "docs/feedback/sprint-032.md",
-      "classification": "repo-owned",
-      "sha256": "8393843ade372ecbcb1c6703f51d528e01708c274f74f2582a199c049b7e34f1"
-    },
-    {
-      "path": "docs/feedback/sprint-033.md",
-      "classification": "repo-owned",
-      "sha256": "a19891b3a2cf015757381aa043affdde951034e7823975cf0408f8343b07f812"
-    },
-    {
-      "path": "docs/feedback/sprint-035-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "874618722fbbcbedce148a8663cb188f84cd89c9de7304126b6bf08714559aed"
-    },
-    {
-      "path": "docs/feedback/sprint-035-patch-002.md",
-      "classification": "repo-owned",
-      "sha256": "61db6e70c1b44c1da7ecc7661bd4ec0f1f9ee444b203847dbd77ea5dcba77626"
-    },
-    {
-      "path": "docs/feedback/sprint-035-patch-003.md",
-      "classification": "repo-owned",
-      "sha256": "c28f8196c0af121151ff061ce6b88293b489e3d7d88542d1f8548fa8ab3c3dbf"
-    },
-    {
-      "path": "docs/feedback/sprint-035-patch-004.md",
-      "classification": "repo-owned",
-      "sha256": "e1a65e7d13374eaf4a0a1f51da50f057783999e02fe2339bc4497e6f77bb66eb"
-    },
-    {
-      "path": "docs/feedback/sprint-035.md",
-      "classification": "repo-owned",
-      "sha256": "8a0e55615aa5217608ef9ebab01082d7eafc038fd7a9d2b4074fbf0d7ff0af21"
-    },
-    {
-      "path": "docs/feedback/sprint-037-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "f9389d2ddd294ede5dab8bc8554a92a980b891d9734f2f2278371e7c669dff55"
-    },
-    {
-      "path": "docs/feedback/sprint-037.md",
-      "classification": "repo-owned",
-      "sha256": "0f0f9c1c8c52eb5b768a8a29105e8c558291b0680cef976bb954c758d53b0b2c"
-    },
-    {
-      "path": "docs/feedback/sprint-038-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "2f24a2faa8bf102d9505e8e57b6e6c3fd33cf2bc0edeea3553df8c56e429ab66"
-    },
-    {
-      "path": "docs/feedback/sprint-038-patch-002.md",
-      "classification": "repo-owned",
-      "sha256": "0f3fb2f33524512b3ff090099c1e4a136790cac2953a2a4a9f63f11b06844eb6"
-    },
-    {
-      "path": "docs/feedback/sprint-038.md",
-      "classification": "repo-owned",
-      "sha256": "10cfd3fdc549c0c7092c93f5693f435defa133c6e595a498c3182015d28a676e"
-    },
-    {
-      "path": "docs/feedback/sprint-039-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "b3b5b5e1683fe82dd66a7aa50ce964a09c679c9e1ed9c303a6a4c7ece23e6bde"
-    },
-    {
-      "path": "docs/feedback/sprint-039.md",
-      "classification": "repo-owned",
-      "sha256": "315aff81e7e0453266d06da6eee357fbfb9220df528f60f418e92e1524516cbc"
-    },
-    {
       "path": "docs/guide/README.md",
       "classification": "repo-owned",
       "sha256": "f9ee14bc17d6f2f64a0f134f5c9e57c51f307d5f72df16e5fdb30ea7e37dfc64"
@@ -1508,281 +1238,6 @@
       "sha256": "926989bf92384b3df21e420f0926a8727f9ba364fab37831443dcad35e24c155"
     },
     {
-      "path": "docs/progress/sprint-001-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "83cb910758113e466d33f51b99e6f98ad714dc729fcc053381c04581bf5cad5e"
-    },
-    {
-      "path": "docs/progress/sprint-001-patch-002.md",
-      "classification": "repo-owned",
-      "sha256": "43e0a5cb74f9986ebb14169b052278e74dd1754eb05240ba33726cb235f694fa"
-    },
-    {
-      "path": "docs/progress/sprint-001.md",
-      "classification": "repo-owned",
-      "sha256": "ff6acf1cbe4b17a9a28be73f1fc7c48cabd7f1f55770aec044082401ae8a518f"
-    },
-    {
-      "path": "docs/progress/sprint-002-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "85df17452d1cf0fc69eefe2d8b23eefff5c3f099878c8dea973e59c06e75bb4f"
-    },
-    {
-      "path": "docs/progress/sprint-002.md",
-      "classification": "repo-owned",
-      "sha256": "f62a78842c8964f4aa4ee2eee926c4d1661162117caeb1a2ecd2d79f2f160ff7"
-    },
-    {
-      "path": "docs/progress/sprint-003-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "1df657c99892dc6e332ef4c63c16be164cd4ad402806538880edc41ccc2db892"
-    },
-    {
-      "path": "docs/progress/sprint-003.md",
-      "classification": "repo-owned",
-      "sha256": "4634ea098ce7c4259bee3d5b65d7be185528ba92c6f4f74ada0f115acafb8791"
-    },
-    {
-      "path": "docs/progress/sprint-004.md",
-      "classification": "repo-owned",
-      "sha256": "cd88365da31e12824c80200bef4b7e70ee7c8b9bcffc3ad26b3a1ec9fd8386ad"
-    },
-    {
-      "path": "docs/progress/sprint-005.md",
-      "classification": "repo-owned",
-      "sha256": "ffa70376dd715c194b87ad5e8d17a8e75c274ac5c95d012ba2c49adade65b429"
-    },
-    {
-      "path": "docs/progress/sprint-006.md",
-      "classification": "repo-owned",
-      "sha256": "2f18ce9c3e9d36a16ceba3f60088f4e9848d9147a3552871fb82b5b923b0f1e6"
-    },
-    {
-      "path": "docs/progress/sprint-008.md",
-      "classification": "repo-owned",
-      "sha256": "7b303c45f543a2a761c767b05a3bfbe74d093d2885e8493b5b412c1b1bf7f396"
-    },
-    {
-      "path": "docs/progress/sprint-009.md",
-      "classification": "repo-owned",
-      "sha256": "0652078d3a0bc504cc341d76c801e4a8069582a4199a51e76df1d01fc22307fc"
-    },
-    {
-      "path": "docs/progress/sprint-010.md",
-      "classification": "repo-owned",
-      "sha256": "61e496326eb5e4e2674042eaf4e8677ad304be437241d2b3192cd57b93b8f7e8"
-    },
-    {
-      "path": "docs/progress/sprint-011.md",
-      "classification": "repo-owned",
-      "sha256": "369f7020ae3030babb2c07a420654664bc077db96d0fe3ed941cd35b7a907769"
-    },
-    {
-      "path": "docs/progress/sprint-012-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "979589eff132c82425d877ad1f71c3c7e27f25f704d85a66651d2f1ffc1cd164"
-    },
-    {
-      "path": "docs/progress/sprint-012.md",
-      "classification": "repo-owned",
-      "sha256": "e36e31f065637c21c82ccd099ea14aa7dd471f644117976674f5e8125af95d7e"
-    },
-    {
-      "path": "docs/progress/sprint-013.md",
-      "classification": "repo-owned",
-      "sha256": "c0805558f63b9768dd04a041117f3da6e9426d6a67984832d708760639775efe"
-    },
-    {
-      "path": "docs/progress/sprint-014-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "fd601e3b483bb289640730a4ccb046bc8ac2f0a33381bb6659d29bdbd4cc75c5"
-    },
-    {
-      "path": "docs/progress/sprint-014.md",
-      "classification": "repo-owned",
-      "sha256": "fb068c25b35e444df8c8e7982c01303849891280f320704bab65196ecd25a44c"
-    },
-    {
-      "path": "docs/progress/sprint-015.md",
-      "classification": "repo-owned",
-      "sha256": "46d37da3a5bf4e6cfd01cc2239b39d9585b7adc798fb2366b87ebd54f42431ec"
-    },
-    {
-      "path": "docs/progress/sprint-016.md",
-      "classification": "repo-owned",
-      "sha256": "46966194f44d9229cadd61c0d4d2d5ee8d3d04c57b64df47573bd8732eefa1a0"
-    },
-    {
-      "path": "docs/progress/sprint-017.md",
-      "classification": "repo-owned",
-      "sha256": "db365bc2d40688432d7cecf47228cbae6a1d5d1090ba90cbbf64169325547043"
-    },
-    {
-      "path": "docs/progress/sprint-018.md",
-      "classification": "repo-owned",
-      "sha256": "cf96c28fd88e2751522add64356ecc43ffb5088c4deb2976fa19ededc4152ef2"
-    },
-    {
-      "path": "docs/progress/sprint-019.md",
-      "classification": "repo-owned",
-      "sha256": "afb242efe8a184ab4cd6dc4f3f00ed886d92e76feb78142207f4c3ddf2bd99db"
-    },
-    {
-      "path": "docs/progress/sprint-020-patch-001-copy-inventory.md",
-      "classification": "repo-owned",
-      "sha256": "badf7dc3267e14ad96ab5c12b32d0021d976fcb8f5efd57b0f7b038461970899"
-    },
-    {
-      "path": "docs/progress/sprint-020-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "7380097ad5a5f8f73fdd0d02edca9387d9af4752f93f2c5c303d1d766dc3d9f8"
-    },
-    {
-      "path": "docs/progress/sprint-020-patch-002.md",
-      "classification": "repo-owned",
-      "sha256": "6244688c57f41d7a3c7b5268bcd045324ed8a72bfe600fe03b2b528397eb149a"
-    },
-    {
-      "path": "docs/progress/sprint-020.md",
-      "classification": "repo-owned",
-      "sha256": "1cc47f2ed463e8fcb920942612cfecfc419037840c5eda2ea3a70365d34c48e6"
-    },
-    {
-      "path": "docs/progress/sprint-021.md",
-      "classification": "repo-owned",
-      "sha256": "17a67c688e8a7ad7906447b15fc3588e52d7e8cfc985562d90a793205862c36a"
-    },
-    {
-      "path": "docs/progress/sprint-022.md",
-      "classification": "repo-owned",
-      "sha256": "8dee8ed618b0b8ace5e3c46662651f542430dfa72df37a220bb82309b9ee6653"
-    },
-    {
-      "path": "docs/progress/sprint-023.md",
-      "classification": "repo-owned",
-      "sha256": "655d406e77b0479249a0153a6c629036df8e006ba0fd693e9de6b157ca755475"
-    },
-    {
-      "path": "docs/progress/sprint-024.md",
-      "classification": "repo-owned",
-      "sha256": "91aa956529b42ad48aaff0aa5bf1790d029dc86795d67e0ca2216238f4e3b54a"
-    },
-    {
-      "path": "docs/progress/sprint-025.md",
-      "classification": "repo-owned",
-      "sha256": "f78ace23e43279ac7395f8e8792c802e36cdb248e0cd5138608d353842e8caf7"
-    },
-    {
-      "path": "docs/progress/sprint-026.md",
-      "classification": "repo-owned",
-      "sha256": "e9af3f0e1b14dd3499ce0db706c35d837028fe84c6b7a3b7394b76c65c68491a"
-    },
-    {
-      "path": "docs/progress/sprint-027.md",
-      "classification": "repo-owned",
-      "sha256": "11764eef7d959856e766b17c5b9be332c7493e633e97ff253802e5a3ed750a3f"
-    },
-    {
-      "path": "docs/progress/sprint-028.md",
-      "classification": "repo-owned",
-      "sha256": "3e293225779ddc201c2ab7d721d6359109c9916173a848816214e079bbae1433"
-    },
-    {
-      "path": "docs/progress/sprint-029.md",
-      "classification": "repo-owned",
-      "sha256": "8a021792fe8b171b7aef854e72c086dfb85a948e178b986133bb882500eff55e"
-    },
-    {
-      "path": "docs/progress/sprint-030.md",
-      "classification": "repo-owned",
-      "sha256": "c4772e86f0f0ebcd321ef0342ff3e6dac81885a2dd9ba3df578f065f22057b24"
-    },
-    {
-      "path": "docs/progress/sprint-031.md",
-      "classification": "repo-owned",
-      "sha256": "acfec76b1b3ba26d7ddbe6d57569978449005f975f0f0647b1b9277bb2ccddb6"
-    },
-    {
-      "path": "docs/progress/sprint-032-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "95051e91235b9f0bde66b3fe52bfcc0fa9ba028a5d2fc0e051665c25b1da5a1e"
-    },
-    {
-      "path": "docs/progress/sprint-032-patch-002.md",
-      "classification": "repo-owned",
-      "sha256": "d68a7aa5bb6c2323745413e3dfbbab2406920c34f83b0d06ba0499648bfc51da"
-    },
-    {
-      "path": "docs/progress/sprint-032.md",
-      "classification": "repo-owned",
-      "sha256": "65e3efd537573c5f44029e62e905fe878917e96bbe1f7dea7444d9b26371ac36"
-    },
-    {
-      "path": "docs/progress/sprint-033.md",
-      "classification": "repo-owned",
-      "sha256": "2704f0991d21c06347eb6efd484796ddfe110ed1950164262ffb54bf7bd07f61"
-    },
-    {
-      "path": "docs/progress/sprint-035-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "c4b92bc95e7106f993666885cead087cde3661cd98b76cad72937a604bf6b938"
-    },
-    {
-      "path": "docs/progress/sprint-035-patch-002.md",
-      "classification": "repo-owned",
-      "sha256": "685ce5577445b2dcdde2e4d7c547b1d3ae48cc53c6037c92c679a2db0bce1847"
-    },
-    {
-      "path": "docs/progress/sprint-035-patch-003.md",
-      "classification": "repo-owned",
-      "sha256": "2e00c2183ec42d6498940e82d54cdade0b8f65ba63ac171adcae2191c9c50d04"
-    },
-    {
-      "path": "docs/progress/sprint-035-patch-004.md",
-      "classification": "repo-owned",
-      "sha256": "cc0cb35719508bacee86731232c330bef15e089c1dc56c8e9903e17eb2b666f1"
-    },
-    {
-      "path": "docs/progress/sprint-035.md",
-      "classification": "repo-owned",
-      "sha256": "30a6b339236b7960cbd73149a288602251a08edd91315f4d8bffd6d5e3546d08"
-    },
-    {
-      "path": "docs/progress/sprint-037-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "5432b22fc11935d23e0a642088e602cfea269601c1c09061f63162a3abc00f82"
-    },
-    {
-      "path": "docs/progress/sprint-037.md",
-      "classification": "repo-owned",
-      "sha256": "484c6935d2f1f57304a74ec06d8882960e209162fe6ab1aea8d553401ab4d608"
-    },
-    {
-      "path": "docs/progress/sprint-038-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "f3abb1d15437a6ed9a8664443ffc53ce4fcd68b54513bd41e6203bac854fac4d"
-    },
-    {
-      "path": "docs/progress/sprint-038-patch-002.md",
-      "classification": "repo-owned",
-      "sha256": "9e53b981512428e3bd311be38212aabd9641c495d982eef0c17d9ab824cfefea"
-    },
-    {
-      "path": "docs/progress/sprint-038.md",
-      "classification": "repo-owned",
-      "sha256": "2aec15ad031f1bf2db3e10120a9b378ee8ac439c4fa3b2e25a787073f093d414"
-    },
-    {
-      "path": "docs/progress/sprint-039-patch-001.md",
-      "classification": "repo-owned",
-      "sha256": "108a215e57e105fbaa80eb58374d330850152fae6fc929cf26bf2ed724b20bb0"
-    },
-    {
-      "path": "docs/progress/sprint-039.md",
-      "classification": "repo-owned",
-      "sha256": "3bce77638676097ddfa7b32aa798cb5be30b9170a74fba960bbd71d57cd24d97"
-    },
-    {
       "path": "docs/proposal-2026-07-15-realignment.md",
       "classification": "repo-owned",
       "sha256": "90831aba6e681c88a0fe23d1eb166313761cec4902c19d3402beb28ecbea2699"
@@ -1800,17 +1255,17 @@
     {
       "path": "docs/spec.md",
       "classification": "repo-owned",
-      "sha256": "effafcbfce7692169a8124ee3b630c7aea19372389823aad65ad63ba2fb48852"
+      "sha256": "a99536d83e15dc40c8b2190a31b1c737f580f91273fd8a23c8c95dcde3a782db"
     },
     {
       "path": "docs/spec/constraints.md",
       "classification": "repo-owned",
-      "sha256": "6e510c20f14a1373e29896e53eb0bb750cac957aa9c0f91bd3dc6670868a9b41"
+      "sha256": "48c057b5bf486d7a36d3469c649cfa50717dcf2b05ff00817bdd6fe31f5d9757"
     },
     {
       "path": "docs/spec/domain.md",
       "classification": "repo-owned",
-      "sha256": "417dbdbc3bb6575da3ad4c01852f9bd29e7b630f49a905fc35fd85ebf6bb41e2"
+      "sha256": "dfea11c0ffce6a006953443bfd048603197bffef4f83e091026800851564e962"
     },
     {
       "path": "docs/spec/editions.md",
@@ -1820,22 +1275,22 @@
     {
       "path": "docs/spec/features.md",
       "classification": "repo-owned",
-      "sha256": "fedb685dcdec2f4efa8b919d16de1f866042980715413afe9f3750429982f214"
+      "sha256": "0ebd8d0f7c22489a42b3e1fef76d272b3d6e94d49ff38cf9b970421e672b341d"
     },
     {
       "path": "docs/spec/product.md",
       "classification": "repo-owned",
-      "sha256": "5b19f724dbdacd197d57583e707937c24fee7b6f44cff00dc33187a860da9fa2"
+      "sha256": "3ba825c3bb6363d825ed7300c312272d85d87389b4a9a8d3c67286a878d7837b"
     },
     {
       "path": "docs/spec/rubric.md",
       "classification": "repo-owned",
-      "sha256": "f924dbf8a15815dd145582a913eb6262ca98cf0d350990d315ee2d25072216dd"
+      "sha256": "32d226a642cb059a1cb342d4e0a182208c40f09ac7182fefdf80e4c63086588f"
     },
     {
       "path": "docs/spec/ui.md",
       "classification": "repo-owned",
-      "sha256": "5692c48cb29e0888f29a56cbb29afd21d0873bc2442b5ca15b886f187d64439c"
+      "sha256": "8289ad7e113a93f3135553b519bb486d322425045feb864b227c4c80757ab927"
     },
     {
       "path": "docs/sprints/sprint-001-patch-001.md",
@@ -2123,9 +1578,14 @@
       "sha256": "fcc645943f6eb169f92d20fdd02229183c665c1bfe4313bdc17a8903b869fea0"
     },
     {
-      "path": "docs/sprints/state.md",
+      "path": "docs/sprints/sprint-040-patch-001.md",
       "classification": "repo-owned",
-      "sha256": "2f6ba08ba4b574099c391fe3ebda426360f068da6ad479da86752b1a24ea31d1"
+      "sha256": "1d4459a40a8500186ae29bf82e5410c6eb6052fa009ccc4d08fb5c5186de052d"
+    },
+    {
+      "path": "docs/sprints/sprint-040.md",
+      "classification": "repo-owned",
+      "sha256": "674e5bbb95f01cc5113c5558a086bb43d77f4af8d76a0d822c17f2f122f92808"
     },
     {
       "path": "plugins/secretary/.claude-plugin/plugin.json",
@@ -2146,6 +1606,11 @@
       "path": "plugins/secretary/CHANGELOG.md",
       "classification": "anchor-overlay",
       "sha256": "efadf403e79fbeb3b731d9ed4d1a22501edb77dcecce5f3c15bbd7e0b6b2a754"
+    },
+    {
+      "path": "plugins/secretary/conversation-core-inventory.json",
+      "classification": "common",
+      "sha256": "1c77e1df553a517f65b22d078f75e94f18df6f1f3c775b358deef79769cb12cb"
     },
     {
       "path": "plugins/secretary/edition.json",
@@ -2220,17 +1685,17 @@
     {
       "path": "plugins/secretary/rules/conversation-contract.md",
       "classification": "common",
-      "sha256": "a245870686096410c398d29d54493ef3fe4197d5797deb3f258654d8b6fbe761"
+      "sha256": "e779828be8c3265fee685ea496a4f19fc3c741605a837a24249156d19bc194f5"
     },
     {
       "path": "plugins/secretary/rules/copy/agentic.json",
-      "classification": "upstream-only",
-      "sha256": "34d595f8a48e76004a06ba54edfe61faf8ac4537dd68126a0e6c4079c39c116f"
+      "classification": "common",
+      "sha256": "07d1b396c3e9be7ba64ba867fb98debac0c0210ce67a8f97a1ec551c7e246d05"
     },
     {
       "path": "plugins/secretary/rules/copy/yasashii.json",
-      "classification": "repo-owned",
-      "sha256": "46bd8eee125924305be5aaf1c4f345190bea53b31680d170dedf67716bbffab4"
+      "classification": "common",
+      "sha256": "b730ece91753ab562da363b6b085adbffbbe9c3958c3983abef31098a6224e7a"
     },
     {
       "path": "plugins/secretary/rules/evidence.md",
@@ -2250,7 +1715,7 @@
     {
       "path": "plugins/secretary/rules/safety.md",
       "classification": "common",
-      "sha256": "d07eb28d35986f5e11ea244ca848bd34c2ce66fe5a433981d06a7f02f33607d1"
+      "sha256": "565c9006d3ad1b4eda5e5b87cdb7e62096739c0e1eb65abfefbe33a50bdb1e48"
     },
     {
       "path": "plugins/secretary/rules/styles/agentic.md",
@@ -2275,7 +1740,7 @@
     {
       "path": "plugins/secretary/scripts/lib/conversation-contract.mjs",
       "classification": "common",
-      "sha256": "07b5ec192a7ec17735905c2a987c6c13b0a36cdc2dd16bc8b5b7e886f722e9ea"
+      "sha256": "2e6df7c4e9a29fa4077431190e7fee7876fd88b9f92a8b68779a1eb29cf0ad2d"
     },
     {
       "path": "plugins/secretary/scripts/lib/conversation-migration.mjs",
@@ -2520,7 +1985,7 @@
     {
       "path": "plugins/secretary/skills/daily/SKILL.md",
       "classification": "common",
-      "sha256": "f0f8a94a8d3afb5d3481a9d0916ee7ad0cca917a71f871d2a6b008ad9ff0bec9"
+      "sha256": "1e719c3cd11b7cf2fdae7084aa2d5bd2096ae5ab59172a0c2071194d62b140e9"
     },
     {
       "path": "plugins/secretary/skills/google-chat/SKILL.md",
@@ -2615,12 +2080,12 @@
     {
       "path": "plugins/secretary/skills/memory-care/SKILL.md",
       "classification": "common",
-      "sha256": "30431ca285d1ac56caa34c72cde5d63d49dbe2183bd657730036336d85dc6a5c"
+      "sha256": "188b07c29ca0ae8fa48e1f1910a50e0c422d1de1c92edbb20d181664c5e1860c"
     },
     {
       "path": "plugins/secretary/skills/memory-care/scripts/memory-tools.mjs",
       "classification": "common",
-      "sha256": "239244ea2f46971f66f4bae6b083aa7d448c788c241cb0dd773f918078e5f69a"
+      "sha256": "e28789ac62b2c3a1aa423535ae9075ed890f65bd40906f5c41a3cff8a1337630"
     },
     {
       "path": "plugins/secretary/skills/memory-care/scripts/memory-tools.sh",
@@ -2639,18 +2104,18 @@
     },
     {
       "path": "plugins/secretary/skills/projects/SKILL.md",
-      "classification": "anchor-overlay",
-      "sha256": "f6853e0c0dd49ac4699bdae8c8e906cdf0644e8b81ddef4b3b084675289e7774"
+      "classification": "common",
+      "sha256": "e8cdde2c91ca6fd4df612a0a5231fcd34a63f6063a4766ed0e56e058994bdcef"
     },
     {
       "path": "plugins/secretary/skills/secretary/SKILL.md",
       "classification": "anchor-overlay",
-      "sha256": "b9f4c126088e97cf50592ce57c9b9a24288d6574d3f1168d9e4f68d411bb619c"
+      "sha256": "37587d011d890f65cb1cf24b25380abbd0f0146285e3683211c79be6f2eb8c6a"
     },
     {
       "path": "plugins/secretary/skills/settings/SKILL.md",
-      "classification": "anchor-overlay",
-      "sha256": "ea555484cbaabf6577e518ec78be4d3a3821c40eb75c00b048fcf21765ff94dd"
+      "classification": "common",
+      "sha256": "1c32532ea8c4ab33f73c45b359b8709d780efcb203d8b0f09618e62c921d6936"
     },
     {
       "path": "plugins/secretary/skills/setup-google/SKILL.md",
@@ -2680,12 +2145,12 @@
     {
       "path": "plugins/secretary/templates/AGENTS.md",
       "classification": "common",
-      "sha256": "146ba63693b79998884866d3287863ff9a7900fd5c41c3941d147ca1ee1c4279"
+      "sha256": "0bd57ec94676dab3ba91bf12a54314ce3e9229984bd254898b964e79b5d8d62f"
     },
     {
       "path": "plugins/secretary/templates/CLAUDE.md",
       "classification": "common",
-      "sha256": "9a1299a134a823fc636486a7c93320588183c6af484a1d4d9ca231b5d36f165e"
+      "sha256": "d1d60ccc0f0d39cb844dcb10e6b6132f392657b8dfdec9548e5f3cc3e1843886"
     },
     {
       "path": "plugins/secretary/templates/docs/.gitkeep",
@@ -3015,7 +2480,7 @@
     {
       "path": "scripts/fixtures/sprint-038/conversation-golden.json",
       "classification": "common",
-      "sha256": "ac093c60891377c489110cf8da340d8a014a1c85ac69901d4440e8ab5a169caf"
+      "sha256": "b6037dc9bfe04c1fd29fa2ff4e0eb5c22fd4f906fcd07f4a6f54ed09788175d6"
     },
     {
       "path": "scripts/fixtures/sprint-038/current-wizard-assets.json",
@@ -3061,6 +2526,16 @@
       "path": "scripts/fixtures/sprint-039-patch-002/v0.9.2/CLAUDE.md",
       "classification": "upstream-only",
       "sha256": "406d6aa02a57a485cf7195cee4c10d6a5260213831cf9e31eb41bee392848b72"
+    },
+    {
+      "path": "scripts/fixtures/sprint-040/downstream-handoff.json",
+      "classification": "common",
+      "sha256": "e515842b147393ac77dddfb94d000188916d4aa837fda17d7e8fb4015f844982"
+    },
+    {
+      "path": "scripts/fixtures/sprint-040/legacy-schema2-handoff.json",
+      "classification": "common",
+      "sha256": "53e6f4638cb9236f773eb0bcf9c7d085c9a00c1237530e48e18806b2f7f88743"
     },
     {
       "path": "scripts/fixtures/yasashii-harness/claude-marketplace-good.json",
@@ -3130,7 +2605,7 @@
     {
       "path": "scripts/lib/sprint-038-conversation-runner.mjs",
       "classification": "common",
-      "sha256": "0307684893c7670daab26e787480fda9f95e431207f651cf328c95fb5c5eb18a"
+      "sha256": "68ba3574028cc719948cfe82ad93dd006b05b116e16046089d1aac470ebc2125"
     },
     {
       "path": "scripts/lib/sprint-038-private-runner.mjs",
@@ -3165,7 +2640,7 @@
     {
       "path": "scripts/sprint-010-regression.sh",
       "classification": "anchor-overlay",
-      "sha256": "face1c72d748965e7ee9683b582b33b0f7328a571277d1d5b32d8430a7b72cdb"
+      "sha256": "42ac77018fb656685b437ae2c3e5d49023cbfa93dc6ece65df53e7a6b265029c"
     },
     {
       "path": "scripts/sprint-011-live-dialogue.sh",
@@ -3439,7 +2914,7 @@
     },
     {
       "path": "scripts/sprint-032-patch-001-readability-test.mjs",
-      "classification": "common",
+      "classification": "anchor-overlay",
       "sha256": "c4c34f9cefd5a18bc6e6c916e518c23719bc086d479c9573fde079da01cd02b8"
     },
     {
@@ -3564,8 +3039,8 @@
     },
     {
       "path": "scripts/sprint-038-test.mjs",
-      "classification": "anchor-overlay",
-      "sha256": "0eb53d3baec22499aee24f965d499fbee8914b4c676bb604ff2856f1e8c12c42"
+      "classification": "repo-owned",
+      "sha256": "7505356867bbb4e4253735109cceec83f5bbac129e54300b01d5d39f3f400e99"
     },
     {
       "path": "scripts/sprint-039-handoff.mjs",
@@ -3601,6 +3076,46 @@
       "path": "scripts/sprint-039-test.mjs",
       "classification": "upstream-only",
       "sha256": "e3743f42c80f2e99dec891e5b385e8649e2e1ce5fa2a3bb75f7b737d2495c414"
+    },
+    {
+      "path": "scripts/sprint-040-candidate-build.mjs",
+      "classification": "common",
+      "sha256": "5528cefff9f44a00d12c6862b8e598f43529cc5ec56b97f567ac470970d201f4"
+    },
+    {
+      "path": "scripts/sprint-040-candidate-suite.sh",
+      "classification": "common",
+      "sha256": "e3e83a2f06f50e86289a8debcba25cd917252787cbd922b87ab9c607b8c785ef"
+    },
+    {
+      "path": "scripts/sprint-040-edition-test.mjs",
+      "classification": "common",
+      "sha256": "14f32aa89899ca361d43b3004f12c924900447f5d159f27270492fba543998e9"
+    },
+    {
+      "path": "scripts/sprint-040-handoff-test.mjs",
+      "classification": "common",
+      "sha256": "6891fdc689e8cb13107c899407a79151d74a586320c0d695de3328f598ea97c8"
+    },
+    {
+      "path": "scripts/sprint-040-inventory-test.mjs",
+      "classification": "common",
+      "sha256": "c9e3d3c367372ac0fa09caee63c79086cea591ecb6e2dca587416b396c300b17"
+    },
+    {
+      "path": "scripts/sprint-040-regression.sh",
+      "classification": "common",
+      "sha256": "8404a3aaf3f63a44ee96368bb4e9aa99b44a4498fe9833f12fa7a303be994d62"
+    },
+    {
+      "path": "scripts/sprint-040-source-snapshot.mjs",
+      "classification": "common",
+      "sha256": "481f55771c12096dd5a6868aef29415c59a518618cfbe6926e4067d10ffbf7e9"
+    },
+    {
+      "path": "scripts/sprint-040-test.mjs",
+      "classification": "common",
+      "sha256": "50fa46ab2ee8ce5a73a916e22e63f435cd40b1a9b2431909e06a4850469c3eab"
     },
     {
       "path": "scripts/start-sprint-013-wizard-fixture.sh",

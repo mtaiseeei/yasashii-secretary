@@ -84,6 +84,17 @@ release、Mac mini同期、受講者向け更新文を開始しない。
 候補は名前らしい値だけを出典つきで提案し、探索結果ではなく確認済みの呼び方だけを保存する。
 Agenticの合格済み固定candidateをreview済みbaseとしてYasashiiの宣言済みoverlayへ同期し、
 Yasashii固有の言葉遣い・identity・repo-owned正本を維持する。
+2026-08-26、公開Agentic Sprint 040と、その下流handoffを実行正本へ接続したPatch 001で独立評価PASSした
+明示memory authorizationを、固定base `3c472dd9a2b5299f27741ae2c418094486b7d035` からYasashiiへ適用し、
+次メインSprint 040として独立評価する方針を確定した。製品bytesの公開正本は
+`9acea13477cd7730bf064a32c170b752586fa116`、公開candidate IDは
+`36a5c5f5482fcd510e5b361bdf9e24620be696046e248fb29b3b557800cc083d`、Yasashii隔離product candidate IDは
+`4bc87169d87baf90f9681f7ba07d3154c71df34eac78bad15b435732e876faf2`、schema 3 handoff digestは
+`e515842b147393ac77dddfb94d000188916d4aa837fda17d7e8fb4015f844982` に固定する。公開repoの後続docs／state HEADは
+PASSの参照記録であってYasashiiへ適用する製品bytesではない。parity／adapted／supportingの排他的な集合と実action traceを
+manifest／builder runから機械導出し、公開版のPASSはYasashii版へ引き継がない。明示memory依頼の一度限り実行、依頼と内容の
+不確実性分離、pending、純追加訂正、内容重複抑止、checkpoint partial、memory scope gate、既存6操作を実Yasashii sourceで
+検証する。Yasashii固有の文体、copy、`edition.json`、overlay正本／metadata、README、LICENSE、repo-owned docs、Harness履歴を保護する。
 
 ## ひとことで
 
@@ -110,13 +121,14 @@ Gmail等の公式コネクタは従来どおり都度参照し、Chatworkと明�
 | G10 | 公開済み0.7.0の安全基準を維持する | secret・Git・symlink・OAuth・履歴・更新・回帰・UXを監査指摘0件まで閉じた基準と、専用private test workspaceのlive gate・後始末を次候補でも回帰させない |
 | G11 | 2つの完成品を安全に育てる | `agentic-secretary` を上流、`yasashii-secretary` を狭いoverlayの下流とし、共通安全性・Git系譜・0.8.0配布準備・会話可読性・edition衝突停止を守る |
 | G12 | 呼び方と配布物を利用者中立にする | host提供済み文脈→Git→OSの順で安全な表示名候補をbest effortで示し、4経路と保存前確認を守る。既存設定変更では現役表示を同期し、配布物は個人名・端末固有path・私用環境へ依存しない |
+| G13 | 「覚えて」を一度で安全に完了する | 明示された低リスクmemory依頼は内部分類の再確認を挟まず一度だけ実行し、内容の不確実性、pending、訂正、重複、部分成功、scope境界を正直に扱う |
 
 ## 詳細仕様
 
 | ファイル | 内容 |
 |---|---|
-| [product.md](spec/product.md) | 目的、対象ユーザー、G1〜G12、成功状態、非ゴール |
-| [features.md](spec/features.md) | F01〜F55 とユーザーから見た振る舞い |
+| [product.md](spec/product.md) | 目的、対象ユーザー、G1〜G13、成功状態、非ゴール |
+| [features.md](spec/features.md) | F01〜F59 とユーザーから見た振る舞い |
 | [constraints.md](spec/constraints.md) | 安全・記憶保護・secret・single private repo・同期同意などの不変条件 |
 | [domain.md](spec/domain.md) | 三層記憶、一般／開発プロジェクト、更新台帳、timeline、Chatwork／Google Chatの取得・検索状態、時刻・索引・Git規約 |
 | [ui.md](spec/ui.md) | 対話UX、更新の説明と確認、プロジェクト候補確認、Chatwork／Google Chat wizardの簡潔な日本語、3行報告、先回り提案 |
@@ -169,6 +181,7 @@ Gmail等の公式コネクタは従来どおり都度参照し、Chatworkと明�
 | [sprint-038-patch-002](sprints/sprint-038-patch-002.md) | Agenticの合格済み完全SHAからWindows native保存互換をoverlay同期し、Yasashii Secretary 0.9.2を独立評価する通常Patch | sprint-038 done |
 | [sprint-039](sprints/sprint-039.md) | 固定Agentic candidateのhandoff manifestから英語の秘書名、stable identity、AI author、別repo routing、安全な改名をYasashii overlayへ同期 | sprint-038-patch-002 |
 | [sprint-039-patch-001](sprints/sprint-039-patch-001.md) | 固定Agentic `0.10.1`候補から、既存`0.10.0` workspaceの完全identity migration、更新後handoff、Yasashii保護回帰を同期 | sprint-039 done |
+| [sprint-040](sprints/sprint-040.md) | 公開PASS済みの明示memory authorizationを固定handoffから実Yasashii sourceへ適用し、固有surfaceを保護して独立評価 | sprint-039-patch-001 done |
 
 既存 sprint-001〜006 と各 patch の契約・progress・feedback は履歴として保持する。
 sprint-007 は製品方針転換で白紙化され、旧計画と実装は `backup/sprint-007-010-plan` に退避済みである。
@@ -211,3 +224,4 @@ sprint-007 は製品方針転換で白紙化され、旧計画と実装は `back
 34. 配布物と現行製品正本は、利用者・保守者の個人名、利用者端末固有の絶対path、私用workspaceを実行前提にしない。MITの著作権表示、GitHub owner、公式repository URL等の製品所有・配布識別情報は維持する。
 35. Yasashiiへの共通機能同期は、合格済みAgentic完全SHAをreview済みbaseとして記録し、宣言済みoverlayを二回適用して追加差分0件を確認する。Yasashii固有copy、identity、manifest、README、repo-owned docsを上流値で上書きしない。
 36. 秘書自身の英語名は利用者の呼び方と分離し、stable identity、AI author、canonical workspaceを維持する。user-scope routingはopt-inの製品管理blockだけを扱い、人名文脈を誤routingせず、改名では履歴をblind replaceしない。
+37. 明示された低リスクmemory依頼は、依頼そのものを再確認せず一度だけ実行する。ただし内容の不確実性は推測で埋めず、pending、純追加訂正、意味内容の重複抑止、checkpoint単位の部分成功、memory scope gateを適用する。既存6操作と安全境界を維持し、公開版のPASSをYasashii版のPASSとして扱わない。

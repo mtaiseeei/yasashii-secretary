@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "surfaces": {
+    "conversation": {
+      "explicitMemory": "明示された内容をmemoryへ1回保存し、内部分類と保存先を結果で示す",
+      "decisionSuggestion": "この要点を決定として記録しますか: <短い要点>",
+      "topicSuggestion": "この要点を案件メモに残しますか: <短い要点>",
+      "contentUncertainty": "情報源・確実性・否定条件・訂正関係を保つ",
+      "projectSuggestion": "この作業は複数の行動またはセッションにまたがります。プロジェクトとして管理しますか？"
+    },
+    "diagnosis": {
+      "unverifiedConnection": "UNVERIFIED: 接続状態は未検証です",
+      "failureOrder": [
+        "error / 観測された挙動",
+        "再現commandとpath",
+        "影響",
+        "次の操作"
+      ],
+      "latestUnverified": "UNVERIFIED: 最新versionを確認できませんでした"
+    },
+    "report": {
+      "states": {
+        "answered": "<質問への答え。必要なら根拠>",
+        "question": "<実行に必要な不足または確認を1つ>",
+        "saved": "<実行した操作、対象、destination、件数、evidence>",
+        "error": "<観測error、影響、再試行条件>",
+        "partial": "<完了済み操作と未完了操作、その境界>"
+      },
+      "detailedSuffix": "実装メモ: <必要な場合だけ追加の技術情報>"
+    },
+    "developerHandoff": {
+      "order": [
+        "観測された挙動と影響",
+        "再現command",
+        "関連pathとerror",
+        "証跡（evidence）",
+        "未確定の仮説または修正境界"
+      ],
+      "guidance": "そのまま実行できるcommand、正確なpath、観測結果、未解決の前提を示します。確認済みの事実と推論は分けます。"
+    }
+  }
+}

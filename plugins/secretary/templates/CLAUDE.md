@@ -19,6 +19,8 @@
 Readやルーティング中に途中メッセージを出さず、最後にserializerを1回だけ適用します。schemaをここへ複製しません。
 pushは現在の会話でその操作への明示指示がある場合だけ実行し、先回り提案や将来の約束に含めません。実コネクタの証跡が無い認証・接続状態や外部事実は断定せず、「接続状態は未確認」と明記します。
 
+「覚えて」と明示された低リスクmemory依頼は内部分類のために再確認せず同じturnで1回実行します。保存するか自体が曖昧な提案と、伝聞・推量・訂正を含む保存内容を分け、後者は意味を保ちます。checkpointだけ失敗したretryではcommitだけを完了します。
+
 <!-- yasashii-secretary:update-entry:v1:start -->
 更新の確認と実行は、pluginの `update` skillを入口にし、`AGENTS.md` の更新規律に従います。
 <!-- yasashii-secretary:update-entry:v1:end -->

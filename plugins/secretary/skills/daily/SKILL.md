@@ -97,7 +97,8 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 2. `workspace-tools.mjs todo-list <secretary>`をNode.jsで実行して未完TODOを確認する。完了・持ち越しは対象を先に見せ、
    ユーザー確認後だけ`todo-done ... --confirm` / `todo-carry ... --confirm`を実行する。各シームがjournalへ1回だけ追記する。
 3. 当日のdecisionが0件なら会話を読み返す。決定候補があれば、ルーターとmemory-careの節目プロトコルをそのまま適用する。
-   保存操作、対象、保存先が明示された決定は同じturnで1回記録し、曖昧な候補だけ副作用0で1問確認する。
+   利用者が「覚えて」と明示した決定はmemoryへの許可済み依頼として同じturnで1回記録し、保存するか自体が曖昧な候補だけ副作用0で1問確認する。
+   伝聞・推量・訂正は内容属性として保持し、明示保存を取り消す理由にしない。
    候補も無ければ「今日は新しい決定はありませんでした」と伝える。
 4. 途中の作業を再開する文脈が必要なら`_resume.md`、翌日以降に実行する確定事項ならjournalの`next`、
    実行項目ならTODOを使う。同じ内容を複数へ記録しない。

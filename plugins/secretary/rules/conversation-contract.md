@@ -11,13 +11,18 @@
 - `destructive`: 内容を失う削除、置換、hard rollback、復元不能な上書き。
 - `external`: push、送信、公開、外部サービスへの書込み。
 
-引用、伝聞、仮定・条件文、訂正、取り消し、過去の依頼についての質問は、現在の `explicit` な
-書込み指示に昇格させません。保存済み内容の取り消しは新しい削除依頼として二段階で扱います。
+保存操作をぼかすrequest hedge（例:「覚えといたほうがいいかも」）と、保存する内容の不確実さを示す
+content hedge（伝聞、推量、留保、否定、条件、訂正）を分けます。依頼語の引用、現在依頼ではない仮定、
+依頼の取り消し、過去の依頼についての質問は、現在の `explicit` な書込み指示に昇格させません。
+一方、content hedgeがあっても現在の利用者が「覚えて」と明示していれば、情報源・確実性・訂正関係を
+意味tupleへ残して `explicit` とします。保存済み内容の取り消しは新しい削除依頼として二段階で扱います。
 
 ## 2. 実行境界
 
 - `explicit` で低リスクな操作は、同じassistant turnで正規の決定的シームを**ちょうど1回**実行します。
   必要事項が揃った依頼へ二度目の了承を求めません。
+- 「覚えて」はuser-visible scope `memory`へのauthorizationとして十分です。decision／topic等の内部分類、
+  保存先file、要約案を利用者へ選ばせず、内部routeでも`proposed`へ戻しません。
 - `inferred` / `ambiguous` は副作用0のまま、ユーザーが決められる不足だけを1問で聞きます。
 - `destructive` / `external` は対象、影響、宛先を示して明示確認を取り、副作用0で止まります。
 - Secret、token、credentialらしき内容は書き込まず停止します。
@@ -28,8 +33,15 @@
 
 - 通常の順序付き依頼では、境界に達する前の独立した低リスク操作だけ実行でき、残りは `partial` で返します。
 - atomic、依存関係のある一組、batchは、全体を確認してから最初の副作用を実行します。
-- 同じ承認済み操作には一意なoperation idを割り当て、完了済みidを再実行しません。
+- operation idだけでなく、canonical memory root、memory種別、正規化した意味tuple、訂正関係から
+  content keyを作ります。同じ内容は別turn・別operation id・再起動後でも再保存しません。
 - 正規シームのatomic write、backup、rollback、path guard、symlink拒否、空上書き拒否を迂回しません。
+
+### pending confirmation
+
+- pendingは同時に1件だけとし、保存予定content、user-visible scope `memory`、会話anchorを固定します。
+- 同じ話題の単純な了承はその候補へのauthorizationです。別話題が介在したら失効し、後の短い了承を適用しません。
+- 「はい、ただしX」はXへ修正した明示依頼として同じturnで実行し、修正版を再確認しません。
 
 ## 4. 応答状態
 
@@ -42,8 +54,16 @@
 - `partial`: 完了した操作と未完了の操作を分け、確認待ちの境界を示す。
 
 架空の「次の行動」を埋めず、質問と保存完了を同時に主張しません。意味は
-`subject / date / action / target / negation-condition / destination` のtupleで保持し、
-主語・日付・対象・否定条件・保存先を落としたり、逆転・追加したりしません。
+`subject / date / action / target / negation-condition / source / certainty / correction-of /
+correction-reason / destination` のtupleで保持し、主語・日付・対象・否定条件・情報源・確実性・
+訂正関係・保存先を落としたり、逆転・追加したりしません。会話全文、依頼語、完全な逐語copyは保存しません。
+
+memory本体と必須journalが成功し、local checkpointだけ失敗した場合は`partial`とします。retryは現在の
+fileをcontent keyで確認して未完了commitだけを行い、memory／journal／indexを再実行しません。
+
+<!-- explicit-memory-request=run-once -->
+<!-- content-uncertainty=preserve -->
+<!-- retry-after-checkpoint-failure=commit-only -->
 
 ## 5. 現在の依頼を優先する
 

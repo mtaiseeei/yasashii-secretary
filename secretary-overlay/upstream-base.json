@@ -2,13 +2,19 @@
   "schemaVersion": 1,
   "repository": "https://github.com/mtaiseeei/agentic-secretary.git",
   "fetchRemoteName": "upstream",
-  "baseCommit": "3ef792819a4a445df089f70aa74ca09176762e5e",
+  "baseCommit": "9acea13477cd7730bf064a32c170b752586fa116",
   "neutralizationCommit": "52016cf10c1c5587fbd83ff2faf3888e29282d5e",
-  "releaseCandidate": "0.10.1",
-  "externalLiveGate": "upstream-sprint-039-patch-002-product-pass-verified",
+  "releaseCandidate": "0.10.2",
+  "externalLiveGate": "upstream-sprint-040-patch-001-product-pass-verified",
   "identityHandoff": {
     "manifest": "adapters/downstream-identity-handoff.json",
-    "commonTreeSha256": "a7d74a7a9bb42ea67815a75132acf588fe312314f98b7f9685cef97fdfca59c9"
+    "commonTreeSha256": "04be75e09f8597abe30de003eda6e9511cbe9782e41e6200ad07a5f32418c977"
+  },
+  "memoryAuthorizationHandoff": {
+    "manifest": "scripts/fixtures/sprint-040/downstream-handoff.json",
+    "manifestSha256": "e515842b147393ac77dddfb94d000188916d4aa837fda17d7e8fb4015f844982",
+    "publicCandidateSha256": "36a5c5f5482fcd510e5b361bdf9e24620be696046e248fb29b3b557800cc083d",
+    "yasashiiCandidateSha256": "4bc87169d87baf90f9681f7ba07d3154c71df34eac78bad15b435732e876faf2"
   },
   "remoteContract": {
     "originRepository": "https://github.com/mtaiseeei/yasashii-secretary.git",

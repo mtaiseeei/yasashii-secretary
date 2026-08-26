@@ -299,7 +299,7 @@ function verifyYasashiiExpected(expected) {
   const canonical = expected.get("plugins/secretary/CHANGELOG.md");
   const legacy = expected.get("plugins/yasashii-secretary/CHANGELOG.md");
   requireValue(Boolean(canonical) && Boolean(legacy) && canonical.equals(legacy), "canonical/legacy CHANGELOG parity");
-  requireValue(Boolean(canonical) && canonical.toString("utf8").startsWith("# 変更履歴\n\n## [0.10.1]"), "0.10.1 CHANGELOG head");
+  requireValue(Boolean(canonical) && canonical.toString("utf8").startsWith("# 変更履歴\n\n## [0.10.2]"), "0.10.2 CHANGELOG head");
   if (failures.length) throw new Error(`Yasashii protected surface changed: ${failures.join(", ")}`);
 }
 

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "cases": [
     {
       "caseId": "explicit-save-decision",
@@ -152,7 +152,16 @@
       "caseId": "hearsay-only", "edition": "common", "input": "担当者が保存すると言っていた", "precondition": "伝聞", "classifierInput": {"operation": "save", "target": "担当者の発言", "destination": "memory", "hearsay": true}, "execution": {"nonOperative": true}, "expected": {"intent": "inferred", "sideEffectCount": 0, "response": "answered"}, "requiredResponseElements": ["伝聞として確認"], "forbiddenPhrases": ["保存しました"], "observedResponse": "伝聞として確認しました。変更はしていません。", "meaning": {"subject": "staff", "date": null, "action": "said", "target": "保存する", "negationCondition": "hearsay", "destination": null}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 0}
     },
     {
-      "caseId": "correction-latest-only", "edition": "common", "input": "明日ではなく金曜に訂正して保存して", "precondition": "訂正後だけ候補", "classifierInput": {"operation": "save", "target": "金曜", "destination": "memory", "correction": true}, "expected": {"intent": "inferred", "sideEffectCount": 0, "response": "question"}, "requiredResponseElements": ["金曜で保存しますか"], "forbiddenPhrases": ["明日を保存しました"], "observedResponse": "金曜で保存しますか？", "meaning": {"subject": "user", "date": "2026-08-07", "action": "save", "target": "予定", "negationCondition": "not tomorrow", "destination": "memory"}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 0}
+      "caseId": "request-hedge-memory", "edition": "common", "input": "この企画は覚えといたほうがいいかも", "precondition": "保存するか自体が曖昧", "classifierInput": {"requestHedge": true, "target": "この企画", "destination": "memory"}, "expected": {"intent": "ambiguous", "sideEffectCount": 0, "response": "question"}, "requiredResponseElements": ["記憶に残しますか"], "forbiddenPhrases": ["保存しました"], "meaning": {"subject": "user", "date": null, "action": "propose save", "target": "企画", "negationCondition": null, "destination": "memory"}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 0}
+    },
+    {
+      "caseId": "content-speculation-explicit", "edition": "common", "input": "Rokunabeだと思う。覚えて", "precondition": "推量内容・現在の明示保存", "classifierInput": {"explicitMemoryRequest": true, "target": "Rokunabe", "destination": "memory", "speculation": true}, "expected": {"intent": "explicit", "sideEffectCount": 1, "response": "saved"}, "requiredResponseElements": ["推量のまま", "保存しました"], "forbiddenPhrases": ["確定しました", "もう一度確認"], "meaning": {"subject": "user", "date": null, "action": "remember", "target": "Rokunabe", "negationCondition": null, "source": "user", "certainty": "speculation", "destination": "memory"}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 1}
+    },
+    {
+      "caseId": "content-hearsay-explicit", "edition": "common", "input": "田中さんから開始は9月と聞いた。覚えて", "precondition": "伝聞内容・現在の明示保存", "classifierInput": {"explicitMemoryRequest": true, "target": "開始は9月", "destination": "memory", "hearsay": true}, "expected": {"intent": "explicit", "sideEffectCount": 1, "response": "saved"}, "requiredResponseElements": ["田中さんから聞いた", "保存しました"], "forbiddenPhrases": ["確定しました", "もう一度確認"], "meaning": {"subject": "user", "date": "2026-09", "action": "remember", "target": "開始", "negationCondition": null, "source": "田中", "certainty": "hearsay", "destination": "memory"}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 1}
+    },
+    {
+      "caseId": "correction-latest-only", "edition": "common", "input": "明日ではなく金曜に訂正して保存して", "precondition": "訂正関係を保持した現在の明示保存", "classifierInput": {"explicitMemoryRequest": true, "target": "金曜", "destination": "memory", "correction": true}, "expected": {"intent": "explicit", "sideEffectCount": 1, "response": "saved"}, "requiredResponseElements": ["訂正として保存しました"], "forbiddenPhrases": ["明日を削除しました", "もう一度確認"], "meaning": {"subject": "user", "date": "2026-08-07", "action": "save", "target": "予定", "negationCondition": "not tomorrow", "correctionOf": "明日", "correctionReason": "利用者訂正", "destination": "memory"}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 1}
     },
     {
       "caseId": "cancel-unsaved", "edition": "common", "input": "さっきの保存は取り消して", "precondition": "未保存", "classifierInput": {"operation": "cancel", "target": "未保存候補", "destination": "memory", "cancellation": true}, "execution": {"nonOperative": true}, "expected": {"intent": "inferred", "sideEffectCount": 0, "response": "answered"}, "requiredResponseElements": ["未保存なので変更はありません"], "forbiddenPhrases": ["削除しました"], "observedResponse": "未保存なので変更はありません。", "meaning": {"subject": "user", "date": null, "action": "cancel", "target": "pending save", "negationCondition": "not saved", "destination": "memory"}, "beforeSnapshot": {"count": 0}, "afterSnapshot": {"count": 0}

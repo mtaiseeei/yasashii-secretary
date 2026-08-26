@@ -1,18 +1,43 @@
 const INTENTS = new Set(["explicit", "inferred", "ambiguous", "destructive", "external"]);
 const RESPONSES = new Set(["answered", "question", "saved", "error", "partial"]);
 
+// explicit-memory-request=run-once
+// content-uncertainty=preserve
+// retry-after-checkpoint-failure=commit-only
+
+function hasCurrentExplicitRequest(input = {}) {
+  if (input.explicitMemoryRequest && input.target) return true;
+  return Boolean(input.explicit && input.operation && input.target && input.destination);
+}
+
+export function isMemoryDestination(destination) {
+  if (destination === null || destination === undefined || String(destination).trim() === "") return true;
+  const normalized = String(destination).normalize("NFKC").trim().toLocaleLowerCase("ja-JP").replaceAll("\\", "/");
+  return normalized === "memory"
+    || normalized === "decision"
+    || normalized === "topic"
+    || normalized.startsWith("memory/");
+}
+
 export function classifyIntent(input = {}) {
   if (input.destructive) return "destructive";
   if (input.external) return "external";
-  if (input.quote || input.hearsay || input.hypothetical || input.correction || input.cancellation || input.pastInquiry) return input.ambiguous ? "ambiguous" : "inferred";
-  if (input.explicit && input.operation && input.target && input.destination) return "explicit";
+  if (input.requestHedge || input.ambiguous) return "ambiguous";
+  // 引用された依頼語、現在依頼でない仮定、取消、過去照会は操作要求ではない。
+  if (input.quotedRequest || input.quote || input.nonCurrentHypothetical || input.hypothetical || input.cancellation || input.pastInquiry) return "inferred";
+  // 伝聞・推量・留保・否定・条件・訂正は保存内容の属性であり、現在の明示依頼を取り消さない。
+  if (hasCurrentExplicitRequest(input)) return "explicit";
   return input.ambiguous ? "ambiguous" : "inferred";
 }
 
 export function requiresConfirmation(input = {}) {
   const intent = input.intent ?? classifyIntent(input);
   const bulk = input.bulkUnknown || Number(input.bulkCount ?? 0) >= 10 || input.multipleRepos || input.multipleRecipients;
-  return intent === "destructive" || intent === "external" || bulk || input.secret === true;
+  const explicitMemoryOperation = input.explicitMemoryRequest === true
+    || (input.explicit === true && input.operation === "save-memory");
+  const memoryScopeBoundary = explicitMemoryOperation
+    && !isMemoryDestination(input.destination);
+  return intent === "destructive" || intent === "external" || bulk || input.secret === true || memoryScopeBoundary;
 }
 
 export function planOperations(operations, options = {}) {
@@ -56,8 +81,39 @@ export function meaningTuple(value = {}) {
     action: value.action ?? null,
     target: value.target ?? null,
     negationCondition: value.negationCondition ?? null,
+    source: value.source ?? null,
+    certainty: value.certainty ?? null,
+    correctionOf: value.correctionOf ?? null,
+    correctionReason: value.correctionReason ?? null,
     destination: value.destination ?? null,
   };
+}
+
+function canonicalText(value) {
+  if (value === null || value === undefined) return null;
+  if (Array.isArray(value)) return value.map(canonicalText);
+  if (typeof value === "object") return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonicalText(value[key])]));
+  if (typeof value !== "string") return value;
+  return value.normalize("NFKC").toLocaleLowerCase("ja-JP").replace(/[\s\p{P}\p{S}]+/gu, "");
+}
+
+export function canonicalMeaning(value = {}) {
+  return canonicalText(meaningTuple(value));
+}
+
+export function createPendingMemory({ content, scope = "memory", anchor } = {}) {
+  if (!String(content ?? "").trim() || scope !== "memory" || !String(anchor ?? "").trim()) throw new Error("invalid-pending-memory");
+  return { status: "pending", content: String(content).trim(), scope, anchor: String(anchor).trim() };
+}
+
+export function resolvePendingMemory(pending, { reply, anchor, topicChanged = false } = {}) {
+  if (!pending || pending.status !== "pending") return { action: "none", pending: null };
+  if (topicChanged || !anchor || anchor !== pending.anchor) return { action: "expired", pending: null };
+  const text = String(reply ?? "").trim();
+  const revised = text.match(/^(?:はい|ええ|うん)[、,\s]*(?:ただし|でも)\s*(.+)$/u);
+  if (revised) return { action: "execute", authorization: "explicit", content: revised[1].trim(), scope: pending.scope, pending: null, revised: true };
+  if (/^(?:はい|ええ|うん|お願いします|それで)$/u.test(text)) return { action: "execute", authorization: "explicit", content: pending.content, scope: pending.scope, pending: null, revised: false };
+  return { action: "expired", pending: null };
 }
 
 function clone(value) {

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "requiredMarkers": [
+    "explicit-memory-request=run-once",
+    "content-uncertainty=preserve",
+    "retry-after-checkpoint-failure=commit-only"
+  ],
+  "forbiddenLegacyMarkers": [
+    "topic-save=confirm-first",
+    "save-copy=exact-copy",
+    "explicit-memory-request=next-turn-confirmation"
+  ],
+  "forbiddenLegacyPhrases": [
+    "要点を案件メモに残しますね",
+    "この内容を決定として残しますね: <そのターンのユーザー入力全文>",
+    "次の別ターンで明示的に了承した後だけ",
+    "推測、曖昧、引用、伝聞、仮定、訂正、取り消し"
+  ],
+  "surfaces": [
+    {"id":"rules-contract","path":"plugins/secretary/rules/conversation-contract.md","role":"authorization and response contract","editions":["agentic","yasashii","private-my-vault"],"requiredMarkers":["explicit-memory-request=run-once","content-uncertainty=preserve","retry-after-checkpoint-failure=commit-only"],"sha256":"e779828be8c3265fee685ea496a4f19fc3c741605a837a24249156d19bc194f5"},
+    {"id":"rules-safety","path":"plugins/secretary/rules/safety.md","role":"safety precedence","editions":["agentic","yasashii","private-my-vault"],"sha256":"565c9006d3ad1b4eda5e5b87cdb7e62096739c0e1eb65abfefbe33a50bdb1e48"},
+    {"id":"copy-agentic","path":"plugins/secretary/rules/copy/agentic.json","role":"agentic and private conversation copy","editions":["agentic","private-my-vault"],"sha256":"07d1b396c3e9be7ba64ba867fb98debac0c0210ce67a8f97a1ec551c7e246d05"},
+    {"id":"copy-yasashii","path":"plugins/secretary/rules/copy/yasashii.json","role":"yasashii conversation copy","editions":["yasashii"],"sha256":"b730ece91753ab562da363b6b085adbffbbe9c3958c3983abef31098a6224e7a"},
+    {"id":"skill-memory-care","path":"plugins/secretary/skills/memory-care/SKILL.md","role":"memory routing and user contract","editions":["agentic","yasashii","private-my-vault"],"requiredMarkers":["explicit-memory-request=run-once","content-uncertainty=preserve","retry-after-checkpoint-failure=commit-only"],"sha256":"188b07c29ca0ae8fa48e1f1910a50e0c422d1de1c92edbb20d181664c5e1860c"},
+    {"id":"skill-secretary","path":"plugins/secretary/skills/secretary/SKILL.md","role":"conversation router","editions":["agentic","yasashii","private-my-vault"],"sha256":"37587d011d890f65cb1cf24b25380abbd0f0146285e3683211c79be6f2eb8c6a"},
+    {"id":"skill-settings","path":"plugins/secretary/skills/settings/SKILL.md","role":"preference memory boundary","editions":["agentic","yasashii","private-my-vault"],"sha256":"1c32532ea8c4ab33f73c45b359b8709d780efcb203d8b0f09618e62c921d6936"},
+    {"id":"skill-daily","path":"plugins/secretary/skills/daily/SKILL.md","role":"daily decision boundary","editions":["agentic","yasashii","private-my-vault"],"sha256":"1e719c3cd11b7cf2fdae7084aa2d5bd2096ae5ab59172a0c2071194d62b140e9"},
+    {"id":"skill-projects","path":"plugins/secretary/skills/projects/SKILL.md","role":"project versus general memory boundary","editions":["agentic","yasashii","private-my-vault"],"sha256":"e8cdde2c91ca6fd4df612a0a5231fcd34a63f6063a4766ed0e56e058994bdcef"},
+    {"id":"template-agents","path":"plugins/secretary/templates/AGENTS.md","role":"new workspace guidance","editions":["agentic","yasashii","private-my-vault"],"sha256":"0bd57ec94676dab3ba91bf12a54314ce3e9229984bd254898b964e79b5d8d62f"},
+    {"id":"template-claude","path":"plugins/secretary/templates/CLAUDE.md","role":"Claude workspace pointer","editions":["agentic","yasashii","private-my-vault"],"sha256":"d1d60ccc0f0d39cb844dcb10e6b6132f392657b8dfdec9548e5f3cc3e1843886"},
+    {"id":"runtime-classifier","path":"plugins/secretary/scripts/lib/conversation-contract.mjs","role":"intent meaning and pending classifier","editions":["agentic","yasashii","private-my-vault"],"requiredMarkers":["explicit-memory-request=run-once","content-uncertainty=preserve","retry-after-checkpoint-failure=commit-only"],"sha256":"2e6df7c4e9a29fa4077431190e7fee7876fd88b9f92a8b68779a1eb29cf0ad2d"},
+    {"id":"memory-seam","path":"plugins/secretary/skills/memory-care/scripts/memory-tools.mjs","role":"content idempotent memory journal and checkpoint seam","editions":["agentic","yasashii","private-my-vault"],"sha256":"e28789ac62b2c3a1aa423535ae9075ed890f65bd40906f5c41a3cff8a1337630"},
+    {"id":"golden-fixture","path":"scripts/fixtures/sprint-038/conversation-golden.json","role":"current conversation golden oracle","editions":["agentic","yasashii","private-my-vault"],"sha256":"b6037dc9bfe04c1fd29fa2ff4e0eb5c22fd4f906fcd07f4a6f54ed09788175d6"},
+    {"id":"golden-runner","path":"scripts/lib/sprint-038-conversation-runner.mjs","role":"natural language golden runner","editions":["agentic","yasashii","private-my-vault"],"sha256":"68ba3574028cc719948cfe82ad93dd006b05b116e16046089d1aac470ebc2125"},
+    {"id":"sprint-010-regression","path":"scripts/sprint-010-regression.sh","role":"accepted memory and daily regression","editions":["agentic","yasashii","private-my-vault"],"sha256":"42ac77018fb656685b437ae2c3e5d49023cbfa93dc6ece65df53e7a6b265029c"},
+    {"id":"sprint-040-regression","path":"scripts/sprint-040-test.mjs","role":"authorization idempotency and checkpoint regression","editions":["agentic","yasashii","private-my-vault"],"sha256":"50fa46ab2ee8ce5a73a916e22e63f435cd40b1a9b2431909e06a4850469c3eab"}
+  ]
+}

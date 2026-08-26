@@ -19,8 +19,8 @@ function sha(path) { return createHash("sha256").update(readFileSync(path)).dige
 function sameMeaning(left, right) { return JSON.stringify(meaningTuple(left)) === JSON.stringify(meaningTuple(right)); }
 
 check("golden schema and required evidence fields", () => {
-  assert.equal(fixture.schemaVersion, 1);
-  for (const item of fixture.cases) for (const key of ["caseId", "edition", "input", "precondition", "expected", "requiredResponseElements", "forbiddenPhrases", "meaning", "beforeSnapshot", "afterSnapshot"]) assert.ok(Object.hasOwn(item, key), `${item.caseId}:${key}`);
+  assert.equal(fixture.schemaVersion, 2);
+  for (const item of fixture.cases) for (const key of ["caseId", "edition", "input", "precondition", "classifierInput", "expected", "requiredResponseElements", "forbiddenPhrases", "meaning", "beforeSnapshot", "afterSnapshot"]) assert.ok(Object.hasOwn(item, key), `${item.caseId}:${key}`);
 });
 
 for (const item of fixture.cases) {
@@ -28,7 +28,7 @@ for (const item of fixture.cases) {
     // The runner receives only the natural-language request and its natural-language
     // precondition. Expected values, labels, response fragments and snapshots stay
     // exclusively on this oracle side of the comparison.
-    const observed = runConversationScenario({ input: item.input, precondition: item.precondition });
+    const observed = runConversationScenario({ input: item.input, precondition: item.precondition, classifierInput: item.classifierInput, execution: item.execution });
     try {
       assert.equal(observed.intent, item.expected.intent);
       assert.equal(observed.response, item.expected.response);
@@ -54,7 +54,7 @@ check("golden set covers all contract axes and named boundaries", () => {
   assert.deepEqual([...responses].sort(), ["answered", "error", "partial", "question", "saved"]);
   assert.deepEqual([...effects].sort(), ["0", "1", "partial"]);
   const ids = fixture.cases.map((item) => item.caseId).join(" ");
-  for (const boundary of ["quote", "hearsay", "hypothetical", "correction", "cancel-unsaved", "cancel-saved", "past-inquiry", "duplicate", "secret", "notify", "todo-complete", "todo-carry", "closed", "closing-zero", "setup-connected", "setup-unknown", "resume", "private-1", "private-2", "private-3", "private-4", "private-5"]) assert.match(ids, new RegExp(boundary));
+  for (const boundary of ["quote", "hearsay", "hypothetical", "request-hedge", "content-speculation", "content-hearsay", "correction", "cancel-unsaved", "cancel-saved", "past-inquiry", "duplicate", "secret", "notify", "todo-complete", "todo-carry", "closed", "closing-zero", "setup-connected", "setup-unknown", "resume", "private-1", "private-2", "private-3", "private-4", "private-5"]) assert.match(ids, new RegExp(boundary));
 });
 
 check("actual operation log prevents retry/resume duplicate side effect", () => {
@@ -195,13 +195,14 @@ check("0.8 to 0.9 migration dry-run, ownership, atomicity, rollback and idempote
   }
 });
 
-check("current release owners are 0.10.1 and historical 0.9.2／0.8 migration remain unchanged", () => {
-  assert.equal(JSON.parse(readFileSync(join(root, ".claude-plugin/marketplace.json"))).plugins[0].version, "0.10.1");
-  assert.equal(JSON.parse(readFileSync(join(root, "plugins/secretary/.claude-plugin/plugin.json"))).version, "0.10.1");
-  assert.ok(JSON.parse(readFileSync(join(root, "plugins/secretary/.codex-plugin/plugin.json"))).version.startsWith("0.10.1"));
+check("current release owners are 0.10.2 and historical 0.10.1／0.8 migration remain unchanged", () => {
+  assert.equal(JSON.parse(readFileSync(join(root, ".claude-plugin/marketplace.json"))).plugins[0].version, "0.10.2");
+  assert.equal(JSON.parse(readFileSync(join(root, "plugins/secretary/.claude-plugin/plugin.json"))).version, "0.10.2");
+  assert.ok(JSON.parse(readFileSync(join(root, "plugins/secretary/.codex-plugin/plugin.json"))).version.startsWith("0.10.2"));
   assert.equal(JSON.parse(readFileSync(join(root, "plugins/secretary/migrations/0.7.0-to-0.8.0.json"))).toVersion, "0.8.0");
   const changelog = readFileSync(join(root, "plugins/secretary/CHANGELOG.md"), "utf8");
-  assert.match(changelog, /^# 変更履歴\n\n## \[0\.10\.1\]/);
+  assert.match(changelog, /^# 変更履歴\n\n## \[0\.10\.2\]/);
+  assert.match(changelog, /## \[0\.10\.1\] - 2026-08-14/);
   assert.match(changelog, /## \[0\.9\.2\] - 2026-08-10/);
   assert.match(changelog, /## \[0\.9\.1\] - 2026-08-03/);
 });

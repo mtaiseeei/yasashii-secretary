@@ -108,15 +108,15 @@ MEMCARE_SKILL="$PLUGIN/skills/memory-care/SKILL.md"
 DAILY_SKILL="$PLUGIN/skills/daily/SKILL.md"
 AGENTS_TEMPLATE="$PLUGIN/templates/AGENTS.md"
 assert "明示低リスク決定は同じturnで1回保存" \
-  "grep -q '同じturnで' '$MEMCARE_SKILL' && grep -q '1回' '$MEMCARE_SKILL' && grep -q 'remember-decision' '$MEMCARE_SKILL'"
+  "grep -q '同じturnで' '$MEMCARE_SKILL' && grep -q '1回' '$MEMCARE_SKILL' && grep -q 'save-memory' '$MEMCARE_SKILL'"
 assert "自発提案と明示保存を分離" \
   "grep -q 'inferred' '$REPO/plugins/secretary/rules/conversation-contract.md' && grep -q 'explicit' '$REPO/plugins/secretary/rules/conversation-contract.md'"
 assert "曖昧さは不足一点を質問" \
   "grep -q '不足.*1点' '$MEMCARE_SKILL' || grep -q '不足.*1問' '$MEMCARE_SKILL'"
-assert "引用・伝聞・仮定を現在writeにしない" \
-  "grep -q '引用' '$MEMCARE_SKILL' && grep -q '伝聞' '$MEMCARE_SKILL' && grep -q '仮定' '$MEMCARE_SKILL'"
-assert "訂正は訂正後だけを扱う" \
-  "grep -q '訂正' '$MEMCARE_SKILL'"
+assert "request hedgeとcontent hedgeを分離" \
+  "grep -q 'request hedge' '$MEMCARE_SKILL' && grep -q 'content hedge' '$MEMCARE_SKILL'"
+assert "非現在依頼はwrite 0、明示された伝聞・訂正は意味保持" \
+  "grep -q '依頼語の引用' '$MEMCARE_SKILL' && grep -q '過去依頼の照会はwrite 0件' '$MEMCARE_SKILL' && grep -q '伝聞.*content hedge' '$MEMCARE_SKILL' && grep -q '訂正関係' '$MEMCARE_SKILL'"
 assert "取消は未保存と保存済みを分離" \
   "grep -q '保存済み.*取り消し' '$REPO/plugins/secretary/rules/conversation-contract.md' && grep -q '副作用0' '$REPO/plugins/secretary/rules/conversation-contract.md'"
 assert "過去照会はread-only" \
@@ -124,8 +124,8 @@ assert "過去照会はread-only" \
 assert "決定検出が完全自動でないことを明示" "grep -q '完全自動ではない' '$MEMCARE_SKILL'"
 assert "decidedゼロの締め確認を定義" \
   "grep -q '当日の.*decisions.*0件' '$MEMCARE_SKILL' && grep -q '会話を読み返' '$MEMCARE_SKILL'"
-assert "topicは短い確認後に要点だけ保存" \
-  "grep -q '要点を案件メモに残しますね' '$MEMCARE_SKILL' && grep -q '逐語ログ' '$MEMCARE_SKILL'"
+assert "topicは自発提案だけ確認し明示依頼は同turn保存" \
+  "grep -q '秘書から保存を提案する場合だけ' '$MEMCARE_SKILL' && grep -q '利用者の明示memory依頼はそのturnで実行' '$MEMCARE_SKILL' && grep -q '逐語ログ' '$MEMCARE_SKILL'"
 assert "決定確認設定を都度とまとめてへ接続" \
   "grep -q '決定の確認.*都度' '$MEMCARE_SKILL' && grep -q 'まとめて.*候補を未確認のまま記録せず' '$MEMCARE_SKILL'"
 

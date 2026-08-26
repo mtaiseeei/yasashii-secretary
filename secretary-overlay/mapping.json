@@ -18,9 +18,7 @@
     "plugins/secretary/rules/plain-language.md",
     "plugins/secretary/skills/build/SKILL.md",
     "plugins/secretary/skills/name/SKILL.md",
-    "plugins/secretary/skills/projects/SKILL.md",
     "plugins/secretary/skills/secretary/SKILL.md",
-    "plugins/secretary/skills/settings/SKILL.md",
     "plugins/secretary/skills/update/SKILL.md",
     "scripts/regression-check.sh",
     "scripts/sprint-035-patch-001-regression.sh",
@@ -34,15 +32,14 @@
     "scripts/sprint-032-update-gate-test.mjs",
     "scripts/master-release-gate.mjs",
     "scripts/sprint-035-test.mjs",
-    "scripts/sprint-038-test.mjs",
     "scripts/sprint-038-patch-001-test.mjs",
-    "scripts/sprint-037-test.mjs"
+    "scripts/sprint-037-test.mjs",
+    "scripts/sprint-032-patch-001-readability-test.mjs"
   ],
   "upstreamOnly": [
     ".agents/**",
     "adapters/**",
     "plugins/secretary/.codex-plugin/**",
-    "plugins/secretary/rules/copy/agentic.json",
     "plugins/secretary/rules/styles/agentic.md",
     "scripts/agentic-*",
     "scripts/lib/agentic-hosts.mjs",

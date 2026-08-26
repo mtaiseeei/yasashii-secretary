@@ -196,6 +196,17 @@ Yasashii固有の言葉遣い・identity・配布metadata・repo-owned正本は�
 AGENTS／CLAUDE identity管理節、最小台帳を`0.10.1`新規導入相当へ揃える。利用者自由記述と既存Git状態を
 守り、失敗時は開始前へ戻す。別repoから呼ぶuser-scope routingは、このローカル移行とは別確認のままにする。
 
+### G13 「覚えて」を一度で安全に完了する
+
+利用者が「覚えて」「記憶して」と低リスクのmemory保存を明示したときは、依頼した事実を内部分類のために
+もう一度確認せず、そのturnで一度だけ実行する。何を保存するかが曖昧な場合は依頼全体を止めず、不確実な内容だけを
+質問またはpendingとして分ける。再試行や同義の言い換えで同じ意味内容を二重追加せず、訂正では過去を消さず純追加で
+最新内容を示す。複数保存先の途中失敗はcheckpoint単位で成功・未完了を区別し、再開時に完了済み部分を重ねない。
+
+この簡略化はmemory scope gateの内側だけに適用する。削除、外部送信、公開、権限拡張、Secret、プロジェクト化など、
+既存6操作が確認を要求する境界は変えない。公開AgenticでのPASSは設計入力として使えるが、Yasashiiの合格根拠にはせず、
+固定baseから宣言済みcommon／adapted pathだけを適用して、実Yasashii sourceで独立評価する。
+
 ## ゴール
 
 1. 非エンジニアが説明に沿って導入し、初回5問以内で `secretary/` を安全に生成したうえで、1つのprivate GitHub repoを作成・初回pushできる。
@@ -222,6 +233,7 @@ AGENTS／CLAUDE identity管理節、最小台帳を`0.10.1`新規導入相当へ
 22. 共通15 skillsがhost固有の環境変数設定に依存せず同じplugin本体へ到達し、両editionがClaude CodeとCodexの正式manifest／marketplaceから共通skillsを配布できる。
 23. 初回の呼び方を4経路から選び、安全な候補を確認してから保存できる。既存変更では現役3正本を一括同期し、Yasashiiの言葉遣いとedition境界を保ったまま、配布物を利用者中立にできる。
 24. `0.10.0`を導入済みの利用者がPlugin更新後に残るローカルidentity移行を理解し、read-only診断と別確認を経て、自由記述を失わず`0.10.1`新規導入相当へ揃えられる。
+25. 明示された低リスクmemory依頼が、依頼確認の反復なしで一度だけ完了する。曖昧な内容、pending、訂正、意味重複、部分成功、scope外操作を区別し、再試行でも安全に続きから再開できる。
 
 ## 成功状態
 
@@ -308,6 +320,8 @@ AGENTS／CLAUDE identity管理節、最小台帳を`0.10.1`新規導入相当へ
 - 任意の過去会話、別task、raw transcript、生session log、memory storeを直接探索して呼び方を推定しない。Git email、remote、credential、commit history、home directory列挙、外部人物検索も名前候補sourceにしない。
 - 呼び方候補の探索値、除外値、出典、推奨順位を永続化しない。初回決定ログを後日の現在値へ書き換えない。
 - 既存workspace identity migrationの確認を、user-scope routing、過去author書換え、利用者文書のGrep置換、pushの許可へ拡張しない。
+- 明示memory authorizationを、削除、外部送信、公開、権限拡張、Secret取扱い、プロジェクト化など、別確認が必要な操作の包括許可へ拡張しない。
+- 公開Agentic版、private版、Yasashii版の評価を共有しない。Sprint 040でpush、tag、release、marketplace、cache、実workspaceまたはexternal serviceへの変更を行わず、private版は別repoの別Sprintで扱う。
 
 ## 承認済みの条件付き判断
 
@@ -323,3 +337,4 @@ AGENTS／CLAUDE identity管理節、最小台帳を`0.10.1`新規導入相当へ
 - 2026-07-21、OpenAI公式仕様とCodex CLI 0.144.6に合わせ、Codex App／Codex CLIの共有配布正本を `.codex-plugin/plugin.json` とmarketplaceへ改訂した。`.agents/skills`、`AGENTS.md`、`config.toml` の手動構成はauthoring・補助・fallbackに降格し、Claude marketplaceのlegacy互換読込だけでは正式Codex配布の合格にしない。
 - 2026-07-21、Sprint 033のformal gateが製品価値に対して過剰化したため、出荷受入を実用証拠へ戻した。`4670438` を完成候補とし、同一bytesの4 host固有証拠を再利用可能にする。`f285120`／`b9c0f3e` のschema v3証明基盤は製品から外し、将来のoptional internal QAへ移す。これは品質を弱める変更ではなく、製品動作・安全性・配布整合の証拠を保ったまま、証明基盤だけをNon-scopeへ戻す判断である。
 - 2026-07-20、Sprint 032 Patch 002で、一般回答を固定3項目へ押し込まない分離、実会話runnerの安全化（env allowlist・最小ツール・workspace内fixture・cleanup）、完了報告テストの誤合格解消、wizard進捗一貫性、GitHub用語の初出説明、serializer正本の明確化、yasashii向け `ルーム` 表記統一を確定した。設定確認の `key=value` 表現改善はSprint 034へ延期する。
+- 2026-08-26、公開Agentic Sprint 040 Patch 001の限定再試行で独立PASSした製品commit `9acea13477cd7730bf064a32c170b752586fa116` を入力とし、固定base `3c472dd9a2b5299f27741ae2c418094486b7d035` からschema 3 handoffの排他的なparity／adapted／supporting契約に従ってYasashiiへ適用することを承認した。公開candidate ID `36a5c5f5482fcd510e5b361bdf9e24620be696046e248fb29b3b557800cc083d`、Yasashii隔離product candidate ID `4bc87169d87baf90f9681f7ba07d3154c71df34eac78bad15b435732e876faf2`、handoff digest `e515842b147393ac77dddfb94d000188916d4aa837fda17d7e8fb4015f844982` を固定する。公開の後続docs／state HEADは製品bytes入力へ読み替えず、Yasashii固有surface保護と独立評価を必須とする。

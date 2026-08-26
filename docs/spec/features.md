@@ -1,6 +1,6 @@
 # Features
 
-機能IDと、ユーザーから見える振る舞いの正本。F01〜F16 は受け入れ済みの既存機能、F17〜F22 は 2026-07-15 方針転換、F23〜F27 は 2026-07-16 のsingle-repo Git-first + Chatwork方針、F28 は 2026-07-17 の一般プロジェクト管理方針、F29 は配布チャネルから独立した製品説明、F30〜F31 は更新の説明と実行を分ける安全な更新体験、F32〜F35 は各社所有Google Cloudプロジェクトを使うGoogle Chat同期、F36〜F43 は `0.7.0` の配布前監査を閉じたrelease hardening、F44〜F50 は次候補 `0.8.0` で2 editionへ安全に分離する機能、F51は両edition共通の会話可読性、F52は4つの正式対象ホストへ拡張できるホスト非依存の共通本体と各ホストの正式配布adapter、F53は別Pluginの対応Harness 0.5.1へ安全に追随する機能、F54はhost-neutralなplugin root解決と両editionのCodex正式配布parity、F55は利用者中立の呼び方と配布物、F56はWindows native保存、F57は英語の秘書名とstable identity、F58は既存`0.10.0` workspaceを`0.10.1`新規導入相当へ安全に移行する機能である。
+機能IDと、ユーザーから見える振る舞いの正本。F01〜F16 は受け入れ済みの既存機能、F17〜F22 は 2026-07-15 方針転換、F23〜F27 は 2026-07-16 のsingle-repo Git-first + Chatwork方針、F28 は 2026-07-17 の一般プロジェクト管理方針、F29 は配布チャネルから独立した製品説明、F30〜F31 は更新の説明と実行を分ける安全な更新体験、F32〜F35 は各社所有Google Cloudプロジェクトを使うGoogle Chat同期、F36〜F43 は `0.7.0` の配布前監査を閉じたrelease hardening、F44〜F50 は次候補 `0.8.0` で2 editionへ安全に分離する機能、F51は両edition共通の会話可読性、F52は4つの正式対象ホストへ拡張できるホスト非依存の共通本体と各ホストの正式配布adapter、F53は別Pluginの対応Harness 0.5.1へ安全に追随する機能、F54はhost-neutralなplugin root解決と両editionのCodex正式配布parity、F55は利用者中立の呼び方と配布物、F56はWindows native保存、F57は英語の秘書名とstable identity、F58は既存`0.10.0` workspaceを`0.10.1`新規導入相当へ安全に移行する機能、F59は明示memory authorizationをYasashii下流へ独立適用する機能である。
 
 ## 既存機能（F01〜F16）
 
@@ -472,6 +472,24 @@ file差分、marker／台帳重複、stable ID変化、追加commit 0件とす�
 16 pathをbyte parity、`name`／`secretary`／`settings`／`update`の4 Skillを宣言済みanchorとして扱い、
 Yasashii固有の文体、README、配布identity、overlay、repo-owned正本、履歴を保護する。
 
+### F59 明示memory authorizationのYasashii下流反映
+
+低リスクのmemory保存が明示された場合は、依頼の内部分類を利用者へ確認し直さず、そのturnで一度だけ保存する。
+依頼が明確でも内容に不確実性があれば、不確実な部分だけを質問またはpendingとして分ける。訂正は過去の記録を
+削除・置換せず純追加し、同じ意味内容の再依頼・言い換え・retryは重複追加しない。複数checkpointの途中失敗では
+成功済みと未完了を区別し、再開時は未完了だけを実行する。memory scope gateの外にある操作と既存6操作は従来の確認を保つ。
+
+Yasashiiへの入力は、固定base `3c472dd9a2b5299f27741ae2c418094486b7d035`、公開製品commit
+`9acea13477cd7730bf064a32c170b752586fa116`、公開candidate ID
+`36a5c5f5482fcd510e5b361bdf9e24620be696046e248fb29b3b557800cc083d`、Yasashii隔離product candidate ID
+`4bc87169d87baf90f9681f7ba07d3154c71df34eac78bad15b435732e876faf2`、schema 3 handoff digest
+`e515842b147393ac77dddfb94d000188916d4aa837fda17d7e8fb4015f844982` に固定する。公開repoの後続docs／state HEADは
+参照記録に限り、製品bytes入力へ読み替えない。handoffのparity／adapted／supportingは排他的で、manifestと実runから
+集合、action、差分を機械導出する。parityはbyte／mode一致、adaptedは宣言transformer／anchorの実測一致、supportingは
+製品差分0かつ実利用を満たし、未分類pathは0件、二回適用後の差分は0件でなければならない。
+Yasashii固有の文体、copy、style、`edition.json`、overlay正本／metadata、README、LICENSE、repo-owned docs、
+Harness履歴を保護し、公開版のPASSをYasashii版へ昇格しない。
+
 ## Gテーマと機能の対応
 
 | テーマ | 主な機能 |
@@ -488,3 +506,4 @@ Yasashii固有の文体、README、配布identity、overlay、repo-owned正本�
 | G10 | F01 F02 F04 F05 F07 F10 F16 F23 F24 F30 F31 F32 F33 F34 F35 F36 F37 F38 F39 F40 F41 F42 F43 |
 | G11 | F30 F31 F36 F40 F41 F42 F43 F44 F45 F46 F47 F48 F49 F50 F51 F52 F53 F54 F55 F56 F57 F58 |
 | G12 | F04 F16 F20 F41 F42 F49 F55 F57 F58 |
+| G13 | F05 F07 F12 F44 F49 F59 |

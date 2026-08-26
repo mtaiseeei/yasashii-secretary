@@ -174,10 +174,11 @@ check("B: copy schema provides all content-dependent response states", () => {
   assert.equal(Object.hasOwn(contract.copy.surfaces.report, "shortLines"), false);
 });
 
-check("B: one short confirmation copy remains one natural paragraph", () => {
-  const confirmation = contract.copy.surfaces.conversation.decisionConfirmation;
-  assert(!confirmation.includes("\n"));
-  assert(!confirmation.startsWith("- "));
+check("B: explicit memory authorization remains one natural paragraph", () => {
+  const authorization = contract.copy.surfaces.conversation.explicitMemory;
+  assert.equal(Object.hasOwn(contract.copy.surfaces.conversation, "decisionConfirmation"), false);
+  assert(!authorization.includes("\n"));
+  assert(!authorization.startsWith("- "));
 });
 
 check("B: every scenario is classified by the actual rule text", () => {

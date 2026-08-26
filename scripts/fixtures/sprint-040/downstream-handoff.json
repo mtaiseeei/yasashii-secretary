@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 3,
+  "inventory": "plugins/secretary/conversation-core-inventory.json",
+  "legacyObservation": "scripts/fixtures/sprint-040/legacy-schema2-handoff.json",
+  "publicationStatus": "source-candidate-offline-only",
+  "previousCandidateIds": {
+    "agentic": "428b3ff435ee63bf47837e38792873264e14336e85ca1190bd823e80cbc67e0a",
+    "yasashii": "bb194d55a3cff4fe6fbfdb588f1db665d4fcd2ed4446482410ca9dc525490cfd",
+    "private-my-vault": "95b7c5346dd9173817e40479e7599d39f4660f3efbb2b6d6122ab723b148bc84"
+  },
+  "requiredMarkers": [
+    "explicit-memory-request=run-once",
+    "content-uncertainty=preserve",
+    "retry-after-checkpoint-failure=commit-only"
+  ],
+  "notExecuted": ["push", "tag", "release", "marketplace", "installed-cache", "workspace-migration", "new-session", "external-service"],
+  "publicWholeTree": {
+    "root": ".",
+    "exclusions": [".git/**", "docs/sprints/state.md", "docs/progress/**", "docs/feedback/**"]
+  },
+  "sharedParity": [
+    "plugins/secretary/conversation-core-inventory.json",
+    "plugins/secretary/rules/conversation-contract.md",
+    "plugins/secretary/rules/copy/agentic.json",
+    "plugins/secretary/rules/copy/yasashii.json",
+    "plugins/secretary/rules/safety.md",
+    "plugins/secretary/scripts/lib/conversation-contract.mjs",
+    "plugins/secretary/scripts/lib/markdown-lines.mjs",
+    "plugins/secretary/scripts/lib/safe-fs.mjs",
+    "plugins/secretary/scripts/lib/secretary-store.mjs",
+    "plugins/secretary/skills/memory-care/scripts/memory-tools.sh",
+    "plugins/secretary/skills/memory-care/scripts/memory-tools.mjs",
+    "plugins/secretary/templates/AGENTS.md",
+    "plugins/secretary/templates/CLAUDE.md",
+    "scripts/fixtures/sprint-038/conversation-golden.json",
+    "scripts/fixtures/sprint-040/downstream-handoff.json",
+    "scripts/fixtures/sprint-040/legacy-schema2-handoff.json",
+    "scripts/lib/sprint-038-conversation-runner.mjs",
+    "scripts/sprint-040-candidate-build.mjs",
+    "scripts/sprint-040-candidate-suite.sh",
+    "scripts/sprint-040-edition-test.mjs",
+    "scripts/sprint-040-handoff-test.mjs",
+    "scripts/sprint-040-inventory-test.mjs",
+    "scripts/sprint-040-regression.sh",
+    "scripts/sprint-040-source-snapshot.mjs",
+    "scripts/sprint-040-test.mjs"
+  ],
+  "editions": [
+    {
+      "id": "agentic",
+      "sourceKey": "current-git-or-archive-root",
+      "baseHead": "09267e352db51227e3f1375d861df53139797249",
+      "roles": {"parity": [], "adapted": [], "supporting": []},
+      "protected": [],
+      "suite": "scripts/sprint-040-candidate-suite.sh"
+    },
+    {
+      "id": "yasashii",
+      "sourceKey": "yasashii",
+      "baseHead": "3c472dd9a2b5299f27741ae2c418094486b7d035",
+      "roles": {
+        "parity": [
+          "plugins/secretary/skills/daily/SKILL.md",
+          "plugins/secretary/skills/memory-care/SKILL.md",
+          "plugins/secretary/skills/projects/SKILL.md",
+          "plugins/secretary/skills/settings/SKILL.md"
+        ],
+        "adapted": ["plugins/secretary/skills/secretary/SKILL.md", "scripts/sprint-010-regression.sh", "scripts/sprint-038-test.mjs"],
+        "supporting": ["README.md", "AGENTS.md", "docs/spec.md", "plugins/secretary/edition.json", "plugins/secretary/rules/styles/yasashii.md"]
+      },
+      "transformations": {
+        "plugins/secretary/skills/secretary/SKILL.md": {"input":"public-source","transformer":"yasashii-secretary-identity","anchors":["# agentic-secretary —", "開発の入口（Agentic Harness）"]},
+        "scripts/sprint-010-regression.sh": {"input":"public-source","transformer":"yasashii-style-and-copy","anchors":["styles/agentic.md", "copy/agentic.json"]},
+        "scripts/sprint-038-test.mjs": {"input":"fixed-base","transformer":"schema2-runtime-input","anchors":["assert.equal(fixture.schemaVersion, 1);", "\"quote\", \"hearsay\", \"hypothetical\", \"correction\"", "[\"caseId\", \"edition\", \"input\", \"precondition\", \"expected\", \"requiredResponseElements\", \"forbiddenPhrases\", \"meaning\", \"beforeSnapshot\", \"afterSnapshot\"]", "// exclusively on this oracle side of the comparison.\n    const observed = runConversationScenario({ input: item.input, precondition: item.precondition });"]}
+      },
+      "protected": [
+        {"path":"README.md","sha256":"35361391ad9a74c9403f8a2cc20616b5e3aa0635d76a067c1022fb35b794b527"},
+        {"path":"AGENTS.md","sha256":"dd4343eb57b108bc54f867f458040d3315060da4ccf3df476106323401f7b5da"},
+        {"path":"docs/spec.md","sha256":"694c582a5200901a4669741956017aedcc242056620d051e9e621d0423d8de76"},
+        {"path":"plugins/secretary/edition.json","sha256":"663c14cc51b92a936a1dbaf34d5ab4f7ded65f20d57ad0ed645dfd3e8d9bf7b7"},
+        {"path":"plugins/secretary/rules/styles/yasashii.md","sha256":"50c9df0ff79fb43d5e051eb0c42070e31393b210a7fb78076c6e7e6996b1699c"}
+      ],
+      "suite": "scripts/sprint-040-candidate-suite.sh"
+    },
+    {
+      "id": "private-my-vault",
+      "sourceKey": "private",
+      "baseHead": "8e0796c9aba49d9a3dccb020912b0e1cf3989abf",
+      "roles": {
+        "parity": ["scripts/sprint-010-regression.sh"],
+        "adapted": [
+          "plugins/secretary/skills/daily/SKILL.md",
+          "plugins/secretary/skills/memory-care/SKILL.md",
+          "plugins/secretary/skills/projects/SKILL.md",
+          "plugins/secretary/skills/secretary/SKILL.md",
+          "plugins/secretary/skills/settings/SKILL.md",
+          "scripts/sprint-038-test.mjs"
+        ],
+        "supporting": ["README.md", "AGENTS.md", "docs/spec.md", "plugins/secretary/edition.json", "plugins/secretary/skills/notion-tasks/SKILL.md", "plugins/secretary/skills/vault-search/SKILL.md"]
+      },
+      "transformations": {
+        "plugins/secretary/skills/daily/SKILL.md": {"input":"fixed-base","transformer":"private-daily-memory-boundary","anchors":["3. 当日のdecisionが0件なら", "この内容を決定として残しますね:", "次の別ターンで明示的な了承を得た後だけ記録する。"]},
+        "plugins/secretary/skills/memory-care/SKILL.md": {"input":"fixed-base-and-public-source","transformer":"private-memory-sections","anchors":["## 1. 記憶の追加・更新", "## 3. 節目プロトコル", "確認済みの相談要点を案件メモへ追加"]},
+        "plugins/secretary/skills/projects/SKILL.md": {"input":"fixed-base","transformer":"private-project-memory-boundary","anchors":["判断は原文を示して確認した後だけ"]},
+        "plugins/secretary/skills/secretary/SKILL.md": {"input":"fixed-base-and-public-source","transformer":"private-secretary-checkpoint-section","anchors":["## 会話中の節目（全モード共通）", "## 成果物を保存するとき（出力規約）"]},
+        "plugins/secretary/skills/settings/SKILL.md": {"input":"fixed-base","transformer":"private-settings-memory-boundary","anchors":["`pref-note-add` は末尾追記だけに使い"]},
+        "scripts/sprint-038-test.mjs": {"input":"fixed-base","transformer":"schema2-runtime-input","anchors":["assert.equal(fixture.schemaVersion, 1);", "\"quote\", \"hearsay\", \"hypothetical\", \"correction\"", "[\"caseId\", \"edition\", \"input\", \"precondition\", \"expected\", \"requiredResponseElements\", \"forbiddenPhrases\", \"meaning\", \"beforeSnapshot\", \"afterSnapshot\"]", "// exclusively on this oracle side of the comparison.\n    const observed = runConversationScenario({ input: item.input, precondition: item.precondition });"]}
+      },
+      "protected": [
+        {"path":"README.md","sha256":"08046efc3648633b0e80f182c254755bb4e1a5e086607e1674abef22783ff293"},
+        {"path":"AGENTS.md","sha256":"dd4343eb57b108bc54f867f458040d3315060da4ccf3df476106323401f7b5da"},
+        {"path":"docs/spec.md","sha256":"58755995d733d454daad0da28ab98b83c0829f5f1c1ebfe6f0516d30bf78ef1f"},
+        {"path":"plugins/secretary/edition.json","sha256":"29d70da3b1b9c6c48716488919a9de35a38c4087853363563f385eb07dacf7b9"},
+        {"path":"plugins/secretary/skills/notion-tasks/SKILL.md","sha256":"8c40b2007c952b88a38165ef308dc723098ddca9e31cec3ec503d723a84c4527"},
+        {"path":"plugins/secretary/skills/vault-search/SKILL.md","sha256":"54d0e7094a03497ceaeda5a48d753124763982f80bf1e60494034cb7faceca88"}
+      ],
+      "suite": "scripts/sprint-040-candidate-suite.sh"
+    }
+  ]
+}
