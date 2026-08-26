@@ -4,7 +4,7 @@
 
 - Current ID: sprint-040
 - Retry Count: 0
-- Spec-Issue Count: 1
+- Spec-Issue Count: 0
 - Lineage Dispatches: 3
 - Model Tier: standard
 - Rotate: none
