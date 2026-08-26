@@ -19,8 +19,8 @@ function sha(path) { return createHash("sha256").update(readFileSync(path)).dige
 function sameMeaning(left, right) { return JSON.stringify(meaningTuple(left)) === JSON.stringify(meaningTuple(right)); }
 
 check("golden schema and required evidence fields", () => {
-  assert.equal(fixture.schemaVersion, 1);
-  for (const item of fixture.cases) for (const key of ["caseId", "edition", "input", "precondition", "expected", "requiredResponseElements", "forbiddenPhrases", "meaning", "beforeSnapshot", "afterSnapshot"]) assert.ok(Object.hasOwn(item, key), `${item.caseId}:${key}`);
+  assert.equal(fixture.schemaVersion, 2);
+  for (const item of fixture.cases) for (const key of ["caseId", "edition", "input", "precondition", "classifierInput", "expected", "requiredResponseElements", "forbiddenPhrases", "meaning", "beforeSnapshot", "afterSnapshot"]) assert.ok(Object.hasOwn(item, key), `${item.caseId}:${key}`);
 });
 
 for (const item of fixture.cases) {
@@ -28,7 +28,7 @@ for (const item of fixture.cases) {
     // The runner receives only the natural-language request and its natural-language
     // precondition. Expected values, labels, response fragments and snapshots stay
     // exclusively on this oracle side of the comparison.
-    const observed = runConversationScenario({ input: item.input, precondition: item.precondition });
+    const observed = runConversationScenario({ input: item.input, precondition: item.precondition, classifierInput: item.classifierInput, execution: item.execution });
     try {
       assert.equal(observed.intent, item.expected.intent);
       assert.equal(observed.response, item.expected.response);
@@ -54,7 +54,7 @@ check("golden set covers all contract axes and named boundaries", () => {
   assert.deepEqual([...responses].sort(), ["answered", "error", "partial", "question", "saved"]);
   assert.deepEqual([...effects].sort(), ["0", "1", "partial"]);
   const ids = fixture.cases.map((item) => item.caseId).join(" ");
-  for (const boundary of ["quote", "hearsay", "hypothetical", "correction", "cancel-unsaved", "cancel-saved", "past-inquiry", "duplicate", "secret", "notify", "todo-complete", "todo-carry", "closed", "closing-zero", "setup-connected", "setup-unknown", "resume", "private-1", "private-2", "private-3", "private-4", "private-5"]) assert.match(ids, new RegExp(boundary));
+  for (const boundary of ["quote", "hearsay", "hypothetical", "request-hedge", "content-speculation", "content-hearsay", "correction", "cancel-unsaved", "cancel-saved", "past-inquiry", "duplicate", "secret", "notify", "todo-complete", "todo-carry", "closed", "closing-zero", "setup-connected", "setup-unknown", "resume", "private-1", "private-2", "private-3", "private-4", "private-5"]) assert.match(ids, new RegExp(boundary));
 });
 
 check("actual operation log prevents retry/resume duplicate side effect", () => {

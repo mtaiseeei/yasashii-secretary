@@ -55,6 +55,7 @@ secretary/memory/
 | 決定を記録（＋目次追従） | `memory-tools.mjs remember-decision <secretary> <YYYY-MM-DD> "<本文>"` |
 | 活動をjournalへ追記 | `memory-tools.mjs journal-add <secretary> <did\|decided\|next\|note> "<本文>"` |
 | 確認済みの相談要点を案件メモへ追加 | `memory-tools.mjs topic-add <secretary> "<トピック名>" "<要点>"` |
+| 明示memory依頼を保存しlocal checkpoint | `memory-tools.mjs save-memory <secretary> <decision\|topic> <YYYY-MM-DD> "<題名>" '<意味tuple JSON>' "<表示要点>" [--checkpoint] [--fail-at stage\|commit\|post-commit]` |
 | 活動・決定を時系列表示 | `memory-tools.mjs timeline <secretary> [--from YYYY-MM-DD] [--to YYYY-MM-DD] [--type decisions\|journal\|all] [--grep "<キーワード>"]` |
 | 週次ふりかえり | `memory-tools.mjs weekly <secretary> [--week YYYY-MM-DD]` |
 | 古い月の退避候補 | `memory-tools.mjs archive-plan <secretary> [YYYY-MM]` |
@@ -73,10 +74,18 @@ secretary/memory/
 
 ## 1. 記憶の追加・更新
 
-- 操作、決定内容、保存先が現在の依頼で明示された低リスクな記憶追加は、同じturnで `remember-decision` を1回だけ呼ぶ。
-  推測、引用、伝聞、仮定、訂正、取り消し、過去依頼の質問は保存せず、不足を1問で確認する。
+- 現在の利用者が低リスクな内容を「覚えて」と明示した場合、user-visible scope `memory`だけで十分な許可とする。
+  decision／topicの内部分類、保存先file、要約案を聞き返さず、同じturnで `save-memory` を1回だけ呼ぶ。
+- 「覚えといたほうがいいかも」のように保存操作自体が曖昧なrequest hedgeは、contentとscopeを示して副作用0で1問確認する。
+  対象やscopeに不足がある場合も、結果を変える不足だけを1問で確認する。
+  「Xだと思う。覚えて」「YさんからXと聞いた。覚えて」の推量・伝聞や、留保・否定・条件・訂正はcontent hedgeであり、
+  明示依頼を取り消さない。情報源、確実性、否定条件、訂正関係を意味tupleへ残し、確定事実へ変えない。
+- 依頼語の引用、現在依頼ではない仮定、依頼の取消、過去依頼の照会はwrite 0件とする。保存済み取消は削除二段階へ進める。
 - `remember-decision` は過去の決定を直さず、新しい日付ファイルへ追加する。変更時は `変更: 「旧決定」(旧日付) → 「新決定」（理由）` の形で新しい行を足す。
-- 結論が出ていない相談でも、背景として価値がある場合は「要点を案件メモに残しますね」という短い段落で確認し、了承後だけ `topic-add` に渡す。会話全文や外部データ本文は保存しない。
+- 結論が出ていない相談を秘書から保存提案する場合は「要点を案件メモに残しますか」という短い段落で確認し、
+  同じ話題の了承後だけ保存する。利用者が現在「覚えて」と明示した場合は提案フローへ戻さない。
+  pendingは1件だけで、別話題が介在したら失効する。「はい、ただしX」はXへ直した内容を同じturnで保存し、再確認しない。
+  会話全文、依頼語、完全な逐語copy、外部データ本文は保存しない。
 - 好み・呼び方・役割・言葉遣いはsettingsの確認フローを通し、指定行だけを`pref-set`で更新する。
   `preferences.md`全体を`guarded-write`で組み直さない。確認済みの自由メモだけ`pref-note-add`で末尾追記する。
 - 記憶ファイルを足したり消したりしたら、`MEMORY.md`（目次）が自動で追従する（ヘルパーが `reindex` する）。目次は「1行1記憶」を保つ。
@@ -112,10 +121,11 @@ secretary/memory/
 
 ### 決定のintentを判定して記録する
 
-1. 「覚えて」「決定として残して」等の保存操作、対象となる決定、保存先が現在の依頼で明示されていれば `explicit` とする。
-2. `explicit` なら同じassistant turnで`remember-decision`をちょうど1回呼び、保存した決定、日付、保存先を過去形で返す。
+1. 「覚えて」「決定として残して」等の保存操作と対象が現在の依頼で明示されていれば、行き先はuser-visible scope `memory`で十分として `explicit` とする。
+2. `explicit` なら同じassistant turnで`save-memory`をちょうど1回呼び、保存した内容、日付、内部分類された保存先を過去形で返す。
 3. 「〜にしよう」だけで保存操作が明示されない場合や、指示対象が曖昧なら副作用0で、記録するかを1問だけ聞く。
-4. 引用、伝聞、仮定、訂正、取り消し、過去依頼の質問は現在の保存指示にしない。保存済み決定の取り消しは削除の二段階確認へ進める。
+4. 依頼語の引用、現在依頼ではない仮定、取り消し、過去依頼の質問は現在の保存指示にしない。
+   伝聞・推量・留保・否定・条件・訂正は明示保存がある場合の内容属性として保持する。保存済み決定の取り消しは削除の二段階確認へ進める。
 5. 会話の締めで、当日の`--type decisions --from <今日> --to <今日>`が0件なら会話を読み返す。
    決定候補が1件なら短い段落で確認し、複数件なら箇条書きでまとめて確認する。無ければ「今日は新しい決定はありませんでした」と伝える。確認は1回だけにする。
 
@@ -125,9 +135,10 @@ secretary/memory/
 
 ### 結論のない相談は要点だけ確認する
 
-相談が一区切りし、背景・経緯・固有名詞が今後も役立つ場合は、
-`要点を案件メモに残しますね: <短い要点>`と1段落で確認する。了承後だけ`topic-add`を実行する。
-逐語ログ、会話全文、外部データ本文、未確認の推測は保存しない。
+相談が一区切りし、背景・経緯・固有名詞が今後も役立つため秘書から保存を提案する場合だけ、
+`要点を案件メモに残しますか: <短い要点>`と1段落で確認する。同じ話題の了承後だけ実行する。
+利用者の明示memory依頼はそのturnで実行する。topic訂正は旧eventを編集・削除せず、訂正前後と理由・不確実性を持つ
+新eventとして追記する。逐語ログ、会話全文、外部データ本文は保存しない。
 
 ## 4. 保護規則（不変条件・必ず守る）
 
@@ -158,6 +169,13 @@ secretary/memory/
 - 記憶を更新した節目で、`commit` を使って `secretary/` 内をローカルに記録する（日本語メッセージ、何をしたかがわかる粒度）。
 - **push はしない**（インターネットには送らない）。現在の会話でユーザーが対象と送信先を含めて「pushして」とその操作を明示した場合だけ実行できる。「共有したい」はpush指示として扱わず、別途確認する。
 - コミットメッセージ例: `記憶を更新（企画方針の決定を記録）` / `好みを更新（呼び方の変更）`。
+
+memory本体とjournalが保存済みでlocal checkpointだけ失敗した場合は`partial`と伝える。retryは同じcontent keyを
+実fileから確認してcommitだけを行い、memory、journal、indexを増やさない。commit成功後の再retryは全副作用0件とする。
+
+<!-- explicit-memory-request=run-once -->
+<!-- content-uncertainty=preserve -->
+<!-- retry-after-checkpoint-failure=commit-only -->
 
 ## 参照
 

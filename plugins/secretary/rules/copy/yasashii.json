@@ -2,8 +2,10 @@
   "schemaVersion": 2,
   "surfaces": {
     "conversation": {
-      "decisionConfirmation": "この内容を決定として残しますね: <そのターンのユーザー入力全文>",
-      "topicConfirmation": "要点を案件メモに残しますね: <確認済みの要点>",
+      "explicitMemory": "頼まれた内容を記憶へ1回保存し、保存先を結果で伝える",
+      "decisionSuggestion": "この要点を決めごととして残しますか: <短い要点>",
+      "topicSuggestion": "この要点を案件メモに残しますか: <短い要点>",
+      "contentUncertainty": "誰から聞いたか・どのくらい確かか・訂正関係を保つ",
       "projectSuggestion": "この内容は今後も続きそうです。プロジェクトとしてまとめますか？"
     },
     "diagnosis": {
