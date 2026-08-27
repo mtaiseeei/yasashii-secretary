@@ -18,6 +18,7 @@
     "plugins/secretary/rules/plain-language.md",
     "plugins/secretary/skills/build/SKILL.md",
     "plugins/secretary/skills/name/SKILL.md",
+    "plugins/secretary/skills/projects/SKILL.md",
     "plugins/secretary/skills/secretary/SKILL.md",
     "plugins/secretary/skills/update/SKILL.md",
     "scripts/regression-check.sh",

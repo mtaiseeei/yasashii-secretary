@@ -176,8 +176,8 @@ node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs create-dev-pointer <secr
 
 このコマンドはrepoやremoteを作成・変更しない。workspace側に実装仕様、判断ログ、Sprint状態、コード、
 成果物を複製しない。実作業は正本repoで行い、Harnessの入口は `edition.json` のhost別設定に従う。
-Agentic版ではClaude Codeが `harness@agentic-harness` の `/harness`、Codexが
-`harness@agentic-harness-local` の `$using-harness` または `$harness-loop` を使う。
+Yasashii版ではClaude Codeが `harness@yasashii-harness` の `/harness`、Codexも
+`harness@yasashii-harness` の `$using-harness` または `$harness-loop` を使う。
 
 ## 成功時だけ残す記録
 

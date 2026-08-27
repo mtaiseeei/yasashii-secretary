@@ -2104,7 +2104,7 @@
     },
     {
       "path": "plugins/secretary/skills/projects/SKILL.md",
-      "classification": "common",
+      "classification": "anchor-overlay",
       "sha256": "e8cdde2c91ca6fd4df612a0a5231fcd34a63f6063a4766ed0e56e058994bdcef"
     },
     {
