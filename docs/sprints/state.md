@@ -2,10 +2,10 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-040
+- Current ID: TBD
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 3
+- Lineage Dispatches: 6
 - Model Tier: standard
 - Rotate: none
 - Next Planned: TBD
@@ -72,12 +72,14 @@
 | sprint-039 | done | [contract](sprint-039.md) | [progress](../progress/sprint-039.md) | [feedback](../feedback/sprint-039.md) |
 | sprint-039-patch-001 | done | [contract](sprint-039-patch-001.md) | [progress](../progress/sprint-039-patch-001.md) | [feedback](../feedback/sprint-039-patch-001.md) |
 | sprint-040 | done | [contract](sprint-040.md) | [progress](../progress/sprint-040.md) | [feedback](../feedback/sprint-040.md) |
+| sprint-040-patch-001 | done | [contract](sprint-040-patch-001.md) | [progress](../progress/sprint-040-patch-001.md) | [feedback](../feedback/sprint-040-patch-001.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-27: Sprint 040 Patch 001はmicro軽量評価でPASS。projects SkillのClaude Code／Codex Harness IDを `harness@yasashii-harness` へ統一し、既存 `projects-harness` anchorをoverlay分類へ接続した。Patch専用4/4、Sprint 035 15/15、overlay check／隔離reapply `secondChanged=0`、`git diff --check`をfresh独立Evaluatorが確認。機能完全性／動作安定性／回帰なしは各5/5、product finding 0、blocking verification-infra 0。release／cache／workspace／remote writeは0。
 - 2026-08-26: Sprint 040はproduct commit `9089a05f85b307d52aba0b02b54a9670c60d4fad` でfresh独立Evaluator PASS。AC1〜20、C2／C5／C6／C13／C14／C19は全5/5、product finding 0。固定入力・Yas ID `4bc87169...`、schema 3 role/action/diff、handoff負例、overlay record 628／check／apply changed0／reapply secondChanged0、実sourceとcommit Git-freeのSprint 040 15/15、Sprint 038 67/67＋14/14＋3/3、Sprint 010 56/56、Git／Secret 71/71、release integrity、inventory 17/17を独立確認。fixed-base edition fixtureを現行Planner docs入りsourceへ直接使う旧digest FAILは、固定candidate 3/3とsource fixture 9/9で責務分離した非阻害verification-infra 1件。protected bytes、private、external state不変。Status done、Retry 0、Spec-Issue 1、Lineage Dispatches 3、Model Tier standard、Rotate noneとする。release／cache／workspace／new sessionは未実行のままprivate版へ引き渡す。
 - 2026-08-26: schema 3整合後のfresh Generatorがproduct／test candidate `9089a05f85b307d52aba0b02b54a9670c60d4fad` を実Yasashiiへ同期。accepted actual diff 28 path、overlay正本4、Yas実source fixture1、既存progress追記1の34 filesを所有範囲commitとした。pre-write handoff 12/12、inventory 8/8、Yas ID `4bc87169...`再現、実source Sprint 040 15/15、Yas fixture 9/9、Sprint 038 67/67＋14/14＋3/3、Sprint 010 56/56、Git／Secret 71/71、release integrity、accepted Git-free candidate full suiteがPASS。overlay record 628／check PASS／apply changed0／reapply secondChanged0。staged-tree Git-freeはrelease 14/14、source fixture 9/9、Sprint 040 15/15。初回実source wrapperの固定base旧docs digest比較FAILは、承認済みPlanner docs保持との検証面不一致として分離し、固定candidate edition 3/3と実source fixture 9/9で適用面を別証明した。protected bytes不変、private／external write0。fresh独立Evaluator予約としてLineage Dispatches 3、Status awaiting-eval、Retry 0、Spec-Issue 1、Model Tier strong、Rotate noneへ更新する。
 - 2026-08-26: ユーザーが「Yasashii Sprint 040のactive契約とrubricに残る旧schema 2条件を、公開PASS済みschema 3条件へ置換してよい」と明示承認。fresh Plannerがcommit `4a9a913` で固定入力を公開product `9acea13477cd7730bf064a32c170b752586fa116`、public ID `36a5c5f5482fcd510e5b361bdf9e24620be696046e248fb29b3b557800cc083d`、Yasashii ID `4bc87169d87baf90f9681f7ba07d3154c71df34eac78bad15b435732e876faf2`、schema 3 digest `e515842b147393ac77dddfb94d000188916d4aa837fda17d7e8fb4015f844982`へ更新し、parity／adapted／supporting排他、manifest／実action／actual diff同一run照合、anchor実測、copy後adapt trace、pre-write負例をactive契約／rubricへ整合した。memory AC、rubric閾値、Yasashii保護境界は不変。旧schema 2期待のactive残存0。Spec-Issue Count 1を履歴として保持し、fresh Generator予約でLineage Dispatches 2、Status active、Model Tier strong、Rotate noneとする。

@@ -11,6 +11,7 @@
     "scripts/sprint-039-patch-001-test.mjs",
     "scripts/sprint-039-release-integrity-test.mjs",
     "scripts/sprint-039-test.mjs",
+    "scripts/sprint-040-patch-001-test.mjs",
     "scripts/sync-secretary-overlay.mjs",
     "secretary-overlay/README.md",
     "secretary-overlay/anchors.json",
