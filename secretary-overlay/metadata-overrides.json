@@ -10,20 +10,20 @@
       { "op": "set", "pointer": "/name", "value": "yasashii-secretary" },
       { "op": "set", "pointer": "/metadata/description", "value": "非エンジニア向けのAI秘書プラグイン。秘書、通常のプロジェクト、選択したChatwork／Google Chat履歴を1つのprivate GitHub repoで管理する。" },
       { "op": "set", "pointer": "/plugins/0/name", "value": "yasashii-secretary" },
-      { "op": "set", "pointer": "/plugins/0/version", "value": "0.10.2" },
+      { "op": "set", "pointer": "/plugins/0/version", "value": "0.10.3" },
       { "op": "set", "pointer": "/plugins/0/description", "value": "あなた専属のAI秘書。記憶、プロジェクト、選択したChatwork／Google Chat履歴を1つのprivate GitHub repoで管理する。" },
       { "op": "set", "pointer": "/plugins/0/tags", "value": ["secretary", "assistant", "non-engineer", "memory", "productivity"] }
     ],
     "plugins/secretary/.claude-plugin/plugin.json": [
       { "op": "set", "pointer": "/name", "value": "yasashii-secretary" },
-      { "op": "set", "pointer": "/version", "value": "0.10.2" },
+      { "op": "set", "pointer": "/version", "value": "0.10.3" },
       { "op": "set", "pointer": "/description", "value": "あなた専属のAI秘書。記憶、通常のプロジェクト、選択したChatwork／Google Chat履歴を1つのprivate GitHub repoで管理する。" },
       { "op": "set", "pointer": "/homepage", "value": "https://github.com/mtaiseeei/yasashii-secretary" },
       { "op": "set", "pointer": "/repository", "value": "https://github.com/mtaiseeei/yasashii-secretary" }
     ],
     "plugins/secretary/.codex-plugin/plugin.json": [
       { "op": "set", "pointer": "/name", "value": "yasashii-secretary" },
-      { "op": "set", "pointer": "/version", "value": "0.10.2" },
+      { "op": "set", "pointer": "/version", "value": "0.10.3" },
       { "op": "set", "pointer": "/description", "value": "非エンジニア向けAI秘書。記憶、通常のプロジェクト、選択したChatwork／Google Chat履歴を安全に管理します。" },
       { "op": "set", "pointer": "/homepage", "value": "https://github.com/mtaiseeei/yasashii-secretary" },
       { "op": "set", "pointer": "/repository", "value": "https://github.com/mtaiseeei/yasashii-secretary" },

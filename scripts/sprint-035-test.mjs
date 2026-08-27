@@ -185,7 +185,7 @@ check("Codex and Claude formal manifests share the same 16 skills", () => {
   const claude = json(join(plugin, ".claude-plugin/plugin.json"));
   assert.equal(codex.name, edition.edition);
   assert.equal(claude.name, edition.edition);
-  assert.equal(codex.version, "0.10.2");
+  assert.equal(codex.version, "0.10.3");
   assert.equal(codex.skills, "./skills/");
   assert.equal(codexMarket.plugins[0].source.path, "./plugins/secretary");
   assert.equal(codexMarket.name, edition.distribution.marketplaceId);

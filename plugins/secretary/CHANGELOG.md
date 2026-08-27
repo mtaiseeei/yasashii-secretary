@@ -1,5 +1,29 @@
 # 変更履歴
 
+## [0.10.3] - 2026-08-27
+
+### 対象者
+
+- Yasashii Secretaryから別repoの開発projectへ進むとき、正しいやさしいハーネスを案内してほしい方。
+
+### 変わること
+
+- Claude CodeとCodexの両方で、Harnessのinstall IDを`harness@yasashii-harness`として案内します。
+- Overlayを再適用しても、Agentic版のHarness IDへ戻らないようにします。
+
+### 設定・ファイルへの影響
+
+- 記憶、プロジェクト、identity、チャット履歴、利用者workspaceは自動で変更しません。
+- `0.10.2`の明示memory依頼を一度だけ保存する契約と、安全確認の境界を維持します。
+
+### 必要な操作
+
+- pluginを更新したあと、新しいsessionを開始してください。workspace migrationはありません。
+
+### 互換性上の注意
+
+- `0.10.2`以前のrelease記録、migration、fixture、tagは履歴として維持します。
+
 ## [0.10.2] - 2026-08-26
 
 ### 対象者
