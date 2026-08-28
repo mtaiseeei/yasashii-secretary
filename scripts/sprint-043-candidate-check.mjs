@@ -12,7 +12,7 @@ const candidate = JSON.parse(readFileSync(join(root, "scripts/fixtures/sprint-04
 const threeSurfaces = process.argv.includes("--three-surfaces");
 const sha = (value) => createHash("sha256").update(value).digest("hex");
 function run(command, args, options = {}) {
-  return spawnSync(command, args, { cwd: options.cwd || root, encoding: options.encoding ?? "utf8", input: options.input, timeout: options.timeout || 1_500_000, maxBuffer: 512 * 1024 * 1024, env: { ...process.env, ...(options.env || {}) } });
+  return spawnSync(command, args, { cwd: options.cwd || root, encoding: Object.hasOwn(options, "encoding") ? options.encoding : "utf8", input: options.input, timeout: options.timeout || 1_500_000, maxBuffer: 512 * 1024 * 1024, env: { ...process.env, ...(options.env || {}) } });
 }
 function ok(result, label) { assert.equal(result.status, 0, `${label}\nstdout:\n${result.stdout || ""}\nstderr:\n${result.stderr || ""}`); }
 function mode(path) { return lstatSync(path).mode & 0o111 ? "100755" : "100644"; }
