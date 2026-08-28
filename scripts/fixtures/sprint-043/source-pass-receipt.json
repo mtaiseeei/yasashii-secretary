@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "kind": "yasashii-project-clarity-source-pass-receipt",
+  "status": "source-pass-verified",
+  "final": true,
+  "candidate": "f5a44f180bf1d39a1f2689e9c6763723c23eb2da",
+  "candidateTree": "e9831484f912830b75349dedf6f50cb836a81b44",
+  "productDigest": "2bbb126e083ce65fc021b53a244549cd7a919f5b1867ff16d119f01a5bb9d3f0",
+  "feedback": {
+    "path": "docs/feedback/sprint-043.md",
+    "sha256": "a372f2b09c4e166674ec36a44207747d87315c4bf35f8bd17aac93e953117c20",
+    "verdict": "PASS",
+    "candidate": "f5a44f180bf1d39a1f2689e9c6763723c23eb2da"
+  },
+  "counts": {
+    "features": 17,
+    "behaviors": 62,
+    "primary": 250,
+    "collaboration": 20,
+    "visual": 4,
+    "e2e": 4,
+    "pass": 273,
+    "conditionalNotRun": 1
+  },
+  "conditionalNotRunIds": [
+    "XM-007"
+  ],
+  "pathRoles": {
+    "total": 46,
+    "byteSync": 16,
+    "adapted": 30,
+    "unknown": 0,
+    "overlap": 0,
+    "unclassified": 0,
+    "unused": 0,
+    "stale": 0
+  },
+  "protectedGroups": 9,
+  "downstreamOwnedProductIntersection": 0,
+  "harnessOwnedProductIntersection": 0,
+  "rollback": "file-scoped candidate rollback to the exact pre-Clarity Yasashii base; release actions require a separate plan",
+  "notRun": [
+    "release",
+    "push",
+    "tag",
+    "github-release",
+    "marketplace",
+    "cache",
+    "install",
+    "new-session",
+    "workspace-migration",
+    "live-host",
+    "live-xmind",
+    "external-connector"
+  ],
+  "nextPermission": "release-decision-requires-separate-user-approval",
+  "internalSha256": "607201eab8216527cae15a95834e6d944a6bc3c4a9ed0592f8f04f19b6a41d03",
+  "fixedInputs": {
+    "yasashiiBase": "c6cfb40a6026c5447a8ec4729f517adb4cc51031",
+    "public": {
+      "productCandidate": "5f08d454c05576fcff8ab32c10c00887b4c15a96",
+      "handoffFileSha256": "09c3fa1289fa0af4d31c084a74ab108ce5cf85bcf3b3e7c9320cab72758d83c0",
+      "status": "public-user-decision-risk-accepted",
+      "evaluatorPass": false
+    },
+    "privateReceiptIdentity": {
+      "productCandidate": "d5598226213004d55781ca033985589907ae7b5d",
+      "productTree": "920aea5d09b1aa51fcb5ebe23ab242a538c50445",
+      "feedbackCommit": "556c80117c7a1db8f2dd4eabb997277d47e02a51",
+      "receiptFileSha256": "bf6893f3891b10b9b86669308e123008f09eae05d6d8330a477eb1614a456745",
+      "receiptInternalSha256": "0aac84a3d1beadcc7820a495205f292c4491e1758c5c9349a8ee523e68e82122",
+      "verdict": "PASS",
+      "nextPermission": "yasashii-prewrite-only",
+      "writesAuthorized": false
+    }
+  },
+  "finalizedBy": "orchestrator-after-fresh-evaluator-pass"
+}
