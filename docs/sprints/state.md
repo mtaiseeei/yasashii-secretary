@@ -3,9 +3,9 @@
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
 - Current ID: sprint-041
-- Retry Count: 0
+- Retry Count: 1
 - Spec-Issue Count: 0
-- Lineage Dispatches: 2
+- Lineage Dispatches: 3
 - Model Tier: strong
 - Rotate: none
 - Next Planned: sprint-042
@@ -73,7 +73,7 @@
 | sprint-039-patch-001 | done | [contract](sprint-039-patch-001.md) | [progress](../progress/sprint-039-patch-001.md) | [feedback](../feedback/sprint-039-patch-001.md) |
 | sprint-040 | done | [contract](sprint-040.md) | [progress](../progress/sprint-040.md) | [feedback](../feedback/sprint-040.md) |
 | sprint-040-patch-001 | done | [contract](sprint-040-patch-001.md) | [progress](../progress/sprint-040-patch-001.md) | [feedback](../feedback/sprint-040-patch-001.md) |
-| sprint-041 | awaiting-eval | [contract](sprint-041.md) | [progress](../progress/sprint-041.md) | - |
+| sprint-041 | active | [contract](sprint-041.md) | [progress](../progress/sprint-041.md) | [feedback](../feedback/sprint-041.md) |
 | sprint-042 | planned | [contract](sprint-042.md) | - | - |
 | sprint-043 | planned | [contract](sprint-043.md) | - | - |
 
@@ -82,6 +82,7 @@
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-29: Sprint 041初回fresh Evaluatorはcandidate `b506a943ade648fbe89776b9a2c2d830e6d7bf71` をFAIL／`implementation-issue`と判定。固定handoffとprivate receiptを同一bytesの別pathへ移してCLIへ渡すとexit 0となり、固定pathへのbindingを満たさないP-01を独立再現した。AC1／AC10、C2／C5／C6／C25が4/5で必須閾値未達。他の18代表負例、46 path、protected 9、write 0はPASS。Git-free surface内fresh emit→verifyはPASSし、tracked receiptのsurface間portabilityと旧全体回帰13 FAILは非blocking verification-infraへ分離した。feedback SHA `a9997728a338c5a080ae9342f6e7cc248ac3d987c7a3f4436e31f2e028440aab`を保持し、固定path equalityと回帰追加だけをfresh strong Generator Retry 1へ差し戻す。Retry Count 1、Lineage Dispatches 3、Status active、Model Tier strong、Rotate none。製品本体、external、release／cache／live writeは0のまま。
 - 2026-08-29: Sprint 041 fresh strong Generatorがcandidate `b506a943ade648fbe89776b9a2c2d830e6d7bf71` を作成。固定tuple、private PASS receipt、46 product path（byte-sync 16／adapted 30）、protected 9 group、Hook 3 byte-sync、dirty／tamper等のfail-closed gateとYasashii prewrite receiptを実装した。専用正負例24/24、Sprint 040 Patch 001回帰4/4、receipt再検証、`git diff --check`がPASSし、observed product／public／private／external writesは0。receipt SHAは`7334da0f2cb50984d06026db504a60ac45dd0d066acc166c0f58585b308f4f0f`、role manifest SHAは`433d6e2597be4a504e9da6b1b78f6d701377006521b55379554fb37e9cfc32f5`、`authorizedNow=false`、Evaluator verdict未記録。fresh Evaluator予約としてLineage Dispatchesを2、Statusをawaiting-eval、Rotateをnoneとする。全体旧回帰の既存baseline／localhost権限／外部sibling不足はSprint 041の受入と分離し、assertや契約は緩和していない。
 - 2026-08-29: ユーザー承認済みのProject Clarity Yasashii展開を開始。Planner commit `93ecd5f41e861b6af215f4d82fe797def7d2c87f` がF60〜F76と62 behavior、C20〜C25、Sprint 041〜043を確定した。固定public product `5f08d454c05576fcff8ab32c10c00887b4c15a96`／handoff SHA `09c3fa1289fa0af4d31c084a74ab108ce5cf85bcf3b3e7c9320cab72758d83c0` は `public-user-decision-risk-accepted`・`evaluatorPass=false`のまま、private product `d5598226213004d55781ca033985589907ae7b5d`／fresh PASS feedback `556c80117c7a1db8f2dd4eabb997277d47e02a51`／receipt file SHA `bf6893f3891b10b9b86669308e123008f09eae05d6d8330a477eb1614a456745`／internal SHA `0aac84a3d1beadcc7820a495205f292c4491e1758c5c9349a8ee523e68e82122`が`yasashii-prewrite-only`を許可し、`writesAuthorized=false`を保持する。Sprint 041はhigh riskの事前gateであり、fresh strong Generatorの予約としてLineage Dispatchesを新しいlineageの1、Model Tierをstrong、Rotateをmodel-escalation、Statusをactiveとする。製品write、release、push、tag、cache、install、new session、実Xmind、実host、connector writeはまだ0件。
 - 2026-08-27: Sprint 040 Patch 001はmicro軽量評価でPASS。projects SkillのClaude Code／Codex Harness IDを `harness@yasashii-harness` へ統一し、既存 `projects-harness` anchorをoverlay分類へ接続した。Patch専用4/4、Sprint 035 15/15、overlay check／隔離reapply `secondChanged=0`、`git diff --check`をfresh独立Evaluatorが確認。機能完全性／動作安定性／回帰なしは各5/5、product finding 0、blocking verification-infra 0。release／cache／workspace／remote writeは0。
