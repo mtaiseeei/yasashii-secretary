@@ -1,6 +1,192 @@
 # Sprint 041 fresh独立評価 — Project Clarity Yasashii prewrite gate
 
-## 最終Verdict
+## Current final verdict — Retry 1
+
+**PASS**
+
+- Product findings: **0件**
+- Blocking verification-infra findings: **0件**
+- Closed product finding: **P-01**
+- Nonblocking verification-infra findings: **V-01／V-02（初回記録を保持）**
+- 評価対象Generator product candidate: `2b60f3898f0a81be7ae7e142efe0cbb36e1820b8`
+- Candidate tree: `643ea2d06f912900f6636bdcdfe3d7dfa660781e`
+- 評価開始時Orchestrator state HEAD: `f5850f0ef344fb76e82999599777862e4c2758b6`
+- Retry 1開始state: `c2eaaae`
+- 初回candidate／初回feedback commit: `b506a943ade648fbe89776b9a2c2d830e6d7bf71`／`ccdfe97bd393f3a3d282b7d3e84e3e3ed17b2400`
+- 初回feedback file SHA-256: `a9997728a338c5a080ae9342f6e7cc248ac3d987c7a3f4436e31f2e028440aab`
+- Branch: `codex/sprint-041-project-clarity`
+- UI: なし。browser、DOM、screenshot、実host liveは契約対象外
+
+Generatorの自己評価をVerdictへ流用せず、Retry 1のactual diff、固定入力、CLI、同一bytes別path負例、
+receipt path改変＋self-digest再計算、正式回帰、source receipt、固定candidateのGit-free archive内fresh
+emit→verifyを独立再実行した。P-01の2つの再現はどちらも内容SHA読込前に期待codeでexit 1となり、
+receipt自身も契約固定path以外を検証済みとして保持できなくなった。AC1〜10と重点rubric 10軸はすべて
+必須閾値5/5を満たすため、Sprint 041 Retry 1をPASSと判定する。
+
+publicは引き続き`public-user-decision-risk-accepted`／`evaluatorPass=false`であり、private `PASS`を
+public Evaluator PASSへ昇格していない。本PASSが許すのはOrchestratorによるstate更新後のSprint 042だけで、
+製品apply、release、push、cache、liveを現在許可するものではない。
+
+## Retry 1 candidateとactual diff
+
+評価対象product candidateは厳密に`2b60f3898f0a81be7ae7e142efe0cbb36e1820b8`である。
+state handoffの`f5850f0`はcandidate後に`docs/sprints/state.md`だけを変更しており、製品candidateへ混ぜていない。
+
+`git diff --name-status c2eaaae..2b60f38`の実結果は次の5件だった。
+
+```text
+M docs/progress/sprint-041.md
+M scripts/fixtures/sprint-041/yasashii-prewrite-receipt.json
+M scripts/lib/sprint-041-prewrite.mjs
+M scripts/sprint-041-prewrite.mjs
+M scripts/sprint-041-test.mjs
+```
+
+差分はP-01の固定absolute path binding、同じ固定pathをreceiptへ直接記録する変更、正式負例2件と
+receipt self-digest再計算負例、receipt再生成、Generator progressだけである。Clarity製品path、既存product、
+spec、Sprint contract、state、初回feedback、回帰期待値の緩和は0件。`git diff --check
+c2eaaae..2b60f38`はexit 0だった。
+
+## P-01再現とclose証拠
+
+固定handoffとprivate receiptを、それぞれ同一bytesの別pathへcopyしてCLIへ渡した。
+copyのSHA-256は契約固定値と一致しているため、内容tamperではなくpathだけの不一致である。
+
+| Scenario | copy SHA-256 | exit | 観測code |
+|---|---|---:|---|
+| public handoff same-byte別path | `09c3fa1289fa0af4d31c084a74ab108ce5cf85bcf3b3e7c9320cab72758d83c0` | 1 | `handoff-path-mismatch` |
+| private receipt same-byte別path | `bf6893f3891b10b9b86669308e123008f09eae05d6d8330a477eb1614a456745` | 1 | `private-receipt-path-mismatch` |
+| Yasashii receiptのpublic handoff path改変＋self-digest再計算 | self-digest再計算済み | 1 | `yasashii-receipt-input-path` |
+
+観測detailsには契約固定pathとcopy／改変pathが別々に出力された。`validateFixedInputFile()`は
+呼出pathを契約固定absolute pathと照合してからfile SHAを読み、source receiptの
+`fixedInputs.public.handoffPath`／`fixedInputs.private.receiptPath`は呼出値ではなく固定値を保持する。
+`verifyReceiptDigest()`は自己digestが正しくても両pathが固定値と一致しなければ拒否する。
+
+したがって初回P-01は**closed**。同じbytesを別pathへ移しても固定入力として受理せず、誤ったpathを
+「検証済みbinding」とするreceiptも構築・検証できない。失敗前後のClarity製品writeは0件だった。
+
+## 固定入力、authorization、path role、protected snapshot
+
+`node scripts/sprint-041-prewrite.mjs --check`とsource receipt再検証はともにexit 0だった。
+
+| 対象 | Retry 1独立観測 |
+|---|---|
+| 固定tuple | Yasashii base、public product／tree／common／handoff、private candidate／tree／feedback／receiptが全固定値と一致 |
+| public判定 | `public-user-decision-risk-accepted`、`evaluatorPass=false`を保持 |
+| private判定 | feedback `PASS`、private→Yasashii順序を保持 |
+| authorization | `nextPermission=yasashii-prewrite-only`、`writesAuthorized=false`、`applyAuthorized=false`、`releaseAuthorized=false`、`authorizedNow=false` |
+| product path | 46 unique = byte-sync 16＋adapted 30 |
+| supporting／excluded／protected | supporting 2、excluded 9、protected 9 group |
+| role異常 | overlap、unknown、unclassified、unused、stale、blind copy、downstream-owned／Harness role-owned intersectionは全0 |
+| planned action | 全46 pathにread／copyまたはadapt／writeとpostcondition。Sprint 041でのobserved product writeは0 |
+| source inventory | differences 19、roleOwned 15、gateOwned 4、product conflict 0、unknown 0 |
+| Yasashii identity | `yasashii-secretary`、`rules/copy/yasashii.json`、`https://github.com/mtaiseeei/yasashii-harness`、`harness@yasashii-harness` |
+| source receipt | internal SHA `fed303e8d56ed428d1fcf595ca4580d9903728aa7b89a9705a898fe812fde547`、verify exit 0 |
+
+public Hook 3 pathはすべて`byte-sync`、予定actionは`read→copy→write`、postconditionは
+`mode-and-bytes-equal-fixed-public-product`だった。
+
+```text
+plugins/secretary/hooks/hooks.json
+plugins/secretary/scripts/clarity-hook.mjs
+plugins/secretary/scripts/lib/clarity-hook.mjs
+```
+
+protected 9 groupは固定baseから同じfile数／digestで再構築された。README、LICENSE、AGENTS／CLAUDE、
+repo-owned `docs/**`、Yasashii copy／style、`edition.json`、`secretary-overlay/**`、両marketplace identity、
+release historyを製品同期actionから分離している。
+
+## 正式回帰、check、emit／verify
+
+| Command／surface | exit | 独立結果 |
+|---|---:|---|
+| `bash scripts/sprint-041-regression.sh` | 0 | Sprint 041 26/26、Sprint 040 Patch 001 4/4、source receipt verify、wrapper 1/0 |
+| `node scripts/sprint-041-prewrite.mjs --check` | 0 | 46 path、16 byte-sync、30 adapted、protected 9、roleOwned 15、gateOwned 4、product writes 0 |
+| `node scripts/sprint-041-prewrite.mjs --verify-receipt --receipt scripts/fixtures/sprint-041/yasashii-prewrite-receipt.json` | 0 | verified、internal SHA `fed303e8...`、product writes 0 |
+| 固定candidate `2b60f38` Git-free archive内`--check` | 0 | sourceと固定baseをGit-freeで分離し、同じ46／16／30／9／15／4、product writes 0 |
+| 同Git-free surface内canonical fixture pathへのfresh `--emit-receipt` | 0 | receipt write 1件だけ。internal SHA `df956e199b78d7bd80a94f683243c26faaf63b7d3b7fcd16cf4aa3cfe458c1a2` |
+| 同Git-free surface内fresh receipt `--verify-receipt` | 0 | verified、product writes 0 |
+| `git diff --check c2eaaae..2b60f38` | 0 | outputなし |
+
+Git-free評価の最初のEvaluator-only試行では、契約外の別output名を指定したため
+`receipt-output-path`で正しくfail-closedした。canonical fixture pathへ戻したfresh emit→verifyは上表どおり成功した。
+この試行は隔離temporary archiveだけを書き、source fixture／candidateを変更していない。
+
+## Acceptance Criteria — Retry 1
+
+| AC | 判定 | 独立根拠 |
+|---:|---|---|
+| 1 | PASS | 固定identity／digest／pathが一致。同一bytes別path 2件を期待code、exit 1で製品write前に拒否。 |
+| 2 | PASS | public status、`evaluatorPass=false`、private `PASS`を分離し、public PASSへの昇格0。 |
+| 3 | PASS | private→Yasashii、`yasashii-prewrite-only`、`writesAuthorized=false`を保持。apply／release／public Patch権限0。 |
+| 4 | PASS | 正式26/26でunknown／missing／mismatch／falsy-truthy／dirty／content tamper／path mismatch／fixed-baseをfail-closed。 |
+| 5 | PASS | 46 unique、byte-sync 16／adapted 30、role overlap／unknown／未分類／unused／stale 0。 |
+| 6 | PASS | Hook 3 byte-sync。Yasashii adapter／overlay／copy／style／edition／manifest／Harness IDをadapted／protectedへ分離。 |
+| 7 | PASS | 全46 pathに予定action、before、postcondition。blind copy／downstream-owned write予定0。 |
+| 8 | PASS | protected 9 groupを固定baseから再計算。role-owned docsとgate-ownedを製品同期から分離し、product conflict 0。 |
+| 9 | PASS | Clarity product／public／private／upstream／remote／external write各0。source receipt fixtureへのEvaluator write 0。 |
+| 10 | PASS | receiptは固定path、protected before、role manifest、write 0、Sprint 042だけを束縛。path改変＋self-digest再計算を`yasashii-receipt-input-path`で拒否。 |
+
+**AC 10 PASS / 0 FAIL。**
+
+## Rubric scores — Retry 1
+
+Sprint 041指定の10軸はすべて5/5必須である。
+
+| Rubric | Score | 根拠 |
+|---|---:|---|
+| C2 構文・整合 | **5/5** | 固定入力pathとdigestを別々に検査し、receiptも固定pathへ束縛。diff check、JSON、参照整合がPASS。 |
+| C5 安全・規律 | **5/5** | fail-closed境界を内容読込前に適用し、確認・権限を拡張せず、全禁止write 0。 |
+| C6 無回帰 | **5/5** | 正式26/26、Patch回帰4/4、check、source／Git-free emit→verifyが全green。 |
+| C13 edition分離・互換 | **5/5** | Yasashii identity／overlay／protected surface、`harness@yasashii-harness`を分離し、外部操作0。 |
+| C15 4ホスト正式配布 | **5/5** | Retry diffで既存host配布面の変更0。UI／liveを追加条件にせず、未実施を昇格していない。 |
+| C16 Windows native保存・0.9.2下流同期 | **5/5** | 対象製品path／既存回帰期待値の変更0。固定baseとYasashii固有surface、外部write 0を保持。 |
+| C17 秘書identity・routing・安全な改名 | **5/5** | identity製品変更0。adapted／protected境界とYasashii identityを保持。 |
+| C18 既存workspace identity migration | **5/5** | workspace／HOME／cache／migration write 0。関連製品面と履歴の変更0。 |
+| C19 明示memory authorization・内容冪等性・Yasashii下流分離 | **5/5** | 固定公開入力、排他的role、protected surface、公開PASS非継承を保持。memory製品変更0。 |
+| C25 Yasashii安全・統合・handoff | **5/5** | P-01をcloseし、fixed tuple／path／receipt、46 role、protected 9、Hook 3、source／Git-free、write 0が一致。 |
+
+**重点rubric 10軸すべて5/5。**
+
+## Findings — Retry 1
+
+### P-01 `product` / closed — 固定handoff／private receipt path binding
+
+初回の再現2件はRetry 1でどちらも期待code、exit 1へ変わった。receipt path改変＋自己digest再計算も
+専用codeで拒否されたため、blocking product findingは0件である。
+
+### V-01 `verification-infra` / nonblocking・carry forward — 旧全体回帰の既存失敗
+
+初回記録を保持する。Retry diffはP-01 gate、正式test／fixture、progressだけで、旧製品path、旧test、
+旧baseline、localhost server、外部sibling依存を変更していない。worktree cleanを確認後、正式Sprint 041回帰と
+直前Patch回帰がgreenであるため、増分再評価規則に従い初回証拠をcarry forwardした。
+`bash scripts/regression-check.sh --offline`はRetry 1で再実行しておらず、旧13 FAILをPASSへ数えていない。
+Sprint 041由来のproduct regressionまたはblocking verification-infraへ再分類する根拠はない。
+
+### V-02 `verification-infra` / nonblocking・再確認済み — receiptのsurface間portability
+
+契約内の固定candidate Git-free surface内fresh emit→verifyを独立再実行し、exit 0を確認した。
+sourceで生成済みのtracked receiptを別surfaceへ同一bytesのまま移すportable化は契約外であり、今回も要求・実装していない。
+したがってV-02はnonblockingのまま。surface間portable化をPASS条件へ追加していない。
+
+## write count、Non-scope、Evaluator self-review — Retry 1
+
+- Clarity product、public、private、upstream、remote、external write: **各0件**。
+- source receipt fixtureへのEvaluator write: **0件**。隔離temporary archive内fresh receiptだけ1件生成。
+- Evaluatorのrepo内編集: **本feedbackだけ**。
+- push、PR、merge、tag、GitHub Release、Marketplace、installed cache、new session、loaded version、real workspace、
+  real HOME、real Xmind、real host、connector: **not-run / write 0**。
+- Sprint 042／043の製品実装、17／62 behavior、primary 250／CLX20／XV4／E2E4: **not-run／評価対象外**。
+- UI、browser、screenshot、実host live、release、cacheを合格条件へ追加していない。
+- Generator自己評価をVerdictへ流用せず、P-01を独立再現し、public `evaluatorPass=false`を維持した。
+- product finding 0、blocking verification-infra 0。`spec-issue`／`verification-scope-issue`への分類変更は不要。
+
+---
+
+## 初回評価履歴 — candidate `b506a943ade648fbe89776b9a2c2d830e6d7bf71`（保持）
+
+### 初回Verdict
 
 **FAIL — `implementation-issue`**
 
