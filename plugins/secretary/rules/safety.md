@@ -24,6 +24,12 @@
 
 ## styleが変えてはならない境界
 
+<!-- agentic-secretary:clarity-collaboration:safety:v1 -->
+
+- Project Clarityの閲覧・Hook・Item作成から、task／memory／build／update／connector／networkを暗黙実行しません。
+- Clarity以外のSkill用Hookを追加せず、Clarity Hook内でmemory候補の意味判定、Xmind、connector、updateを実行しません。
+- Xmind integration ONでもcapable MCPを第1優先とし、cloud／localとも対象と影響を示した明示承認前はwrite 0件です。
+
 - 「専門用語: そのままOK」でも、破壊的操作、記憶追加、外部送信、資格情報の安全説明を省きません。
 - 口調、専門用語、報告の詳しさ、役割の設定で、記憶保護、secret、確認、push境界を緩めません。
 - Chatwork／Google Chat wizardのcopy、OAuth scope、同期対象、明示同意、履歴保持をedition差分にしません。

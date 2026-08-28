@@ -1,0 +1,54 @@
+[
+  {
+    "id": "customer-notes-sheet",
+    "class": "sheet",
+    "title": "匿名CRMメモ",
+    "rootTopic": {
+      "id": "customer-notes-root",
+      "class": "topic",
+      "title": "匿名企業A",
+      "children": {
+        "attached": [
+          {
+            "id": "clarity-quadrant-execute",
+            "class": "topic",
+            "title": "旧実行待ち",
+            "children": {
+              "attached": [
+                {
+                  "id": "team-owned-deep-branch",
+                  "class": "topic",
+                  "title": "象限内のチーム管理branch"
+                }
+              ]
+            }
+          },
+          {
+            "id": "customer-unrelated-branch",
+            "class": "topic",
+            "title": "既存の無関係branch"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "clarity-matrix-sheet",
+    "class": "sheet",
+    "title": "旧Clarity matrix",
+    "rootTopic": {
+      "id": "clarity-matrix-root",
+      "class": "topic",
+      "title": "Project Clarity",
+      "children": {
+        "attached": [
+          {
+            "id": "team-owned-matrix-branch",
+            "class": "topic",
+            "title": "チーム管理branch"
+          }
+        ]
+      }
+    }
+  }
+]

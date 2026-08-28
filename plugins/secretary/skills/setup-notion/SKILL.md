@@ -7,6 +7,11 @@ description: >
 
 # Notion 接続ガイド（setup-notion・任意）
 
+<!-- yasashii-secretary:clarity-collaboration:connector:v1 -->
+
+このSkillはNotion接続が現在の依頼で明示された場合だけ使う。Project Clarityの閲覧、Item作成、Attention、Hookは
+接続、認証、networkやtask作成の許可ではなく、自動でこのSkillを起動しない。
+
 ## plugin root（必須）
 
 このSKILL.mdの実ファイル絶対pathを `SECRETARY_SKILL_FILE` に入れ、最初に1回だけ解決する。

@@ -1,5 +1,7 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 3,
+  "collaborationMarker": "yasashii-secretary:clarity-collaboration:host:v1",
+  "collaborationInventory": "collaboration-inventory.json",
   "pluginRoot": {
     "strategy": "skill-file-realpath-v1",
     "resolver": "scripts/resolve-plugin-root.mjs",
@@ -25,28 +27,211 @@
       "updateSurface": "Plugins Directory or Codex CLI plugin marketplace"
     }
   },
+  "releaseInventory": "release-inventory.json",
+  "clarityHook": {
+    "commonManifest": "hooks/hooks.json",
+    "commonRouter": "scripts/clarity-hook.mjs",
+    "manualFallback": [
+      "status",
+      "attention",
+      "review",
+      "checkpoint",
+      "doctor"
+    ],
+    "hosts": {
+      "claudeCode": {
+        "desktop": {
+          "status": "supported",
+          "supported": true,
+          "verified": false,
+          "degraded": false,
+          "reason": "Claude Code DesktopでのYasashii candidate 0.11.0 Clarity Hook実機確認は未実行です。"
+        },
+        "cli": {
+          "status": "supported",
+          "supported": true,
+          "verified": false,
+          "degraded": false,
+          "reason": "Claude Code CLIでのYasashii candidate 0.11.0 Clarity Hook実機確認は未実行です。"
+        },
+        "disabled": {
+          "status": "degraded",
+          "supported": true,
+          "verified": false,
+          "degraded": true,
+          "canonicalWrite": false,
+          "reason": "Hook無効時は手動fallbackを使い、Hook由来canonical writeを行いません。"
+        }
+      },
+      "codex": {
+        "app": {
+          "status": "supported",
+          "supported": true,
+          "verified": false,
+          "degraded": false,
+          "reason": "Codex AppでのYasashii candidate 0.11.0 Clarity Hook実機確認は未実行です。"
+        },
+        "cli": {
+          "status": "supported",
+          "supported": true,
+          "verified": false,
+          "degraded": false,
+          "reason": "Codex CLIの主要eventは過去candidateで一部確認済みですが、compact後resume SessionStartを含むYasashii candidate 0.11.0の完全な実機確認は未完了です。"
+        },
+        "untrusted": {
+          "status": "degraded",
+          "supported": true,
+          "verified": false,
+          "degraded": true,
+          "canonicalWrite": false,
+          "reviewSurface": "/hooks",
+          "reason": "trust前はHookを実行せず、手動fallbackを案内します。"
+        },
+        "disabled": {
+          "status": "degraded",
+          "supported": true,
+          "verified": false,
+          "degraded": true,
+          "canonicalWrite": false,
+          "reason": "Hook無効時は手動fallbackを使い、Hook由来canonical writeを行いません。"
+        }
+      }
+    },
+    "promotionRule": "A verified result belongs only to its exact host and surface. supported, verified, degraded, and unverified are never promoted across hosts."
+  },
+  "collaborationRouting": {
+    "router": "scripts/collaboration-router.mjs",
+    "execution": "selection-only",
+    "sideEffect": {
+      "fileWrites": 0,
+      "adapterCalls": 0,
+      "commandCalls": 0,
+      "externalCalls": 0
+    },
+    "manualFallback": "skills/clarity/SKILL.md",
+    "verified": false,
+    "reason": "Natural-language fixtureはoffline検証対象です。host実会話のverifiedへ昇格しません。"
+  },
   "skills": [
-    { "name": "build", "hostSpecific": ["Harness marketplace and install ID", "explicit Harness entry"] },
-    { "name": "chatwork", "hostSpecific": ["explicit skill invocation", "loopback browser surface"] },
-    { "name": "connections", "hostSpecific": ["connector availability and error surface"] },
-    { "name": "daily", "hostSpecific": ["connector availability"] },
-    { "name": "google-chat", "hostSpecific": ["explicit skill invocation", "loopback browser surface"] },
-    { "name": "memory-care", "hostSpecific": ["explicit skill invocation only"] },
-    { "name": "name", "hostSpecific": ["explicit skill invocation", "user-scope guidance file selection"] },
-    { "name": "onboarding", "hostSpecific": ["explicit skill invocation", "plugin reload surface"] },
-    { "name": "projects", "hostSpecific": ["Harness handoff invocation"] },
-    { "name": "secretary", "hostSpecific": ["explicit skill invocation"] },
-    { "name": "settings", "hostSpecific": ["structured question surface"] },
-    { "name": "setup-google", "hostSpecific": ["official connector or App UI", "reload surface"] },
-    { "name": "setup-microsoft", "hostSpecific": ["official connector or App UI", "reload surface"] },
-    { "name": "setup-notion", "hostSpecific": ["official connector or App UI", "reload surface"] },
-    { "name": "update", "hostSpecific": ["plugin marketplace", "reload and new-session surface", "explicit skill invocation"] },
-    { "name": "weekly", "hostSpecific": ["explicit skill invocation only"] }
+    {
+      "name": "build",
+      "hostSpecific": [
+        "Harness marketplace and install ID",
+        "explicit Harness entry"
+      ]
+    },
+    {
+      "name": "chatwork",
+      "hostSpecific": [
+        "explicit skill invocation",
+        "loopback browser surface"
+      ]
+    },
+    {
+      "name": "clarity",
+      "hostSpecific": [
+        "explicit skill invocation",
+        "common Clarity Hook",
+        "manual fallback"
+      ]
+    },
+    {
+      "name": "connections",
+      "hostSpecific": [
+        "connector availability and error surface"
+      ]
+    },
+    {
+      "name": "daily",
+      "hostSpecific": [
+        "connector availability"
+      ]
+    },
+    {
+      "name": "google-chat",
+      "hostSpecific": [
+        "explicit skill invocation",
+        "loopback browser surface"
+      ]
+    },
+    {
+      "name": "memory-care",
+      "hostSpecific": [
+        "explicit skill invocation only"
+      ]
+    },
+    {
+      "name": "name",
+      "hostSpecific": [
+        "explicit skill invocation",
+        "user-scope guidance file selection"
+      ]
+    },
+    {
+      "name": "onboarding",
+      "hostSpecific": [
+        "explicit skill invocation",
+        "plugin reload surface"
+      ]
+    },
+    {
+      "name": "projects",
+      "hostSpecific": [
+        "Harness handoff invocation"
+      ]
+    },
+    {
+      "name": "secretary",
+      "hostSpecific": [
+        "explicit skill invocation"
+      ]
+    },
+    {
+      "name": "settings",
+      "hostSpecific": [
+        "structured question surface"
+      ]
+    },
+    {
+      "name": "setup-google",
+      "hostSpecific": [
+        "official connector or App UI",
+        "reload surface"
+      ]
+    },
+    {
+      "name": "setup-microsoft",
+      "hostSpecific": [
+        "official connector or App UI",
+        "reload surface"
+      ]
+    },
+    {
+      "name": "setup-notion",
+      "hostSpecific": [
+        "official connector or App UI",
+        "reload surface"
+      ]
+    },
+    {
+      "name": "update",
+      "hostSpecific": [
+        "plugin marketplace",
+        "reload and new-session surface",
+        "explicit skill invocation"
+      ]
+    },
+    {
+      "name": "weekly",
+      "hostSpecific": [
+        "explicit skill invocation only"
+      ]
+    }
   ],
   "claudeOnlyInventory": [
     "slash commands",
     "Claude plugin marketplace commands",
-    "SessionStart hooks supplied by the separate Harness plugin",
+    "Claude plugin manifest trust and Hook review surface",
     "Claude connector settings UI",
     "Claude plugin update and reload UI"
   ],
@@ -54,6 +239,9 @@
     "$skill-name explicit invocation",
     "Codex repository marketplace",
     "Plugins Directory and Codex CLI plugin commands",
+    "/hooks trust and review surface",
     "new chat or CLI session after install"
-  ]
+  ],
+  "candidateStatus": "candidate-unverified",
+  "fixedPublicEvaluatorPass": false
 }

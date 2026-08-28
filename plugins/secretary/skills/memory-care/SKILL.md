@@ -74,6 +74,13 @@ secretary/memory/
 
 ## 1. 記憶の追加・更新
 
+<!-- yasashii-secretary:clarity-collaboration:memory:v1 -->
+
+Project固有DecisionとClarity Event／Evidenceは一般memoryへ複製しない。確認済みPJのDecisionは既存の
+`project-tools.mjs add-decision`、Clarityの状態遷移はClarity Eventが正本であり、memory-careは同じ本文を
+`decisions/`や`topics/`へ二重保存しない。「覚えて」が明示された場合も、既にこれらの正本へ保存済みなら
+新しい一般memoryを作らず、その参照と保存済み状態を返す。自然会話のmemory選択をHookへ移さない。
+
 - 現在の利用者が低リスクな内容を「覚えて」と明示した場合、user-visible scope `memory`だけで十分な許可とする。
   decision／topicの内部分類、保存先file、要約案を聞き返さず、同じturnで `save-memory` を1回だけ呼ぶ。
 - 「覚えといたほうがいいかも」のように保存操作自体が曖昧なrequest hedgeは、contentとscopeを示して副作用0で1問確認する。

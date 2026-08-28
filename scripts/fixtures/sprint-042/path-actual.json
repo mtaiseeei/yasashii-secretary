@@ -1,0 +1,694 @@
+{
+  "schemaVersion": 1,
+  "sprint": "sprint-042",
+  "base": "27d37b6",
+  "counts": {
+    "total": 46,
+    "byteSync": 16,
+    "adapted": 30,
+    "unknown": 0,
+    "overlap": 0,
+    "unclassified": 0,
+    "unused": 0,
+    "stale": 0
+  },
+  "rows": [
+    {
+      "path": "plugins/secretary/.claude-plugin/plugin.json",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/.claude-plugin/plugin.json",
+        "mode": "100644",
+        "sha256": "e5973cf4014e73d887153fff7b05066dcf5eea993636a4d075f75dfeecdafb52",
+        "size": 429
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "e79d8688020191d6f33eaeb7eea0262df0a3d0d269f30161723c7504f6cac11b",
+        "size": 487
+      }
+    },
+    {
+      "path": "plugins/secretary/.codex-plugin/plugin.json",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/.codex-plugin/plugin.json",
+        "mode": "100644",
+        "sha256": "28c3a5ec9cb3747a79fc8435e260f8c373214e12a6a8f4659c2186dc2c09fb2d",
+        "size": 1418
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "f7ba3ebfb742da5537569d9de9e020996a8f23154cbcf60f2915712baac2b836",
+        "size": 1451
+      }
+    },
+    {
+      "path": "plugins/secretary/clarity/schemas/event.schema.json",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "168dd16627164526ad3d5db0d7d462632dc52f0fc6daf178d2d11aabee3b89ae",
+        "size": 1145
+      }
+    },
+    {
+      "path": "plugins/secretary/clarity/schemas/evidence.schema.json",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "19ed542e1c5f80a84165075efaa4b576730a94bac8139b067e692b678d76f384",
+        "size": 1263
+      }
+    },
+    {
+      "path": "plugins/secretary/clarity/schemas/item.schema.json",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "b71dca0be30182dcb0e6aac42d8cfddd4a58f61a690bf3f117826be035e71875",
+        "size": 5022
+      }
+    },
+    {
+      "path": "plugins/secretary/clarity/schemas/project.schema.json",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "e8c42cb8aa6e8d55aec31c4748344e2d5660e5ed1cb0f97dd58f93b19d8ee88f",
+        "size": 2310
+      }
+    },
+    {
+      "path": "plugins/secretary/clarity/schemas/state.schema.json",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "6b11d65d0e38b18096d5e6e089d9d84ec877d31174f7290533be1caa8ab9b87f",
+        "size": 1387
+      }
+    },
+    {
+      "path": "plugins/secretary/clarity/secretary-adapter.json",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "97aeed5228b17651c87e2224fd5c4ee66acdccd6228b9c5feb6bebe5526039b7",
+        "size": 890
+      }
+    },
+    {
+      "path": "plugins/secretary/collaboration-inventory.json",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "9ede71776fffb3b6143807ceeab2a9261a2262044ae5941aecdce09217fa64de",
+        "size": 18341
+      }
+    },
+    {
+      "path": "plugins/secretary/hooks/hooks.json",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "7ac60c7f280c965321ced1658dd7fcdad1b481f09bd6eee5cf8153278b5bc40b",
+        "size": 1768
+      }
+    },
+    {
+      "path": "plugins/secretary/host-inventory.json",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/host-inventory.json",
+        "mode": "100644",
+        "sha256": "cc19a55dc7d5b132a77f685800dce37f1b06e9da7a141a4381ef6b265b25026e",
+        "size": 2799
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "e00800647cad616a51cf729a354d919cd309db44e1ffa4fb421743ae5bbd4cb5",
+        "size": 6814
+      }
+    },
+    {
+      "path": "plugins/secretary/release-inventory.json",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "2ba9e97e0f5426663f1402f1e8de4fab86fbd53361536ba52cd2cad38f8a03be",
+        "size": 5265
+      }
+    },
+    {
+      "path": "plugins/secretary/rules/common-language.md",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/rules/common-language.md",
+        "mode": "100644",
+        "sha256": "ad2690834858d00ed917c0acd0ec118531b64fb90e2f56d91b469bf02e8f57c3",
+        "size": 4043
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "1be43eac4c83f630c6646d1c41c6e37c936975c654aebf362236d3455a16f2c5",
+        "size": 4523
+      }
+    },
+    {
+      "path": "plugins/secretary/rules/conversation-contract.md",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/rules/conversation-contract.md",
+        "mode": "100644",
+        "sha256": "e779828be8c3265fee685ea496a4f19fc3c741605a837a24249156d19bc194f5",
+        "size": 5368
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "37da4e6145246434fa5c876ac70b66da9d47345961a33ae8308ea79812009e14",
+        "size": 5853
+      }
+    },
+    {
+      "path": "plugins/secretary/rules/plain-language.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-execute-protect",
+      "diff": "unchanged",
+      "before": {
+        "path": "plugins/secretary/rules/plain-language.md",
+        "mode": "100644",
+        "sha256": "22895f5d23fe0a584012ff55874aefba9c2d2540a0a2f9d4d470096618c64f85",
+        "size": 1728
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "22895f5d23fe0a584012ff55874aefba9c2d2540a0a2f9d4d470096618c64f85",
+        "size": 1728
+      }
+    },
+    {
+      "path": "plugins/secretary/rules/rule-manifest.json",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/rules/rule-manifest.json",
+        "mode": "100644",
+        "sha256": "1ea1d4edc40724f9b8f7823edb14d889a562739fc8d8edf1b5a586f21732645b",
+        "size": 1545
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "61d91fb17a8086d3ae1243f985ff577a0a9527fa4efa8e482b9c9f6d59b41a07",
+        "size": 1631
+      }
+    },
+    {
+      "path": "plugins/secretary/rules/safety.md",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/rules/safety.md",
+        "mode": "100644",
+        "sha256": "565c9006d3ad1b4eda5e5b87cdb7e62096739c0e1eb65abfefbe33a50bdb1e48",
+        "size": 2430
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "6c53847f4ff4a2746c1198901bd2c551e9978a4c0b4a08813d1892ceb38a864a",
+        "size": 2921
+      }
+    },
+    {
+      "path": "plugins/secretary/scripts/clarity-hook.mjs",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "8cf657ae6a9f1c0fdbd2ce96aa73c1917c3105e3d5488cebc92e80db385ceea3",
+        "size": 1087
+      }
+    },
+    {
+      "path": "plugins/secretary/scripts/clarity-secretary.mjs",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "bed4fa879448eebe8a0f97df79aaf1ae1a2bcc362e62fc266a07412a9ba78135",
+        "size": 7180
+      }
+    },
+    {
+      "path": "plugins/secretary/scripts/clarity.mjs",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "9d336c245e3db3e973433670ebef5af5d6394f57a7dcaa443249b0887543398a",
+        "size": 21248
+      }
+    },
+    {
+      "path": "plugins/secretary/scripts/collaboration-router.mjs",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100755",
+        "sha256": "e2a1674fc009a59b92db128b6adfbd567edc6ac341a6ec429fa763f4dd7b70df",
+        "size": 761
+      }
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/clarity-core.mjs",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "49ccac57d074baa01c4b50dd7203e13f0669c79ae3dd6e89078c8281489db5ac",
+        "size": 95445
+      }
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/clarity-drift.mjs",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "7d243edfdc10b4c906f82186cfb1dab41a89f99366e41604bfca194261701c61",
+        "size": 20844
+      }
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/clarity-hook.mjs",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "c85137b5b5b0abce9fc1da454218c205e090aa086daaa26cdcb17b924165aa48",
+        "size": 22573
+      }
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/clarity-link.mjs",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "78bfb47121d99440fb9348556ca53e310312044044c34dc5eab076d46fcbafd4",
+        "size": 44602
+      }
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/clarity-projection.mjs",
+      "role": "byte-sync",
+      "actualAction": "read-copy-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "c432a87dbc4e8da610270b7e0b7396aa26dd2e87cd5c7e7b3701a6f98c821b81",
+        "size": 32028
+      }
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/clarity-secretary.mjs",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "32e2a0b4b0654396bf4364e4e4c89d1f6bfe2cbbaa4e8a517f3332889f941a63",
+        "size": 21219
+      }
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/collaboration-router.mjs",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "51b2be883d33a7b3b8b42aa51e87ae08477eb4771dff67618429242c8fe0ed33",
+        "size": 9543
+      }
+    },
+    {
+      "path": "plugins/secretary/scripts/project-tools.mjs",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/scripts/project-tools.mjs",
+        "mode": "100755",
+        "sha256": "27137a1e894dd83cfb77fa7e9fa7d6bd7951c8cbd225b0acf03dddc1e485b65f",
+        "size": 43876
+      },
+      "after": {
+        "mode": "100755",
+        "sha256": "9840ecc9a73acd673f36507d97c1233fc884cb1da50ca4305918ae931b7502f9",
+        "size": 44253
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/build/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/build/SKILL.md",
+        "mode": "100644",
+        "sha256": "fe88f2630ba4ff90631274157758c890f7eac63f313a96077633923042e4f0ec",
+        "size": 5671
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "55cf475a6f284a95a9c34881dc0669bbcbe6b11c86fa18c55af6929d7b6b3f44",
+        "size": 6299
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/chatwork/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/chatwork/SKILL.md",
+        "mode": "100644",
+        "sha256": "be773dbfb68ad995927d3b1cca48280d8c239418d2c6c8e46299fdc49ce4cd02",
+        "size": 7968
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "9e9c3c97d7d7063ed9211591779a1045f0b46aaac425be5fe7c7b9491a5f67ab",
+        "size": 8337
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/clarity/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "added",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "sha256": "3ee86e48d4888258bd6c7d82eb7016e6fce89f637d08465d1407df94a0b2c10f",
+        "size": 12897
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/connections/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/connections/SKILL.md",
+        "mode": "100644",
+        "sha256": "77885d780506773b3cad5dd8417b8506dcdfbf376a5e6b2a23ecdbad5754153f",
+        "size": 5812
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "154981680413dbffe634fe3124e5466ef100c8b5f7d071723276f5e9bb9e3c6e",
+        "size": 6083
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/daily/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/daily/SKILL.md",
+        "mode": "100644",
+        "sha256": "1e719c3cd11b7cf2fdae7084aa2d5bd2096ae5ab59172a0c2071194d62b140e9",
+        "size": 9771
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "6ff703f22bda4e1bbf7c943431a63260f65282a93fdf75841e30c27e498546d7",
+        "size": 10522
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/google-chat/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/google-chat/SKILL.md",
+        "mode": "100644",
+        "sha256": "1eb2dd83cd0529b5a6b37ad2b9a08f9cc67973018d9c69530430ba8f0fadcfdf",
+        "size": 15822
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "804613c5e332d47f7b79063337b18e9399875babaf71296c834a7ae8985515f2",
+        "size": 16196
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/memory-care/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/memory-care/SKILL.md",
+        "mode": "100644",
+        "sha256": "188b07c29ca0ae8fa48e1f1910a50e0c422d1de1c92edbb20d181664c5e1860c",
+        "size": 15685
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "4948b45df507ee08d56ac4376ce267781d708136cc8edb56d1dfc5b0b6854039",
+        "size": 16269
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/onboarding/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/onboarding/SKILL.md",
+        "mode": "100644",
+        "sha256": "a2a3332d7726d2b6cb590687f18a0fc8033d655e2efb8eff4040fa243239479e",
+        "size": 19696
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "8f7e8ac6703c54a355bde46efafb823b72c85e52ea45b801ed344f023ea32cf3",
+        "size": 20643
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/projects/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/projects/SKILL.md",
+        "mode": "100644",
+        "sha256": "8d8059d75fa2f740dd3aabe661c8533df4e95bbc5163c6cc67ad9a781833a0ab",
+        "size": 11317
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "6c43b052907b628c67a2ac3df7760550fa5a002568d66bc4c70e3c5bfd0cde11",
+        "size": 13343
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/secretary/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/secretary/SKILL.md",
+        "mode": "100644",
+        "sha256": "4f03c788c97db9dec08cc40926a6b7e280a9e32797327d6f2a8777880bd45438",
+        "size": 15029
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "821a5f41e1a2d5bb3d1f3b87010f38680892aea1630a4ad7cccb53eebff81b5a",
+        "size": 16516
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/setup-google/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/setup-google/SKILL.md",
+        "mode": "100644",
+        "sha256": "384e1f7c06789cf277a7ef110b2a8a290b890d7c01c0600c9a165c6baf9ba5be",
+        "size": 8567
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "4d2138ddba505b851cd328fe20ec03a45121e8565b6d444f6294ce2459b6a211",
+        "size": 8866
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/setup-microsoft/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/setup-microsoft/SKILL.md",
+        "mode": "100644",
+        "sha256": "42c574ebc2c9944540d27494f2ebc5187ba716d81e51eb90bceafd279b6c834b",
+        "size": 8757
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "b61adefdcb04890ffeb9b6fcb2de9d613efb81a1dcff737b2b3d721ac6a43010",
+        "size": 9059
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/setup-notion/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/setup-notion/SKILL.md",
+        "mode": "100644",
+        "sha256": "c8b9de21c1a661610e05fbd41459f85c304d1ca1386d7a8c4b065d9774c1b275",
+        "size": 6496
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "13e25c95f8a413daa6bd29b77441415c4c99a6b09f5e8d2950c5b7b50d834220",
+        "size": 6808
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/update/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/update/SKILL.md",
+        "mode": "100644",
+        "sha256": "31ceb8d511def2bc5606db2d6653f728153c06003c1297334e2ba7143d6908c4",
+        "size": 11632
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "a3fdcbbbb2269c0754c9fc829217d2c24cdbec8831ae5e9e1b1cfb09fe488243",
+        "size": 12128
+      }
+    },
+    {
+      "path": "plugins/secretary/skills/weekly/SKILL.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/skills/weekly/SKILL.md",
+        "mode": "100644",
+        "sha256": "8d77c49c2bd087c47e7b60b32f1875f1d78387f13e4dec427738b60150226c2c",
+        "size": 5233
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "4f44934867cd9a82f5f6754ae9bedb00f35e3b5731a98b2af720707d26fbf4f0",
+        "size": 5696
+      }
+    },
+    {
+      "path": "plugins/secretary/templates/AGENTS.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/templates/AGENTS.md",
+        "mode": "100644",
+        "sha256": "0bd57ec94676dab3ba91bf12a54314ce3e9229984bd254898b964e79b5d8d62f",
+        "size": 12171
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "51869aee09ced1011d1debca9638ef77f138a0d2f089d85f8303d7980e43c0e8",
+        "size": 13063
+      }
+    },
+    {
+      "path": "plugins/secretary/templates/CLAUDE.md",
+      "role": "adapted",
+      "actualAction": "read-adapt-write-execute",
+      "diff": "modified",
+      "before": {
+        "path": "plugins/secretary/templates/CLAUDE.md",
+        "mode": "100644",
+        "sha256": "d1d60ccc0f0d39cb844dcb10e6b6132f392657b8dfdec9548e5f3cc3e1843886",
+        "size": 1822
+      },
+      "after": {
+        "mode": "100644",
+        "sha256": "3e81d323ba645b3a78c7ab17c53a68244ef1c343e98f2cfe722c69b83a296ab7",
+        "size": 2136
+      }
+    }
+  ]
+}

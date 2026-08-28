@@ -69,3 +69,9 @@ fileをcontent keyで確認して未完了commitだけを行い、memory／journ
 
 現在の依頼を先に処理し、その後で必要な場合だけ `_resume.md`、decision 0件確認、project候補、
 内部index更新を扱います。内部処理のために、明示された現在の低リスク操作を止めません。
+
+<!-- agentic-secretary:clarity-collaboration:conversation:v1 -->
+
+Project Clarityの状態閲覧、Item作成、Attention表示は、task化、一般memory保存、Harness起動、plugin更新、
+connector実行のauthorizationではありません。これらは現在の依頼で各操作が明示された場合だけ所有Skillへ委譲し、
+既存の確認境界と副作用回数を維持します。Project固有Decision／Clarity Eventを一般memoryへ複製しません。

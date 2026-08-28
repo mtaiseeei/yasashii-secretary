@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "sprint": "sprint-042",
+  "algorithm": "sorted-path-NUL-mode-NUL-bytes-NUL",
+  "groups": [
+    {
+      "id": "yasashii-readme",
+      "patterns": [
+        "README.md"
+      ],
+      "beforeSha256": "51b6e5f207aaf9ece4e4683c9d19860940113a412b352cd8ed78e9c3b2232497",
+      "afterSha256": "51b6e5f207aaf9ece4e4683c9d19860940113a412b352cd8ed78e9c3b2232497",
+      "beforeFileCount": 1,
+      "afterFileCount": 1,
+      "diffPaths": [],
+      "authorizedExceptions": [],
+      "unauthorizedChanges": []
+    },
+    {
+      "id": "license",
+      "patterns": [
+        "LICENSE"
+      ],
+      "beforeSha256": "e0e1f1e4499eb41b66a5be20d24b8d4dec722c755746193634873a51675c7bba",
+      "afterSha256": "e0e1f1e4499eb41b66a5be20d24b8d4dec722c755746193634873a51675c7bba",
+      "beforeFileCount": 1,
+      "afterFileCount": 1,
+      "diffPaths": [],
+      "authorizedExceptions": [],
+      "unauthorizedChanges": []
+    },
+    {
+      "id": "repo-agents",
+      "patterns": [
+        "AGENTS.md",
+        "CLAUDE.md"
+      ],
+      "beforeSha256": "945f0e573288b1f5f0028a8e01ba032031e0179f8b81036304fe7d7fc4d51e3b",
+      "afterSha256": "945f0e573288b1f5f0028a8e01ba032031e0179f8b81036304fe7d7fc4d51e3b",
+      "beforeFileCount": 2,
+      "afterFileCount": 2,
+      "diffPaths": [],
+      "authorizedExceptions": [],
+      "unauthorizedChanges": []
+    },
+    {
+      "id": "repo-owned-docs",
+      "patterns": [
+        "docs/**"
+      ],
+      "beforeSha256": "b10c050fc2da673c53c079d57790df20aa48c587baba7ea74f119a3b2d830b8c",
+      "afterSha256": "60b3fd2ac3d3b62f5f9f5efd29b1544b5822885817ce8e5c9acfbee0715baf1e",
+      "beforeFileCount": 398,
+      "afterFileCount": 405,
+      "diffPaths": [
+        "docs/progress/sprint-042.md"
+      ],
+      "authorizedExceptions": [
+        "docs/progress/sprint-042.md"
+      ],
+      "unauthorizedChanges": []
+    },
+    {
+      "id": "yasashii-copy-style",
+      "patterns": [
+        "plugins/secretary/rules/copy/yasashii.json",
+        "plugins/secretary/rules/styles/yasashii.md"
+      ],
+      "beforeSha256": "a7a140ec724d414321c4b39ec3503b2b770a28d1aa61a4b1cb041138c2ac4c73",
+      "afterSha256": "a7a140ec724d414321c4b39ec3503b2b770a28d1aa61a4b1cb041138c2ac4c73",
+      "beforeFileCount": 2,
+      "afterFileCount": 2,
+      "diffPaths": [],
+      "authorizedExceptions": [],
+      "unauthorizedChanges": []
+    },
+    {
+      "id": "yasashii-edition-identity",
+      "patterns": [
+        "plugins/secretary/edition.json"
+      ],
+      "beforeSha256": "3366d69bfd0d72c117a004a151a7fcf2786d89dab7b3cc4642fb0b1256c7fbcd",
+      "afterSha256": "3366d69bfd0d72c117a004a151a7fcf2786d89dab7b3cc4642fb0b1256c7fbcd",
+      "beforeFileCount": 1,
+      "afterFileCount": 1,
+      "diffPaths": [],
+      "authorizedExceptions": [],
+      "unauthorizedChanges": []
+    },
+    {
+      "id": "overlay-definitions",
+      "patterns": [
+        "secretary-overlay/**"
+      ],
+      "beforeSha256": "1e615bae3548a02f5463339e66c2b84daa1d6096e2ec195d87cc8ead1c16b4a7",
+      "afterSha256": "1e615bae3548a02f5463339e66c2b84daa1d6096e2ec195d87cc8ead1c16b4a7",
+      "beforeFileCount": 8,
+      "afterFileCount": 8,
+      "diffPaths": [],
+      "authorizedExceptions": [],
+      "unauthorizedChanges": []
+    },
+    {
+      "id": "marketplace-identity",
+      "patterns": [
+        ".agents/plugins/marketplace.json",
+        ".claude-plugin/marketplace.json"
+      ],
+      "beforeSha256": "91e734ade4ab7bafeeb4a5394bcfc7d601dcc8222334bdc5303f73f319eed890",
+      "afterSha256": "91e734ade4ab7bafeeb4a5394bcfc7d601dcc8222334bdc5303f73f319eed890",
+      "beforeFileCount": 2,
+      "afterFileCount": 2,
+      "diffPaths": [],
+      "authorizedExceptions": [],
+      "unauthorizedChanges": []
+    },
+    {
+      "id": "release-history",
+      "patterns": [
+        "plugins/secretary/CHANGELOG.md",
+        "plugins/yasashii-secretary/CHANGELOG.md",
+        "scripts/master-release-gate.mjs",
+        "scripts/archive-release-gate.mjs",
+        "scripts/check-release-integrity.py"
+      ],
+      "beforeSha256": "58d7d96c24b0a2c7411520a15b0d501ee7c0e7f3fa0e43f010c2e3e5260030a8",
+      "afterSha256": "58d7d96c24b0a2c7411520a15b0d501ee7c0e7f3fa0e43f010c2e3e5260030a8",
+      "beforeFileCount": 5,
+      "afterFileCount": 5,
+      "diffPaths": [],
+      "authorizedExceptions": [],
+      "unauthorizedChanges": []
+    }
+  ],
+  "unauthorizedChanges": []
+}

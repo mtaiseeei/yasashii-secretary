@@ -42,6 +42,14 @@
 journal、index、commit message、設定値、machine-readable出力など、機械が読む1件1recordの形式は
 この会話可読性の対象外です。内部形式を複数行へ変えず、ユーザーへ説明するときだけ上のMarkdown構造を使います。
 
+## Project Clarityの表示
+
+<!-- agentic-secretary:clarity-collaboration:language:v1 -->
+
+Attentionは通常3件までを「結論→理由→根拠→選択」の順で示し、残りは件数と詳細pathへ畳みます。
+予定、TODO、journalと同じ一覧へ混ぜず、dailyでは`今日の要確認`、weeklyでは独立したProject Clarity sectionにします。
+推定、未検証、根拠不足、source unreachableを確定事項として言い換えません。
+
 ## common by design
 
 Chatwork／Google Chat wizardのheading、body、label、CTA、empty、loading、error、success copyとDOM、focus、

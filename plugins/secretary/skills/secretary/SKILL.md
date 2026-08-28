@@ -73,6 +73,16 @@ canonical workspace rootで次を実行する。
 
 ユーザーの自然な言い回しから、やりたいことを推測し、必要な機能スキルだけを段階ロードする。
 
+Clarityを含む用件は、まず次のread-only routerで所有Skillを確認できる。このrouterはSkillを実行せず、
+file、adapter、command、external serviceを変更・呼出ししない。結果の`selectedSkill`だけを段階ロード先として使い、
+現在の別用件をClarityへ寄せない。
+
+```text
+node "${SECRETARY_PLUGIN_ROOT}/scripts/collaboration-router.mjs" "<現在の用件>" --json
+```
+
+<!-- yasashii-secretary:clarity-collaboration-router:v1 -->
+
 | こう言われたら | やりたいこと | 段階ロード先 |
 |---|---|---|
 | 「覚えて」「記憶して」「決めた」「案件メモに残して」「消して」「振り返って」「前回の続き」 | 記憶ケア（memory-care） | `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/SKILL.md` |
@@ -88,6 +98,7 @@ canonical workspace rootで次を実行する。
 | 「設定変えたい」「もっとフランクに」「専門用語そのままで」「呼び方を変えて」 | 個人設定（settings） | `${SECRETARY_PLUGIN_ROOT}/skills/settings/SKILL.md` |
 | 「秘書に名前をつけたい」「秘書名を変えたい」「Alexと呼びたい」「別repoでも呼びたい」 | 秘書identityと名前routing（name） | `${SECRETARY_PLUGIN_ROOT}/skills/name/SKILL.md` |
 | 「プロジェクトにまとめたい」「案件を整理したい」「プロジェクトの状況」「完了にしたい」「再開したい」 | 継続する仕事の整理（projects） | `${SECRETARY_PLUGIN_ROOT}/skills/projects/SKILL.md` |
+| 「クラリティを初期化」「今のClarity状態」「今、人間が考える必要があること」「決定と実行のズレ」 | Project Clarityの状態・Attention・Drift（clarity） | `${SECRETARY_PLUGIN_ROOT}/skills/clarity/SKILL.md` |
 | 「最新版にして」「更新ある？」「バージョンを確認して」「自動更新はどうする？」 | 更新状況の読み取り専用診断（update） | `${SECRETARY_PLUGIN_ROOT}/skills/update/SKILL.md` |
 | 「保存して」「文書にして」「まとめて残して」「企画書にして」 | 成果物保存（出力規約） | 下記「成果物を保存するとき」 |
 | 「作って」「開発したい」「アプリ／ツールにして」 | 開発の入口（build） | `${SECRETARY_PLUGIN_ROOT}/skills/build/SKILL.md` |
@@ -95,6 +106,12 @@ canonical workspace rootで次を実行する。
 
 LINE等の未対応サービスは準備中。Chatworkと明示設定済みGoogle Chatは、Repository Secretを使う読取専用同期に対応する。Notion は任意で、繋がなくても他の機能は普通に使える。
 準備中の機能を求められたら、正直に「その機能は準備中です」と伝え、いまできることを代わりに提案する。断定せず、できないことはできないと言う。
+
+Clarityが所有するのはDecision／Execution／Validation／Attention／Driftである。Project作成・open／closed・完了・再開・
+`canonicalRepo`はprojects、予定・TODO・journalはdaily／weekly、一般memoryはmemory-care、開発はbuild、plugin更新はupdate、
+外部サービスは各connector入口が所有する。「Clarity Itemを見せて」「Clarityを作って」だけではtask、memory、build、update、
+Chatwork、Google Chat、Google、Microsoft、Notionを起動しない。タスク化や外部サービス名が現在の依頼で明示された場合だけ、
+既存の確認境界を保った所有Skillへ委譲する。
 
 どのロード先でも、同じ成果に向けた複数行動・複数セッションを含む候補シグナルが2つ以上揃ったら、
 `${SECRETARY_PLUGIN_ROOT}/skills/projects/SKILL.md` の候補確認だけを段階ロードする。候補検出は完全自動ではない。
@@ -154,6 +171,7 @@ LINE等の未対応サービスは準備中。Chatworkと明示設定済みGoogl
 - 秘書自身の名前と別repo呼び出し: `${SECRETARY_PLUGIN_ROOT}/skills/name/SKILL.md`
 - 週次ふりかえり・索引退避: `${SECRETARY_PLUGIN_ROOT}/skills/weekly/SKILL.md`
 - 継続する仕事の整理: `${SECRETARY_PLUGIN_ROOT}/skills/projects/SKILL.md`
+- Project Clarity: `${SECRETARY_PLUGIN_ROOT}/skills/clarity/SKILL.md`
 - 更新状況の確認: `${SECRETARY_PLUGIN_ROOT}/skills/update/SKILL.md`
 - 開発の入口（やさしいハーネス）: `${SECRETARY_PLUGIN_ROOT}/skills/build/SKILL.md`
 - 成果物・TODO の決定的シーム: `node "${SECRETARY_PLUGIN_ROOT}/scripts/workspace-tools.mjs"`

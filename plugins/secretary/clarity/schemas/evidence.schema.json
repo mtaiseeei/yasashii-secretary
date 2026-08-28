@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentic-secretary://clarity/evidence.schema.json",
+  "title": "ClarityEvidence",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schemaVersion", "evidenceId", "type", "source", "locator", "summary", "observedAt", "contentDigest", "sensitivity", "availability"],
+  "properties": {
+    "schemaVersion": { "enum": [1, 2] },
+    "evidenceId": { "type": "string", "pattern": "^ce_[a-f0-9]{20}$" },
+    "type": { "enum": ["user-confirmation", "project-decision", "adr", "spec-section", "meeting-reference", "git-commit", "git-diff", "pull-request", "test-run", "deployment", "file-reference", "task-reference", "xmind-proposal", "agent-observation"] },
+    "source": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "locator": { "type": "object", "additionalProperties": { "type": "string", "minLength": 1, "maxLength": 300 } },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 240 },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "contentDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "sensitivity": { "const": "non-secret-reference" },
+    "availability": { "enum": ["available", "source_unreachable"] }
+  }
+}

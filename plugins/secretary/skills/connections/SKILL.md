@@ -7,6 +7,11 @@ description: >
 
 # 接続診断（connections）
 
+<!-- yasashii-secretary:clarity-collaboration:connector:v1 -->
+
+接続診断は現在の依頼で明示された場合だけ行う。Project Clarityの閲覧、Item作成、Attention、Hookから
+connector toolを呼ばず、接続済み・verifiedを推定しない。
+
 ## plugin root（必須）
 
 このSKILL.mdの実ファイル絶対pathを `SECRETARY_SKILL_FILE` に入れ、最初に1回だけ解決する。
