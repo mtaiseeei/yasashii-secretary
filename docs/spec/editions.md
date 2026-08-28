@@ -325,3 +325,16 @@ privateの3版すべてがfresh独立PASSするまで、release、Mac mini同期
 18. 既存`0.10.0` workspaceのidentity migrationは、Plugin更新とローカル移行を別状態として示し、read-only診断、別確認、所有marker限定更新、local checkpoint、完全rollback、retry／rerun冪等性を満たす。Yasashii固有surfaceと`0.10.0`以前の履歴は不変である。
 
 許可不足や外部サービス未準備は `external-live-gate-unavailable` として不合格にし、実装不具合とは分けて記録する。
+## Project ClarityのYasashii下流境界
+
+Project Clarityのcommon core正本は固定public product candidate `5f08d454c05576fcff8ab32c10c00887b4c15a96`、Yasashii適用前の下流順序証拠はprivate candidate `d5598226213004d55781ca033985589907ae7b5d`のfresh PASS receiptである。公開版のpublication statusは`public-user-decision-risk-accepted`、`evaluatorPass=false`のまま保持し、private PASSで書き換えない。
+
+Yasashiiはpublic F64〜F80をF60〜F76へ一対一で適応する。common coreには4モード、Event／Evidence／State、Decision／Execution／Validation／Attention／Drift、Clarity専用command-only Hook、Markdown／Mermaid／Xmind provider、Skill／CLI、host adapter、collaboration inventoryを含む。
+
+public Hook 3 pathはbyte-syncする。Yasashii adapter、`edition.json`、copy、style、overlay、manifest／marketplace、repository、install ID、`harness@yasashii-harness`はYasashii所有のadaptation／protected面とする。`README.md`、`LICENSE`、`AGENTS.md`、repo-owned `docs/**`、`secretary-overlay/**`、既存release履歴をpublic／private値で上書きしない。
+
+保存先はgeneric `secretary/projects/open/<project>/clarity/`とし、private my-vaultの`05/02` resolver、`vault/10_sources`、Notion TaskDB property／relation、private root guidance、private値を同梱しない。private実装の成功をYasashii実装済みへ昇格しない。
+
+XmindのYasashii既定はOFF。ON時のpriorityは1. capable Xmind MCP、2. 明示承認済みlocal `.xmind`。default、ON／OFF、capability、selected、reason、verified、approvalを別fieldにし、MCP不可時のlocal自動writeを禁止する。固定4象限visualはedition間で変えない。
+
+Project Clarity以外のSkillへHookを追加しない。projects、daily、weekly、memory-care、update等は既存router／Skill入口でClarity-awareになり、Clarity routerの責務を広げない。release、push、tag、cache、install、new session、live Xmind／host／connectorはsource適用と別phaseである。

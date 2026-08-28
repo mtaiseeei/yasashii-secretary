@@ -649,3 +649,33 @@ enabled stateは別domainであり、ローカルmigrationで変更しない。
 - downstream remote: `upstream` fetch enabled、push disabled
 
 directory／repo作成、remote変更、push、公開は該当Sprintでユーザーが明示許可するまで未実行状態を正常とする。
+## Project Clarity
+
+Project Clarityの概念正本、17機能／62 behavior、固定handoffは[clarity.md](clarity.md)を参照する。
+
+### 状態モデル
+
+ClarityProjectはimmutableなIDと`standalone`、`secretary-local`、`linked-external`、`portfolio`のmodeを持つ。Eventはappend-onlyの出来事、Evidenceは本文を複製しない参照根拠、StateはEventから決定的に再構築できる派生状態とする。
+
+- Decision: `unknown`、`exploring`、`proposed`、`confirmed`、`rejected`、`superseded`
+- Execution: `unknown`、`not_started`、`in_progress`、`implemented`、`verified`、`operational`、`rolled_back`
+- Validation: `unknown`、`pending`、`passed`、`failed`、`waived`
+- Alignment: `unknown`、`aligned`、`possible_drift`、`drift`、`not_applicable`
+
+DecisionとExecutionを単一進捗値へ潰さない。confirmed以上×implemented以上は定着・検証、confirmed以上×implemented未満は実行待ち、confirmed未満×implemented以上は暫定実装・要再確認、confirmed未満×implemented未満は設計・意思決定へ派生させる。
+
+### 保存先と既存正本
+
+YasashiiのClarity正本は`secretary/projects/open/<project>/clarity/`。Projectsがproject lifecycleと`canonicalRepo`、ClarityがDecision／Execution／Validation／Attention／Driftを所有する。既存`PROJECT.md`、Decision、memory、TODO、外部Repo正本を複製・置換しない。private版の`05/02/10_sources/Notion`は実装せず、adapter seamと非混入検査だけを保つ。
+
+### Hook observationとcheckpoint
+
+Hook observationはsession／turn／event／host event／tool／touched path／test候補／result summaryをruntime領域へ競合安全に記録する。通常Bash／他Skill payloadのnonmaterial observationはcanonical Eventではない。重い意味分類はreview／checkpoint側で行う。`material=false`ならStop checkpointは0件、material changeと未checkpointがある同一turnでは最大1件とする。
+
+### Xmind provider状態
+
+Yasashiiの`xmind.enabled`既定はfalse。provider capability、priority、selected、reason、verifiedを設定値と分ける。状態は少なくとも`mcp-selected`、`fallback-approval-required`、`local-selected-after-approval`、`stopped`を持つ。MCPは第1優先、localは明示承認後の第2優先であり、自動fallbackしない。固定4象限visualを満たせないproviderはcapability不足として停止する。
+
+### link、sync、Drift
+
+linkはprepare／accept／finalizeで双方identity／digest／authorityを確認する。syncはpull-onlyで自己rootへだけwriteし、authorityはPrimary／Reference／Shared derivedを一意に持つ。DriftはDecision側と実装側のEvidenceを示し、片側根拠が弱ければ`possible_drift`に留める。resolutionは新Eventとして残す。
