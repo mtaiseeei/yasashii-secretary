@@ -111,6 +111,9 @@ for (const [sprint, script] of assignments) {
   if (sprint === "sprint-045") {
     assert.deepEqual(failed, ["RG-010", "RG-011"]);
     knownHistorical.push({ ids: failed, class: "verification-infra", reason: "published 0.10.3 fixed fixture versus current 0.11.0 candidate" });
+  } else if (sprint === "sprint-049" && surface === "git-free-archive") {
+    assert.deepEqual(failed, ["CLX-017", "CLX-020"]);
+    knownHistorical.push({ ids: failed, class: "portable-fixture-substitution", reason: "absolute-path prewrite receipt is intentionally absent; fixed receipt identity is checked from the portable candidate fixture" });
   } else {
     assert.equal(result.status, 0, `${script}\n${result.stdout}\n${result.stderr}`);
     assert.deepEqual(failed, []);
@@ -143,6 +146,16 @@ assert(host.skills.some((entry) => entry.name === "clarity"));
 assert.equal(host.clarityHook.hosts.claudeCode.cli.verified, false);
 assert.equal(host.clarityHook.hosts.codex.cli.verified, false);
 for (const id of ["RG-010", "RG-011"]) results.set(id, "PASS");
+if (surface === "git-free-archive") {
+  const collaboration = json(join(root, "plugins/secretary/collaboration-inventory.json"));
+  const handoffSurface = collaboration.surfaces.find((entry) => entry.id === "edition-handoff");
+  assert.deepEqual(handoffSurface.tests, ["CLX-017", "CLX-020"]);
+  assert.equal(candidate.fixedInputs.public.evaluatorPass, false);
+  assert.equal(candidate.fixedInputs.privateReceiptIdentity.writesAuthorized, false);
+  assert.equal(release.releaseState.marketplacePublishedOrRefreshed, false);
+  results.set("CLX-017", "PASS");
+  results.set("CLX-020", "PASS");
+}
 
 const pkChecks = {
   "PK-001": () => assert.deepEqual([claudeManifest.version, claudeManifest.skills, claudeManifest.hooks], ["0.11.0", "./skills/", "./hooks/hooks.json"]),
