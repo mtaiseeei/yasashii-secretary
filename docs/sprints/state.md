@@ -5,7 +5,7 @@
 - Current ID: sprint-043
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 1
+- Lineage Dispatches: 2
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
@@ -75,13 +75,14 @@
 | sprint-040-patch-001 | done | [contract](sprint-040-patch-001.md) | [progress](../progress/sprint-040-patch-001.md) | [feedback](../feedback/sprint-040-patch-001.md) |
 | sprint-041 | done | [contract](sprint-041.md) | [progress](../progress/sprint-041.md) | [feedback](../feedback/sprint-041.md) |
 | sprint-042 | done | [contract](sprint-042.md) | [progress](../progress/sprint-042.md) | [feedback](../feedback/sprint-042.md) |
-| sprint-043 | active | [contract](sprint-043.md) | - | - |
+| sprint-043 | awaiting-eval | [contract](sprint-043.md) | [progress](../progress/sprint-043.md) | - |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-29: Sprint 043 fresh strong Generatorは最終source gateを製品本体不変で整備。固定product candidate `f5a44f180bf1d39a1f2689e9c6763723c23eb2da`／tree `e9831484f912830b75349dedf6f50cb836a81b44`／product digest `2bbb126e083ce65fc021b53a244549cd7a919f5b1867ff16d119f01a5bb9d3f0`／153 filesを維持し、verification HEAD `e4243d9d334f5d2f91c371b64cedf644d3c93745` でsource、clean detached checkout、Git-free archiveの3 surfaceを検査した。各surfaceは同一product bytes／mode、46 path、protected 9、17 Skill／62 behavior、registry 274件（273 PASS＋XM-007 conditional NOT-RUN、FAIL 0）、E2E 4/4、receipt負例10/10、tamper 13/13を満たす。archive内`.git`／absolute source path／private source literal、product diff、cross-root write、Hook loop、task auto creation、Decision wrong confirmationはいずれも0。最終source receiptはEvaluator feedback未確定のため意図どおり`feedback-pending`で拒否され、release／push／tag／cache／install／new session／実Xmind／host／connector writeはNOT-RUN／0のまま。fresh独立Evaluator予約としてStatusをawaiting-eval、Lineage Dispatchesを2、Retry／Spec-Issue 0、Model Tier strong、Rotate none、Next Planned TBDとする。
 - 2026-08-29: Sprint 042はproduct candidate `f5a44f180bf1d39a1f2689e9c6763723c23eb2da` でfresh独立Evaluator PASS。feedback commit `e1ed69bd0271e7559e4bfdae8fe903c8bd2c3299`／SHA `f711691599a6b775b4faafc1a09ffce87ddec4cdbecddd04e7ec1821a4f1038f`。AC15/15、指定19 rubric全5/5、17/17／62/62、actual263 PASS、XM-007はNOT-RUN非計上。synthetic CLI、generic storage、Projects／task／daily／weekly、Hook、fixed visual、Xmind承認境界、link／sync／Drift、安全性、46 path、protected9を独立確認しproduct finding0。state HEAD wrapper、RG-010旧overlay snapshot、RG-011／release-integrity旧0.10.3 fixtureはnonblocking verification-infra 3件としてPASSへ数えず、current 0.11.0／17 Skill／schema22／downgrade-blocked write0はgreen。Sprint 042をdone。最終Sprint 043 fresh strong Generator予約としてCurrent IDをsprint-043、Lineage Dispatchesを新しいlineageの1、Retry／Spec-Issue0、Model Tier strong、Rotate none、Next Planned TBDとする。
 - 2026-08-29: Sprint 042 fresh strong GeneratorがYasashii Project Clarity full integration candidate `f5a44f180bf1d39a1f2689e9c6763723c23eb2da` を作成。F60〜F76 17/17、62/62 behaviorを一対一matrixへ束縛し、actual behaviorはcore43、projection35、Xmind29、Hook40、Secretary33、link/sync36、Drift27、collaboration20の計263 PASS、XM-007実Xmind liveのみNOT-RUN、product FAIL0。46 product pathはbyte-sync16／adapted30、Hook3 mode+bytes一致、protected9の許可外変化0、generic storage／Projects所有／task明示委譲／Xmind OFF・MCP-first・local承認／reciprocal link／pull-only／Drift／安全境界を実装した。manifestは未公開candidate 0.11.0、published marketplace 0.10.3不変、current report schema22／update downgrade-blocked／write0を確認。旧RG-010/011とrelease-integrityの0.10.3固定差は既知historical verificationとして分離し、期待値やrelease履歴を変更していない。fresh Evaluator予約としてLineage Dispatches2、Status awaiting-eval、Model Tier strong、Rotate none。public/private source、release、push、tag、cache、install、new session、実Xmind／host／connector writeは0。
 - 2026-08-29: Sprint 041 Retry 1はproduct candidate `2b60f3898f0a81be7ae7e142efe0cbb36e1820b8` でfresh独立Evaluator PASS。feedback commit `48d50f76ba32afc1a19234c9d898b1a966814005`／SHA `30bf2a0944b2cb7dd1c25a9a2d0a3aed935143bc82f819ac701812d3e9bf76ab`。初回P-01のsame-byte別path 2件とreceipt path self-digest改ざんを製品write前に所定codeで拒否し、AC1〜10とC2／C5／C6／C13／C15／C16／C17／C18／C19／C25は全て5/5。46 path（byte-sync16／adapted30）、Hook3、protected9、public `evaluatorPass=false`、private PASS／順序／authority、product／external write0を再確認。旧全体回帰13 FAILとsurface間receipt portabilityは非blocking verification-infra履歴として保持し、PASSへ数えていない。Sprint 041をdone、Retry／Spec-Issueを0へ戻す。次のhigh-risk Sprint 042 fresh strong Generator予約としてCurrent IDをsprint-042、Lineage Dispatchesを新しいlineageの1、Model Tier strong、Rotate none、Next Plannedをsprint-043とする。
