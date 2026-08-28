@@ -2,13 +2,13 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-041
-- Retry Count: 1
+- Current ID: sprint-042
+- Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 4
+- Lineage Dispatches: 1
 - Model Tier: strong
 - Rotate: none
-- Next Planned: sprint-042
+- Next Planned: sprint-043
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
      ユーザー確認で単段クレジットに正本改訂、回帰assert強化のうえ合格）。
@@ -73,8 +73,8 @@
 | sprint-039-patch-001 | done | [contract](sprint-039-patch-001.md) | [progress](../progress/sprint-039-patch-001.md) | [feedback](../feedback/sprint-039-patch-001.md) |
 | sprint-040 | done | [contract](sprint-040.md) | [progress](../progress/sprint-040.md) | [feedback](../feedback/sprint-040.md) |
 | sprint-040-patch-001 | done | [contract](sprint-040-patch-001.md) | [progress](../progress/sprint-040-patch-001.md) | [feedback](../feedback/sprint-040-patch-001.md) |
-| sprint-041 | awaiting-eval | [contract](sprint-041.md) | [progress](../progress/sprint-041.md) | [feedback](../feedback/sprint-041.md) |
-| sprint-042 | planned | [contract](sprint-042.md) | - | - |
+| sprint-041 | done | [contract](sprint-041.md) | [progress](../progress/sprint-041.md) | [feedback](../feedback/sprint-041.md) |
+| sprint-042 | active | [contract](sprint-042.md) | - | - |
 | sprint-043 | planned | [contract](sprint-043.md) | - | - |
 
 ## Deferred / Superseded
@@ -82,6 +82,7 @@
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-29: Sprint 041 Retry 1はproduct candidate `2b60f3898f0a81be7ae7e142efe0cbb36e1820b8` でfresh独立Evaluator PASS。feedback commit `48d50f76ba32afc1a19234c9d898b1a966814005`／SHA `30bf2a0944b2cb7dd1c25a9a2d0a3aed935143bc82f819ac701812d3e9bf76ab`。初回P-01のsame-byte別path 2件とreceipt path self-digest改ざんを製品write前に所定codeで拒否し、AC1〜10とC2／C5／C6／C13／C15／C16／C17／C18／C19／C25は全て5/5。46 path（byte-sync16／adapted30）、Hook3、protected9、public `evaluatorPass=false`、private PASS／順序／authority、product／external write0を再確認。旧全体回帰13 FAILとsurface間receipt portabilityは非blocking verification-infra履歴として保持し、PASSへ数えていない。Sprint 041をdone、Retry／Spec-Issueを0へ戻す。次のhigh-risk Sprint 042 fresh strong Generator予約としてCurrent IDをsprint-042、Lineage Dispatchesを新しいlineageの1、Model Tier strong、Rotate none、Next Plannedをsprint-043とする。
 - 2026-08-29: Sprint 041 Retry 1 fresh strong GeneratorがP-01だけを限定修正したcandidate `2b60f3898f0a81be7ae7e142efe0cbb36e1820b8` を作成。固定handoff／private receiptのabsolute pathを内容SHA読込前に検査し、same-byte別pathを`handoff-path-mismatch`／`private-receipt-path-mismatch`で拒否、receipt path改ざん＋self-digest再計算も`yasashii-receipt-input-path`で拒否する。正式26/26、Patch回帰4/4、source／Git-free各surface内fresh emit→verify、`git diff --check`がPASS。receipt SHAは`fed303e8d56ed428d1fcf595ca4580d9903728aa7b89a9705a898fe812fde547`、46 path／protected 9／Hook 3 byte-sync／write 0を維持。fresh Retry 1 Evaluator予約としてLineage Dispatches 4、Status awaiting-eval、Model Tier strong、Rotate noneとする。旧feedbackとV-01／V-02は改変せず保持。
 - 2026-08-29: Sprint 041初回fresh Evaluatorはcandidate `b506a943ade648fbe89776b9a2c2d830e6d7bf71` をFAIL／`implementation-issue`と判定。固定handoffとprivate receiptを同一bytesの別pathへ移してCLIへ渡すとexit 0となり、固定pathへのbindingを満たさないP-01を独立再現した。AC1／AC10、C2／C5／C6／C25が4/5で必須閾値未達。他の18代表負例、46 path、protected 9、write 0はPASS。Git-free surface内fresh emit→verifyはPASSし、tracked receiptのsurface間portabilityと旧全体回帰13 FAILは非blocking verification-infraへ分離した。feedback SHA `a9997728a338c5a080ae9342f6e7cc248ac3d987c7a3f4436e31f2e028440aab`を保持し、固定path equalityと回帰追加だけをfresh strong Generator Retry 1へ差し戻す。Retry Count 1、Lineage Dispatches 3、Status active、Model Tier strong、Rotate none。製品本体、external、release／cache／live writeは0のまま。
 - 2026-08-29: Sprint 041 fresh strong Generatorがcandidate `b506a943ade648fbe89776b9a2c2d830e6d7bf71` を作成。固定tuple、private PASS receipt、46 product path（byte-sync 16／adapted 30）、protected 9 group、Hook 3 byte-sync、dirty／tamper等のfail-closed gateとYasashii prewrite receiptを実装した。専用正負例24/24、Sprint 040 Patch 001回帰4/4、receipt再検証、`git diff --check`がPASSし、observed product／public／private／external writesは0。receipt SHAは`7334da0f2cb50984d06026db504a60ac45dd0d066acc166c0f58585b308f4f0f`、role manifest SHAは`433d6e2597be4a504e9da6b1b78f6d701377006521b55379554fb37e9cfc32f5`、`authorizedNow=false`、Evaluator verdict未記録。fresh Evaluator予約としてLineage Dispatchesを2、Statusをawaiting-eval、Rotateをnoneとする。全体旧回帰の既存baseline／localhost権限／外部sibling不足はSprint 041の受入と分離し、assertや契約は緩和していない。
