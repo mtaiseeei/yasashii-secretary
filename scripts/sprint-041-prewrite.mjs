@@ -2,7 +2,7 @@
 
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { emitReceipt, inspectPrewrite, PrewriteError, verifyReceipt } from "./lib/sprint-041-prewrite.mjs";
+import { emitReceipt, FIXED, inspectPrewrite, PrewriteError, verifyReceipt } from "./lib/sprint-041-prewrite.mjs";
 
 const argv = process.argv.slice(2);
 const rootDefault = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -30,9 +30,9 @@ const root = resolve(values["--root"] || rootDefault);
 const options = {
   root,
   baseRoot: values["--base-root"] ? resolve(values["--base-root"]) : null,
-  handoffPath: resolve(values["--handoff"] || "/private/tmp/project-clarity-handoff-20260829/ready-handoff.json"),
-  privateReceiptPath: resolve(values["--private-receipt"] || "/private/tmp/agentic-secretary-my-vault-clarity/scripts/fixtures/sprint-050/private-pass-receipt.json"),
-  privateFeedbackCommit: values["--private-feedback-commit"] || "556c80117c7a1db8f2dd4eabb997277d47e02a51",
+  handoffPath: resolve(values["--handoff"] || FIXED.publicHandoffPath),
+  privateReceiptPath: resolve(values["--private-receipt"] || FIXED.privateReceiptPath),
+  privateFeedbackCommit: values["--private-feedback-commit"] || FIXED.privateFeedbackCommit,
 };
 
 try {

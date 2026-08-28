@@ -11,14 +11,17 @@ import {
   FIXED,
   inspectPrewrite,
   PrewriteError,
+  sha256,
+  stable,
   validatePrivateReceiptDocument,
   validatePublicHandoffDocument,
+  validateFixedInputFile,
   verifyReceipt,
 } from "./lib/sprint-041-prewrite.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const handoffPath = "/private/tmp/project-clarity-handoff-20260829/ready-handoff.json";
-const privateReceiptPath = "/private/tmp/agentic-secretary-my-vault-clarity/scripts/fixtures/sprint-050/private-pass-receipt.json";
+const handoffPath = FIXED.publicHandoffPath;
+const privateReceiptPath = FIXED.privateReceiptPath;
 const baseOptions = { root, baseRoot: null, handoffPath, privateReceiptPath, privateFeedbackCommit: FIXED.privateFeedbackCommit };
 const handoff = JSON.parse(readFileSync(handoffPath, "utf8"));
 const privateReceipt = JSON.parse(readFileSync(privateReceiptPath, "utf8"));
@@ -100,8 +103,28 @@ check("handoff and receipt file tamper fail before source action", () => {
     const badReceipt = join(temporary, "receipt.json");
     writeFileSync(badHandoff, `${JSON.stringify(handoff)}\n`);
     writeFileSync(badReceipt, `${JSON.stringify(privateReceipt)}\n`);
-    expectCode("handoff-file-tamper", () => inspectPrewrite({ ...baseOptions, handoffPath: badHandoff }));
-    expectCode("private-receipt-file-tamper", () => inspectPrewrite({ ...baseOptions, privateReceiptPath: badReceipt }));
+    expectCode("handoff-file-tamper", () => validateFixedInputFile({ actualPath: badHandoff, expectedPath: badHandoff, expectedSha256: FIXED.publicHandoffSha256, pathCode: "handoff-path-mismatch", tamperCode: "handoff-file-tamper", label: "public handoff" }));
+    expectCode("private-receipt-file-tamper", () => validateFixedInputFile({ actualPath: badReceipt, expectedPath: badReceipt, expectedSha256: FIXED.privateReceiptFileSha256, pathCode: "private-receipt-path-mismatch", tamperCode: "private-receipt-file-tamper", label: "private PASS receipt" }));
+  } finally { rmSync(temporary, { recursive: true, force: true }); }
+});
+
+check("same-byte handoff copy at another path fails closed", () => {
+  const temporary = mkdtempSync(join(tmpdir(), "sprint041-handoff-copy-"));
+  try {
+    const relocated = join(temporary, "ready-handoff.json");
+    cpSync(handoffPath, relocated);
+    assert.equal(sha256(readFileSync(relocated)), FIXED.publicHandoffSha256);
+    expectCode("handoff-path-mismatch", () => inspectPrewrite({ ...baseOptions, handoffPath: relocated }));
+  } finally { rmSync(temporary, { recursive: true, force: true }); }
+});
+
+check("same-byte private receipt copy at another path fails closed", () => {
+  const temporary = mkdtempSync(join(tmpdir(), "sprint041-private-receipt-copy-"));
+  try {
+    const relocated = join(temporary, "private-pass-receipt.json");
+    cpSync(privateReceiptPath, relocated);
+    assert.equal(sha256(readFileSync(relocated)), FIXED.privateReceiptFileSha256);
+    expectCode("private-receipt-path-mismatch", () => inspectPrewrite({ ...baseOptions, privateReceiptPath: relocated }));
   } finally { rmSync(temporary, { recursive: true, force: true }); }
 });
 
@@ -125,6 +148,22 @@ check("Git-free fixed-base/source verification emits and verifies only the recei
     tampered.authorization.writesAuthorized = true;
     writeFileSync(outputPath, `${JSON.stringify(tampered, null, 2)}\n`);
     expectCode("yasashii-receipt-tamper", () => verifyReceipt({ ...options, receiptPath: outputPath }));
+    emitReceipt(options);
+    const pathTampered = JSON.parse(readFileSync(outputPath, "utf8"));
+    pathTampered.fixedInputs.public.handoffPath = join(temporary, "copied-handoff.json");
+    const body = { ...pathTampered };
+    delete body.receiptSha256;
+    pathTampered.receiptSha256 = sha256(Buffer.from(stable(body)));
+    writeFileSync(outputPath, `${JSON.stringify(pathTampered, null, 2)}\n`);
+    expectCode("yasashii-receipt-input-path", () => verifyReceipt({ ...options, receiptPath: outputPath }));
+    emitReceipt(options);
+    const privatePathTampered = JSON.parse(readFileSync(outputPath, "utf8"));
+    privatePathTampered.fixedInputs.private.receiptPath = join(temporary, "copied-private-receipt.json");
+    const privatePathBody = { ...privatePathTampered };
+    delete privatePathBody.receiptSha256;
+    privatePathTampered.receiptSha256 = sha256(Buffer.from(stable(privatePathBody)));
+    writeFileSync(outputPath, `${JSON.stringify(privatePathTampered, null, 2)}\n`);
+    expectCode("yasashii-receipt-input-path", () => verifyReceipt({ ...options, receiptPath: outputPath }));
   } finally { rmSync(temporary, { recursive: true, force: true }); }
 });
 

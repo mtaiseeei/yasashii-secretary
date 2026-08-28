@@ -136,3 +136,44 @@ remote、push、tag、Release、GitHub Release、Marketplace、installed cache�
 実workspace、実HOME、実Xmind、実host live、external connectorはすべてNOT-RUN／write 0件。
 
 `docs/spec*`、`docs/sprints/*`、`docs/feedback/*`はGeneratorとして変更していない。
+
+## Retry 1 — P-01 固定入力path binding
+
+fresh Evaluatorのblocking finding P-01だけを修正した。契約固定absolute pathを`FIXED`の正本へ追加し、
+`--handoff`と`--private-receipt`の指定値を内容SHA読込より前に照合する。同じbytes／同じSHA-256でも別pathなら、
+それぞれ`handoff-path-mismatch`、`private-receipt-path-mismatch`で非0停止する。Clarity製品writeは検査前後とも0件である。
+
+Yasashii prewrite receiptの`fixedInputs.public.handoffPath`と`fixedInputs.private.receiptPath`は呼出値ではなく
+契約固定値を直接保持する。receipt内pathを改変して自己digestを再計算しても、
+`yasashii-receipt-input-path`で検証不能になる。既存の内容SHA、public `evaluatorPass=false`、private `PASS`、
+private→Yasashii順序、`writesAuthorized=false`、receipt全体のrebuild bindingは維持した。
+
+正式suiteへ次の独立負例を追加した。
+
+- 固定handoffのbyte同一copyを別pathで渡す: 期待／観測`handoff-path-mismatch`
+- 固定private receiptのbyte同一copyを別pathで渡す: 期待／観測`private-receipt-path-mismatch`
+
+Retry 1の実行結果は次のとおり。
+
+| Command／scenario | 結果 |
+|---|---|
+| `node scripts/sprint-041-test.mjs` | `SPRINT041_TEST_PASS=26 SPRINT041_TEST_FAIL=0`。上記2負例、内容tamper、receipt両固定path改変＋自己digest再計算、dirty、fixed-baseを含む |
+| `node scripts/sprint-041-prewrite.mjs --check` | PASS。46 paths、16 byte-sync、30 adapted、protected 9、roleOwned 15、gateOwned 4、product writes 0 |
+| `node scripts/sprint-041-prewrite.mjs --emit-receipt` | PASS。現在surface内でfresh emit、receipt write 1件だけ |
+| `node scripts/sprint-041-prewrite.mjs --verify-receipt` | PASS。新receipt SHA `fed303e8d56ed428d1fcf595ca4580d9903728aa7b89a9705a898fe812fde547` |
+| Evaluatorのhandoff copy再現 | exit 1、`handoff-path-mismatch` |
+| Evaluatorのprivate receipt copy再現 | exit 1、`private-receipt-path-mismatch` |
+| `bash scripts/sprint-041-regression.sh` | PASS。Sprint 041 26/26、Sprint 040 Patch 001 4/4、receipt verify PASS |
+| Git-free surface内fresh emit→verify | PASS。正式26件suite内で実行 |
+| `git diff --check` | PASS |
+
+全46 product path、Hook 3 byte-sync、role overlap／unknown／未分類／unused／stale 0、protected 9 group、
+downstream-owned予定write 0、Clarity product／public／private／upstream／remote／external write 0は維持した。
+fresh emitで初回評価後の`docs/feedback/sprint-041.md`をrole-owned inventoryへ追加したため、receipt SHAだけは上記へ更新された。
+
+EvaluatorのV-01（旧全体回帰の既存失敗）はnonblockingのまま変更せず、旧baseline、assert、期待値を緩めていない。
+V-02はsurface間portable化を行わず、契約内のGit-free surface内fresh emit→verifyだけを回帰した。
+Sprint 042／043、Clarity本体、release、cache、live、外部writeは未実施である。
+
+Retry 1の変更は製品gate、正式test、fixture、Generator所有の本progressだけで、spec、Sprint契約、state、feedbackへの変更は0件。
+これはGenerator自己評価であり、Evaluator verdictではない。

@@ -19,6 +19,7 @@ export const FIXED = Object.freeze({
   publicProduct: "5f08d454c05576fcff8ab32c10c00887b4c15a96",
   publicTree: "1fbffe636565355b875dcde35ff05d26cd7e15f00710c1c88a563866749037c5",
   publicCommon: "4aa6e8d4b21aa9e0020cfaa6edefd5ff0e6640fd2e8f937db00478190142f849",
+  publicHandoffPath: "/private/tmp/project-clarity-handoff-20260829/ready-handoff.json",
   publicHandoffSha256: "09c3fa1289fa0af4d31c084a74ab108ce5cf85bcf3b3e7c9320cab72758d83c0",
   publicStatus: "public-user-decision-risk-accepted",
   publicEvaluatorPass: false,
@@ -26,6 +27,7 @@ export const FIXED = Object.freeze({
   privateTree: "920aea5d09b1aa51fcb5ebe23ab242a538c50445",
   privateFeedbackCommit: "556c80117c7a1db8f2dd4eabb997277d47e02a51",
   privateFeedbackSha256: "aa502ca0b3b53ece16822edc39b60b9a587b93c15f701ce1ad6578c2b9f47774",
+  privateReceiptPath: "/private/tmp/agentic-secretary-my-vault-clarity/scripts/fixtures/sprint-050/private-pass-receipt.json",
   privateReceiptFileSha256: "bf6893f3891b10b9b86669308e123008f09eae05d6d8330a477eb1614a456745",
   privateReceiptInternalSha256: "0aac84a3d1beadcc7820a495205f292c4491e1758c5c9349a8ee523e68e82122",
   nextPermission: "yasashii-prewrite-only",
@@ -121,6 +123,14 @@ function exactKeys(value, expected, code) {
 function json(path, code) {
   try { return JSON.parse(readFileSync(path, "utf8")); }
   catch (error) { throw new PrewriteError(code, `${code}: ${error.message}`); }
+}
+
+export function validateFixedInputFile({ actualPath, expectedPath, expectedSha256, pathCode, tamperCode, label }) {
+  const actual = resolve(actualPath);
+  const expected = resolve(expectedPath);
+  fail(actual === expected, pathCode, `${label} must use the contract-fixed absolute path`, { expected, actual });
+  fail(sha256(readFileSync(actual)) === expectedSha256, tamperCode, `${label} file digest mismatch`);
+  return actual;
 }
 
 function normalizePath(path) {
@@ -387,7 +397,7 @@ function yasashiiIdentity(baseRoot) {
   return { edition: edition.edition, copyPath: edition.copy.path, harnessRepository: edition.harness.repository, harnessInstallId: edition.harness.installId };
 }
 
-function buildReceiptBody({ handoffPath, privateReceiptPath, privateFeedbackCommit, handoff, privateReceipt, pathRoles, protectedBefore, source, overlay, identity, baseSource }) {
+function buildReceiptBody({ privateFeedbackCommit, handoff, privateReceipt, pathRoles, protectedBefore, source, overlay, identity, baseSource }) {
   return {
     schemaVersion: 1,
     kind: "yasashii-project-clarity-prewrite-receipt",
@@ -395,8 +405,8 @@ function buildReceiptBody({ handoffPath, privateReceiptPath, privateFeedbackComm
     status: "prewrite-verified",
     fixedInputs: {
       yasashiiBase: FIXED.yasashiiBase,
-      public: { product: FIXED.publicProduct, treeSha256: FIXED.publicTree, commonSha256: FIXED.publicCommon, handoffPath: resolve(handoffPath), handoffFileSha256: FIXED.publicHandoffSha256, publicationStatus: handoff.publicationStatus, evaluatorPass: false },
-      private: { product: FIXED.privateProduct, tree: FIXED.privateTree, feedbackCommit: privateFeedbackCommit, feedbackSha256: FIXED.privateFeedbackSha256, receiptPath: resolve(privateReceiptPath), receiptFileSha256: FIXED.privateReceiptFileSha256, receiptInternalSha256: privateReceipt.receiptSha256, feedbackVerdict: privateReceipt.feedback.verdict },
+      public: { product: FIXED.publicProduct, treeSha256: FIXED.publicTree, commonSha256: FIXED.publicCommon, handoffPath: FIXED.publicHandoffPath, handoffFileSha256: FIXED.publicHandoffSha256, publicationStatus: handoff.publicationStatus, evaluatorPass: false },
+      private: { product: FIXED.privateProduct, tree: FIXED.privateTree, feedbackCommit: privateFeedbackCommit, feedbackSha256: FIXED.privateFeedbackSha256, receiptPath: FIXED.privateReceiptPath, receiptFileSha256: FIXED.privateReceiptFileSha256, receiptInternalSha256: privateReceipt.receiptSha256, feedbackVerdict: privateReceipt.feedback.verdict },
     },
     authorization: { downstreamOrder: ["agentic-secretary-my-vault", "yasashii-secretary"], inputPermission: FIXED.nextPermission, writesAuthorized: false, applyAuthorized: false, releaseAuthorized: false, publicPatchAuthorized: false, nextScope: { sprint: "sprint-042", operation: "yasashii-product-apply-only", authorizedNow: false } },
     verification: { handoff: "PASS", privateReceipt: "PASS", fixedBase: "PASS", sourceBoundary: "PASS", overlayDeclarations: "PASS", yasashiiIdentity: "PASS", publicEvaluatorPassPreserved: true, privatePassNotPromotedToPublic: true },
@@ -415,6 +425,12 @@ function verifyReceiptDigest(receipt) {
   fail(receipt?.kind === "yasashii-project-clarity-prewrite-receipt" && receipt.status === "prewrite-verified", "yasashii-receipt-status", "Yasashii prewrite receipt status mismatch");
   const body = { ...receipt }; delete body.receiptSha256;
   fail(receipt.receiptSha256 === sha256(Buffer.from(stable(body))), "yasashii-receipt-tamper", "Yasashii prewrite receipt digest mismatch");
+  fail(receipt.fixedInputs?.public?.handoffPath === FIXED.publicHandoffPath && receipt.fixedInputs?.private?.receiptPath === FIXED.privateReceiptPath, "yasashii-receipt-input-path", "Yasashii receipt fixed input path binding mismatch", {
+    expectedHandoffPath: FIXED.publicHandoffPath,
+    actualHandoffPath: receipt.fixedInputs?.public?.handoffPath,
+    expectedPrivateReceiptPath: FIXED.privateReceiptPath,
+    actualPrivateReceiptPath: receipt.fixedInputs?.private?.receiptPath,
+  });
   fail(receipt.authorization?.writesAuthorized === false && receipt.authorization?.applyAuthorized === false && receipt.authorization?.nextScope?.sprint === "sprint-042" && receipt.authorization?.nextScope?.authorizedNow === false, "yasashii-receipt-authority", "Yasashii receipt expanded authority");
   fail(Object.entries(receipt.writeAccounting || {}).filter(([key]) => key !== "receiptWrites").every(([, value]) => value === 0), "yasashii-receipt-writes", "Yasashii receipt records a forbidden write");
   fail(receipt.provenance?.evaluatorVerdict === null && receipt.provenance?.orchestratorStateWritten === false, "yasashii-receipt-owner", "Yasashii receipt forged Evaluator or Orchestrator state");
@@ -422,11 +438,9 @@ function verifyReceiptDigest(receipt) {
 
 export function inspectPrewrite(options) {
   const root = resolve(options.root);
-  const handoffPath = resolve(options.handoffPath);
-  const privateReceiptPath = resolve(options.privateReceiptPath);
+  const handoffPath = validateFixedInputFile({ actualPath: options.handoffPath, expectedPath: FIXED.publicHandoffPath, expectedSha256: FIXED.publicHandoffSha256, pathCode: "handoff-path-mismatch", tamperCode: "handoff-file-tamper", label: "public handoff" });
+  const privateReceiptPath = validateFixedInputFile({ actualPath: options.privateReceiptPath, expectedPath: FIXED.privateReceiptPath, expectedSha256: FIXED.privateReceiptFileSha256, pathCode: "private-receipt-path-mismatch", tamperCode: "private-receipt-file-tamper", label: "private PASS receipt" });
   fail(options.privateFeedbackCommit === FIXED.privateFeedbackCommit, "private-feedback-commit", "private feedback commit mismatch");
-  fail(sha256(readFileSync(handoffPath)) === FIXED.publicHandoffSha256, "handoff-file-tamper", "public handoff file digest mismatch");
-  fail(sha256(readFileSync(privateReceiptPath)) === FIXED.privateReceiptFileSha256, "private-receipt-file-tamper", "private receipt file digest mismatch");
   const handoff = json(handoffPath, "handoff-json");
   const privateReceipt = json(privateReceiptPath, "private-receipt-json");
   validatePublicHandoffDocument(handoff);
