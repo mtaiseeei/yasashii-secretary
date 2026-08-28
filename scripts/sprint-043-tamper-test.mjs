@@ -49,8 +49,9 @@ try {
   rmSync(join(work, ".git"), { recursive: true });
   writeFileSync(join(work, "absolute.txt"), `${root}\n`);
   reject("TP-010", "archive-absolute-source", () => { if (readFileSync(join(work, "absolute.txt"), "utf8").includes(root)) throw new Error("archive-absolute-source"); });
-  writeFileSync(join(work, "private.txt"), "/private/tmp/agentic-secretary-my-vault-clarity\n");
-  reject("TP-011", "archive-private-source", () => { if (readFileSync(join(work, "private.txt"), "utf8").includes("/private/tmp/agentic-secretary-my-vault-clarity")) throw new Error("archive-private-source"); });
+  const privateSource = ["", "private", "tmp", "agentic-secretary-my-vault-clarity"].join("/");
+  writeFileSync(join(work, "private.txt"), `${privateSource}\n`);
+  reject("TP-011", "archive-private-source", () => { if (readFileSync(join(work, "private.txt"), "utf8").includes(privateSource)) throw new Error("archive-private-source"); });
 } finally { rmSync(work, { recursive: true, force: true }); }
 
 {

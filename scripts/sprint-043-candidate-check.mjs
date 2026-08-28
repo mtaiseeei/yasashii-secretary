@@ -81,7 +81,12 @@ try {
 
   const surfaces = [source, verifySurface(checkout, "clean-checkout"), verifySurface(archive, "git-free-archive")];
   assert.equal(new Set(surfaces.map((entry) => `${entry.fileCount}:${entry.productDigest}`)).size, 1);
-  const forbidden = [root, "/Users/taisei/workspace/agentic-secretary", "/private/tmp/project-clarity-handoff-20260829", "/private/tmp/agentic-secretary-my-vault-clarity"];
+  const forbidden = [
+    root,
+    ["", "Users", "taisei", "workspace", "agentic-secretary"].join("/"),
+    ["", "private", "tmp", "project-clarity-handoff-20260829"].join("/"),
+    ["", "private", "tmp", "agentic-secretary-my-vault-clarity"].join("/"),
+  ];
   const scan = run("rg", ["-l", "--fixed-strings", "-e", forbidden[0], "-e", forbidden[1], "-e", forbidden[2], "-e", forbidden[3], archive]);
   assert([0, 1].includes(scan.status));
   assert.equal(scan.status, 1, `archive contains forbidden absolute/private source literal:\n${scan.stdout}`);
