@@ -1,0 +1,2502 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "productCandidate": "5f08d454c05576fcff8ab32c10c00887b4c15a96",
+    "registry": "docs/spec/clarity-acceptance.md",
+    "cases": "docs/spec/clarity-acceptance-cases.md"
+  },
+  "registry": {
+    "schemaVersion": 1,
+    "expectedPrimaryCaseCount": 250,
+    "expectedCollaborationCaseCount": 20,
+    "expectedVisualProviderCaseCount": 4,
+    "primaryCaseIds": {
+      "sprint-041": [
+        "ST-001",
+        "ST-002",
+        "ST-003",
+        "ST-004",
+        "ST-005",
+        "ST-006",
+        "ST-007",
+        "ST-008",
+        "ST-009",
+        "ST-010",
+        "ST-011",
+        "ST-012",
+        "ST-013",
+        "ST-014",
+        "ST-015",
+        "QM-001",
+        "QM-002",
+        "QM-003",
+        "QM-004",
+        "QM-005",
+        "QM-006",
+        "QM-007",
+        "QM-008",
+        "QM-009",
+        "QM-010",
+        "QM-011",
+        "QM-012",
+        "QM-013",
+        "QM-014",
+        "DE-001",
+        "DE-002",
+        "DE-003",
+        "DE-004",
+        "DE-005",
+        "DE-006",
+        "DE-007",
+        "DE-008",
+        "DE-009",
+        "DE-010",
+        "DE-011",
+        "DE-012",
+        "DE-013",
+        "DE-014"
+      ],
+      "sprint-042": [
+        "AT-001",
+        "AT-002",
+        "AT-003",
+        "AT-004",
+        "AT-005",
+        "AT-006",
+        "AT-007",
+        "AT-008",
+        "AT-009",
+        "AT-010",
+        "AT-011",
+        "AT-012",
+        "AT-013",
+        "AT-014",
+        "AT-016",
+        "AT-017",
+        "AT-018",
+        "IM-001",
+        "IM-004",
+        "IM-006",
+        "IM-007",
+        "IM-008",
+        "IM-009",
+        "IM-013",
+        "IM-014",
+        "UX-001",
+        "UX-002",
+        "UX-003",
+        "UX-004",
+        "UX-005",
+        "UX-006",
+        "UX-007",
+        "UX-008",
+        "UX-009",
+        "UX-010"
+      ],
+      "sprint-043": [
+        "MM-001",
+        "MM-002",
+        "MM-003",
+        "MM-004",
+        "MM-005",
+        "MM-006",
+        "MM-007",
+        "MM-008",
+        "MM-009",
+        "MM-010",
+        "XM-001",
+        "XM-002",
+        "XM-003",
+        "XM-004",
+        "XM-005",
+        "XM-006",
+        "XM-007",
+        "XM-008",
+        "XM-009",
+        "XM-010",
+        "XM-011",
+        "XM-012",
+        "XM-013",
+        "XM-014",
+        "XM-015",
+        "IM-005"
+      ],
+      "sprint-044": [
+        "HC-001",
+        "HC-002",
+        "HC-003",
+        "HC-004",
+        "HC-005",
+        "HC-006",
+        "HC-007",
+        "HC-008",
+        "HC-009",
+        "HC-010",
+        "HC-011",
+        "HC-012",
+        "HC-013",
+        "HC-014",
+        "HC-015",
+        "HC-016",
+        "HC-017",
+        "HX-001",
+        "HX-002",
+        "HX-003",
+        "HX-004",
+        "HX-005",
+        "HX-006",
+        "HX-007",
+        "HX-008",
+        "HX-009",
+        "HX-010",
+        "HX-011",
+        "HX-012",
+        "HX-013",
+        "HX-014",
+        "HP-001",
+        "HP-002",
+        "HP-003",
+        "HP-004",
+        "HP-005",
+        "HP-006",
+        "HP-007",
+        "AT-015",
+        "IM-012"
+      ],
+      "sprint-045": [
+        "SL-001",
+        "SL-002",
+        "SL-003",
+        "SL-004",
+        "SL-005",
+        "SL-006",
+        "SL-007",
+        "SL-008",
+        "SL-009",
+        "SL-010",
+        "SL-011",
+        "SL-012",
+        "PF-001",
+        "PF-002",
+        "PF-003",
+        "PF-004",
+        "PF-005",
+        "PF-006",
+        "PF-007",
+        "PF-008",
+        "PF-010",
+        "PF-011",
+        "PF-012",
+        "RG-001",
+        "RG-002",
+        "RG-003",
+        "RG-004",
+        "RG-005",
+        "RG-006",
+        "RG-007",
+        "RG-008",
+        "RG-009",
+        "RG-010",
+        "RG-011",
+        "RG-012"
+      ],
+      "sprint-046": [
+        "LK-001",
+        "LK-002",
+        "LK-003",
+        "LK-004",
+        "LK-005",
+        "LK-006",
+        "LK-007",
+        "LK-008",
+        "LK-009",
+        "LK-010",
+        "LK-011",
+        "LK-012",
+        "LK-013",
+        "LK-014",
+        "LK-015",
+        "LK-016",
+        "SY-001",
+        "SY-002",
+        "SY-003",
+        "SY-004",
+        "SY-005",
+        "SY-006",
+        "SY-007",
+        "SY-008",
+        "SY-009",
+        "SY-010",
+        "SY-011",
+        "SY-012",
+        "SY-013",
+        "IM-002",
+        "IM-003",
+        "IM-010",
+        "IM-011",
+        "PF-009"
+      ],
+      "sprint-047": [
+        "DR-001",
+        "DR-002",
+        "DR-003",
+        "DR-004",
+        "DR-005",
+        "DR-006",
+        "DR-007",
+        "DR-008",
+        "DR-009",
+        "DR-010",
+        "GS-001",
+        "GS-002",
+        "GS-003",
+        "GS-004",
+        "GS-005",
+        "GS-006",
+        "GS-007",
+        "GS-008",
+        "GS-009",
+        "GS-010",
+        "GS-011",
+        "GS-012",
+        "GS-013",
+        "GS-014",
+        "GS-015"
+      ],
+      "sprint-048": [
+        "PK-001",
+        "PK-002",
+        "PK-003",
+        "PK-004",
+        "PK-005",
+        "PK-006",
+        "PK-007",
+        "PK-008",
+        "PK-009",
+        "PK-010",
+        "PK-011",
+        "PK-012"
+      ]
+    },
+    "collaborationCaseIds": {
+      "sprint-049": [
+        "CLX-001",
+        "CLX-002",
+        "CLX-003",
+        "CLX-004",
+        "CLX-005",
+        "CLX-006",
+        "CLX-007",
+        "CLX-008",
+        "CLX-009",
+        "CLX-010",
+        "CLX-011",
+        "CLX-012",
+        "CLX-013",
+        "CLX-014",
+        "CLX-015",
+        "CLX-016",
+        "CLX-017",
+        "CLX-018",
+        "CLX-019",
+        "CLX-020"
+      ]
+    },
+    "visualProviderCaseIds": {
+      "sprint-043": [
+        "XV-001",
+        "XV-002",
+        "XV-003",
+        "XV-004"
+      ]
+    },
+    "finalRecheck": {
+      "sprint": "sprint-050",
+      "primary": "ALL_PRIMARY_CASE_IDS",
+      "collaboration": "ALL_COLLABORATION_CASE_IDS",
+      "visualProvider": "ALL_VISUAL_PROVIDER_CASE_IDS",
+      "e2e": [
+        "E2E-001",
+        "E2E-002",
+        "E2E-003",
+        "E2E-004"
+      ],
+      "existingRegression": "FULL_EXISTING_MASTER_REGRESSION"
+    }
+  },
+  "groups": {
+    "primary": [
+      "ST-001",
+      "ST-002",
+      "ST-003",
+      "ST-004",
+      "ST-005",
+      "ST-006",
+      "ST-007",
+      "ST-008",
+      "ST-009",
+      "ST-010",
+      "ST-011",
+      "ST-012",
+      "ST-013",
+      "ST-014",
+      "ST-015",
+      "QM-001",
+      "QM-002",
+      "QM-003",
+      "QM-004",
+      "QM-005",
+      "QM-006",
+      "QM-007",
+      "QM-008",
+      "QM-009",
+      "QM-010",
+      "QM-011",
+      "QM-012",
+      "QM-013",
+      "QM-014",
+      "DE-001",
+      "DE-002",
+      "DE-003",
+      "DE-004",
+      "DE-005",
+      "DE-006",
+      "DE-007",
+      "DE-008",
+      "DE-009",
+      "DE-010",
+      "DE-011",
+      "DE-012",
+      "DE-013",
+      "DE-014",
+      "AT-001",
+      "AT-002",
+      "AT-003",
+      "AT-004",
+      "AT-005",
+      "AT-006",
+      "AT-007",
+      "AT-008",
+      "AT-009",
+      "AT-010",
+      "AT-011",
+      "AT-012",
+      "AT-013",
+      "AT-014",
+      "AT-016",
+      "AT-017",
+      "AT-018",
+      "IM-001",
+      "IM-004",
+      "IM-006",
+      "IM-007",
+      "IM-008",
+      "IM-009",
+      "IM-013",
+      "IM-014",
+      "UX-001",
+      "UX-002",
+      "UX-003",
+      "UX-004",
+      "UX-005",
+      "UX-006",
+      "UX-007",
+      "UX-008",
+      "UX-009",
+      "UX-010",
+      "MM-001",
+      "MM-002",
+      "MM-003",
+      "MM-004",
+      "MM-005",
+      "MM-006",
+      "MM-007",
+      "MM-008",
+      "MM-009",
+      "MM-010",
+      "XM-001",
+      "XM-002",
+      "XM-003",
+      "XM-004",
+      "XM-005",
+      "XM-006",
+      "XM-007",
+      "XM-008",
+      "XM-009",
+      "XM-010",
+      "XM-011",
+      "XM-012",
+      "XM-013",
+      "XM-014",
+      "XM-015",
+      "IM-005",
+      "HC-001",
+      "HC-002",
+      "HC-003",
+      "HC-004",
+      "HC-005",
+      "HC-006",
+      "HC-007",
+      "HC-008",
+      "HC-009",
+      "HC-010",
+      "HC-011",
+      "HC-012",
+      "HC-013",
+      "HC-014",
+      "HC-015",
+      "HC-016",
+      "HC-017",
+      "HX-001",
+      "HX-002",
+      "HX-003",
+      "HX-004",
+      "HX-005",
+      "HX-006",
+      "HX-007",
+      "HX-008",
+      "HX-009",
+      "HX-010",
+      "HX-011",
+      "HX-012",
+      "HX-013",
+      "HX-014",
+      "HP-001",
+      "HP-002",
+      "HP-003",
+      "HP-004",
+      "HP-005",
+      "HP-006",
+      "HP-007",
+      "AT-015",
+      "IM-012",
+      "SL-001",
+      "SL-002",
+      "SL-003",
+      "SL-004",
+      "SL-005",
+      "SL-006",
+      "SL-007",
+      "SL-008",
+      "SL-009",
+      "SL-010",
+      "SL-011",
+      "SL-012",
+      "PF-001",
+      "PF-002",
+      "PF-003",
+      "PF-004",
+      "PF-005",
+      "PF-006",
+      "PF-007",
+      "PF-008",
+      "PF-010",
+      "PF-011",
+      "PF-012",
+      "RG-001",
+      "RG-002",
+      "RG-003",
+      "RG-004",
+      "RG-005",
+      "RG-006",
+      "RG-007",
+      "RG-008",
+      "RG-009",
+      "RG-010",
+      "RG-011",
+      "RG-012",
+      "LK-001",
+      "LK-002",
+      "LK-003",
+      "LK-004",
+      "LK-005",
+      "LK-006",
+      "LK-007",
+      "LK-008",
+      "LK-009",
+      "LK-010",
+      "LK-011",
+      "LK-012",
+      "LK-013",
+      "LK-014",
+      "LK-015",
+      "LK-016",
+      "SY-001",
+      "SY-002",
+      "SY-003",
+      "SY-004",
+      "SY-005",
+      "SY-006",
+      "SY-007",
+      "SY-008",
+      "SY-009",
+      "SY-010",
+      "SY-011",
+      "SY-012",
+      "SY-013",
+      "IM-002",
+      "IM-003",
+      "IM-010",
+      "IM-011",
+      "PF-009",
+      "DR-001",
+      "DR-002",
+      "DR-003",
+      "DR-004",
+      "DR-005",
+      "DR-006",
+      "DR-007",
+      "DR-008",
+      "DR-009",
+      "DR-010",
+      "GS-001",
+      "GS-002",
+      "GS-003",
+      "GS-004",
+      "GS-005",
+      "GS-006",
+      "GS-007",
+      "GS-008",
+      "GS-009",
+      "GS-010",
+      "GS-011",
+      "GS-012",
+      "GS-013",
+      "GS-014",
+      "GS-015",
+      "PK-001",
+      "PK-002",
+      "PK-003",
+      "PK-004",
+      "PK-005",
+      "PK-006",
+      "PK-007",
+      "PK-008",
+      "PK-009",
+      "PK-010",
+      "PK-011",
+      "PK-012"
+    ],
+    "collaboration": [
+      "CLX-001",
+      "CLX-002",
+      "CLX-003",
+      "CLX-004",
+      "CLX-005",
+      "CLX-006",
+      "CLX-007",
+      "CLX-008",
+      "CLX-009",
+      "CLX-010",
+      "CLX-011",
+      "CLX-012",
+      "CLX-013",
+      "CLX-014",
+      "CLX-015",
+      "CLX-016",
+      "CLX-017",
+      "CLX-018",
+      "CLX-019",
+      "CLX-020"
+    ],
+    "visual": [
+      "XV-001",
+      "XV-002",
+      "XV-003",
+      "XV-004"
+    ]
+  },
+  "semanticRows": {
+    "ST-001": [
+      "ST-001",
+      "Critical",
+      "`.clarity/`もSecretaryもないGit Repoで`init preview`",
+      "write 0件。検出内容、作成予定path、Item候補、競合を表示",
+      "before／after tree、git status、stdout"
+    ],
+    "ST-002": [
+      "ST-002",
+      "Critical",
+      "previewをキャンセル",
+      "file、commit、journal、runtimeを含め副作用0件",
+      "git diff、find結果"
+    ],
+    "ST-003": [
+      "ST-003",
+      "Critical",
+      "confirm後に初期化",
+      "`.clarity/`が作られ、空テンプレでなく実Repo由来のItemを持つ",
+      "generated files、state、event"
+    ],
+    "ST-004": [
+      "ST-004",
+      "High",
+      "Git remoteなしRepo",
+      "local identityで初期化でき、remote不明を明示",
+      "manifest、doctor output"
+    ],
+    "ST-005": [
+      "ST-005",
+      "High",
+      "non-git directory",
+      "対応可能範囲を明示。Git機能なしでも安全に初期化するか、理由付き停止",
+      "output、tree"
+    ],
+    "ST-006": [
+      "ST-006",
+      "High",
+      "巨大Repo",
+      "bounded scanとなり、除外／未確認範囲を表示",
+      "timing、scan report"
+    ],
+    "ST-007": [
+      "ST-007",
+      "Critical",
+      "`.env`、credential fixtureあり",
+      "値を読取結果、Evidence、logへ露出しない",
+      "secret scanner、output inspection"
+    ],
+    "ST-008": [
+      "ST-008",
+      "Critical",
+      "root外へ向くsymlinkあり",
+      "symlink先を読まず、対象を拒否または除外",
+      "negative test"
+    ],
+    "ST-009": [
+      "ST-009",
+      "High",
+      "既存`CLARITY.md`あり",
+      "無断上書きしない。managed block可否をpreview",
+      "diff"
+    ],
+    "ST-010": [
+      "ST-010",
+      "High",
+      "既存ADR規約あり",
+      "Decision正本候補として検出し、独自Decision本文を重複生成しない",
+      "state refs、tree"
+    ],
+    "ST-011": [
+      "ST-011",
+      "High",
+      "specはあるがDecision未確定",
+      "`proposed`または`exploring`となり、`confirmed`にならない",
+      "state"
+    ],
+    "ST-012": [
+      "ST-012",
+      "High",
+      "Accepted ADRあり",
+      "有効性を確認してEvidence付きDecision候補となる",
+      "Evidence、state"
+    ],
+    "ST-013": [
+      "ST-013",
+      "Medium",
+      "binary中心Repo",
+      "binaryを無理に解析せず、確認範囲を明示",
+      "scan report"
+    ],
+    "ST-014": [
+      "ST-014",
+      "Critical",
+      "initを同じ入力で再実行",
+      "duplicate Item、Event、commitが増えない",
+      "byte diff、event count"
+    ],
+    "ST-015": [
+      "ST-015",
+      "High",
+      "初期化途中でwrite失敗",
+      "partialを明示し、retryで一状態へ収束",
+      "failure injection、retry result"
+    ],
+    "QM-001": [
+      "QM-001",
+      "Critical",
+      "confirmed + implemented",
+      "`stabilize`、表示「定着・検証」",
+      "state、matrix"
+    ],
+    "QM-002": [
+      "QM-002",
+      "Critical",
+      "confirmed + not_started",
+      "`execute`、表示「実行待ち」",
+      "state、matrix"
+    ],
+    "QM-003": [
+      "QM-003",
+      "Critical",
+      "proposed + implemented",
+      "`validate`、表示「暫定実装・要再確認」",
+      "state、matrix"
+    ],
+    "QM-004": [
+      "QM-004",
+      "Critical",
+      "unknown + not_started",
+      "`decide`、表示「設計・意思決定」",
+      "state、matrix"
+    ],
+    "QM-005": [
+      "QM-005",
+      "High",
+      "confirmed + in_progress",
+      "`execute`かつ進行中badge",
+      "output"
+    ],
+    "QM-006": [
+      "QM-006",
+      "High",
+      "unknown + verified",
+      "`validate`",
+      "output"
+    ],
+    "QM-007": [
+      "QM-007",
+      "High",
+      "execution rolled_back",
+      "実行済み扱いにしない",
+      "state"
+    ],
+    "QM-008": [
+      "QM-008",
+      "Critical",
+      "quadrantを手で改ざん",
+      "rebuildでstateから正しい象限へ戻る",
+      "before／after"
+    ],
+    "QM-009": [
+      "QM-009",
+      "High",
+      "Decision superseded",
+      "Active Matrixから旧Itemを除外し履歴保持",
+      "state、history"
+    ],
+    "QM-010": [
+      "QM-010",
+      "High",
+      "disposition idea",
+      "Matrixには任意表示できるが今日のAttention既定除外",
+      "attention output"
+    ],
+    "QM-011": [
+      "QM-011",
+      "High",
+      "deferred期限前",
+      "Attention除外",
+      "attention output"
+    ],
+    "QM-012": [
+      "QM-012",
+      "High",
+      "deferred期限到来",
+      "再評価対象になる",
+      "time-fixed test"
+    ],
+    "QM-013": [
+      "QM-013",
+      "Medium",
+      "unknown state",
+      "無理に決定済み扱いせず不確実性を表示",
+      "state"
+    ],
+    "QM-014": [
+      "QM-014",
+      "High",
+      "state rebuild",
+      "eventsと参照正本からbyte安定したprojectionを生成",
+      "repeated hashes"
+    ],
+    "DE-001": [
+      "DE-001",
+      "Critical",
+      "AIが「決まっていそう」と推定",
+      "`proposed`、`humanConfirmed=false`",
+      "state"
+    ],
+    "DE-002": [
+      "DE-002",
+      "Critical",
+      "ユーザーが「これで確定」と明示",
+      "既存Decision seam、PROJECT更新、Clarity Eventが一体成功",
+      "affected files、event"
+    ],
+    "DE-003": [
+      "DE-003",
+      "Critical",
+      "Decision書込み成功、Clarity更新失敗",
+      "partialを明示し、retryで重複なしに完了",
+      "failure injection"
+    ],
+    "DE-004": [
+      "DE-004",
+      "Critical",
+      "Clarity更新成功、Decision正本書込み失敗",
+      "confirmedと表示しない。rollbackまたはpartial",
+      "state、error"
+    ],
+    "DE-005": [
+      "DE-005",
+      "High",
+      "draft ADR",
+      "confirmedにしない",
+      "Evidence"
+    ],
+    "DE-006": [
+      "DE-006",
+      "High",
+      "superseded ADR",
+      "current Decisionとして使わない",
+      "output"
+    ],
+    "DE-007": [
+      "DE-007",
+      "Critical",
+      "transcript全文がある",
+      "Clarityへ全文保存せず、短いref／digestだけ",
+      "repo scan"
+    ],
+    "DE-008": [
+      "DE-008",
+      "High",
+      "meeting reference",
+      "path／ID／日付をEvidenceに残し、本文複製なし",
+      "evidence"
+    ],
+    "DE-009": [
+      "DE-009",
+      "High",
+      "Git commit Evidence",
+      "repository、SHA、pathsが残る",
+      "evidence"
+    ],
+    "DE-010": [
+      "DE-010",
+      "High",
+      "test run Evidence",
+      "command、status、time、bounded summaryを保持",
+      "evidence"
+    ],
+    "DE-011": [
+      "DE-011",
+      "Critical",
+      "EvidenceがSecretを含む",
+      "redactionまたは保存拒否",
+      "negative test"
+    ],
+    "DE-012": [
+      "DE-012",
+      "High",
+      "Decision変更",
+      "過去Decisionを消さずsuperseded履歴を追加",
+      "event history"
+    ],
+    "DE-013": [
+      "DE-013",
+      "Medium",
+      "Evidence source unreachable",
+      "stateを捏造せず`source_unreachable`",
+      "attention"
+    ],
+    "DE-014": [
+      "DE-014",
+      "High",
+      "humanConfirmed field改ざん",
+      "schema／rebuildで不整合検知",
+      "doctor output"
+    ],
+    "AT-001": [
+      "AT-001",
+      "Critical",
+      "implemented without confirmed decision",
+      "High Attention、理由を日本語表示",
+      "attention.md"
+    ],
+    "AT-002": [
+      "AT-002",
+      "High",
+      "confirmed but not executed",
+      "Medium以上のAttention",
+      "output"
+    ],
+    "AT-003": [
+      "AT-003",
+      "Critical",
+      "decision implementation drift",
+      "Critical Attention、両方の根拠",
+      "output"
+    ],
+    "AT-004": [
+      "AT-004",
+      "High",
+      "possible drift",
+      "driftと断定せずpossible表示",
+      "output"
+    ],
+    "AT-005": [
+      "AT-005",
+      "Critical",
+      "validation failed",
+      "Critical Attention",
+      "output"
+    ],
+    "AT-006": [
+      "AT-006",
+      "High",
+      "validation pending stale",
+      "High Attention",
+      "fixed-time test"
+    ],
+    "AT-007": [
+      "AT-007",
+      "High",
+      "undecided stale",
+      "Medium Attention",
+      "fixed-time test"
+    ],
+    "AT-008": [
+      "AT-008",
+      "Critical",
+      "authority conflict",
+      "Critical Attention",
+      "sync fixture"
+    ],
+    "AT-009": [
+      "AT-009",
+      "High",
+      "sync conflict",
+      "High Attention",
+      "sync fixture"
+    ],
+    "AT-010": [
+      "AT-010",
+      "High",
+      "evidence missing",
+      "Medium Attention",
+      "output"
+    ],
+    "AT-011": [
+      "AT-011",
+      "High",
+      "dependency blocked",
+      "dependencyを示す",
+      "output"
+    ],
+    "AT-012": [
+      "AT-012",
+      "Medium",
+      "decision owner missing",
+      "誰が決めるか不明と表示",
+      "output"
+    ],
+    "AT-013": [
+      "AT-013",
+      "Critical",
+      "idea item",
+      "既定の今日の要確認から除外",
+      "output"
+    ],
+    "AT-014": [
+      "AT-014",
+      "High",
+      "human priority override",
+      "deterministic priorityへ反映",
+      "state、output"
+    ],
+    "AT-016": [
+      "AT-016",
+      "Medium",
+      "同点項目",
+      "stable tie-breakで順番が揺れない",
+      "repeated run"
+    ],
+    "AT-017": [
+      "AT-017",
+      "High",
+      "解消済みAttention",
+      "active一覧から消え、historyへ残る",
+      "before／after"
+    ],
+    "AT-018": [
+      "AT-018",
+      "Medium",
+      "Clarity score未実装",
+      "件数と理由だけで主要価値が成立",
+      "UX verification"
+    ],
+    "IM-001": [
+      "IM-001",
+      "Critical",
+      "same checkpoint retry",
+      "Event／Evidence重複0件",
+      "counts"
+    ],
+    "IM-004": [
+      "IM-004",
+      "High",
+      "state rebuild retry",
+      "byte同一",
+      "hash"
+    ],
+    "IM-006": [
+      "IM-006",
+      "Critical",
+      "migration preview",
+      "write 0件",
+      "diff"
+    ],
+    "IM-007": [
+      "IM-007",
+      "Critical",
+      "migration apply",
+      "schema更新、history保持",
+      "before／after"
+    ],
+    "IM-008": [
+      "IM-008",
+      "Critical",
+      "migration failure",
+      "old schemaを利用可能なまま保持",
+      "failure injection"
+    ],
+    "IM-009": [
+      "IM-009",
+      "High",
+      "newer unknown fields",
+      "roundtripで不要破壊しない",
+      "fixture"
+    ],
+    "IM-013": [
+      "IM-013",
+      "High",
+      "doctor stale runtime",
+      "安全なcleanup preview",
+      "output"
+    ],
+    "IM-014": [
+      "IM-014",
+      "Critical",
+      "cleanup apply",
+      "owned runtimeだけ削除",
+      "tree"
+    ],
+    "UX-001": [
+      "UX-001",
+      "High",
+      "日本語UI",
+      "Clarity、象限、Attentionを日本語で自然に表示",
+      "outputs"
+    ],
+    "UX-002": [
+      "UX-002",
+      "High",
+      "重要項目あり",
+      "結論、理由、根拠、次の選択が分かる",
+      "UX review"
+    ],
+    "UX-003": [
+      "UX-003",
+      "Medium",
+      "情報多数",
+      "重要項目を先にし、全件を押し付けない",
+      "output"
+    ],
+    "UX-004": [
+      "UX-004",
+      "High",
+      "AI推定",
+      "推定であることを明示",
+      "output"
+    ],
+    "UX-005": [
+      "UX-005",
+      "High",
+      "未検証",
+      "未検証を断定しない",
+      "output"
+    ],
+    "UX-006": [
+      "UX-006",
+      "Medium",
+      "technical handoff",
+      "command、path、error、証拠、残課題を保持",
+      "final report"
+    ],
+    "UX-007": [
+      "UX-007",
+      "Medium",
+      "matrix label",
+      "「決定×実行クラリティマトリクス」で統一",
+      "repo search"
+    ],
+    "UX-008": [
+      "UX-008",
+      "Medium",
+      "old English labels",
+      "user-facingへ不要に露出しない",
+      "repo search"
+    ],
+    "UX-009": [
+      "UX-009",
+      "High",
+      "no Attention",
+      "安心できる短い表示",
+      "output"
+    ],
+    "UX-010": [
+      "UX-010",
+      "Medium",
+      "error",
+      "何が起きたか、変更有無、次の一手が分かる",
+      "output"
+    ],
+    "MM-001": [
+      "MM-001",
+      "High",
+      "4象限生成",
+      "軸・象限の配置が仕様どおり",
+      "`.mmd`"
+    ],
+    "MM-002": [
+      "MM-002",
+      "High",
+      "item座標",
+      "stateに対応",
+      "golden test"
+    ],
+    "MM-003": [
+      "MM-003",
+      "Medium",
+      "同じ入力を再生成",
+      "byte安定",
+      "hashes"
+    ],
+    "MM-004": [
+      "MM-004",
+      "Medium",
+      "point重複",
+      "stable jitter",
+      "output"
+    ],
+    "MM-005": [
+      "MM-005",
+      "High",
+      "日本語label",
+      "syntaxを壊さず表示",
+      "render evidence"
+    ],
+    "MM-006": [
+      "MM-006",
+      "High",
+      "Mindmap failure",
+      "Markdown／flowchart fallback",
+      "failure fixture"
+    ],
+    "MM-007": [
+      "MM-007",
+      "Medium",
+      "project structure",
+      "area treeが安定",
+      "generated map"
+    ],
+    "MM-008": [
+      "MM-008",
+      "Medium",
+      "dependencies",
+      "dependency relationが表示",
+      "generated map"
+    ],
+    "MM-009": [
+      "MM-009",
+      "Medium",
+      "state flow",
+      "transitionsが表示",
+      "generated map"
+    ],
+    "MM-010": [
+      "MM-010",
+      "High",
+      "Mermaidなし環境",
+      "raw `.mmd`とMarkdownは生成",
+      "live test"
+    ],
+    "XM-001": [
+      "XM-001",
+      "High",
+      "Xmind CLI未導入",
+      "Clarity本体は成功し、導入案内またはfallback",
+      "output"
+    ],
+    "XM-002": [
+      "XM-002",
+      "High",
+      "Xmind CLI利用可能",
+      "native `.xmind`生成とvalidation成功",
+      "file、CLI result"
+    ],
+    "XM-003": [
+      "XM-003",
+      "High",
+      "multi-sheet",
+      "クラリティマトリクス／プロジェクト構造を持つ",
+      "Xmind inspection"
+    ],
+    "XM-004": [
+      "XM-004",
+      "Medium",
+      "追加Sheet",
+      "Attention／Decision履歴等が要件どおり",
+      "Xmind inspection"
+    ],
+    "XM-005": [
+      "XM-005",
+      "Critical",
+      "credential",
+      "Repoへ保存されない",
+      "repo scan"
+    ],
+    "XM-006": [
+      "XM-006",
+      "High",
+      "Xmind MCP未接続",
+      "cloud機能だけdegrade、local／Mermaid継続",
+      "output"
+    ],
+    "XM-007": [
+      "XM-007",
+      "High",
+      "Xmind MCP接続済み",
+      "cloud map create／read／updateの少なくとも1経路",
+      "live evidence"
+    ],
+    "XM-008": [
+      "XM-008",
+      "Critical",
+      "Xmindでstatus変更",
+      "直接state変更せずproposal生成",
+      "before／after"
+    ],
+    "XM-009": [
+      "XM-009",
+      "High",
+      "proposal承認",
+      "Clarity Eventへ反映",
+      "event"
+    ],
+    "XM-010": [
+      "XM-010",
+      "High",
+      "proposal拒否",
+      "state変更なし",
+      "diff"
+    ],
+    "XM-011": [
+      "XM-011",
+      "High",
+      "stable Item ID",
+      "Xmind nodeとClarity Itemを再対応可能",
+      "map／mapping"
+    ],
+    "XM-012": [
+      "XM-012",
+      "High",
+      "匿名CRM導入PJ fixture",
+      "元文書と同構造の匿名マップで4象限と将来アイデアを再現",
+      "screenshot／file"
+    ],
+    "XM-013": [
+      "XM-013",
+      "Medium",
+      "Xmind file既存編集",
+      "無関係Sheet／branchを保持",
+      "before／after validation"
+    ],
+    "XM-014": [
+      "XM-014",
+      "Medium",
+      "map open中編集",
+      "refresh注意または安全な扱いを説明",
+      "UX output"
+    ],
+    "XM-015": [
+      "XM-015",
+      "High",
+      "有料credit必要",
+      "実消費前に明示確認",
+      "interaction evidence"
+    ],
+    "IM-005": [
+      "IM-005",
+      "High",
+      "map render retry",
+      "byte同一",
+      "hash"
+    ],
+    "HC-001": [
+      "HC-001",
+      "Critical",
+      "Claude Code plugin load",
+      "Clarity SkillとHookが認識される",
+      "validator、live output"
+    ],
+    "HC-002": [
+      "HC-002",
+      "High",
+      "SessionStart startup",
+      "短いAttention contextを注入",
+      "transcript／hook evidence"
+    ],
+    "HC-003": [
+      "HC-003",
+      "High",
+      "SessionStart resume",
+      "最新projectionを再読込",
+      "output"
+    ],
+    "HC-004": [
+      "HC-004",
+      "High",
+      "compact後",
+      "Clarity contextが再注入",
+      "compact live test"
+    ],
+    "HC-005": [
+      "HC-005",
+      "Critical",
+      "PostToolUse複数同時",
+      "runtime eventが破損しない",
+      "event count、JSON parse"
+    ],
+    "HC-006": [
+      "HC-006",
+      "High",
+      "PostToolUse Edit／Write",
+      "touched pathだけを観測",
+      "runtime event"
+    ],
+    "HC-007": [
+      "HC-007",
+      "High",
+      "PostToolUse test command",
+      "test実行候補を観測",
+      "event"
+    ],
+    "HC-008": [
+      "HC-008",
+      "Critical",
+      "Stop material change + no checkpoint",
+      "1回だけcheckpoint継続を要求",
+      "live test"
+    ],
+    "HC-009": [
+      "HC-009",
+      "Critical",
+      "Stop 2回目",
+      "無限継続せず停止可能",
+      "live test"
+    ],
+    "HC-010": [
+      "HC-010",
+      "High",
+      "no material change",
+      "Stopが不要なreviewを要求しない",
+      "live test"
+    ],
+    "HC-011": [
+      "HC-011",
+      "High",
+      "PreCompact",
+      "flush／pending checkpoint／resume生成",
+      "files"
+    ],
+    "HC-012": [
+      "HC-012",
+      "High",
+      "SessionEnd",
+      "制限時間内に軽量flush",
+      "timing"
+    ],
+    "HC-013": [
+      "HC-013",
+      "Critical",
+      "Hook command failure",
+      "Repo正本を壊さずmanual fallback案内",
+      "failure injection"
+    ],
+    "HC-014": [
+      "HC-014",
+      "High",
+      "Hook無効",
+      "Skill手動利用が完全動作",
+      "live test"
+    ],
+    "HC-015": [
+      "HC-015",
+      "High",
+      "plugin root from subdirectory",
+      "cwd依存せず正しいplugin scriptを解決",
+      "live test"
+    ],
+    "HC-016": [
+      "HC-016",
+      "Critical",
+      "Hook内networkなし",
+      "network call 0件",
+      "instrumentation"
+    ],
+    "HC-017": [
+      "HC-017",
+      "High",
+      "large Attention state",
+      "context注入がbounded",
+      "token／size evidence"
+    ],
+    "HX-001": [
+      "HX-001",
+      "Critical",
+      "Codex plugin load",
+      "`$clarity`とHookが認識される",
+      "plugin list、live output"
+    ],
+    "HX-002": [
+      "HX-002",
+      "Critical",
+      "Hook trust前",
+      "Hookを勝手に実行せず、review案内。Skill手動は動く",
+      "`/hooks` evidence"
+    ],
+    "HX-003": [
+      "HX-003",
+      "High",
+      "trust後SessionStart",
+      "追加developer contextを注入",
+      "live output"
+    ],
+    "HX-004": [
+      "HX-004",
+      "High",
+      "source compact",
+      "immediate continuationへcontext",
+      "compact live test"
+    ],
+    "HX-005": [
+      "HX-005",
+      "Critical",
+      "command-only",
+      "prompt／agent hookへ依存しない",
+      "manifest inspection"
+    ],
+    "HX-006": [
+      "HX-006",
+      "Critical",
+      "PostToolUse同時",
+      "runtime event破損なし",
+      "parse test"
+    ],
+    "HX-007": [
+      "HX-007",
+      "Critical",
+      "Stop block",
+      "新しいcontinuationとしてcheckpointを1回促す",
+      "live test"
+    ],
+    "HX-008": [
+      "HX-008",
+      "Critical",
+      "stop_hook_active true",
+      "2回目継続なし",
+      "live test"
+    ],
+    "HX-009": [
+      "HX-009",
+      "High",
+      "SessionEnd 3秒以内",
+      "lightweight flushのみ",
+      "timing"
+    ],
+    "HX-010": [
+      "HX-010",
+      "High",
+      "subdirectory起動",
+      "git root／plugin rootを正しく解決",
+      "live test"
+    ],
+    "HX-011": [
+      "HX-011",
+      "High",
+      "Hook disable config",
+      "Skill fallback",
+      "live test"
+    ],
+    "HX-012": [
+      "HX-012",
+      "High",
+      "PLUGIN_ROOT／compat env",
+      "common scriptが動く",
+      "environment evidence"
+    ],
+    "HX-013": [
+      "HX-013",
+      "Critical",
+      "transcript format変更想定",
+      "transcript parserを主要正本に依存しない",
+      "code inspection、fixture"
+    ],
+    "HX-014": [
+      "HX-014",
+      "High",
+      "large output",
+      "bounded additionalContext",
+      "output size"
+    ],
+    "HP-001": [
+      "HP-001",
+      "Critical",
+      "common core inventory",
+      "Claude／Codexで同じSkill semanticを参照",
+      "inventory check"
+    ],
+    "HP-002": [
+      "HP-002",
+      "Critical",
+      "hooks source",
+      "可能な限り共通`hooks.json`。差分がある場合は単一生成元",
+      "tree、generator test"
+    ],
+    "HP-003": [
+      "HP-003",
+      "High",
+      "host input normalization",
+      "同一fixtureから同一Clarity Event",
+      "fixture hashes"
+    ],
+    "HP-004": [
+      "HP-004",
+      "High",
+      "host output serializer",
+      "host固有記法以外の意味内容が一致",
+      "golden tests"
+    ],
+    "HP-005": [
+      "HP-005",
+      "Critical",
+      "1hostのみlive PASS",
+      "他hostを検証済み表示しない",
+      "status output"
+    ],
+    "HP-006": [
+      "HP-006",
+      "High",
+      "Desktop／CLI差",
+      "supportedとverifiedを別表示",
+      "host gate"
+    ],
+    "HP-007": [
+      "HP-007",
+      "High",
+      "natural language invocation",
+      "Claude／Codex双方でClarity Skillが選ばれる",
+      "live conversation"
+    ],
+    "AT-015": [
+      "AT-015",
+      "High",
+      "Attention最大件数",
+      "SessionStartは重要3件程度に制限",
+      "hook output"
+    ],
+    "IM-012": [
+      "IM-012",
+      "High",
+      "doctor hook untrusted",
+      "trust確認方法を示す",
+      "output"
+    ],
+    "SL-001": [
+      "SL-001",
+      "Critical",
+      "05 open PJへClarity追加",
+      "正しいPJ内にのみ生成",
+      "tree"
+    ],
+    "SL-002": [
+      "SL-002",
+      "Critical",
+      "02 legacy only PJ",
+      "既存resolver規則どおり参照し、無断二重writeなし",
+      "tree、resolver output"
+    ],
+    "SL-003": [
+      "SL-003",
+      "Critical",
+      "05／02 conflict",
+      "05採用＋conflict報告",
+      "output"
+    ],
+    "SL-004": [
+      "SL-004",
+      "Critical",
+      "closed未明示",
+      "closedを探索しない",
+      "instrumentation"
+    ],
+    "SL-005": [
+      "SL-005",
+      "High",
+      "closed明示",
+      "指定範囲だけ参照",
+      "output"
+    ],
+    "SL-006": [
+      "SL-006",
+      "Critical",
+      "Decision確定",
+      "existing project Decision seamへ委譲",
+      "affected files"
+    ],
+    "SL-007": [
+      "SL-007",
+      "Critical",
+      "Clarity Itemをタスク化",
+      "自動TODO生成せず、明示時だけnotion-tasksへroute",
+      "live test"
+    ],
+    "SL-008": [
+      "SL-008",
+      "Critical",
+      "vault/10_sources",
+      "read-onlyを維持",
+      "negative test"
+    ],
+    "SL-009": [
+      "SL-009",
+      "High",
+      "PROJECT表示",
+      "Clarity mode／Attention／link healthを短く表示",
+      "output"
+    ],
+    "SL-010": [
+      "SL-010",
+      "High",
+      "PROJECTへ全Item埋込みなし",
+      "pointer／summaryのみ",
+      "diff"
+    ],
+    "SL-011": [
+      "SL-011",
+      "High",
+      "PJ完了",
+      "Clarityを伴ってclosedへ整合移動または参照維持",
+      "completion test"
+    ],
+    "SL-012": [
+      "SL-012",
+      "High",
+      "PJ再開",
+      "過去Clarity履歴を失わない",
+      "reopen test"
+    ],
+    "PF-001": [
+      "PF-001",
+      "High",
+      "open PJ複数",
+      "Portfolio rollup生成",
+      "rollup.json"
+    ],
+    "PF-002": [
+      "PF-002",
+      "Critical",
+      "closed PJ",
+      "通常rollupから除外",
+      "output"
+    ],
+    "PF-003": [
+      "PF-003",
+      "High",
+      "daily morning",
+      "`今日の要確認`を独立sectionで表示",
+      "live output"
+    ],
+    "PF-004": [
+      "PF-004",
+      "High",
+      "TODO／Attention同内容",
+      "自動重複タスク化しない",
+      "output、Notion check"
+    ],
+    "PF-005": [
+      "PF-005",
+      "High",
+      "most critical",
+      "理由付き最優先Item",
+      "output"
+    ],
+    "PF-006": [
+      "PF-006",
+      "High",
+      "no Attention",
+      "「現在判断不要」と簡潔表示",
+      "output"
+    ],
+    "PF-007": [
+      "PF-007",
+      "Medium",
+      "evening",
+      "Decision／実装／候補／Driftを分離",
+      "output"
+    ],
+    "PF-008": [
+      "PF-008",
+      "Medium",
+      "weekly",
+      "Attention増減とDrift解消を表示",
+      "output"
+    ],
+    "PF-010": [
+      "PF-010",
+      "High",
+      "source failure",
+      "取得できた範囲と未確認範囲を分離",
+      "output"
+    ],
+    "PF-011": [
+      "PF-011",
+      "Medium",
+      "project counts",
+      "全Item数ではなくAttention中心",
+      "UX review"
+    ],
+    "PF-012": [
+      "PF-012",
+      "High",
+      "Context size",
+      "dailyが全stateを読み上げない",
+      "output size"
+    ],
+    "RG-001": [
+      "RG-001",
+      "Critical",
+      "Clarity Item作成",
+      "Notion Task自動作成0件",
+      "adapter log"
+    ],
+    "RG-002": [
+      "RG-002",
+      "Critical",
+      "「これをタスク化」",
+      "既存notion-tasksへ委譲し確認境界維持",
+      "live test"
+    ],
+    "RG-003": [
+      "RG-003",
+      "Critical",
+      "projects create／complete／reopen",
+      "既存回帰合格",
+      "suite"
+    ],
+    "RG-004": [
+      "RG-004",
+      "Critical",
+      "daily既存予定／TODO",
+      "Clarity追加後も回帰なし",
+      "suite"
+    ],
+    "RG-005": [
+      "RG-005",
+      "Critical",
+      "weekly",
+      "既存集計回帰なし",
+      "suite"
+    ],
+    "RG-006": [
+      "RG-006",
+      "Critical",
+      "memory authorization",
+      "Clarity scopeへ漏れない",
+      "suite"
+    ],
+    "RG-007": [
+      "RG-007",
+      "Critical",
+      "Chatwork",
+      "config／workflow／history境界不変",
+      "suite"
+    ],
+    "RG-008": [
+      "RG-008",
+      "Critical",
+      "Google Chat",
+      "OAuth／SPACE／history境界不変",
+      "suite"
+    ],
+    "RG-009": [
+      "RG-009",
+      "Critical",
+      "vault-search",
+      "10_sources read-only不変",
+      "suite"
+    ],
+    "RG-010": [
+      "RG-010",
+      "Critical",
+      "identity／rename",
+      "Clarityで回帰なし",
+      "suite"
+    ],
+    "RG-011": [
+      "RG-011",
+      "Critical",
+      "plugin update",
+      "migration／version gate回帰なし",
+      "suite"
+    ],
+    "RG-012": [
+      "RG-012",
+      "High",
+      "Harness connection",
+      "SecretaryへHarness本体を同梱しない",
+      "tree check"
+    ],
+    "LK-001": [
+      "LK-001",
+      "Critical",
+      "link prepare",
+      "SecretなしLink Request生成",
+      "JSON inspection"
+    ],
+    "LK-002": [
+      "LK-002",
+      "Critical",
+      "expected target不一致",
+      "accept拒否、副作用0件",
+      "negative test"
+    ],
+    "LK-003": [
+      "LK-003",
+      "Critical",
+      "link accept",
+      "targetにreciprocal manifest",
+      "files"
+    ],
+    "LK-004": [
+      "LK-004",
+      "Critical",
+      "link finalize",
+      "両Project ID／Repo identity／digest照合",
+      "files、output"
+    ],
+    "LK-005": [
+      "LK-005",
+      "Critical",
+      "external RepoにClarityなし",
+      "accept時にpreview後初期化可能",
+      "live fixture"
+    ],
+    "LK-006": [
+      "LK-006",
+      "High",
+      "既存Standalone Clarityあり",
+      "ID維持してlink追加",
+      "before／after IDs"
+    ],
+    "LK-007": [
+      "LK-007",
+      "Critical",
+      "cross-root write監視",
+      "一方のprocessが他Repoを変更しない",
+      "filesystem canary"
+    ],
+    "LK-008": [
+      "LK-008",
+      "Critical",
+      "remote pushなし",
+      "linkだけでpushしない",
+      "git log、remote evidence"
+    ],
+    "LK-009": [
+      "LK-009",
+      "High",
+      "local checkout mapping",
+      "absolute pathはgitignored local configだけ",
+      "repo scan"
+    ],
+    "LK-010": [
+      "LK-010",
+      "High",
+      "GitHub read-only取得",
+      "明示許可時だけread",
+      "command log"
+    ],
+    "LK-011": [
+      "LK-011",
+      "High",
+      "bundle manual transfer",
+      "networkなしでlink可能",
+      "fixture"
+    ],
+    "LK-012": [
+      "LK-012",
+      "Critical",
+      "duplicate link",
+      "idempotent、重複なし",
+      "rerun"
+    ],
+    "LK-013": [
+      "LK-013",
+      "High",
+      "link解除",
+      "履歴保持、Standalone継続",
+      "state"
+    ],
+    "LK-014": [
+      "LK-014",
+      "High",
+      "link先unreachable",
+      "stale／unreachable表示、local機能継続",
+      "output"
+    ],
+    "LK-015": [
+      "LK-015",
+      "Critical",
+      "linkId改ざん",
+      "sync拒否",
+      "negative test"
+    ],
+    "LK-016": [
+      "LK-016",
+      "Critical",
+      "repository identity改ざん",
+      "sync拒否",
+      "negative test"
+    ],
+    "SY-001": [
+      "SY-001",
+      "Critical",
+      "sync preview",
+      "write 0件、変更候補とconflict表示",
+      "diff"
+    ],
+    "SY-002": [
+      "SY-002",
+      "Critical",
+      "sync apply",
+      "自Repoのimports／projectionだけ更新",
+      "filesystem evidence"
+    ],
+    "SY-003": [
+      "SY-003",
+      "Critical",
+      "Secretary Primary field conflict",
+      "authority conflictとして停止／Attention",
+      "output"
+    ],
+    "SY-004": [
+      "SY-004",
+      "Critical",
+      "Repo Primary implementation update",
+      "Secretary projectionへ反映候補",
+      "output"
+    ],
+    "SY-005": [
+      "SY-005",
+      "Critical",
+      "same field both Primary",
+      "schema validation拒否",
+      "negative test"
+    ],
+    "SY-006": [
+      "SY-006",
+      "Critical",
+      "last-write-wins禁止",
+      "conflictが消えない",
+      "fixture"
+    ],
+    "SY-007": [
+      "SY-007",
+      "High",
+      "stale remote revision",
+      "stale表示",
+      "output"
+    ],
+    "SY-008": [
+      "SY-008",
+      "High",
+      "schema newer than reader",
+      "安全停止またはread-only degradation",
+      "output"
+    ],
+    "SY-009": [
+      "SY-009",
+      "High",
+      "unknown fields",
+      "readerが保持／無視し、破壊しない",
+      "roundtrip test"
+    ],
+    "SY-010": [
+      "SY-010",
+      "Critical",
+      "retry",
+      "duplicate import／eventなし",
+      "rerun"
+    ],
+    "SY-011": [
+      "SY-011",
+      "High",
+      "remote item deletion",
+      "tombstone／conflictとして扱い、黙って削除しない",
+      "state"
+    ],
+    "SY-012": [
+      "SY-012",
+      "High",
+      "item split resolution",
+      "新Item relationとhistoryを保持",
+      "resolution test"
+    ],
+    "SY-013": [
+      "SY-013",
+      "High",
+      "authority変更",
+      "previewと人間確認が必要",
+      "output"
+    ],
+    "IM-002": [
+      "IM-002",
+      "Critical",
+      "same sync retry",
+      "import／event重複0件",
+      "counts"
+    ],
+    "IM-003": [
+      "IM-003",
+      "Critical",
+      "same link finalize retry",
+      "link重複0件",
+      "links.json"
+    ],
+    "IM-010": [
+      "IM-010",
+      "High",
+      "doctor healthy",
+      "mode、schema、Hook、link、Xmind状態を表示",
+      "output"
+    ],
+    "IM-011": [
+      "IM-011",
+      "High",
+      "doctor broken link",
+      "原因と修復候補を表示",
+      "output"
+    ],
+    "PF-009": [
+      "PF-009",
+      "High",
+      "link stale project",
+      "Portfolioにstale表示",
+      "output"
+    ],
+    "DR-001": [
+      "DR-001",
+      "Critical",
+      "Decision email first、code customer_id first",
+      "driftまたはpossible driftを検出",
+      "Decision ref、code ref"
+    ],
+    "DR-002": [
+      "DR-002",
+      "High",
+      "同義実装",
+      "false positiveを抑えalignedまたはunknown",
+      "output"
+    ],
+    "DR-003": [
+      "DR-003",
+      "High",
+      "Evidence不足",
+      "drift断定せずpossible",
+      "output"
+    ],
+    "DR-004": [
+      "DR-004",
+      "Critical",
+      "confirmed drift",
+      "Critical Attention",
+      "attention"
+    ],
+    "DR-005": [
+      "DR-005",
+      "High",
+      "Decision変更で整合",
+      "drift解消、history保持",
+      "before／after"
+    ],
+    "DR-006": [
+      "DR-006",
+      "High",
+      "実装修正で整合",
+      "drift解消、history保持",
+      "before／after"
+    ],
+    "DR-007": [
+      "DR-007",
+      "High",
+      "例外承認",
+      "waiver Evidence付きでAttention調整",
+      "state"
+    ],
+    "DR-008": [
+      "DR-008",
+      "High",
+      "古いcommitのみ",
+      "current implementationと誤認しない",
+      "git fixture"
+    ],
+    "DR-009": [
+      "DR-009",
+      "High",
+      "generated code",
+      "source authorityを区別",
+      "output"
+    ],
+    "DR-010": [
+      "DR-010",
+      "Critical",
+      "Secret含むcode fixture",
+      "EvidenceへSecret非露出",
+      "scan"
+    ],
+    "GS-001": [
+      "GS-001",
+      "Critical",
+      "preexisting unstaged change",
+      "内容と状態を保持",
+      "before／after diff"
+    ],
+    "GS-002": [
+      "GS-002",
+      "Critical",
+      "preexisting staged change",
+      "stage状態を保持",
+      "index diff"
+    ],
+    "GS-003": [
+      "GS-003",
+      "Critical",
+      "Clarity commit",
+      "owned pathsだけを含む",
+      "commit diff"
+    ],
+    "GS-004": [
+      "GS-004",
+      "Critical",
+      "failed apply",
+      "user dirtyへrollback作用なし",
+      "failure injection"
+    ],
+    "GS-005": [
+      "GS-005",
+      "Critical",
+      "unexpected push",
+      "実行しない",
+      "remote log"
+    ],
+    "GS-006": [
+      "GS-006",
+      "Critical",
+      "branch／remote／visibility",
+      "変更しない",
+      "before／after"
+    ],
+    "GS-007": [
+      "GS-007",
+      "Critical",
+      "root外symlink",
+      "拒否",
+      "negative test"
+    ],
+    "GS-008": [
+      "GS-008",
+      "Critical",
+      "`..`／absolute path injection",
+      "拒否",
+      "negative test"
+    ],
+    "GS-009": [
+      "GS-009",
+      "Critical",
+      "concurrent hooks",
+      "JSON破損なし",
+      "stress test"
+    ],
+    "GS-010": [
+      "GS-010",
+      "High",
+      "lock残骸",
+      "doctor／recovery可能",
+      "failure fixture"
+    ],
+    "GS-011": [
+      "GS-011",
+      "Critical",
+      "Secret scanner",
+      "Clarity managed filesにSecret 0件",
+      "scanner"
+    ],
+    "GS-012": [
+      "GS-012",
+      "Critical",
+      "Xmind credential",
+      "Repo 0件",
+      "scanner"
+    ],
+    "GS-013": [
+      "GS-013",
+      "Critical",
+      "transcript path absolute",
+      "committed metadataへ保存しない",
+      "repo scan"
+    ],
+    "GS-014": [
+      "GS-014",
+      "High",
+      "generated overwrite",
+      "plugin-owned generatedだけ再生成",
+      "diff"
+    ],
+    "GS-015": [
+      "GS-015",
+      "Critical",
+      "schema corruption",
+      "safe stop、正本破壊なし",
+      "negative test"
+    ],
+    "PK-001": [
+      "PK-001",
+      "Critical",
+      "Claude manifest",
+      "version／description／hooks／skills整合",
+      "validator"
+    ],
+    "PK-002": [
+      "PK-002",
+      "Critical",
+      "Codex manifest",
+      "version／skills／hooks整合",
+      "validator"
+    ],
+    "PK-003": [
+      "PK-003",
+      "High",
+      "marketplace manifests",
+      "source／version／metadata整合",
+      "tests"
+    ],
+    "PK-004": [
+      "PK-004",
+      "Critical",
+      "host inventory",
+      "Clarity追加とhost差分が記録",
+      "file、test"
+    ],
+    "PK-005": [
+      "PK-005",
+      "Critical",
+      "skill inventory count",
+      "actual treeと一致",
+      "inventory test"
+    ],
+    "PK-006": [
+      "PK-006",
+      "High",
+      "CHANGELOG",
+      "利用者向けに日本語で説明",
+      "file"
+    ],
+    "PK-007": [
+      "PK-007",
+      "Critical",
+      "existing release regression",
+      "全suite green",
+      "command results"
+    ],
+    "PK-008": [
+      "PK-008",
+      "High",
+      "Git-free archive",
+      "pluginが動く／validator合格",
+      "archive gate"
+    ],
+    "PK-009": [
+      "PK-009",
+      "High",
+      "clean checkout",
+      "同一candidateで合格",
+      "clean gate"
+    ],
+    "PK-010": [
+      "PK-010",
+      "Critical",
+      "live status",
+      "未検証hostをverifiedにしない",
+      "status artifact"
+    ],
+    "PK-011": [
+      "PK-011",
+      "Critical",
+      "public upstream",
+      "明示許可なしにwrite／pushしない",
+      "remote evidence"
+    ],
+    "PK-012": [
+      "PK-012",
+      "High",
+      "private candidate",
+      "current repo方針に従ってversion一貫",
+      "manifests"
+    ],
+    "CLX-001": [
+      "CLX-001",
+      "Critical",
+      "secretary routerがClarity intentを選べるが、現在の別用件を横取りしない。"
+    ],
+    "CLX-002": [
+      "CLX-002",
+      "Critical",
+      "projects作成は既存確認境界とproject正本を維持し、Clarityを無断初期化しない。"
+    ],
+    "CLX-003": [
+      "CLX-003",
+      "High",
+      "projects表示はmode、Attention、link healthをpointer／summaryで示し、全Itemを埋め込まない。"
+    ],
+    "CLX-004": [
+      "CLX-004",
+      "Critical",
+      "project completeでClarity履歴を失わず、closedの通常探索禁止を維持する。"
+    ],
+    "CLX-005": [
+      "CLX-005",
+      "Critical",
+      "project reopenで既存Clarity ID／履歴を保持し、再作成しない。"
+    ],
+    "CLX-006": [
+      "CLX-006",
+      "Critical",
+      "`canonicalRepo`はlink候補となるが、相手Repoへの直接write／fetch／pushを行わない。"
+    ],
+    "CLX-007": [
+      "CLX-007",
+      "High",
+      "dailyは予定／TODOと別の`今日の要確認`をbounded表示し、connectorをClarityから自動実行しない。"
+    ],
+    "CLX-008": [
+      "CLX-008",
+      "High",
+      "weeklyは既存journal集計を回帰させず、Attention増減／Drift解消を別集計する。"
+    ],
+    "CLX-009": [
+      "CLX-009",
+      "Critical",
+      "Clarity ItemからNotion Taskを自動作成せず、明示依頼時だけ既存notion-tasks確認境界へ委譲する。"
+    ],
+    "CLX-010": [
+      "CLX-010",
+      "Critical",
+      "Clarity Itemからlocal TODOを自動作成せず、明示依頼時だけ既存TODO seamへ委譲する。"
+    ],
+    "CLX-011": [
+      "CLX-011",
+      "Critical",
+      "memory-careはPJ Decision／Clarity Eventを一般memoryへ重複保存せず、自然会話選択をHookへ移さない。"
+    ],
+    "CLX-012": [
+      "CLX-012",
+      "Critical",
+      "buildはClarity contextを参照できるがHarnessのspec／Sprint／state／評価を置き換えない。"
+    ],
+    "CLX-013": [
+      "CLX-013",
+      "Critical",
+      "updateはClarity Hookから起動せず、毎session通信、自動更新、確認なしmigrationを行わない。"
+    ],
+    "CLX-014": [
+      "CLX-014",
+      "High",
+      "onboarding／workspace templatesがClarity optional状態とXmind edition defaultを正しく説明する。"
+    ],
+    "CLX-015": [
+      "CLX-015",
+      "High",
+      "rules／serializerがClarity出力の結論→理由→根拠→選択、最大3件程度、自然な日本語を維持する。"
+    ],
+    "CLX-016": [
+      "CLX-016",
+      "Critical",
+      "host inventoryがSkill／Hookのsupportedとverified、trust／disabled／manual fallbackを別表示する。"
+    ],
+    "CLX-017": [
+      "CLX-017",
+      "Critical",
+      "edition handoffがpublic common pathとprivate／Yasashii protected pathを分離し、private literalをpublicへ混ぜない。"
+    ],
+    "CLX-018": [
+      "CLX-018",
+      "Critical",
+      "Chatwork、Google Chat、Google／Microsoft／Notion等connectorをClarityが暗黙実行しない。"
+    ],
+    "CLX-019": [
+      "CLX-019",
+      "Critical",
+      "Project Clarity以外のSkill Hookが0件で、Clarity Hookにmemory候補の意味判定が0件である。"
+    ],
+    "CLX-020": [
+      "CLX-020",
+      "Critical",
+      "tracked inventoryが全関連surfaceの実path、役割、edition、marker、digest、回帰を列挙し、漏れ／stale／旧契約0件である。"
+    ],
+    "XV-001": [
+      "XV-001",
+      "Critical",
+      "integration ONで(a) MCP connected／available／capable、(b) MCP未接続／無効／capability不足、(c) MCP実行失敗／外部操作未承認、(d) local fallback承認／拒否／cancel、(e) 最初からlocal指定を実行",
+      "(a) `mcp-selected`、(b)(c)(e) preview中は`fallback-approval-required`・local write 0、(d)承認後だけ`local-selected-after-approval`、拒否／cancelは`stopped`・write 0。常にprovider status／selected／reasonが実状態と一致",
+      "resolver JSON／stdout、provider capability fixture、approval前後tree／map snapshot、external／local write log"
+    ],
+    "XV-002": [
+      "XV-002",
+      "Critical",
+      "Xmind MCPのcloud map create／updateを隔離adapterと、明示承認された場合のreal liveで評価",
+      "左上 🟢 定着・検証／安定している／`#16A34A`、右上 🔵 実行待ち／あとは進めるだけ／`#2563EB`、左下 🟡 暫定実装・要再確認／注意して確認する／`#D97706`、右下 🔴 設計・意思決定／人間の判断が必要／`#DC2626`。上軸=決まっている、下軸=まだ決まっていない。実tool schemaが不足なら要件を弱めずverifiedにしない",
+      "adapter request／response、tool schema capability report、map screenshot／style inspection、live未承認時はNOT-RUN理由／external write 0"
+    ],
+    "XV-003": [
+      "XV-003",
+      "Critical",
+      "local `.xmind`のcreate／updateを承認前、承認後、拒否／cancel、既存無関係Sheet／branchありで実行",
+      "previewは対象file／path、create／update、既存影響、sign-in／credit見込みを示す。承認前／拒否／cancelはwrite 0。承認後だけcreate／updateし、XV-002と同じ位置・4色・emoji／ラベル／意味文・軸と無関係Sheet／branch保持を満たす",
+      "preview応答、before／after file hash／Sheet／branch inventory、native validation、screenshot／style inspection"
+    ],
+    "XV-004": [
+      "XV-004",
+      "High",
+      "Mermaid quadrantをstyle利用可／不可の両fixtureで生成し、スクリーンリーダー相当の文字情報を検査",
+      "`q1=右上 🔵 実行待ち`、`q2=左上 🟢 定着・検証`、`q3=左下 🟡 暫定実装・要再確認`、`q4=右下 🔴 設計・意思決定`。style可能なときは同じ4 hex color、style不可でもemoji／ラベル／意味文／軸が残り、色だけに依存しない",
+      "raw `.mmd`、render screenshot／DOMまたはSVG text／style inspection、accessibility review"
+    ]
+  },
+  "baseline": {
+    "allocation": {
+      "primary": "4ea7792eabc2ff1d5e8a7037e585ab119823f16ab376b7e556a7dd699e39c6f3",
+      "collaboration": "ffe0962962d5e81bd2fe1aa26df20cc915519d857d123942336aefad1b5416fa",
+      "visual": "6459e3866fa901753aad134e3c15cb41cc863680efa12c676daaa64099ce1b90",
+      "finalRecheck": "abf90c7918340a363ef1acfa478bf081fc41ea5cd8333d9727b78c909d6d06b6"
+    },
+    "semantic": {
+      "primary": "f3782f008a362f4a7d9d38afeb48cda97ced61062e69fd062093132277ccf979",
+      "collaboration": "42c4e7e07c20739870d6d33d4cfa5e235d91539acdf55296d78ee70ae66e831e",
+      "visual": "e3144191159711a4d4623ad58f7973b4d4e3ca3f3eb290e5876d9ba8f6374a1a"
+    }
+  }
+}

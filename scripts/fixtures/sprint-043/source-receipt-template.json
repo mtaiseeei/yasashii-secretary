@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "kind": "yasashii-project-clarity-source-pass-receipt",
+  "status": "pending-fresh-evaluator-pass",
+  "final": false,
+  "candidate": "f5a44f180bf1d39a1f2689e9c6763723c23eb2da",
+  "candidateTree": "e9831484f912830b75349dedf6f50cb836a81b44",
+  "productDigest": "2bbb126e083ce65fc021b53a244549cd7a919f5b1867ff16d119f01a5bb9d3f0",
+  "feedback": {
+    "path": "docs/feedback/sprint-043.md",
+    "sha256": null,
+    "verdict": null,
+    "candidate": null
+  },
+  "counts": {
+    "features": 17,
+    "behaviors": 62,
+    "primary": 250,
+    "collaboration": 20,
+    "visual": 4,
+    "e2e": 4,
+    "pass": 273,
+    "conditionalNotRun": 1
+  },
+  "conditionalNotRunIds": ["XM-007"],
+  "pathRoles": { "total": 46, "byteSync": 16, "adapted": 30, "unknown": 0, "overlap": 0, "unclassified": 0, "unused": 0, "stale": 0 },
+  "protectedGroups": 9,
+  "downstreamOwnedProductIntersection": 0,
+  "harnessOwnedProductIntersection": 0,
+  "rollback": "file-scoped candidate rollback to the exact pre-Clarity Yasashii base; release actions require a separate plan",
+  "notRun": ["release", "push", "tag", "github-release", "marketplace", "cache", "install", "new-session", "workspace-migration", "live-host", "live-xmind", "external-connector"],
+  "nextPermission": "release-decision-requires-separate-user-approval",
+  "internalSha256": null
+}

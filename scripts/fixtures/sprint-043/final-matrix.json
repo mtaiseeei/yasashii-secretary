@@ -1,0 +1,1629 @@
+{
+  "schemaVersion": 1,
+  "sprint": "sprint-043",
+  "candidate": "f5a44f180bf1d39a1f2689e9c6763723c23eb2da",
+  "featureCount": 17,
+  "behaviorCount": 62,
+  "features": [
+    {
+      "featureId": "PC-F60",
+      "behaviors": [
+        "PC-F60-B01",
+        "PC-F60-B02",
+        "PC-F60-B03"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F61",
+      "behaviors": [
+        "PC-F61-B01",
+        "PC-F61-B02",
+        "PC-F61-B03"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F62",
+      "behaviors": [
+        "PC-F62-B01",
+        "PC-F62-B02",
+        "PC-F62-B03"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F63",
+      "behaviors": [
+        "PC-F63-B01",
+        "PC-F63-B02",
+        "PC-F63-B03"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F64",
+      "behaviors": [
+        "PC-F64-B01",
+        "PC-F64-B02",
+        "PC-F64-B03"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F65",
+      "behaviors": [
+        "PC-F65-B01",
+        "PC-F65-B02",
+        "PC-F65-B03"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F66",
+      "behaviors": [
+        "PC-F66-B01",
+        "PC-F66-B02",
+        "PC-F66-B03",
+        "PC-F66-B04",
+        "PC-F66-B05"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F67",
+      "behaviors": [
+        "PC-F67-B01",
+        "PC-F67-B02",
+        "PC-F67-B03",
+        "PC-F67-B04"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F68",
+      "behaviors": [
+        "PC-F68-B01",
+        "PC-F68-B02",
+        "PC-F68-B03",
+        "PC-F68-B04",
+        "PC-F68-B05",
+        "PC-F68-B06",
+        "PC-F68-B07",
+        "PC-F68-B08"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F69",
+      "behaviors": [
+        "PC-F69-B01",
+        "PC-F69-B02",
+        "PC-F69-B03",
+        "PC-F69-B04"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F70",
+      "behaviors": [
+        "PC-F70-B01",
+        "PC-F70-B02",
+        "PC-F70-B03"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F71",
+      "behaviors": [
+        "PC-F71-B01",
+        "PC-F71-B02",
+        "PC-F71-B03"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F72",
+      "behaviors": [
+        "PC-F72-B01",
+        "PC-F72-B02",
+        "PC-F72-B03"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F73",
+      "behaviors": [
+        "PC-F73-B01",
+        "PC-F73-B02",
+        "PC-F73-B03"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F74",
+      "behaviors": [
+        "PC-F74-B01",
+        "PC-F74-B02",
+        "PC-F74-B03"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F75",
+      "behaviors": [
+        "PC-F75-B01",
+        "PC-F75-B02",
+        "PC-F75-B03",
+        "PC-F75-B04"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    },
+    {
+      "featureId": "PC-F76",
+      "behaviors": [
+        "PC-F76-B01",
+        "PC-F76-B02",
+        "PC-F76-B03",
+        "PC-F76-B04"
+      ],
+      "executionSurface": "source-clean-archive",
+      "result": "PASS"
+    }
+  ],
+  "rows": [
+    {
+      "behaviorId": "PC-F60-B01",
+      "featureId": "PC-F60",
+      "publicBehavior": "public F64-1",
+      "scenario": "正式名称Project Clarity、日本語表示クラリティ、namespace `clarity`",
+      "actualAction": "固定behavior suiteで SL-001 を実行する",
+      "expectedResult": "正式名称Project Clarity、日本語表示クラリティ、namespace `clarity`",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "SL-001"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "SL-001"
+      ],
+      "negativeCase": "BIND-PC-F60-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "正式名称Project Clarity、日本語表示クラリティ、namespace `clarity`",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F60-B02",
+      "featureId": "PC-F60",
+      "publicBehavior": "public F64-2",
+      "scenario": "Standalone Repo／Secretary-local Project／Linked External Repo／Portfolioを同じcoreで扱う",
+      "actualAction": "固定behavior suiteで PF-001 / SL-001 を実行する",
+      "expectedResult": "Standalone Repo／Secretary-local Project／Linked External Repo／Portfolioを同じcoreで扱う",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "PF-001",
+        "SL-001"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "PF-001",
+        "SL-001"
+      ],
+      "negativeCase": "BIND-PC-F60-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Standalone Repo／Secretary-local Project／Linked External Repo／Portfolioを同じcoreで扱う",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F60-B03",
+      "featureId": "PC-F60",
+      "publicBehavior": "public F64-3",
+      "scenario": "immutableなProject IDを持ち、後からlinkしてもIDと履歴を変えない",
+      "actualAction": "固定behavior suiteで LK-006 を実行する",
+      "expectedResult": "immutableなProject IDを持ち、後からlinkしてもIDと履歴を変えない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "LK-006"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "LK-006"
+      ],
+      "negativeCase": "BIND-PC-F60-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "immutableなProject IDを持ち、後からlinkしてもIDと履歴を変えない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F61-B01",
+      "featureId": "PC-F61",
+      "publicBehavior": "public F65-1",
+      "scenario": "状態遷移Event、本文を複製しないEvidence、再構築可能なStateを分離する",
+      "actualAction": "固定behavior suiteで DE-012 / QM-008 を実行する",
+      "expectedResult": "状態遷移Event、本文を複製しないEvidence、再構築可能なStateを分離する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "DE-012",
+        "QM-008"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "DE-012",
+        "QM-008"
+      ],
+      "negativeCase": "BIND-PC-F61-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "状態遷移Event、本文を複製しないEvidence、再構築可能なStateを分離する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F61-B02",
+      "featureId": "PC-F61",
+      "publicBehavior": "public F65-2",
+      "scenario": "Evidenceは最小locatorと短い要約だけを持ち、Secret／全文／顧客本文を保存しない",
+      "actualAction": "固定behavior suiteで DE-008 / DE-011 を実行する",
+      "expectedResult": "Evidenceは最小locatorと短い要約だけを持ち、Secret／全文／顧客本文を保存しない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "DE-008",
+        "DE-011"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "DE-008",
+        "DE-011"
+      ],
+      "negativeCase": "BIND-PC-F61-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Evidenceは最小locatorと短い要約だけを持ち、Secret／全文／顧客本文を保存しない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F61-B03",
+      "featureId": "PC-F61",
+      "publicBehavior": "public F65-3",
+      "scenario": "Markdown／Mermaid／Xmindは再生成可能なprojectionで、手編集を正本にしない",
+      "actualAction": "固定behavior suiteで MM-003 を実行する",
+      "expectedResult": "Markdown／Mermaid／Xmindは再生成可能なprojectionで、手編集を正本にしない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "MM-003"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "MM-003"
+      ],
+      "negativeCase": "BIND-PC-F61-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Markdown／Mermaid／Xmindは再生成可能なprojectionで、手編集を正本にしない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F62-B01",
+      "featureId": "PC-F62",
+      "publicBehavior": "public F66-1",
+      "scenario": "DecisionとExecutionから`stabilize`／`execute`／`validate`／`decide`を常に再計算する",
+      "actualAction": "固定behavior suiteで QM-001 / QM-002 / QM-003 / QM-004 を実行する",
+      "expectedResult": "DecisionとExecutionから`stabilize`／`execute`／`validate`／`decide`を常に再計算する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "QM-001",
+        "QM-002",
+        "QM-003",
+        "QM-004"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "QM-001",
+        "QM-002",
+        "QM-003",
+        "QM-004"
+      ],
+      "negativeCase": "BIND-PC-F62-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "DecisionとExecutionから`stabilize`／`execute`／`validate`／`decide`を常に再計算する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F62-B02",
+      "featureId": "PC-F62",
+      "publicBehavior": "public F66-2",
+      "scenario": "AI推定は`proposed`／`inferred`に留め、明示正本や人間確認なしに`confirmed`へ進めない",
+      "actualAction": "固定behavior suiteで DE-001 を実行する",
+      "expectedResult": "AI推定は`proposed`／`inferred`に留め、明示正本や人間確認なしに`confirmed`へ進めない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "DE-001"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "DE-001"
+      ],
+      "negativeCase": "BIND-PC-F62-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "AI推定は`proposed`／`inferred`に留め、明示正本や人間確認なしに`confirmed`へ進めない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F62-B03",
+      "featureId": "PC-F62",
+      "publicBehavior": "public F66-3",
+      "scenario": "`idea`、期限前`deferred`、`rejected`／`superseded`を現在AttentionとActive Matrixから適切に分ける",
+      "actualAction": "固定behavior suiteで QM-010 / QM-011 を実行する",
+      "expectedResult": "`idea`、期限前`deferred`、`rejected`／`superseded`を現在AttentionとActive Matrixから適切に分ける",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "QM-010",
+        "QM-011"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "QM-010",
+        "QM-011"
+      ],
+      "negativeCase": "BIND-PC-F62-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "`idea`、期限前`deferred`、`rejected`／`superseded`を現在AttentionとActive Matrixから適切に分ける",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F63-B01",
+      "featureId": "PC-F63",
+      "publicBehavior": "public F67-1",
+      "scenario": "無承認実装、決定済み未実行、Drift、validation失敗、stale、conflict、Evidence不足を理由つきで抽出する",
+      "actualAction": "固定behavior suiteで AT-001 / AT-003 / AT-005 を実行する",
+      "expectedResult": "無承認実装、決定済み未実行、Drift、validation失敗、stale、conflict、Evidence不足を理由つきで抽出する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "AT-001",
+        "AT-003",
+        "AT-005"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "AT-001",
+        "AT-003",
+        "AT-005"
+      ],
+      "negativeCase": "BIND-PC-F63-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "無承認実装、決定済み未実行、Drift、validation失敗、stale、conflict、Evidence不足を理由つきで抽出する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F63-B02",
+      "featureId": "PC-F63",
+      "publicBehavior": "public F67-2",
+      "scenario": "起動時とdailyは最大3件程度、結論→理由→根拠→選択の順で示し、残りを畳む",
+      "actualAction": "固定behavior suiteで AT-015 を実行する",
+      "expectedResult": "起動時とdailyは最大3件程度、結論→理由→根拠→選択の順で示し、残りを畳む",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "AT-015"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "AT-015"
+      ],
+      "negativeCase": "BIND-PC-F63-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "起動時とdailyは最大3件程度、結論→理由→根拠→選択の順で示し、残りを畳む",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F63-B03",
+      "featureId": "PC-F63",
+      "publicBehavior": "public F67-3",
+      "scenario": "単一進捗率や不透明なAI scoreを主要価値にせず、件数、lag、freshness、解消時間を使う",
+      "actualAction": "固定behavior suiteで AT-018 を実行する",
+      "expectedResult": "単一進捗率や不透明なAI scoreを主要価値にせず、件数、lag、freshness、解消時間を使う",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "AT-018"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "AT-018"
+      ],
+      "negativeCase": "BIND-PC-F63-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "単一進捗率や不透明なAI scoreを主要価値にせず、件数、lag、freshness、解消時間を使う",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F64-B01",
+      "featureId": "PC-F64",
+      "publicBehavior": "public F68-1",
+      "scenario": "未導入Repoをbounded／read-onlyで解析し、予定、候補、競合、除外、未確認範囲をpreviewする",
+      "actualAction": "固定behavior suiteで ST-006 / ST-008 を実行する",
+      "expectedResult": "未導入Repoをbounded／read-onlyで解析し、予定、候補、競合、除外、未確認範囲をpreviewする",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "ST-006",
+        "ST-008"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "ST-006",
+        "ST-008"
+      ],
+      "negativeCase": "BIND-PC-F64-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "未導入Repoをbounded／read-onlyで解析し、予定、候補、競合、除外、未確認範囲をpreviewする",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F64-B02",
+      "featureId": "PC-F64",
+      "publicBehavior": "public F68-2",
+      "scenario": "明示確認後だけ初期化し、retryでItem／Event／commitを重複させない",
+      "actualAction": "固定behavior suiteで ST-014 / ST-015 を実行する",
+      "expectedResult": "明示確認後だけ初期化し、retryでItem／Event／commitを重複させない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "ST-014",
+        "ST-015"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "ST-014",
+        "ST-015"
+      ],
+      "negativeCase": "BIND-PC-F64-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "明示確認後だけ初期化し、retryでItem／Event／commitを重複させない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F64-B03",
+      "featureId": "PC-F64",
+      "publicBehavior": "public F68-3",
+      "scenario": "doctorはmode／schema／Hook／link／projection／lockを診断し、migration／cleanupはpreviewとapplyを分ける",
+      "actualAction": "固定behavior suiteで IM-013 / IM-014 を実行する",
+      "expectedResult": "doctorはmode／schema／Hook／link／projection／lockを診断し、migration／cleanupはpreviewとapplyを分ける",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "IM-013",
+        "IM-014"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "IM-013",
+        "IM-014"
+      ],
+      "negativeCase": "BIND-PC-F64-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "doctorはmode／schema／Hook／link／projection／lockを診断し、migration／cleanupはpreviewとapplyを分ける",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F65-B01",
+      "featureId": "PC-F65",
+      "publicBehavior": "public F69-1",
+      "scenario": "`clarity` Skill 1つでstatus／init／scan／review／checkpoint／decide／validate／drift／map／xmind／link／sync／portfolio／history／doctor／migrateを扱う",
+      "actualAction": "固定behavior suiteで ST-003 / IM-006 を実行する",
+      "expectedResult": "`clarity` Skill 1つでstatus／init／scan／review／checkpoint／decide／validate／drift／map／xmind／link／sync／portfolio／history／doctor／migrateを扱う",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "ST-003",
+        "IM-006"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "ST-003",
+        "IM-006"
+      ],
+      "negativeCase": "BIND-PC-F65-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "`clarity` Skill 1つでstatus／init／scan／review／checkpoint／decide／validate／drift／map／xmind／link／sync／portfolio／history／doctor／migrateを扱う",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F65-B02",
+      "featureId": "PC-F65",
+      "publicBehavior": "public F69-2",
+      "scenario": "反復処理はsafe path、atomic write、JSON output、partial failure、idempotent retryを持つ決定的CLIへ分ける",
+      "actualAction": "固定behavior suiteで IM-001 / IM-004 を実行する",
+      "expectedResult": "反復処理はsafe path、atomic write、JSON output、partial failure、idempotent retryを持つ決定的CLIへ分ける",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "IM-001",
+        "IM-004"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "IM-001",
+        "IM-004"
+      ],
+      "negativeCase": "BIND-PC-F65-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "反復処理はsafe path、atomic write、JSON output、partial failure、idempotent retryを持つ決定的CLIへ分ける",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F65-B03",
+      "featureId": "PC-F65",
+      "publicBehavior": "public F69-3",
+      "scenario": "Hook未信頼／無効／失敗でも自然言語またはSkillからstatus／review／checkpointを完遂できる",
+      "actualAction": "固定behavior suiteで HC-014 / HX-011 を実行する",
+      "expectedResult": "Hook未信頼／無効／失敗でも自然言語またはSkillからstatus／review／checkpointを完遂できる",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "HC-014",
+        "HX-011"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "HC-014",
+        "HX-011"
+      ],
+      "negativeCase": "BIND-PC-F65-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Hook未信頼／無効／失敗でも自然言語またはSkillからstatus／review／checkpointを完遂できる",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F66-B01",
+      "featureId": "PC-F66",
+      "publicBehavior": "public F70-1",
+      "scenario": "plugin rootの`hooks/hooks.json`と軽量command router 1組でhost payload差を正規化する",
+      "actualAction": "固定behavior suiteで HC-001 / HX-001 を実行する",
+      "expectedResult": "plugin rootの`hooks/hooks.json`と軽量command router 1組でhost payload差を正規化する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "HC-001",
+        "HX-001"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "HC-001",
+        "HX-001"
+      ],
+      "negativeCase": "BIND-PC-F66-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "plugin rootの`hooks/hooks.json`と軽量command router 1組でhost payload差を正規化する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F66-B02",
+      "featureId": "PC-F66",
+      "publicBehavior": "public F70-2",
+      "scenario": "SessionStart／PostToolUse／PreCompact／compact後再開／Stop／SessionEndをboundedに扱い、Hook内network／LLM／Xmind／全scanを0件にする",
+      "actualAction": "固定behavior suiteで HC-002 / HC-011 / HC-012 を実行する",
+      "expectedResult": "SessionStart／PostToolUse／PreCompact／compact後再開／Stop／SessionEndをboundedに扱い、Hook内network／LLM／Xmind／全scanを0件にする",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "HC-002",
+        "HC-011",
+        "HC-012"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "HC-002",
+        "HC-011",
+        "HC-012"
+      ],
+      "negativeCase": "BIND-PC-F66-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "SessionStart／PostToolUse／PreCompact／compact後再開／Stop／SessionEndをboundedに扱い、Hook内network／LLM／Xmind／全scanを0件にする",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F66-B03",
+      "featureId": "PC-F66",
+      "publicBehavior": "public F70-3",
+      "scenario": "未初期化／未linkedは高速no-op、同時発火でもevent破損／重複checkpointを0件にする",
+      "actualAction": "固定behavior suiteで HC-010 / HC-005 を実行する",
+      "expectedResult": "未初期化／未linkedは高速no-op、同時発火でもevent破損／重複checkpointを0件にする",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "HC-010",
+        "HC-005"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "HC-010",
+        "HC-005"
+      ],
+      "negativeCase": "BIND-PC-F66-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "未初期化／未linkedは高速no-op、同時発火でもevent破損／重複checkpointを0件にする",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F66-B04",
+      "featureId": "PC-F66",
+      "publicBehavior": "public F70-4",
+      "scenario": "Codex trust未承認／無効とClaude plugin無効をdegradedとして表示し、host結果を相互昇格しない",
+      "actualAction": "固定behavior suiteで HX-002 / HC-014 を実行する",
+      "expectedResult": "Codex trust未承認／無効とClaude plugin無効をdegradedとして表示し、host結果を相互昇格しない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "HX-002",
+        "HC-014"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "HX-002",
+        "HC-014"
+      ],
+      "negativeCase": "BIND-PC-F66-B04-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Codex trust未承認／無効とClaude plugin無効をdegradedとして表示し、host結果を相互昇格しない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F66-B05",
+      "featureId": "PC-F66",
+      "publicBehavior": "public F70-5",
+      "scenario": "routerはClarity専用とし、他Skill独立Hookやmemory候補の意味判定を追加しない",
+      "actualAction": "固定behavior suiteで HP-001 / HP-002 を実行する",
+      "expectedResult": "routerはClarity専用とし、他Skill独立Hookやmemory候補の意味判定を追加しない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "HP-001",
+        "HP-002"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "HP-001",
+        "HP-002"
+      ],
+      "negativeCase": "BIND-PC-F66-B05-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "routerはClarity専用とし、他Skill独立Hookやmemory候補の意味判定を追加しない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F67-B01",
+      "featureId": "PC-F67",
+      "publicBehavior": "public F71-1",
+      "scenario": "overview／Attention／4象限とmatrix／structure／dependency／state flowのMermaidを生成する",
+      "actualAction": "固定behavior suiteで MM-001 / MM-007 / MM-008 / MM-009 を実行する",
+      "expectedResult": "overview／Attention／4象限とmatrix／structure／dependency／state flowのMermaidを生成する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "MM-001",
+        "MM-007",
+        "MM-008",
+        "MM-009"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "MM-001",
+        "MM-007",
+        "MM-008",
+        "MM-009"
+      ],
+      "negativeCase": "BIND-PC-F67-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "overview／Attention／4象限とmatrix／structure／dependency／state flowのMermaidを生成する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F67-B02",
+      "featureId": "PC-F67",
+      "publicBehavior": "public F71-2",
+      "scenario": "同じ入力はbyte安定し、Item ID由来のstable配置で重なりを軽減する",
+      "actualAction": "固定behavior suiteで MM-002 / MM-003 / MM-004 を実行する",
+      "expectedResult": "同じ入力はbyte安定し、Item ID由来のstable配置で重なりを軽減する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "MM-002",
+        "MM-003",
+        "MM-004"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "MM-002",
+        "MM-003",
+        "MM-004"
+      ],
+      "negativeCase": "BIND-PC-F67-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "同じ入力はbyte安定し、Item ID由来のstable配置で重なりを軽減する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F67-B03",
+      "featureId": "PC-F67",
+      "publicBehavior": "public F71-3",
+      "scenario": "Mermaid描画不能でもraw `.mmd`とMarkdownを残し、Clarity本体を失敗にしない",
+      "actualAction": "固定behavior suiteで MM-010 を実行する",
+      "expectedResult": "Mermaid描画不能でもraw `.mmd`とMarkdownを残し、Clarity本体を失敗にしない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "MM-010"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "MM-010"
+      ],
+      "negativeCase": "BIND-PC-F67-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Mermaid描画不能でもraw `.mmd`とMarkdownを残し、Clarity本体を失敗にしない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F67-B04",
+      "featureId": "PC-F67",
+      "publicBehavior": "public F71-4",
+      "scenario": "q1右上青、q2左上緑、q3左下黄、q4右下赤を固定し、emoji／label／意味を併記する",
+      "actualAction": "固定behavior suiteで XV-004 を実行する",
+      "expectedResult": "q1右上青、q2左上緑、q3左下黄、q4右下赤を固定し、emoji／label／意味を併記する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "XV-004"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "XV-004"
+      ],
+      "negativeCase": "BIND-PC-F67-B04-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "q1右上青、q2左上緑、q3左下黄、q4右下赤を固定し、emoji／label／意味を併記する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F68-B01",
+      "featureId": "PC-F68",
+      "publicBehavior": "public F72-1",
+      "scenario": "`xmind.enabled`とprovider capabilityを分け、Yasashii既定OFF、明示ON／OFFを可能にする",
+      "actualAction": "固定behavior suiteで XM-001 / XV-001 を実行する",
+      "expectedResult": "`xmind.enabled`とprovider capabilityを分け、Yasashii既定OFF、明示ON／OFFを可能にする",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "XM-001",
+        "XV-001"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "XM-001",
+        "XV-001"
+      ],
+      "negativeCase": "BIND-PC-F68-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "`xmind.enabled`とprovider capabilityを分け、Yasashii既定OFF、明示ON／OFFを可能にする",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F68-B02",
+      "featureId": "PC-F68",
+      "publicBehavior": "public F72-2",
+      "scenario": "ON時はcapableなXmind MCPを第1優先、local `.xmind`を明示承認後の第2優先にする",
+      "actualAction": "固定behavior suiteで XM-006 / XM-015 を実行する",
+      "expectedResult": "ON時はcapableなXmind MCPを第1優先、local `.xmind`を明示承認後の第2優先にする",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "XM-006",
+        "XM-015"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "XM-006",
+        "XM-015"
+      ],
+      "negativeCase": "BIND-PC-F68-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "ON時はcapableなXmind MCPを第1優先、local `.xmind`を明示承認後の第2優先にする",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F68-B03",
+      "featureId": "PC-F68",
+      "publicBehavior": "public F72-3",
+      "scenario": "`mcp-selected`／`fallback-approval-required`／`local-selected-after-approval`／`stopped`とreasonを区別し、未接続等をverifiedへしない",
+      "actualAction": "固定behavior suiteで XV-001 を実行する",
+      "expectedResult": "`mcp-selected`／`fallback-approval-required`／`local-selected-after-approval`／`stopped`とreasonを区別し、未接続等をverifiedへしない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "XV-001"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "XV-001"
+      ],
+      "negativeCase": "BIND-PC-F68-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "`mcp-selected`／`fallback-approval-required`／`local-selected-after-approval`／`stopped`とreasonを区別し、未接続等をverifiedへしない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F68-B04",
+      "featureId": "PC-F68",
+      "publicBehavior": "public F72-4",
+      "scenario": "cloud／external／network／creditとlocal fallbackを対象・影響preview後の明示承認だけでwriteし、拒否／無回答は0件にする",
+      "actualAction": "固定behavior suiteで XM-010 / XV-003 を実行する",
+      "expectedResult": "cloud／external／network／creditとlocal fallbackを対象・影響preview後の明示承認だけでwriteし、拒否／無回答は0件にする",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "XM-010",
+        "XV-003"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "XM-010",
+        "XV-003"
+      ],
+      "negativeCase": "BIND-PC-F68-B04-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "cloud／external／network／creditとlocal fallbackを対象・影響preview後の明示承認だけでwriteし、拒否／無回答は0件にする",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F68-B05",
+      "featureId": "PC-F68",
+      "publicBehavior": "public F72-5",
+      "scenario": "matrixとproject structureの2 Sheet相当、stable Item IDを生成し、固定visual capability不足は停止する",
+      "actualAction": "固定behavior suiteで XM-003 / XM-011 を実行する",
+      "expectedResult": "matrixとproject structureの2 Sheet相当、stable Item IDを生成し、固定visual capability不足は停止する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "XM-003",
+        "XM-011"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "XM-003",
+        "XM-011"
+      ],
+      "negativeCase": "BIND-PC-F68-B05-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "matrixとproject structureの2 Sheet相当、stable Item IDを生成し、固定visual capability不足は停止する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F68-B06",
+      "featureId": "PC-F68",
+      "publicBehavior": "public F72-6",
+      "scenario": "TL緑`#16A34A`、TR青`#2563EB`、BL黄`#D97706`、BR赤`#DC2626`、上=決まっている、下=まだ決まっていないを厳密に守る",
+      "actualAction": "固定behavior suiteで XV-003 を実行する",
+      "expectedResult": "TL緑`#16A34A`、TR青`#2563EB`、BL黄`#D97706`、BR赤`#DC2626`、上=決まっている、下=まだ決まっていないを厳密に守る",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "XV-003"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "XV-003"
+      ],
+      "negativeCase": "BIND-PC-F68-B06-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "TL緑`#16A34A`、TR青`#2563EB`、BL黄`#D97706`、BR赤`#DC2626`、上=決まっている、下=まだ決まっていないを厳密に守る",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F68-B07",
+      "featureId": "PC-F68",
+      "publicBehavior": "public F72-7",
+      "scenario": "Xmind nodeとClarity Itemをstable IDで対応づけ、既存無関係Sheet／branchを保持する",
+      "actualAction": "固定behavior suiteで XM-004 / XM-013 を実行する",
+      "expectedResult": "Xmind nodeとClarity Itemをstable IDで対応づけ、既存無関係Sheet／branchを保持する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "XM-004",
+        "XM-013"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "XM-004",
+        "XM-013"
+      ],
+      "negativeCase": "BIND-PC-F68-B07-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Xmind nodeとClarity Itemをstable IDで対応づけ、既存無関係Sheet／branchを保持する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F68-B08",
+      "featureId": "PC-F68",
+      "publicBehavior": "public F72-8",
+      "scenario": "Xmind編集はproposalへ戻し、人間確認前に状態を確定せず、Hook内provider呼出しを0件にする",
+      "actualAction": "固定behavior suiteで XM-008 / XM-010 / HC-016 を実行する",
+      "expectedResult": "Xmind編集はproposalへ戻し、人間確認前に状態を確定せず、Hook内provider呼出しを0件にする",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "XM-008",
+        "XM-010",
+        "HC-016"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "XM-008",
+        "XM-010",
+        "HC-016"
+      ],
+      "negativeCase": "BIND-PC-F68-B08-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Xmind編集はproposalへ戻し、人間確認前に状態を確定せず、Hook内provider呼出しを0件にする",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F69-B01",
+      "featureId": "PC-F69",
+      "publicBehavior": "public F73-1",
+      "scenario": "`secretary/projects/open/`、`PROJECT.md`、Decision／memory、project resolverを再利用し、Clarity Item本文をPROJECTへ埋め込まない",
+      "actualAction": "固定behavior suiteで SL-001 / SL-010 を実行する",
+      "expectedResult": "`secretary/projects/open/`、`PROJECT.md`、Decision／memory、project resolverを再利用し、Clarity Item本文をPROJECTへ埋め込まない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "SL-001",
+        "SL-010"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "SL-001",
+        "SL-010"
+      ],
+      "negativeCase": "BIND-PC-F69-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "`secretary/projects/open/`、`PROJECT.md`、Decision／memory、project resolverを再利用し、Clarity Item本文をPROJECTへ埋め込まない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F69-B02",
+      "featureId": "PC-F69",
+      "publicBehavior": "public F73-2",
+      "scenario": "open／closed、作成／完了／再開、PJ Decisionを置換せず、mode／Attention／最重要項目／link healthだけを短く加える",
+      "actualAction": "固定behavior suiteで SL-011 / SL-012 を実行する",
+      "expectedResult": "open／closed、作成／完了／再開、PJ Decisionを置換せず、mode／Attention／最重要項目／link healthだけを短く加える",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "SL-011",
+        "SL-012"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "SL-011",
+        "SL-012"
+      ],
+      "negativeCase": "BIND-PC-F69-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "open／closed、作成／完了／再開、PJ Decisionを置換せず、mode／Attention／最重要項目／link healthだけを短く加える",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F69-B03",
+      "featureId": "PC-F69",
+      "publicBehavior": "public F73-3",
+      "scenario": "private `05/02`、`vault/10_sources`、Notion routingの実装を同梱せず、公開adapter seamだけを保つ",
+      "actualAction": "固定behavior suiteで CLX-009 を実行する",
+      "expectedResult": "private `05/02`、`vault/10_sources`、Notion routingの実装を同梱せず、公開adapter seamだけを保つ",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "CLX-009"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "CLX-009"
+      ],
+      "negativeCase": "BIND-PC-F69-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "private `05/02`、`vault/10_sources`、Notion routingの実装を同梱せず、公開adapter seamだけを保つ",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F69-B04",
+      "featureId": "PC-F69",
+      "publicBehavior": "public F73-4",
+      "scenario": "Projectsはlifecycle／`canonicalRepo`、ClarityはDecision／Execution／Validation／Attention／Driftを所有し、所有権を交換しない",
+      "actualAction": "固定behavior suiteで SL-006 / CLX-006 を実行する",
+      "expectedResult": "Projectsはlifecycle／`canonicalRepo`、ClarityはDecision／Execution／Validation／Attention／Driftを所有し、所有権を交換しない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "SL-006",
+        "CLX-006"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "SL-006",
+        "CLX-006"
+      ],
+      "negativeCase": "BIND-PC-F69-B04-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Projectsはlifecycle／`canonicalRepo`、ClarityはDecision／Execution／Validation／Attention／Driftを所有し、所有権を交換しない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F70-B01",
+      "featureId": "PC-F70",
+      "publicBehavior": "public F74-1",
+      "scenario": "daily morningは予定／TODO／中断点と分けた「今日の要確認」を最大3件程度示す",
+      "actualAction": "固定behavior suiteで PF-003 / PF-012 を実行する",
+      "expectedResult": "daily morningは予定／TODO／中断点と分けた「今日の要確認」を最大3件程度示す",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "PF-003",
+        "PF-012"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "PF-003",
+        "PF-012"
+      ],
+      "negativeCase": "BIND-PC-F70-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "daily morningは予定／TODO／中断点と分けた「今日の要確認」を最大3件程度示す",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F70-B02",
+      "featureId": "PC-F70",
+      "publicBehavior": "public F74-2",
+      "scenario": "eveningはDecision／実装観測／候補／Drift／持越しを分け、weeklyは増減／lag／解消Drift／staleを扱う",
+      "actualAction": "固定behavior suiteで PF-007 / PF-008 を実行する",
+      "expectedResult": "eveningはDecision／実装観測／候補／Drift／持越しを分け、weeklyは増減／lag／解消Drift／staleを扱う",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "PF-007",
+        "PF-008"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "PF-007",
+        "PF-008"
+      ],
+      "negativeCase": "BIND-PC-F70-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "eveningはDecision／実装観測／候補／Drift／持越しを分け、weeklyは増減／lag／解消Drift／staleを扱う",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F70-B03",
+      "featureId": "PC-F70",
+      "publicBehavior": "public F74-3",
+      "scenario": "Portfolioはopen projectの最小projectionだけを集め、closedと全Item本文を通常読込しない",
+      "actualAction": "固定behavior suiteで PF-001 / PF-002 を実行する",
+      "expectedResult": "Portfolioはopen projectの最小projectionだけを集め、closedと全Item本文を通常読込しない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "PF-001",
+        "PF-002"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "PF-001",
+        "PF-002"
+      ],
+      "negativeCase": "BIND-PC-F70-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Portfolioはopen projectの最小projectionだけを集め、closedと全Item本文を通常読込しない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F71-B01",
+      "featureId": "PC-F71",
+      "publicBehavior": "public F75-1",
+      "scenario": "prepare／accept／finalizeで双方のProject ID／Repo identity／link ID／digest／authorityを相互確認する",
+      "actualAction": "固定behavior suiteで LK-003 / LK-004 を実行する",
+      "expectedResult": "prepare／accept／finalizeで双方のProject ID／Repo identity／link ID／digest／authorityを相互確認する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "LK-003",
+        "LK-004"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "LK-003",
+        "LK-004"
+      ],
+      "negativeCase": "BIND-PC-F71-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "prepare／accept／finalizeで双方のProject ID／Repo identity／link ID／digest／authorityを相互確認する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F71-B02",
+      "featureId": "PC-F71",
+      "publicBehavior": "public F75-2",
+      "scenario": "Link metadataへSecret／資格情報／absolute local path／顧客本文を保存しない",
+      "actualAction": "固定behavior suiteで LK-001 / LK-009 を実行する",
+      "expectedResult": "Link metadataへSecret／資格情報／absolute local path／顧客本文を保存しない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "LK-001",
+        "LK-009"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "LK-001",
+        "LK-009"
+      ],
+      "negativeCase": "BIND-PC-F71-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Link metadataへSecret／資格情報／absolute local path／顧客本文を保存しない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F71-B03",
+      "featureId": "PC-F71",
+      "publicBehavior": "public F75-3",
+      "scenario": "既存Standalone IDを維持し、duplicate／tamper／target不一致を副作用0件で拒否する",
+      "actualAction": "固定behavior suiteで LK-006 / LK-012 / LK-015 を実行する",
+      "expectedResult": "既存Standalone IDを維持し、duplicate／tamper／target不一致を副作用0件で拒否する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "LK-006",
+        "LK-012",
+        "LK-015"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "LK-006",
+        "LK-012",
+        "LK-015"
+      ],
+      "negativeCase": "BIND-PC-F71-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "既存Standalone IDを維持し、duplicate／tamper／target不一致を副作用0件で拒否する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F72-B01",
+      "featureId": "PC-F72",
+      "publicBehavior": "public F76-1",
+      "scenario": "相手exportをread-only取得し、自Repoのimport projectionだけをpreview後に更新し、cross-root write／暗黙pushを0件にする",
+      "actualAction": "固定behavior suiteで SY-001 / SY-002 / LK-007 / LK-008 を実行する",
+      "expectedResult": "相手exportをread-only取得し、自Repoのimport projectionだけをpreview後に更新し、cross-root write／暗黙pushを0件にする",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "SY-001",
+        "SY-002",
+        "LK-007",
+        "LK-008"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "SY-001",
+        "SY-002",
+        "LK-007",
+        "LK-008"
+      ],
+      "negativeCase": "BIND-PC-F72-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "相手exportをread-only取得し、自Repoのimport projectionだけをpreview後に更新し、cross-root write／暗黙pushを0件にする",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F72-B02",
+      "featureId": "PC-F72",
+      "publicBehavior": "public F76-2",
+      "scenario": "fieldごとにPrimary／Reference／Shared derivedを持ち、Primary重複とlast-write-winsを拒否する",
+      "actualAction": "固定behavior suiteで SY-005 / SY-006 を実行する",
+      "expectedResult": "fieldごとにPrimary／Reference／Shared derivedを持ち、Primary重複とlast-write-winsを拒否する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "SY-005",
+        "SY-006"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "SY-005",
+        "SY-006"
+      ],
+      "negativeCase": "BIND-PC-F72-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "fieldごとにPrimary／Reference／Shared derivedを持ち、Primary重複とlast-write-winsを拒否する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F72-B03",
+      "featureId": "PC-F72",
+      "publicBehavior": "public F76-3",
+      "scenario": "stale／schema不一致／削除／authority違反を隠さず、resolutionを新Eventとして残す",
+      "actualAction": "固定behavior suiteで SY-007 / SY-008 / SY-011 / SY-012 を実行する",
+      "expectedResult": "stale／schema不一致／削除／authority違反を隠さず、resolutionを新Eventとして残す",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "SY-007",
+        "SY-008",
+        "SY-011",
+        "SY-012"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "SY-007",
+        "SY-008",
+        "SY-011",
+        "SY-012"
+      ],
+      "negativeCase": "BIND-PC-F72-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "stale／schema不一致／削除／authority違反を隠さず、resolutionを新Eventとして残す",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F73-B01",
+      "featureId": "PC-F73",
+      "publicBehavior": "public F77-1",
+      "scenario": "Decision／spec／ADR／顧客合意とcode／commit／test／成果物Evidenceを比較する",
+      "actualAction": "固定behavior suiteで DR-001 を実行する",
+      "expectedResult": "Decision／spec／ADR／顧客合意とcode／commit／test／成果物Evidenceを比較する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "DR-001"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "DR-001"
+      ],
+      "negativeCase": "BIND-PC-F73-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Decision／spec／ADR／顧客合意とcode／commit／test／成果物Evidenceを比較する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F73-B02",
+      "featureId": "PC-F73",
+      "publicBehavior": "public F77-2",
+      "scenario": "根拠が弱ければ`possible_drift`、両側根拠が揃えば`drift`とし、双方の根拠を示す",
+      "actualAction": "固定behavior suiteで DR-003 / DR-004 を実行する",
+      "expectedResult": "根拠が弱ければ`possible_drift`、両側根拠が揃えば`drift`とし、双方の根拠を示す",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "DR-003",
+        "DR-004"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "DR-003",
+        "DR-004"
+      ],
+      "negativeCase": "BIND-PC-F73-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "根拠が弱ければ`possible_drift`、両側根拠が揃えば`drift`とし、双方の根拠を示す",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F73-B03",
+      "featureId": "PC-F73",
+      "publicBehavior": "public F77-3",
+      "scenario": "Decision変更／実装修正／例外承認のどれでも履歴を消さず、解消後だけActive Attentionから外す",
+      "actualAction": "固定behavior suiteで DR-005 / DR-006 / DR-007 を実行する",
+      "expectedResult": "Decision変更／実装修正／例外承認のどれでも履歴を消さず、解消後だけActive Attentionから外す",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "DR-005",
+        "DR-006",
+        "DR-007"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "DR-005",
+        "DR-006",
+        "DR-007"
+      ],
+      "negativeCase": "BIND-PC-F73-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Decision変更／実装修正／例外承認のどれでも履歴を消さず、解消後だけActive Attentionから外す",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F74-B01",
+      "featureId": "PC-F74",
+      "publicBehavior": "public F78-1",
+      "scenario": "root／symlink／junction／traversal／dirty／stage／Secret／schema／lockを安全側に扱う",
+      "actualAction": "固定behavior suiteで GS-001 / GS-002 / GS-007 / GS-008 / GS-010 を実行する",
+      "expectedResult": "root／symlink／junction／traversal／dirty／stage／Secret／schema／lockを安全側に扱う",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "GS-001",
+        "GS-002",
+        "GS-007",
+        "GS-008",
+        "GS-010"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "GS-001",
+        "GS-002",
+        "GS-007",
+        "GS-008",
+        "GS-010"
+      ],
+      "negativeCase": "BIND-PC-F74-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "root／symlink／junction／traversal／dirty／stage／Secret／schema／lockを安全側に扱う",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F74-B02",
+      "featureId": "PC-F74",
+      "publicBehavior": "public F78-2",
+      "scenario": "concurrent Hookは危険な共有JSON read-modify-writeへ依存せず、atomic write／lock／一意eventで破損と重複を防ぐ",
+      "actualAction": "固定behavior suiteで GS-009 を実行する",
+      "expectedResult": "concurrent Hookは危険な共有JSON read-modify-writeへ依存せず、atomic write／lock／一意eventで破損と重複を防ぐ",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "GS-009"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "GS-009"
+      ],
+      "negativeCase": "BIND-PC-F74-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "concurrent Hookは危険な共有JSON read-modify-writeへ依存せず、atomic write／lock／一意eventで破損と重複を防ぐ",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F74-B03",
+      "featureId": "PC-F74",
+      "publicBehavior": "public F78-3",
+      "scenario": "apply／migration／sync／checkpoint失敗は利用者差分を巻き戻さず、partialとretryで一状態へ収束する",
+      "actualAction": "固定behavior suiteで GS-004 / IM-001 / IM-002 を実行する",
+      "expectedResult": "apply／migration／sync／checkpoint失敗は利用者差分を巻き戻さず、partialとretryで一状態へ収束する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "GS-004",
+        "IM-001",
+        "IM-002"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "GS-004",
+        "IM-001",
+        "IM-002"
+      ],
+      "negativeCase": "BIND-PC-F74-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "apply／migration／sync／checkpoint失敗は利用者差分を巻き戻さず、partialとretryで一状態へ収束する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F75-B01",
+      "featureId": "PC-F75",
+      "publicBehavior": "public F79-1",
+      "scenario": "Skill／Hook／host inventory／manifest／marketplace metadata／archive／clean checkoutをYasashii editionとして整合させる",
+      "actualAction": "固定behavior suiteで HP-005 / CLX-016 を実行する",
+      "expectedResult": "Skill／Hook／host inventory／manifest／marketplace metadata／archive／clean checkoutをYasashii editionとして整合させる",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "HP-005",
+        "CLX-016"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "HP-005",
+        "CLX-016"
+      ],
+      "negativeCase": "BIND-PC-F75-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Skill／Hook／host inventory／manifest／marketplace metadata／archive／clean checkoutをYasashii editionとして整合させる",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F75-B02",
+      "featureId": "PC-F75",
+      "publicBehavior": "public F79-2",
+      "scenario": "Claude Code／Codex、Desktop／CLIのsupported／verifiedを分け、1 surfaceのPASSを他へ昇格しない",
+      "actualAction": "固定behavior suiteで HP-006 / CLX-016 を実行する",
+      "expectedResult": "Claude Code／Codex、Desktop／CLIのsupported／verifiedを分け、1 surfaceのPASSを他へ昇格しない",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "HP-006",
+        "CLX-016"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "HP-006",
+        "CLX-016"
+      ],
+      "negativeCase": "BIND-PC-F75-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "Claude Code／Codex、Desktop／CLIのsupported／verifiedを分け、1 surfaceのPASSを他へ昇格しない",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F75-B03",
+      "featureId": "PC-F75",
+      "publicBehavior": "public F79-3",
+      "scenario": "固定public handoffとprivate PASS receiptを前提に、共通path、adaptation、除外・保護path、rollbackをYasashii別Harnessで固定する",
+      "actualAction": "固定behavior suiteで CLX-017 / CLX-020 を実行する",
+      "expectedResult": "固定public handoffとprivate PASS receiptを前提に、共通path、adaptation、除外・保護path、rollbackをYasashii別Harnessで固定する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "CLX-017",
+        "CLX-020"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "CLX-017",
+        "CLX-020"
+      ],
+      "negativeCase": "BIND-PC-F75-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "固定public handoffとprivate PASS receiptを前提に、共通path、adaptation、除外・保護path、rollbackをYasashii別Harnessで固定する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F75-B04",
+      "featureId": "PC-F75",
+      "publicBehavior": "public F79-4",
+      "scenario": "push／tag／Release／marketplace／cache／実downstream反映をこの3 Sprintの対象外にする",
+      "actualAction": "固定behavior suiteで CLX-017 を実行する",
+      "expectedResult": "push／tag／Release／marketplace／cache／実downstream反映をこの3 Sprintの対象外にする",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "CLX-017"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "CLX-017"
+      ],
+      "negativeCase": "BIND-PC-F75-B04-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "push／tag／Release／marketplace／cache／実downstream反映をこの3 Sprintの対象外にする",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F76-B01",
+      "featureId": "PC-F76",
+      "publicBehavior": "public F80-1",
+      "scenario": "secretary／projects／daily／weekly／task collaboration／memory-care／build／update／onboarding／templates／rules／host／release／edition handoffをinventoryする",
+      "actualAction": "固定behavior suiteで CLX-001 / CLX-020 を実行する",
+      "expectedResult": "secretary／projects／daily／weekly／task collaboration／memory-care／build／update／onboarding／templates／rules／host／release／edition handoffをinventoryする",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "CLX-001",
+        "CLX-020"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "CLX-001",
+        "CLX-020"
+      ],
+      "negativeCase": "BIND-PC-F76-B01-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "secretary／projects／daily／weekly／task collaboration／memory-care／build／update／onboarding／templates／rules／host／release／edition handoffをinventoryする",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F76-B02",
+      "featureId": "PC-F76",
+      "publicBehavior": "public F80-2",
+      "scenario": "各surfaceのread／write／delegate／no-touch、manual／Hook入口、外部操作、正本、edition、回帰を明示する",
+      "actualAction": "固定behavior suiteで CLX-020 を実行する",
+      "expectedResult": "各surfaceのread／write／delegate／no-touch、manual／Hook入口、外部操作、正本、edition、回帰を明示する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "CLX-020"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "CLX-020"
+      ],
+      "negativeCase": "BIND-PC-F76-B02-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "各surfaceのread／write／delegate／no-touch、manual／Hook入口、外部操作、正本、edition、回帰を明示する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F76-B03",
+      "featureId": "PC-F76",
+      "publicBehavior": "public F80-3",
+      "scenario": "task化は明示委譲のみ、memory二重保存0、Harness state非置換、自動update／connector 0を負検査する",
+      "actualAction": "固定behavior suiteで CLX-009 / CLX-011 / CLX-012 / CLX-013 / CLX-018 を実行する",
+      "expectedResult": "task化は明示委譲のみ、memory二重保存0、Harness state非置換、自動update／connector 0を負検査する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "CLX-009",
+        "CLX-011",
+        "CLX-012",
+        "CLX-013",
+        "CLX-018"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "CLX-009",
+        "CLX-011",
+        "CLX-012",
+        "CLX-013",
+        "CLX-018"
+      ],
+      "negativeCase": "BIND-PC-F76-B03-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "task化は明示委譲のみ、memory二重保存0、Harness state非置換、自動update／connector 0を負検査する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    },
+    {
+      "behaviorId": "PC-F76-B04",
+      "featureId": "PC-F76",
+      "publicBehavior": "public F80-4",
+      "scenario": "file名だけで合格にせず、実内容marker、routing fixture、前後snapshot、inventory digestで漏れと旧契約再流入を検出する",
+      "actualAction": "固定behavior suiteで CLX-020 を実行する",
+      "expectedResult": "file名だけで合格にせず、実内容marker、routing fixture、前後snapshot、inventory digestで漏れと旧契約再流入を検出する",
+      "expectedSideEffect": "fixtureのbefore/after、canonical write、external write、重複、またはbyte安定性を該当caseで検査する",
+      "verifiedBy": [
+        "CLX-020"
+      ],
+      "executionSurface": "source-clean-archive portable product suite",
+      "positiveCases": [
+        "CLX-020"
+      ],
+      "negativeCase": "BIND-PC-F76-B04-TAMPER",
+      "negativeExpected": "behavior ID、single assignment、期待／副作用bindingの改変をfail-closed拒否",
+      "observedResult": "file名だけで合格にせず、実内容marker、routing fixture、前後snapshot、inventory digestで漏れと旧契約再流入を検出する",
+      "observedSideEffect": "該当actual runnerのbefore/afterまたはwrite count assertionと一致",
+      "result": "PASS"
+    }
+  ],
+  "internalSha256": "73e300c72a659fc66167569bdc32a520ee39ef27f45171ad62d31120b47a3468"
+}
