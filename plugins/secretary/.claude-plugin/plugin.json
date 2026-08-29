@@ -8,6 +8,5 @@
   "homepage": "https://github.com/mtaiseeei/yasashii-secretary",
   "repository": "https://github.com/mtaiseeei/yasashii-secretary",
   "license": "MIT",
-  "skills": "./skills/",
-  "hooks": "./hooks/hooks.json"
+  "skills": "./skills/"
 }

@@ -158,7 +158,7 @@ if (surface === "git-free-archive") {
 }
 
 const pkChecks = {
-  "PK-001": () => assert.deepEqual([claudeManifest.version, claudeManifest.skills, claudeManifest.hooks], ["0.11.0", "./skills/", "./hooks/hooks.json"]),
+  "PK-001": () => { assert.deepEqual([claudeManifest.version, claudeManifest.skills], ["0.11.0", "./skills/"]); assert.equal(Object.hasOwn(claudeManifest, "hooks"), false, "Claude manifest must rely on the standard hooks path"); },
   "PK-002": () => assert.deepEqual([codexManifest.version, codexManifest.skills, codexManifest.hooks], ["0.11.0", "./skills/", "./hooks/hooks.json"]),
   "PK-003": () => assert.deepEqual([release.candidateVersion, claudeMarket.plugins[0].version, release.releaseState.marketplacePublishedOrRefreshed], ["0.11.0", "0.10.3", false]),
   "PK-004": () => assert.equal(host.clarityHook.commonRouter, "scripts/clarity-hook.mjs"),

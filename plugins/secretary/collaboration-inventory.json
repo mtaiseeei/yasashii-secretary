@@ -354,7 +354,7 @@
           "token": "yasashii-secretary:clarity-collaboration:host:v1"
         }
       ],
-      "contentDigest": "03d2362b7ef549ae8ca6f1077babd926fc45650f73e68c485c80dffbd78f9288",
+      "contentDigest": "4879c4e4444481cfc7da7509e8ff797fd8dba87f494966eac63affbc4ce0a8fc",
       "tests": [
         "CLX-016"
       ],
@@ -511,7 +511,7 @@
           "token": "yasashii-secretary:clarity-collaboration:release:v1"
         }
       ],
-      "contentDigest": "af5bf27cf901148c09aa5b93409db73a044a30e91e9120c88e6a041564e00524",
+      "contentDigest": "e9ba8665bcca994bb00135c90cf4f7690707db172fd407d2bd020e4307ae2444",
       "tests": [
         "CLX-016",
         "CLX-017",
