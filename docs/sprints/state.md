@@ -2,11 +2,11 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-043-patch-002
+- Current ID: TBD
 - Retry Count: 0
 - Spec-Issue Count: 0
 - Lineage Dispatches: 6
-- Model Tier: strong
+- Model Tier: standard
 - Rotate: none
 - Next Planned: TBD
 
@@ -77,13 +77,14 @@
 | sprint-042 | done | [contract](sprint-042.md) | [progress](../progress/sprint-042.md) | [feedback](../feedback/sprint-042.md) |
 | sprint-043 | done | [contract](sprint-043.md) | [progress](../progress/sprint-043.md) | [feedback](../feedback/sprint-043.md) |
 | sprint-043-patch-001 | done | [contract](sprint-043-patch-001.md) | [progress](../progress/sprint-043-patch-001.md) | [feedback](../feedback/sprint-043-patch-001.md) |
-| sprint-043-patch-002 | awaiting-eval | [contract](sprint-043-patch-002.md) | [progress](../progress/sprint-043-patch-002.md) | - |
+| sprint-043-patch-002 | done | [contract](sprint-043-patch-002.md) | [progress](../progress/sprint-043-patch-002.md) | [feedback](../feedback/sprint-043-patch-002.md) |
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避
 - sprint-036: superseded — Agentic側でGenerator着手前に候補探索方針がhost明示値限定からhost提供済み文脈→Git→OSへ変更され、合格済みsprint-037へ置換されたため、Yasashii側も旧方針を実装しない。
 
 ## Completion
+- 2026-08-30: Sprint 043 Patch 002はproduct candidate `cefaec0ae1fac7ebd5f4f64316a05318a9d1c0c4`／tree `43c78e437d83e7a7d5a0a70e4eb6aed312a6d1a7`をfresh独立EvaluatorでPASS。feedback commit `7b8f5f3d1f2ab5f9cc3bfd564b452d61c71a51d7`／SHA `829beeb78f2f4d444d9a96102a476fe535a86757d3ceb206071d8d9ca740948e`、対象10 rubricは50/50、AC21/21、product finding 0、blocking verification-infra 0。正確なcandidateのdetached cloneとcommit指定Git-free archiveはいずれもTarget 21/21、public 9 pathはGit object同士のbytes／mode比較で9/9、AR-008／014の独立fixtureは7入口とcleanupをPASSした。RG-010旧overlay snapshot、RG-011公開0.10.3 fixture、portability helperがcurrent checkoutを複製する点の3件はbaseline同一または独立証拠で補完済みのnonblocking verification-infraとして保持し、PASSへ加算していない。Sprintをdone、Current ID／Next PlannedをTBD、Retry／Spec-Issue 0、Lineage Dispatches 6、Model Tier standard、Rotate noneとする。release／Marketplace／cache／install／push／tag／new session、実workspace／顧客repoへのwrite、実Xmind／外部serviceは未実施。
 - 2026-08-30: Sprint 043 Patch 002 Generator candidate `cefaec0ae1fac7ebd5f4f64316a05318a9d1c0c4`／tree `43c78e437d83e7a7d5a0a70e4eb6aed312a6d1a7`を固定。public byte-sync 9／Yasashii adapted 3、product digest `4f4877cba776ef1472f9f9f2a61c94291ec224e2ed34228b38849817f2e75293`、Target 21/21、classification異常0、overlay changed 1→secondChanged 0、core43／projection35／Hook40／link34／Drift25／Xmind29＋XM-007のみNOT-RUN／collaboration20／Patch001 4を確認した。source／clean synthetic Git／Git-free archiveの3面は同一product bytes／mode／digestでTarget各21とclassificationをPASSし、external／network write 0。既知RG-010／011はhistorical verification-infra 2件としてPASSへ加算していない。Statusをawaiting-eval、fresh独立Evaluator dispatch予約としてLineage Dispatches 6、Model Tier strong、Rotate noneとする。Generator自己評価／Fable／public／private PASSはVerdictへ数えず、release／install／cache／live、実workspace／顧客repo、remote、実Xmind、外部serviceは未実施。
 - 2026-08-30: public Patch 003のproduct／test candidate `51329fc05ea0e9e66f64aa5c3bf2ee2db168ed58`／fresh PASS `0f0407758f854633814b485b84e46af8a508044c`と、private Patch 002のverification candidate `5abad512ec415d0e6ca832653dd66eb90f8b2c45`／fresh PASS feedback `54e61975cecdc79bbbf54fa203a35528db0da8df`／final state `5eec49fa5418b0fc612dd230420370ce68bb591e`を固定入力に、Yasashii通常high-risk Patch `sprint-043-patch-002`を開始する。Planner commit `352fb862395c89805523c56b436b50e05a1b076b`はTarget 21件全Critical、AR-008／014独立実入口、public byte-sync候補9／Yasashii adapted候補3、generic storage、17 Skills／62 behavior、Xmind既定OFF、host別Hook、copy／style／identity／overlay／private非同梱を契約化した。Fable／public／privateのPASSをYasashii製品PASSへ流用しない。high-riskのfresh strong Generator dispatchを1件予約し、Lineage Dispatches 5、Model Tier strong、Rotate model-escalation、Status activeとする。release／install／cache／live、実workspace／顧客repo、public／private source、remote、実Xmind、外部service writeは0件。
 - 2026-08-29: Sprint 043 Patch 001はGenerator candidate `2cda8708e245588d2db64e1c2402ab4d2a10c05e`をfresh独立Evaluator commit `838184c08e18274ce40f9b090a4f23536a6e37b2`でPASS。機能完全性／動作安定性／回帰なしは全5/5、product finding 0、blocking verification-infra 0。専用4/4、Clarity core 43/43、projection 35/35、Xmind 29 PASS＋XM-007のみNOT-RUN、Hook 40/40、link 34/34、drift 25/25、collaboration 20/20、parity 4/4、Claude validation、manifest負例を独立確認した。旧RG-010／RG-011、固定Sprint 040 overlay、固定Sprint 043 receipt、固定Sprint 042 path digestはbaselineでも同一のnonblocking verification-infraとして記録。Statusをdone、Current IDをTBD、Retry／Spec-Issue 0、Lineage Dispatches 4、Model Tier standard、Rotate noneとする。release、version、Marketplace、cache、install、push、tag、new session、Yasashii実機liveは未実施。
