@@ -3,7 +3,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { inflateRawSync } from "node:zlib";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 import { ClarityError, appendEvent, attention, history, rebuildState, status } from "./clarity-core.mjs";
-import { FilesystemBoundaryError, safeWritePath, workingRoot, writeFileAtomicSafe } from "./safe-fs.mjs";
+import { FilesystemBoundaryError, safeWritePath, writeFileAtomicSafe } from "./safe-fs.mjs";
+import { resolveClarityRoot, withClarityRootObservation } from "./clarity-root.mjs";
 
 export const QUADRANT_VISUALS = Object.freeze({
   stabilize: Object.freeze({ quadrant: "q2", position: "左上", emoji: "🟢", label: "定着・検証", meaning: "安定している", color: "#16A34A" }),
@@ -18,8 +19,8 @@ const SETTINGS_PATH = ".clarity/xmind-settings.json";
 function sha(value) { return createHash("sha256").update(value).digest("hex"); }
 function stableJson(value) { return `${JSON.stringify(value, null, 2)}\n`; }
 function safeRoot(value) {
-  try { return workingRoot(value || "."); }
-  catch { throw new ClarityError("root-unsafe", "working rootを安全に確認できません。"); }
+  try { return resolveClarityRoot(value || ".").root; }
+  catch (error) { throw new ClarityError(error?.code || "root-unsafe", error instanceof Error ? error.message : "working rootを安全に確認できません。", 3, { changed: false, ...(error?.details || {}) }); }
 }
 function relativeTarget(root, value) {
   const absolute = resolve(root, value);
@@ -101,7 +102,7 @@ function stateFlowMermaid() {
   return `stateDiagram-v2\n  [*] --> 探索中\n  探索中 --> 提案済み: 提案\n  提案済み --> 決定済み: 人間が承認\n  提案済み --> 却下: 人間が却下\n  決定済み --> 実行中: 着手\n  実行中 --> 実装済み: 完了\n  実装済み --> 検証済み: 検証成功\n  検証済み --> [*]\n`;
 }
 
-export function buildProjectionBundle(rootValue, { mindmapSyntaxAccepted = true } = {}) {
+function buildProjectionBundleImpl(rootValue, { mindmapSyntaxAccepted = true } = {}) {
   const data = snapshot(rootValue);
   const files = {
     "overview.md": overviewMarkdown(data), "attention.md": attentionMarkdown(data.attention), "matrix.md": matrixMarkdown(data.state),
@@ -112,19 +113,19 @@ export function buildProjectionBundle(rootValue, { mindmapSyntaxAccepted = true 
   return { status: "preview", changed: false, renderer: { available: false, verified: false, reason: "Mermaid rendererは実行していません。raw .mmdとMarkdownを保持します。" }, structureMode: mindmapSyntaxAccepted ? "mindmap" : "flowchart-fallback", files, digest: sha(bytes), stateDigest: sha(stableJson(data.state)) };
 }
 
-export function writeProjectionBundle(rootValue, options = {}) {
+function writeProjectionBundleImpl(rootValue, options = {}) {
   const root = safeRoot(rootValue); const bundle = buildProjectionBundle(root, options); let changed = false;
   for (const [name, bytes] of Object.entries(bundle.files)) { const rel = `.clarity/projections/${name}`; if (!existsSync(safeWritePath(root, rel)) || readFileSync(safeWritePath(root, rel), "utf8") !== bytes) { writeFileAtomicSafe(root, rel, bytes, { encoding: "utf8" }); changed = true; } }
   return { ...bundle, status: changed ? "written" : "unchanged", changed, paths: Object.keys(bundle.files).map((name) => `.clarity/projections/${name}`) };
 }
 
-export function getXmindSettings(rootValue) {
+function getXmindSettingsImpl(rootValue) {
   const root = safeRoot(rootValue); const path = safeWritePath(root, SETTINGS_PATH);
   if (!existsSync(path)) return { xmindEnabled: false, source: "default", changed: false };
   const value = JSON.parse(readFileSync(path, "utf8"));
   return { xmindEnabled: value.xmindEnabled === true, source: "explicit-setting", changed: false };
 }
-export function setXmindEnabled(rootValue, enabled) {
+function setXmindEnabledImpl(rootValue, enabled) {
   if (typeof enabled !== "boolean") throw new ClarityError("xmind-setting-invalid", "Xmind設定はONかOFFを明示してください。");
   const root = safeRoot(rootValue); status(root); const before = getXmindSettings(root); const bytes = stableJson({ schemaVersion: 1, xmindEnabled: enabled });
   if (existsSync(safeWritePath(root, SETTINGS_PATH)) && readFileSync(safeWritePath(root, SETTINGS_PATH), "utf8") === bytes) return { ...before, status: "unchanged" };
@@ -209,7 +210,7 @@ export function validateXmindStructure(buffer) {
   const text = entries["content.json"]?.toString("utf8") || ""; const visualComplete = Object.values(QUADRANT_VISUALS).every((v) => [v.emoji, v.label, v.meaning, v.color].every((part) => text.includes(part)));
   return { format: "xmind-zen-json-zip", structurallyValid: missing.length === 0 && Array.isArray(sheets) && managed.length === 2 && visualComplete, verified: false, openability: "not-verified-with-xmind-app", missing, entryNames: Object.keys(entries).sort(), sheetIds: Array.isArray(sheets) ? sheets.map((s) => s.id) : [], managedSheetCount: managed.length, itemIds: [...new Set(itemIds)].sort(), visualComplete };
 }
-export function previewLocalXmind(rootValue, targetValue, { mcpReason = "Xmind MCPを利用できません", requestedProvider = "auto" } = {}) {
+function previewLocalXmindImpl(rootValue, targetValue, { mcpReason = "Xmind MCPを利用できません", requestedProvider = "auto" } = {}) {
   const data = snapshot(rootValue); const root = data.root; const targetInfo = localTarget(root, targetValue); const { target, path } = targetInfo; if (!target.toLowerCase().endsWith(".xmind")) throw new ClarityError("xmind-target-invalid", "local Xmindのtargetは.xmind fileを指定してください。");
   const existing = readTarget(path); const existingTarget = existing.identity; const existingBytes = existing.bytes; let priorSheets = [];
   if (existingBytes) { const entries = unpackXmindArchive(existingBytes); priorSheets = JSON.parse(entries["content.json"]?.toString("utf8") || "[]"); if (!Array.isArray(priorSheets)) throw new ClarityError("xmind-content-invalid", "既存Xmindのcontent.jsonがSheet配列ではありません。"); }
@@ -240,7 +241,7 @@ export function previewLocalXmind(rootValue, targetValue, { mcpReason = "Xmind M
   };
   return { status: "fallback-approval-required", changed: false, requestedProvider, mcpReason, target, requestedTarget: targetInfo.requested, operation, existingTarget, existingImpact, refreshWarning: existingTarget.exists ? "Xmindでmapを開いている場合は、承認・保存後にfileを再読込してください" : null, authExpected, creditExpected, approvalRequired: true, approvalArtifact, approvalDigest: localApprovalDigest(approvalArtifact), archiveDigest, stateDigest, bytes: archive.length, internalValidation: validateXmindStructure(archive), archive };
 }
-export function writeLocalXmind(rootValue, targetValue, { approval, approvalDigest, mcpReason, requestedProvider } = {}) {
+function writeLocalXmindImpl(rootValue, targetValue, { approval, approvalDigest, mcpReason, requestedProvider } = {}) {
   const root = safeRoot(rootValue); let preview;
   try { preview = previewLocalXmind(root, targetValue, { mcpReason, requestedProvider }); }
   catch (error) {
@@ -264,16 +265,29 @@ export function writeLocalXmind(rootValue, targetValue, { approval, approvalDige
   return { ...currentPreview, archive: undefined, status: "local-selected-after-approval", provider: "local-xmind", changed, verified: false, reason: changed ? "承認対象とapply直前状態の一致を確認して書き込みました。実Xmindでのopen確認は未検証です" : "承認対象は一致し、archiveが同一bytesのため書込み不要でした", sha256: currentPreview.archiveDigest };
 }
 
-export function proposeXmindEdit(rootValue, { itemId, section, value } = {}) {
+function proposeXmindEditImpl(rootValue, { itemId, section, value } = {}) {
   const data = snapshot(rootValue); const item = data.state.items.find((row) => row.itemId === itemId); if (!item) throw new ClarityError("item-missing", "指定したClarity Itemが見つかりません。");
   const allowed = { decision: ["proposed", "confirmed", "rejected", "superseded"], execution: ["not_started", "in_progress", "implemented", "verified", "operational", "rolled_back"], validation: ["unknown", "pending", "passed", "failed", "waived"] };
   if (!allowed[section]?.includes(value)) throw new ClarityError("xmind-proposal-invalid", "Xmind editの提案内容をClarity Eventへ安全に対応付けられません。");
   const proposalId = `xp_${sha(`${itemId}:${section}:${value}`).slice(0, 20)}`; return { proposalId, status: "approval-required", changed: false, itemId, section, from: item[section].status, to: value, stateDigest: sha(stableJson(data.state)), note: "Xmindは提案入力です。承認前はcanonical Stateを変更しません。" };
 }
-export function applyXmindProposal(rootValue, proposal, { decision = "unanswered" } = {}) {
+function applyXmindProposalImpl(rootValue, proposal, { decision = "unanswered" } = {}) {
   if (decision !== "approved") return { ...proposal, status: ["rejected", "canceled"].includes(decision) ? "stopped" : "approval-required", changed: false };
   const current = proposeXmindEdit(rootValue, { itemId: proposal.itemId, section: proposal.section, value: proposal.to }); if (current.proposalId !== proposal.proposalId || current.stateDigest !== proposal.stateDigest) throw new ClarityError("xmind-proposal-stale", "Stateまたは提案内容が変わったため、もう一度確認してください。");
   const types = { decision: { proposed: "decision.proposed", confirmed: "decision.confirmed", rejected: "decision.rejected", superseded: "decision.superseded" }, execution: {}, validation: {} }; const type = types[proposal.section]?.[proposal.to] || `${proposal.section}.changed`;
   const payload = proposal.section === "decision" ? { source: "xmind-proposal", humanConfirmed: true, proposalId: proposal.proposalId } : { status: proposal.to, proposalId: proposal.proposalId };
   const result = appendEvent(rootValue, { eventId: `cv_${sha(`xmind:${proposal.proposalId}`).slice(0, 20)}`, type, itemId: proposal.itemId, actor: "human-approved-xmind-proposal", payload }); return { ...proposal, status: result.changed ? "applied" : "unchanged", changed: result.changed, eventId: result.event.eventId };
 }
+
+function runRootRequest(rootValue, operation) {
+  return withClarityRootObservation(rootValue, (handle) => operation(handle.root));
+}
+
+export function buildProjectionBundle(rootValue, options = {}) { return runRootRequest(rootValue, (root) => buildProjectionBundleImpl(root, options)); }
+export function writeProjectionBundle(rootValue, options = {}) { return runRootRequest(rootValue, (root) => writeProjectionBundleImpl(root, options)); }
+export function getXmindSettings(rootValue) { return runRootRequest(rootValue, getXmindSettingsImpl); }
+export function setXmindEnabled(rootValue, enabled) { return runRootRequest(rootValue, (root) => setXmindEnabledImpl(root, enabled)); }
+export function previewLocalXmind(rootValue, targetValue, options = {}) { return runRootRequest(rootValue, (root) => previewLocalXmindImpl(root, targetValue, options)); }
+export function writeLocalXmind(rootValue, targetValue, options = {}) { return runRootRequest(rootValue, (root) => writeLocalXmindImpl(root, targetValue, options)); }
+export function proposeXmindEdit(rootValue, options = {}) { return runRootRequest(rootValue, (root) => proposeXmindEditImpl(root, options)); }
+export function applyXmindProposal(rootValue, proposal, options = {}) { return runRootRequest(rootValue, (root) => applyXmindProposalImpl(root, proposal, options)); }

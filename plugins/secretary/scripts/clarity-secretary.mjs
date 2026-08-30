@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// yasashii-secretary:clarity-secretary-adapter:v1
+
 import { readFileSync } from "node:fs";
 import {
   applySecretaryProjectClarity,
@@ -12,6 +14,7 @@ import {
   weeklyClarityRollup,
 } from "./lib/clarity-secretary.mjs";
 import { ClarityError } from "./lib/clarity-core.mjs";
+import { resolveClarityRoot, rootPolicyFor, withClarityRootRequest } from "./lib/clarity-root.mjs";
 
 function usage(message = "") {
   throw new ClarityError("usage", `${message ? `${message}\n\n` : ""}使い方:
@@ -54,6 +57,8 @@ function render(command, result, asJson) {
   }
   if (command === "status") {
     process.stdout.write(`Project Clarity: ${result.initialized ? "利用中" : "未初期化"}\n- mode: ${result.mode}\n- Attention: ${result.attention.activeCount}件\n- link health: ${result.linkHealth}\n`);
+    const observation = result.canonicalObservation;
+    if (observation?.reason !== "development-pointer-missing") process.stdout.write(`- 正本repo: ${observation.availability}（${observation.observedAt}観測、freshness=${observation.freshness}${observation.reason ? `、理由=${observation.reason}` : ""}）\n`);
     return;
   }
   if (command === "portfolio") {
@@ -62,6 +67,7 @@ function render(command, result, asJson) {
     if (result.attention.otherCount) process.stdout.write(`- その他 ${result.attention.otherCount}件\n`);
     if (!result.attention.activeCount) process.stdout.write("- 現在判断不要です\n");
     if (result.unverifiedSources.length) process.stdout.write(`- 未確認: ${result.unverifiedSources.length}件\n`);
+    for (const project of result.projects.filter((row) => row.canonicalObservation?.reason !== "development-pointer-missing")) process.stdout.write(`- ${project.name} 正本repo: ${project.canonicalObservation.availability} / ${project.canonicalObservation.freshness}${project.canonicalObservation.reason ? ` / ${project.canonicalObservation.reason}` : ""}\n`);
     return;
   }
   if (command === "daily" && result.mode === "morning") {
@@ -69,6 +75,7 @@ function render(command, result, asJson) {
     for (const item of result.items) process.stdout.write(attentionLines(item));
     if (result.otherCount) process.stdout.write(`- その他 ${result.otherCount}件\n`);
     if (result.unverifiedSources.length) process.stdout.write(`- 未確認範囲: ${result.unverifiedSources.map((row) => row.project).join("、")}\n`);
+    for (const row of result.canonicalObservations || []) if (row.observation?.reason !== "development-pointer-missing") process.stdout.write(`- ${row.project} 正本repo: ${row.observation.availability} / ${row.observation.freshness}${row.observation.reason ? ` / ${row.observation.reason}` : ""}\n`);
     return;
   }
   if (command === "daily") {
@@ -77,6 +84,7 @@ function render(command, result, asJson) {
   }
   if (command === "weekly") {
     process.stdout.write(`## ${result.section}\n\n- Attention: ${result.attention.activeCount}件（${result.attention.comparison}${result.attention.change === null ? "" : `、増減 ${result.attention.change >= 0 ? "+" : ""}${result.attention.change}`}）\n- lag確認: ${result.lag.length}件\n- 長期滞留: ${result.longRunning.length}件\n- 解消済みAttention: ${result.resolvedAttention}件\n- 解消Drift: ${result.resolvedDrift}件\n`);
+    for (const row of result.canonicalObservations || []) if (row.observation?.reason !== "development-pointer-missing") process.stdout.write(`- ${row.project} 正本repo: ${row.observation.availability} / ${row.observation.freshness}${row.observation.reason ? ` / ${row.observation.reason}` : ""}\n`);
     return;
   }
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
@@ -88,6 +96,7 @@ try {
   const { positional, options } = parse(rawArgs);
   const [secretary, project] = positional;
   if (!secretary) usage("secretary rootを指定してください。");
+  withClarityRootRequest(() => {
   let result;
   if (command === "init") {
     if (!project) usage("Project名を指定してください。");
@@ -108,9 +117,12 @@ try {
     if (!project) usage("Project名を指定してください。");
     result = routeClarityTask(secretary, project, { itemId: options.get("--item-id"), target: options.get("--target") || "local-todo", explicit: Boolean(options.get("--explicit")) });
   } else usage(`不明なcommandです: ${command}`);
+  const resolvedRoot = resolveClarityRoot(secretary).root;
+  result = { ...result, rootPolicy: rootPolicyFor(resolvedRoot) };
   render(command, result, Boolean(options.get("--json")));
+  });
 } catch (error) {
-  const known = error instanceof ClarityError;
+  const known = error instanceof ClarityError || typeof error?.code === "string";
   const details = known && error.details && typeof error.details === "object" ? error.details : {};
   process.stderr.write(`${JSON.stringify({
     ok: false,
@@ -119,5 +131,5 @@ try {
     message: error instanceof Error ? error.message : String(error),
     changed: details.changed === true,
   }, null, 2)}\n`);
-  process.exit(known ? error.exitCode : 3);
+  process.exit(known ? (error.exitCode || 3) : 3);
 }

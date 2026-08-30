@@ -49,6 +49,7 @@ import { applyDrift, commitClarityOwned, recordDriftWaiver } from "./lib/clarity
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { safeWritePath } from "./lib/safe-fs.mjs";
+import { resolveClarityRoot, rootPolicyFor, withClarityRootRequest } from "./lib/clarity-root.mjs";
 
 function usage(message = "") {
   const prefix = message ? `${message}\n\n` : "";
@@ -241,12 +242,13 @@ try {
   const { positional, options } = parse(rawArgs);
   const root = positional[0];
   if (!root) usage("repo／project rootを指定してください。");
+  withClarityRootRequest(() => {
   let result;
   if (command === "init") {
     if (options.get("--apply") && options.get("--cancel")) usage("--apply と --cancel は同時に指定できません。");
-    if (options.get("--cancel")) result = { status: "canceled", preview: previewInit(root) };
+    if (options.get("--cancel")) result = { status: "canceled", changed: false, preview: previewInit(root) };
     else if (options.get("--apply")) result = applyInit(root);
-    else result = { status: "preview", preview: previewInit(root) };
+    else result = { status: "preview", changed: false, preview: previewInit(root) };
   } else if (command === "status") result = status(root);
   else if (command === "attention" || command === "review") {
     const limit = options.get("--limit") === undefined ? 3 : Number(options.get("--limit"));
@@ -324,9 +326,12 @@ try {
       next: options.get("--next"),
     });
   } else usage(`不明なcommandです: ${command}`);
+  const resolvedRoot = resolveClarityRoot(root).root;
+  result = { ...result, rootPolicy: rootPolicyFor(resolvedRoot) };
   render(command, result, Boolean(options.get("--json")));
+  });
 } catch (error) {
-  const known = error instanceof ClarityError;
+  const known = error instanceof ClarityError || typeof error?.code === "string";
   const output = {
     ok: false,
     code: known ? error.code : "unexpected-error",
@@ -336,5 +341,5 @@ try {
     ...(known && Object.keys(error.details || {}).length ? { details: error.details } : {}),
   };
   process.stderr.write(`${JSON.stringify(output, null, 2)}\n`);
-  process.exit(known ? error.exitCode : 3);
+  process.exit(known ? (error.exitCode || 3) : 3);
 }

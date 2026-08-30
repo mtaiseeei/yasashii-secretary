@@ -15,7 +15,13 @@ import {
 import { createHash } from "node:crypto";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { attention, history } from "./clarity-core.mjs";
-import { FilesystemBoundaryError, safeWritePath, workingRoot } from "./safe-fs.mjs";
+import { FilesystemBoundaryError, safeWritePath } from "./safe-fs.mjs";
+import {
+  resolveClarityRoot,
+  rootPolicyFor,
+  withClarityRootObservation,
+  withClarityRootRequest,
+} from "./clarity-root.mjs";
 
 const MAX_INPUT_BYTES = 1024 * 1024;
 const MAX_CONTEXT_CHARS = 3600;
@@ -105,7 +111,7 @@ function samePath(root, target) {
 }
 
 function canonicalRuntimeRoot(rootValue) {
-  const root = workingRoot(rootValue);
+  const root = resolveClarityRoot(rootValue).root;
   const clarity = join(root, ".clarity");
   let guarded;
   try { guarded = safeWritePath(root, ".clarity"); } catch {
@@ -142,22 +148,33 @@ function assertRuntimeDirectoryChain(rootValue, relativeDirectory, { allowMissin
   return { root, directory: current, missing: null };
 }
 
-export function findClarityRoot(cwdValue) {
+function inspectClarityHookRootImpl(cwdValue) {
+  const requestedCwd = resolve(cwdValue || ".");
   let current;
   try {
-    current = realpathSync(resolve(cwdValue || "."));
+    current = resolveClarityRoot(requestedCwd).root;
   } catch {
     return null;
   }
   if (!isNormalDirectory(current)) return null;
   for (let depth = 0; depth < 64; depth += 1) {
     const clarity = join(current, ".clarity");
-    if (isNormalDirectory(clarity) && isNormalFile(join(clarity, "project.json")) && isNormalFile(join(clarity, "state.json"))) return current;
+    if (isNormalDirectory(clarity) && isNormalFile(join(clarity, "project.json")) && isNormalFile(join(clarity, "state.json"))) {
+      const requestedRoot = resolve(requestedCwd, ...Array.from({ length: depth }, () => ".."));
+      try {
+        const resolved = resolveClarityRoot(requestedRoot);
+        return { root: resolved.root, rootPolicy: rootPolicyFor(resolved.root) };
+      } catch { return null; }
+    }
     const parent = dirname(current);
     if (parent === current) break;
     current = parent;
   }
   return null;
+}
+
+export function findClarityRoot(cwdValue) {
+  return inspectClarityHookRoot(cwdValue)?.root || null;
 }
 
 function safeRelative(root, value) {
@@ -297,7 +314,7 @@ function stableEventId(normalized, semantic) {
   return `he_${sha256(`${normalized.host}:${normalized.sessionId}:${normalized.event}:${discriminator}:${JSON.stringify(semantic)}`).slice(0, 24)}`;
 }
 
-export function writeRuntimeEvent(rootValue, normalized, semantic, options = {}) {
+function writeRuntimeEventImpl(rootValue, normalized, semantic, options = {}) {
   const prepared = ensureRuntimeDirectory(rootValue, normalized.sessionId);
   const { root, directory, eventsDirectory } = prepared;
   const eventId = stableEventId(normalized, semantic);
@@ -391,7 +408,7 @@ function hasCheckpointAfter(root, materialEvents) {
   return canonical.events.some((row) => row.type === "checkpoint.recorded" && (Date.parse(row.occurredAt) || 0) >= lastMaterial);
 }
 
-export function semanticHookResult(root, normalized) {
+function semanticHookResultImpl(root, normalized) {
   if (normalized.event === "SessionStart") {
     const context = brief(root);
     writeRuntimeEvent(root, normalized, { kind: normalized.source === "compact" ? "compact-resume" : "session-start" });
@@ -424,6 +441,18 @@ export function semanticHookResult(root, normalized) {
     return { action: "none" };
   }
   return { action: "none" };
+}
+
+export function inspectClarityHookRoot(cwdValue) {
+  return withClarityRootRequest(() => inspectClarityHookRootImpl(cwdValue));
+}
+
+export function writeRuntimeEvent(rootValue, normalized, semantic, options = {}) {
+  return withClarityRootObservation(rootValue, (handle) => writeRuntimeEventImpl(handle.root, normalized, semantic, options));
+}
+
+export function semanticHookResult(rootValue, normalized) {
+  return withClarityRootObservation(rootValue, (handle) => semanticHookResultImpl(handle.root, normalized));
 }
 
 export function serializeHookResult(host, event, result) {

@@ -48,11 +48,11 @@ check("Codex manifest keeps the common Hook reference", () => {
   assert.equal(codex.hooks, "./hooks/hooks.json");
 });
 
-check("Hook and Project Clarity router bytes/modes remain unchanged", () => {
+check("Hook manifest semantics and current Clarity router bytes/modes remain fixed", () => {
   const expected = [
     ["plugins/secretary/hooks/hooks.json", "7ac60c7f280c965321ced1658dd7fcdad1b481f09bd6eee5cf8153278b5bc40b", 1768, "644"],
-    ["plugins/secretary/scripts/clarity-hook.mjs", "8cf657ae6a9f1c0fdbd2ce96aa73c1917c3105e3d5488cebc92e80db385ceea3", 1087, "644"],
-    ["plugins/secretary/scripts/lib/clarity-hook.mjs", "c85137b5b5b0abce9fc1da454218c205e090aa086daaa26cdcb17b924165aa48", 22573, "644"],
+    ["plugins/secretary/scripts/clarity-hook.mjs", "2579e3628bfb85e1783eebe70d23bcae9cef3b882edacc09d3c3896f507fc663", 1182, "644"],
+    ["plugins/secretary/scripts/lib/clarity-hook.mjs", "acd4203e95ddcdf3fe86c27e10b082d40f9a0fe7ec28d824a8227b64dfdff1cf", 23645, "644"],
   ];
   for (const [path, expectedDigest, expectedSize, expectedMode] of expected) {
     const bytes = readFileSync(join(root, path));

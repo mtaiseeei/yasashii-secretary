@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "registryId": "yasashii-sprint-043-patch-002-target-cases",
+  "sourcePublicCandidate": "51329fc05ea0e9e66f64aa5c3bf2ee2db168ed58",
+  "sourcePrivateProduct": "c92dfe53ba7345db57ac0e625e2d6ded8bc0bc38",
+  "cases": [
+    {
+      "id": "yasashii-CF-001",
+      "severity": "Critical",
+      "feature": "F69"
+    },
+    {
+      "id": "yasashii-CF-002",
+      "severity": "Critical",
+      "feature": "F69"
+    },
+    {
+      "id": "yasashii-CF-003",
+      "severity": "Critical",
+      "feature": "F70"
+    },
+    {
+      "id": "yasashii-CF-004",
+      "severity": "Critical",
+      "feature": "F69"
+    },
+    {
+      "id": "yasashii-CF-005",
+      "severity": "Critical",
+      "feature": "F69"
+    },
+    {
+      "id": "yasashii-CF-006",
+      "severity": "Critical",
+      "feature": "F70"
+    },
+    {
+      "id": "yasashii-CF-007",
+      "severity": "Critical",
+      "feature": "F76"
+    },
+    {
+      "id": "yasashii-AR-001",
+      "severity": "Critical",
+      "feature": "F74"
+    },
+    {
+      "id": "yasashii-AR-002",
+      "severity": "Critical",
+      "feature": "F60"
+    },
+    {
+      "id": "yasashii-AR-003",
+      "severity": "Critical",
+      "feature": "F64"
+    },
+    {
+      "id": "yasashii-AR-004",
+      "severity": "Critical",
+      "feature": "F74"
+    },
+    {
+      "id": "yasashii-AR-005",
+      "severity": "Critical",
+      "feature": "F74"
+    },
+    {
+      "id": "yasashii-AR-006",
+      "severity": "Critical",
+      "feature": "F74"
+    },
+    {
+      "id": "yasashii-AR-007",
+      "severity": "Critical",
+      "feature": "F74"
+    },
+    {
+      "id": "yasashii-AR-008",
+      "severity": "Critical",
+      "feature": "F74"
+    },
+    {
+      "id": "yasashii-AR-009",
+      "severity": "Critical",
+      "feature": "F71"
+    },
+    {
+      "id": "yasashii-AR-010",
+      "severity": "Critical",
+      "feature": "F74"
+    },
+    {
+      "id": "yasashii-AR-011",
+      "severity": "Critical",
+      "feature": "F73"
+    },
+    {
+      "id": "yasashii-AR-012",
+      "severity": "Critical",
+      "feature": "F74"
+    },
+    {
+      "id": "yasashii-AR-013",
+      "severity": "Critical",
+      "feature": "F74"
+    },
+    {
+      "id": "yasashii-AR-014",
+      "severity": "Critical",
+      "feature": "F76"
+    }
+  ]
+}

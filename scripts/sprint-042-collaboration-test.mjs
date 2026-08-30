@@ -260,7 +260,7 @@ try {
   });
 
   await test("CLX-020", "tracked inventoryは実path／marker／digest／testと双方向一致し負例を拒否", () => {
-    const inventory = loadCollaborationInventory(repo); const valid = validateCollaborationInventory(repo, inventory); assert.deepEqual(valid, { surfaceCount: 17, caseCount: 20, digestsValid: true, markersValid: true });
+    const inventory = loadCollaborationInventory(repo); const valid = validateCollaborationInventory(repo, inventory); assert.deepEqual(valid, { surfaceCount: 19, caseCount: 41, digestsValid: true, markersValid: true });
     const omitted = structuredClone(inventory); omitted.surfaces.pop(); expectFailure(() => validateCollaborationInventory(repo, omitted), "inventory-surface-omission-or-extra");
     const stale = structuredClone(inventory); stale.surfaces[0].contentDigest = "0".repeat(64); expectFailure(() => validateCollaborationInventory(repo, stale), "inventory-digest-stale");
     const marker = structuredClone(inventory); marker.surfaces[0].markers[0].token = "missing-marker"; expectFailure(() => validateCollaborationInventory(repo, marker), "inventory-marker-stale");

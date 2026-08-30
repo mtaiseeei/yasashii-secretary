@@ -6,11 +6,19 @@ import {
   readdirSync,
   renameSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
 import { createHash } from "node:crypto";
-import { join } from "node:path";
-import { safeWritePath, workingRoot } from "./safe-fs.mjs";
+import { extname, isAbsolute, join } from "node:path";
+import { safeWritePath } from "./safe-fs.mjs";
+import {
+  resolveClarityRoot,
+  rootPolicyFor,
+  withClarityRootObservation,
+  withClarityRootRequest,
+} from "./clarity-root.mjs";
+import { runExternalSync } from "./external-ops.mjs";
 import {
   CLARITY_SCHEMA_VERSION,
   ClarityError,
@@ -18,6 +26,7 @@ import {
   decideGenericProject,
   findCanonicalItem,
   history,
+  inspectRepoIdentity,
   status,
   validateEvent,
   validateEvidence,
@@ -76,8 +85,8 @@ function projectRecord(root, name, scope) {
   return { root, name, scope, rel, dir, file, markdown: readFileSync(file, "utf8") };
 }
 
-export function resolveSecretaryProject(secretaryRootValue, rawName, { closedOnly = false, includeClosed = false } = {}) {
-  const root = workingRoot(secretaryRootValue);
+function resolveSecretaryProjectImpl(secretaryRootValue, rawName, { closedOnly = false, includeClosed = false } = {}) {
+  const root = resolveClarityRoot(secretaryRootValue).root;
   const name = projectName(rawName);
   if (closedOnly) {
     const closed = projectRecord(root, name, "closed");
@@ -178,7 +187,7 @@ function createCanonical(record) {
   return { project, events: [event], evidence: [evidence], state };
 }
 
-export function previewSecretaryProjectClarity(secretaryRootValue, rawName, options = {}) {
+function previewSecretaryProjectClarityImpl(secretaryRootValue, rawName, options = {}) {
   const record = resolveSecretaryProject(secretaryRootValue, rawName, options);
   const target = clarityRoot(record);
   const initialized = existsSync(target);
@@ -197,7 +206,7 @@ export function previewSecretaryProjectClarity(secretaryRootValue, rawName, opti
   };
 }
 
-export function applySecretaryProjectClarity(secretaryRootValue, rawName) {
+function applySecretaryProjectClarityImpl(secretaryRootValue, rawName) {
   const record = resolveSecretaryProject(secretaryRootValue, rawName);
   if (record.scope !== "open") throw new ClarityError("project-scope-read-only", "legacy Projectは既存resolverどおり読み取り専用です。openへの明示移行前はClarityを二重作成しません。");
   const target = clarityRoot(record);
@@ -237,6 +246,149 @@ function readProjectClarity(record) {
   return { root, project, report: status(root), history: history(root) };
 }
 
+// yasashii-secretary:canonical-repo-observation:v1
+const CANONICAL_ENTRY_MAX_BYTES = 64 * 1024;
+const CANONICAL_METADATA_MAX_BYTES = 256 * 1024;
+const canonicalBinaryExtensions = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".pdf", ".zip", ".gz", ".mp3", ".mp4", ".mov", ".exe", ".dylib", ".so"]);
+const canonicalSensitiveName = /(?:^|\/)(?:\.env(?:\..*)?|\.npmrc|\.pypirc|id_[a-z0-9_-]+|.*(?:credential|secret|private[-_]?key|oauth|token).*)$/iu;
+const canonicalSecretValue = /(?:-----BEGIN [A-Z ]*PRIVATE KEY-----|\b(?:gh[pousr]_|github_pat_)[A-Za-z0-9_]{20,}\b|(?:password|api[_-]?key|api[_-]?token|access[_-]?token|refresh[_-]?token|client[_-]?secret)\s*[:=]\s*\S+)/iu;
+
+function pointerFields(record) {
+  const projectType = record.markdown.match(/^projectType:\s*([^\r\n]+)$/mu)?.[1]?.trim() || null;
+  const canonicalRepo = record.markdown.match(/^-\s*(?:場所|canonicalRepo):\s*(.+)$/mu)?.[1]?.trim().replace(/^`|`$/gu, "") || null;
+  const firstFile = record.markdown.match(/^-\s*最初に読むファイル:\s*(.+)$/mu)?.[1]?.trim().replace(/^`|`$/gu, "") || null;
+  const updatedAt = record.markdown.match(/^updatedAt:\s*([^\r\n]+)$/mu)?.[1]?.trim() || null;
+  return { developmentPointer: projectType === "development-pointer", canonicalRepo, firstFile, snapshotUpdatedAt: updatedAt };
+}
+
+function canonicalGit(root) {
+  const run = (args) => {
+    try {
+      const result = runExternalSync("git", ["-C", root, ...args], {
+        encoding: "utf8", timeoutMs: 5_000, maxBuffer: 512 * 1024, allowFailure: true,
+        label: "Clarity canonical Repo read-only inspection",
+        env: { ...process.env, GIT_OPTIONAL_LOCKS: "0", GIT_TERMINAL_PROMPT: "0" },
+      });
+      return result.status === 0 ? String(result.stdout).trim() : null;
+    } catch { return null; }
+  };
+  const head = run(["rev-parse", "--verify", "HEAD"]);
+  if (!head) return { kind: "non-git", head: null, branch: null, dirty: false, staged: false, untracked: false, remote: null, revisionObservedAt: null };
+  const porcelain = run(["status", "--porcelain=v1", "--untracked-files=normal"]) || "";
+  const rows = porcelain.split(/\r?\n/u).filter(Boolean);
+  return {
+    kind: "git",
+    head,
+    branch: run(["symbolic-ref", "--short", "-q", "HEAD"]),
+    dirty: rows.some((row) => row[1] && row[1] !== " "),
+    staged: rows.some((row) => row[0] && row[0] !== " " && row[0] !== "?"),
+    untracked: rows.some((row) => row.startsWith("??")),
+    remote: run(["remote", "get-url", "origin"]) ? "configured" : "missing",
+    revisionObservedAt: run(["show", "-s", "--format=%cI", "HEAD"]),
+  };
+}
+
+function safeCanonicalFile(root, relativePath, { maxBytes = CANONICAL_ENTRY_MAX_BYTES, parseJson = false } = {}) {
+  const report = { path: relativePath || null, inspected: false, bytesRead: 0, digest: null, reason: null };
+  if (!relativePath || isAbsolute(relativePath) || relativePath.split(/[\\/]+/u).some((part) => !part || part === "." || part === "..")) return { ...report, reason: "path-unsafe" };
+  if (canonicalSensitiveName.test(relativePath)) return { ...report, reason: "sensitive-name" };
+  let path;
+  try { path = safeWritePath(root, relativePath); }
+  catch (error) { return { ...report, reason: error?.code === "symlink-boundary" ? "symlink-not-followed" : error?.code || "path-unsafe" }; }
+  if (!existsSync(path)) return { ...report, reason: "missing" };
+  let stat;
+  try { stat = lstatSync(path); } catch { return { ...report, reason: "unreadable" }; }
+  if (stat.isSymbolicLink()) return { ...report, reason: "symlink-not-followed" };
+  if (!stat.isFile()) return { ...report, reason: "not-regular-file" };
+  if ((stat.mode & 0o444) === 0) return { ...report, reason: "unreadable" };
+  if (stat.size > maxBytes) return { ...report, reason: "file-too-large", size: stat.size };
+  if (canonicalBinaryExtensions.has(extname(relativePath).toLowerCase())) return { ...report, reason: "binary" };
+  let bytes;
+  try { bytes = readFileSync(path); } catch { return { ...report, reason: "unreadable" }; }
+  if (bytes.subarray(0, Math.min(bytes.length, 8192)).includes(0)) return { ...report, reason: "binary" };
+  const text = bytes.toString("utf8");
+  if (canonicalSecretValue.test(text)) return { ...report, reason: "secret-like-content" };
+  let parsed = null;
+  if (parseJson) {
+    try { parsed = JSON.parse(text); } catch { return { ...report, reason: "json-invalid", bytesRead: bytes.length }; }
+  }
+  return { ...report, inspected: true, bytesRead: bytes.length, digest: sha256(bytes), parsed };
+}
+
+function canonicalClarity(root) {
+  const clarityPath = safeWritePath(root, ".clarity");
+  if (!existsSync(clarityPath)) return { status: "not-initialized", clarityProjectId: null, stateRevision: null, reports: [] };
+  const stat = lstatSync(clarityPath);
+  if (!stat.isDirectory() || stat.isSymbolicLink()) return { status: "unsafe", clarityProjectId: null, stateRevision: null, reports: [{ path: ".clarity", inspected: false, reason: "root-internal-symlink" }] };
+  const project = safeCanonicalFile(root, ".clarity/project.json", { maxBytes: CANONICAL_METADATA_MAX_BYTES, parseJson: true });
+  const state = safeCanonicalFile(root, ".clarity/state.json", { maxBytes: CANONICAL_METADATA_MAX_BYTES, parseJson: true });
+  if (!project.inspected || !state.inspected) return { status: project.reason === "unreadable" || state.reason === "unreadable" ? "unreadable" : "unsafe", clarityProjectId: null, stateRevision: null, reports: [project, state] };
+  return {
+    status: "initialized",
+    clarityProjectId: typeof project.parsed?.clarityProjectId === "string" ? project.parsed.clarityProjectId : null,
+    stateRevision: state.digest,
+    reports: [project, state].map(({ parsed: _parsed, ...row }) => row),
+  };
+}
+
+function observeCanonicalRepoImpl(record) {
+  const pointer = pointerFields(record);
+  const observedAt = nowIso();
+  const base = {
+    sourceKind: "unavailable", availability: "unavailable", observedAt, sourceRevision: null,
+    freshness: "unknown", snapshotFreshness: "unknown", firstFile: { path: pointer.firstFile, inspected: false, bytesRead: 0, digest: null, reason: "not-inspected" },
+    repoIdentity: null, git: null, clarity: { status: "not-inspected", clarityProjectId: null, stateRevision: null, reports: [] },
+    inspected: [], excluded: [], uninspected: [], reason: null, readLimits: { maxFileBytes: CANONICAL_ENTRY_MAX_BYTES, maxMetadataBytes: CANONICAL_METADATA_MAX_BYTES, maxFiles: 3 },
+    changed: false, networkCalls: 0, gitWrites: 0, canonicalWrites: 0,
+  };
+  if (!pointer.developmentPointer || !pointer.canonicalRepo) return { ...base, reason: "development-pointer-missing" };
+  if (/^(?:https?|ssh):\/\//iu.test(pointer.canonicalRepo) || /^git@[^:]+:/u.test(pointer.canonicalRepo)) {
+    return { ...base, sourceKind: "remote-only", reason: "read-only-provider-evidence-unavailable" };
+  }
+  if (!isAbsolute(pointer.canonicalRepo)) return { ...base, availability: "unsafe", reason: "canonical-repo-path-unsafe" };
+  if (!existsSync(pointer.canonicalRepo)) return { ...base, sourceKind: "local-checkout", availability: "missing", reason: "canonical-repo-missing" };
+  let resolved;
+  try { resolved = resolveClarityRoot(pointer.canonicalRepo); }
+  catch (error) { return { ...base, sourceKind: "local-checkout", availability: "unsafe", reason: error?.code || "canonical-repo-unsafe" }; }
+  const root = resolved.root;
+  try {
+    const mode = statSync(root).mode;
+    if ((mode & 0o555) === 0) return { ...base, sourceKind: "local-checkout", availability: "unreadable", reason: "canonical-repo-unreadable" };
+    const repoIdentity = inspectRepoIdentity(root);
+    const git = canonicalGit(root);
+    const firstFile = safeCanonicalFile(root, pointer.firstFile);
+    const clarity = canonicalClarity(root);
+    const reports = [firstFile, ...clarity.reports];
+    const inspected = reports.filter((row) => row.inspected).map(({ parsed: _parsed, ...row }) => row);
+    const excludedReasons = new Set(["sensitive-name", "secret-like-content", "binary", "file-too-large", "symlink-not-followed"]);
+    const excluded = reports.filter((row) => !row.inspected && excludedReasons.has(row.reason)).map(({ parsed: _parsed, ...row }) => row);
+    const uninspected = reports.filter((row) => !row.inspected && !excludedReasons.has(row.reason)).map(({ parsed: _parsed, ...row }) => row);
+    const sourceRevision = git.head || sha256(`${firstFile.digest || "none"}:${clarity.stateRevision || "none"}`);
+    const snapshotTime = pointer.snapshotUpdatedAt ? Date.parse(pointer.snapshotUpdatedAt) : Number.NaN;
+    const revisionTime = git.revisionObservedAt ? Date.parse(git.revisionObservedAt) : Number.NaN;
+    const snapshotFreshness = !Number.isNaN(snapshotTime) && !Number.isNaN(revisionTime) && snapshotTime < revisionTime ? "stale-snapshot" : "unknown";
+    return {
+      ...base,
+      sourceKind: "local-checkout",
+      availability: firstFile.inspected ? "available" : firstFile.reason === "unreadable" ? "unreadable" : "stale",
+      sourceRevision,
+      freshness: "current-at-observation",
+      snapshotFreshness,
+      firstFile: { ...firstFile, parsed: undefined },
+      repoIdentity,
+      git,
+      clarity,
+      inspected,
+      excluded,
+      uninspected,
+      reason: firstFile.inspected ? null : `first-file-${firstFile.reason}`,
+      rootPolicy: rootPolicyFor(root),
+    };
+  } catch (error) {
+    return { ...base, sourceKind: "local-checkout", availability: error?.code === "EACCES" ? "unreadable" : "unsafe", reason: error?.code || "canonical-repo-inspection-failed" };
+  }
+}
+
 function localReferenceHealth(record, clarityProject) {
   const link = clarityProject.secretaryLink;
   if (!link || typeof link.projectRef !== "string") return "local-reference-missing";
@@ -251,8 +403,9 @@ function localReferenceHealth(record, clarityProject) {
   return stat.isFile() && !stat.isSymbolicLink() ? "local-reference-healthy" : "local-reference-invalid";
 }
 
-export function secretaryProjectClarityStatus(secretaryRootValue, rawName, options = {}) {
+function secretaryProjectClarityStatusImpl(secretaryRootValue, rawName, options = {}) {
   const record = resolveSecretaryProject(secretaryRootValue, rawName, options);
+  const canonicalObservation = observeCanonicalRepo(record);
   const clarity = readProjectClarity(record);
   if (!clarity) {
     return {
@@ -263,6 +416,7 @@ export function secretaryProjectClarityStatus(secretaryRootValue, rawName, optio
       attention: { activeCount: 0, top: [], otherCount: 0 },
       linkHealth: "not-initialized",
       lifecycleAuthority: "projects",
+      canonicalObservation,
     };
   }
   return {
@@ -280,10 +434,11 @@ export function secretaryProjectClarityStatus(secretaryRootValue, rawName, optio
     linkDiagnostic: clarity.report.linkHealth,
     lifecycleAuthority: "projects",
     detailPath: `${record.rel}/clarity/.clarity/state.json`,
+    canonicalObservation,
   };
 }
 
-export function renderSecretaryProjectClaritySummary(secretaryRootValue, rawName, options = {}) {
+function renderSecretaryProjectClaritySummaryImpl(secretaryRootValue, rawName, options = {}) {
   const report = secretaryProjectClarityStatus(secretaryRootValue, rawName, options);
   if (!report.initialized) return "";
   const first = report.attention.top[0];
@@ -308,8 +463,8 @@ function listProjectRecords(root) {
   return rows;
 }
 
-export function portfolioRollup(secretaryRootValue) {
-  const root = workingRoot(secretaryRootValue);
+function portfolioRollupImpl(secretaryRootValue) {
+  const root = resolveClarityRoot(secretaryRootValue).root;
   const projects = [];
   const unverifiedSources = [];
   const attention = [];
@@ -317,14 +472,17 @@ export function portfolioRollup(secretaryRootValue) {
   for (const record of listProjectRecords(root)) {
     if (record.error) { unverifiedSources.push({ project: record.name, reason: record.error }); continue; }
     try {
+      const canonicalObservation = observeCanonicalRepo(record);
       const clarity = readProjectClarity(record);
       if (!clarity) {
-        projects.push({ name: record.name, scope: record.scope, clarity: "not-initialized", attentionCount: 0, top: null });
+        projects.push({ name: record.name, scope: record.scope, clarity: "not-initialized", attentionCount: 0, top: null, canonicalObservation });
+        if (canonicalObservation.availability !== "available" && canonicalObservation.reason !== "development-pointer-missing") unverifiedSources.push({ project: record.name, reason: canonicalObservation.reason, canonicalObservation });
         continue;
       }
       const top = clarity.report.attention.top[0] || null;
       const externalLink = clarity.report.linkHealth || { status: "not-linked", stale: false, healthy: true };
-      projects.push({ name: record.name, scope: record.scope, clarity: "available", attentionCount: clarity.report.attention.activeCount, linkHealth: externalLink.status, linkStale: Boolean(externalLink.stale), top: top ? { itemId: top.itemId, title: top.title, level: top.level, reasons: top.reasonLabels, lagDays: Number(top._rank?.age || 0) } : null });
+      projects.push({ name: record.name, scope: record.scope, clarity: "available", attentionCount: clarity.report.attention.activeCount, linkHealth: externalLink.status, linkStale: Boolean(externalLink.stale), top: top ? { itemId: top.itemId, title: top.title, level: top.level, reasons: top.reasonLabels, lagDays: Number(top._rank?.age || 0) } : null, canonicalObservation });
+      if (canonicalObservation.availability !== "available" && canonicalObservation.reason !== "development-pointer-missing") unverifiedSources.push({ project: record.name, reason: canonicalObservation.reason, canonicalObservation });
       activeCount += clarity.report.attention.activeCount;
       for (const item of clarity.report.attention.top) attention.push({ project: record.name, ...item });
     } catch (error) {
@@ -355,7 +513,7 @@ export function portfolioRollup(secretaryRootValue) {
   };
 }
 
-export function dailyClarityRollup(secretaryRootValue, { mode = "morning" } = {}) {
+function dailyClarityRollupImpl(secretaryRootValue, { mode = "morning" } = {}) {
   const rollup = portfolioRollup(secretaryRootValue);
   const top = rollup.attention.top;
   if (mode === "morning") {
@@ -366,6 +524,7 @@ export function dailyClarityRollup(secretaryRootValue, { mode = "morning" } = {}
       items: top,
       otherCount: rollup.attention.otherCount,
       unverifiedSources: rollup.unverifiedSources,
+      canonicalObservations: rollup.projects.map((project) => ({ project: project.name, observation: project.canonicalObservation })),
       connectorReads: 0,
       itemBodiesIncluded: false,
     };
@@ -380,14 +539,14 @@ export function dailyClarityRollup(secretaryRootValue, { mode = "morning" } = {}
     else if (labels.some((value) => value.includes("決定済み"))) separated.execution.push(row);
     else separated.candidates.push(row);
   }
-  return { mode, section: "Clarityの振り返り", ...separated, unverifiedSources: rollup.unverifiedSources, connectorReads: 0, itemBodiesIncluded: false };
+  return { mode, section: "Clarityの振り返り", ...separated, unverifiedSources: rollup.unverifiedSources, canonicalObservations: rollup.projects.map((project) => ({ project: project.name, observation: project.canonicalObservation })), connectorReads: 0, itemBodiesIncluded: false };
 }
 
-export function weeklyClarityRollup(secretaryRootValue, previous = null) {
+function weeklyClarityRollupImpl(secretaryRootValue, previous = null) {
   const rollup = portfolioRollup(secretaryRootValue);
   let resolvedAttention = 0;
   let resolvedDrift = 0;
-  for (const project of listProjectRecords(workingRoot(secretaryRootValue))) {
+  for (const project of listProjectRecords(resolveClarityRoot(secretaryRootValue).root)) {
     if (project.error) continue;
     try {
       const clarity = readProjectClarity(project);
@@ -410,12 +569,13 @@ export function weeklyClarityRollup(secretaryRootValue, previous = null) {
     lag,
     longRunning: lag.filter((item) => item.days >= 7),
     unverifiedSources: rollup.unverifiedSources,
+    canonicalObservations: rollup.projects.map((project) => ({ project: project.name, observation: project.canonicalObservation })),
     connectorReads: 0,
     itemBodiesIncluded: false,
   };
 }
 
-export function routeClarityTask(secretaryRootValue, rawName, { itemId, target = "local-todo", explicit = false } = {}) {
+function routeClarityTaskImpl(secretaryRootValue, rawName, { itemId, target = "local-todo", explicit = false } = {}) {
   const record = resolveSecretaryProject(secretaryRootValue, rawName);
   const clarity = readProjectClarity(record);
   if (!clarity) throw new ClarityError("clarity-not-initialized", "このProjectにはClarityがありません。");
@@ -431,10 +591,26 @@ export function routeClarityTask(secretaryRootValue, rawName, { itemId, target =
   throw new ClarityError("task-target-invalid", "未対応のtask委譲先です。");
 }
 
-export function decideSecretaryProject(secretaryRootValue, rawName, options = {}) {
+function decideSecretaryProjectImpl(secretaryRootValue, rawName, options = {}) {
   const record = resolveSecretaryProject(secretaryRootValue, rawName);
   if (record.scope !== "open") throw new ClarityError("project-scope-read-only", "Decision確定はopen Projectだけが対象です。");
   const root = clarityRoot(record);
   if (!existsSync(root)) throw new ClarityError("clarity-not-initialized", "このProjectにはClarityがありません。");
   return decideGenericProject(root, { ...options, secretaryRoot: record.root, projectName: record.name });
 }
+
+function runSecretaryRequest(secretaryRootValue, operation) {
+  return withClarityRootObservation(secretaryRootValue, (handle) => operation(handle.root));
+}
+
+export function resolveSecretaryProject(secretaryRootValue, rawName, options = {}) { return runSecretaryRequest(secretaryRootValue, (root) => resolveSecretaryProjectImpl(root, rawName, options)); }
+export function previewSecretaryProjectClarity(secretaryRootValue, rawName, options = {}) { return runSecretaryRequest(secretaryRootValue, (root) => previewSecretaryProjectClarityImpl(root, rawName, options)); }
+export function applySecretaryProjectClarity(secretaryRootValue, rawName) { return runSecretaryRequest(secretaryRootValue, (root) => applySecretaryProjectClarityImpl(root, rawName)); }
+export function observeCanonicalRepo(record) { return withClarityRootRequest(() => observeCanonicalRepoImpl(record)); }
+export function secretaryProjectClarityStatus(secretaryRootValue, rawName, options = {}) { return runSecretaryRequest(secretaryRootValue, (root) => secretaryProjectClarityStatusImpl(root, rawName, options)); }
+export function renderSecretaryProjectClaritySummary(secretaryRootValue, rawName, options = {}) { return runSecretaryRequest(secretaryRootValue, (root) => renderSecretaryProjectClaritySummaryImpl(root, rawName, options)); }
+export function portfolioRollup(secretaryRootValue) { return runSecretaryRequest(secretaryRootValue, portfolioRollupImpl); }
+export function dailyClarityRollup(secretaryRootValue, options = {}) { return runSecretaryRequest(secretaryRootValue, (root) => dailyClarityRollupImpl(root, options)); }
+export function weeklyClarityRollup(secretaryRootValue, previous = null) { return runSecretaryRequest(secretaryRootValue, (root) => weeklyClarityRollupImpl(root, previous)); }
+export function routeClarityTask(secretaryRootValue, rawName, options = {}) { return runSecretaryRequest(secretaryRootValue, (root) => routeClarityTaskImpl(root, rawName, options)); }
+export function decideSecretaryProject(secretaryRootValue, rawName, options = {}) { return runSecretaryRequest(secretaryRootValue, (root) => decideSecretaryProjectImpl(root, rawName, options)); }

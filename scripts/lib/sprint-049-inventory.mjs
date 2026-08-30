@@ -22,9 +22,16 @@ const EXPECTED = {
   "clarity-hook": ["plugins/secretary/hooks/hooks.json", "plugins/secretary/scripts/clarity-hook.mjs", "plugins/secretary/scripts/lib/clarity-hook.mjs"],
   "xmind-editions": ["plugins/secretary/release-inventory.json", "plugins/secretary/edition.json", "plugins/secretary/skills/clarity/SKILL.md"],
   "package-release-inventory": ["plugins/secretary/release-inventory.json", "plugins/secretary/.claude-plugin/plugin.json", "plugins/secretary/.codex-plugin/plugin.json", ".claude-plugin/marketplace.json", ".agents/plugins/marketplace.json"],
+  "canonical-repo-reader": ["plugins/secretary/scripts/clarity-secretary.mjs", "plugins/secretary/scripts/lib/clarity-secretary.mjs", "plugins/secretary/clarity/secretary-adapter.json"],
+  "clarity-root-policy": ["plugins/secretary/scripts/clarity.mjs", "plugins/secretary/scripts/lib/clarity-core.mjs", "plugins/secretary/scripts/lib/clarity-drift.mjs", "plugins/secretary/scripts/lib/clarity-hook.mjs", "plugins/secretary/scripts/lib/clarity-link.mjs", "plugins/secretary/scripts/lib/clarity-projection.mjs", "plugins/secretary/scripts/lib/clarity-root.mjs", "plugins/secretary/scripts/lib/clarity-secretary.mjs", "plugins/secretary/scripts/lib/safe-fs.mjs"],
 };
 
 const EXPECTED_CASES = Array.from({ length: 20 }, (_, index) => `CLX-${String(index + 1).padStart(3, "0")}`);
+const TARGET_CASES = [
+  ...Array.from({ length: 7 }, (_, index) => `yasashii-CF-${String(index + 1).padStart(3, "0")}`),
+  ...Array.from({ length: 14 }, (_, index) => `yasashii-AR-${String(index + 1).padStart(3, "0")}`),
+];
+const INVENTORY_CASES = [...EXPECTED_CASES, ...TARGET_CASES];
 const OLD_CONTRACTS = ["topic-save=confirm-first", "save-copy=exact-copy", "explicit-memory-request=next-turn-confirmation"];
 const COORDINATION_PATHS = new Set([INVENTORY_PATH, "scripts/fixtures/sprint-041/yasashii-prewrite-receipt.json", "plugins/secretary/edition.json", "plugins/secretary/release-inventory.json", "plugins/secretary/rules/styles/yasashii.md"]);
 const PRIVATE_LITERALS = ["vault/10_sources", "/Users/", "rules/copy/my-vault"];
@@ -83,7 +90,7 @@ export function validateCollaborationInventory(rootValue, inventoryValue = null)
     if (!Array.isArray(surface.noTouch) || surface.noTouch.length === 0 || surface.noTouch.some((value) => typeof value !== "string" || !value)) fail("inventory-no-touch", surface.id);
     if (!Array.isArray(surface.tests) || surface.tests.length === 0) fail("inventory-tests", surface.id);
     for (const id of surface.tests) {
-      if (!EXPECTED_CASES.includes(id)) fail("inventory-test-unknown", `${surface.id}:${id}`);
+      if (!INVENTORY_CASES.includes(id)) fail("inventory-test-unknown", `${surface.id}:${id}`);
       coveredCases.add(id);
     }
     if (!Array.isArray(surface.markers) || surface.markers.length === 0) fail("inventory-marker-missing", surface.id);
@@ -103,6 +110,6 @@ export function validateCollaborationInventory(rootValue, inventoryValue = null)
       }
     }
   }
-  if (JSON.stringify([...coveredCases].sort()) !== JSON.stringify([...EXPECTED_CASES].sort())) fail("inventory-case-omission");
+  if (JSON.stringify([...coveredCases].sort()) !== JSON.stringify([...INVENTORY_CASES].sort())) fail("inventory-case-omission");
   return { surfaceCount: inventory.surfaces.length, caseCount: coveredCases.size, digestsValid: true, markersValid: true };
 }
