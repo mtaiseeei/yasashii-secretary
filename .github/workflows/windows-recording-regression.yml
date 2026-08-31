@@ -9,6 +9,7 @@ on:
       - "plugins/secretary/skills/memory-care/scripts/**"
       - "plugins/secretary/skills/**/SKILL.md"
       - "scripts/sprint-038-patch-002-windows-test.mjs"
+      - "scripts/sprint-043-patch-003-test.mjs"
 
 permissions:
   contents: read
@@ -33,3 +34,6 @@ jobs:
       - name: Windows path, rollback, retry, and boundary regression
         shell: pwsh
         run: node scripts/sprint-038-patch-002-windows-test.mjs --require-windows
+      - name: Yasashii Clarity Harness scan and Windows native regression
+        shell: pwsh
+        run: node scripts/sprint-043-patch-003-test.mjs --require-windows

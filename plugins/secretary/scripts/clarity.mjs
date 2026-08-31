@@ -135,6 +135,27 @@ function render(command, result, json) {
       process.stdout.write(`- 作成予定: ${(preview.writes || []).join(", ") || "なし"}\n`);
       process.stdout.write(`- 競合: ${(preview.conflicts || []).length}件\n`);
       process.stdout.write(`- 除外: ${(preview.excluded || []).length}件 / 未確認: ${(preview.uninspected || []).length}件\n`);
+      if (preview.scan?.harness?.detection?.kind === "harness") {
+        const bundle = preview.scan.harness.bundle;
+        const authoritative = preview.scan.lanes?.authoritative;
+        const generic = preview.scan.lanes?.generic;
+        process.stdout.write(`- Harness Current: ${bundle?.currentId || "未解決"}（${bundle?.currentStatus || "状態未確認"}）\n`);
+        for (const role of bundle?.roles || []) {
+          const label = {
+            "orchestrator-execution-truth": "実行状態の正本",
+            requirements: "requirements",
+            "generator-self-report": "Generator自己報告",
+            "evaluator-validation": "Evaluator検証",
+          }[role.role] || role.role;
+          const status = role.status === "not-recorded" ? "評価記録はまだありません" : `${role.status} / ${role.coverage}${role.reason ? `（${role.reason}）` : ""}`;
+          process.stdout.write(`  - ${label}: ${status}\n`);
+        }
+        process.stdout.write(`- Harness正本枠: ${authoritative?.bytesRead || 0}/${authoritative?.limits?.maxReadBytes || 0} bytes、確認${authoritative?.inspected?.length || 0}／除外${authoritative?.excluded?.length || 0}／未確認${authoritative?.uninspected?.length || 0}／不存在${authoritative?.notFound?.length || 0}、partial=${Boolean(authoritative?.partial)}\n`);
+        process.stdout.write(`- 一般scan枠: ${generic?.bytesRead || 0}/${generic?.limits?.maxReadBytes || 0} bytes、確認${generic?.inspected?.length || 0}／除外${generic?.excluded?.length || 0}／未確認${generic?.uninspected?.length || 0}、partial=${Boolean(generic?.partial)}\n`);
+      } else if (preview.scan?.harness?.detection?.kind && preview.scan.harness.detection.kind !== "non-harness") {
+        process.stdout.write(`- Harness判定: ${preview.scan.harness.detection.kind}（${preview.scan.harness.detection.reason}）\n`);
+        if (preview.scan.harness.state?.fallbackSource) process.stdout.write(`- bounded fallback: ${preview.scan.harness.state.currentId || "未解決"}（${preview.scan.harness.state.fallbackSource}、推測）\n`);
+      }
       process.stdout.write("明示確認後だけ --apply を付けて実行します。\n");
     } else if (result.status === "canceled") {
       process.stdout.write("Clarity initを取り消しました。file、Git、journal、runtimeは変更していません。\n");

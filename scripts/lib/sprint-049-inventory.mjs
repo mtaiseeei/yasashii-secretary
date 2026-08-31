@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { existsSync, lstatSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -24,12 +25,14 @@ const EXPECTED = {
   "package-release-inventory": ["plugins/secretary/release-inventory.json", "plugins/secretary/.claude-plugin/plugin.json", "plugins/secretary/.codex-plugin/plugin.json", ".claude-plugin/marketplace.json", ".agents/plugins/marketplace.json"],
   "canonical-repo-reader": ["plugins/secretary/scripts/clarity-secretary.mjs", "plugins/secretary/scripts/lib/clarity-secretary.mjs", "plugins/secretary/clarity/secretary-adapter.json"],
   "clarity-root-policy": ["plugins/secretary/scripts/clarity.mjs", "plugins/secretary/scripts/lib/clarity-core.mjs", "plugins/secretary/scripts/lib/clarity-drift.mjs", "plugins/secretary/scripts/lib/clarity-hook.mjs", "plugins/secretary/scripts/lib/clarity-link.mjs", "plugins/secretary/scripts/lib/clarity-projection.mjs", "plugins/secretary/scripts/lib/clarity-root.mjs", "plugins/secretary/scripts/lib/clarity-secretary.mjs", "plugins/secretary/scripts/lib/safe-fs.mjs"],
+  "clarity-harness-scanner": ["plugins/secretary/scripts/clarity.mjs", "plugins/secretary/scripts/lib/clarity-core.mjs", "plugins/secretary/scripts/lib/clarity-harness-scan.mjs", ".github/workflows/windows-recording-regression.yml", "scripts/sprint-043-patch-003-test.mjs"],
 };
 
 const EXPECTED_CASES = Array.from({ length: 20 }, (_, index) => `CLX-${String(index + 1).padStart(3, "0")}`);
 const TARGET_CASES = [
   ...Array.from({ length: 7 }, (_, index) => `yasashii-CF-${String(index + 1).padStart(3, "0")}`),
   ...Array.from({ length: 14 }, (_, index) => `yasashii-AR-${String(index + 1).padStart(3, "0")}`),
+  ...Array.from({ length: 16 }, (_, index) => `yasashii-HS-${String(index + 1).padStart(3, "0")}`),
 ];
 const INVENTORY_CASES = [...EXPECTED_CASES, ...TARGET_CASES];
 const OLD_CONTRACTS = ["topic-save=confirm-first", "save-copy=exact-copy", "explicit-memory-request=next-turn-confirmation"];
@@ -40,8 +43,36 @@ function fail(code, detail = "") {
   throw new Error(`${code}${detail ? `:${detail}` : ""}`);
 }
 
-function mode(path) {
+function filesystemMode(path) {
   return lstatSync(path).mode & 0o111 ? "100755" : "100644";
+}
+
+function trackedModes(root, paths) {
+  const result = spawnSync("git", ["-C", root, "ls-files", "--stage", "-z", "--", ...paths], {
+    encoding: "utf8", shell: false, windowsHide: true, timeout: 5_000, maxBuffer: 1024 * 1024,
+    env: { ...process.env, GIT_OPTIONAL_LOCKS: "0", GIT_TERMINAL_PROMPT: "0" },
+  });
+  if (result.status !== 0) return new Map();
+  const modes = new Map();
+  for (const row of String(result.stdout).split("\0").filter(Boolean)) {
+    const match = row.match(/^(100644|100755)\s+[a-f0-9]+\s+\d+\t(.+)$/u);
+    if (match) modes.set(match[2].replaceAll("\\", "/"), match[1]);
+  }
+  return modes;
+}
+
+function portableMode(path, absolute, gitModes) {
+  const observed = filesystemMode(absolute);
+  // NTFS does not preserve the executable bit in working-tree metadata. Use
+  // the tracked mode on Windows, while POSIX and Git-free archives keep the
+  // observed mode so chmod tampering remains detectable.
+  return process.platform === "win32" && gitModes.has(path) ? gitModes.get(path) : observed;
+}
+
+function portableBytes(absolute) {
+  // Normalize only the portable CRLF representation. Lone CR and every other
+  // content byte remain inside the inventory digest boundary.
+  return Buffer.from(readFileSync(absolute, "utf8").replaceAll("\r\n", "\n"));
 }
 
 function safeRelative(path) {
@@ -51,6 +82,7 @@ function safeRelative(path) {
 export function digestSurface(rootValue, pathsValue) {
   const root = resolve(rootValue);
   const paths = [...pathsValue].sort((a, b) => Buffer.from(a).compare(Buffer.from(b)));
+  const gitModes = trackedModes(root, paths);
   const hash = createHash("sha256");
   for (const path of paths) {
     if (!safeRelative(path)) fail("inventory-path-unsafe", path);
@@ -58,7 +90,7 @@ export function digestSurface(rootValue, pathsValue) {
     if (!existsSync(absolute)) fail("inventory-path-missing", path);
     const stat = lstatSync(absolute);
     if (!stat.isFile() || stat.isSymbolicLink()) fail("inventory-path-not-regular", path);
-    hash.update(path).update("\0").update(mode(absolute)).update("\0").update(readFileSync(absolute)).update("\0");
+    hash.update(path).update("\0").update(portableMode(path, absolute, gitModes)).update("\0").update(portableBytes(absolute)).update("\0");
   }
   return hash.digest("hex");
 }

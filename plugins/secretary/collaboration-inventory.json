@@ -584,7 +584,7 @@
           "token": "agentic-secretary:clarity-root-policy:v1"
         }
       ],
-      "contentDigest": "c970eebdbabf601253329df21baa4a43656e5bc1bc3ef2ced8b8389fdef49618",
+      "contentDigest": "4274ee1cc7716c7f39b21a9f30a400e1733dd2ff88b6d6c5752d526c4c544421",
       "tests": [
         "yasashii-AR-001",
         "yasashii-AR-002",
@@ -609,6 +609,52 @@
         "root-external locator",
         "Git mutation",
         "user-facing flag"
+      ]
+    },
+    {
+      "id": "clarity-harness-scanner",
+      "role": "Scan Harness authoritative state, requirements, Generator report and Evaluator validation before the bounded generic lane",
+      "edition": "yasashii-adapted-common-core-read-only",
+      "paths": [
+        "plugins/secretary/scripts/clarity.mjs",
+        "plugins/secretary/scripts/lib/clarity-core.mjs",
+        "plugins/secretary/scripts/lib/clarity-harness-scan.mjs",
+        ".github/workflows/windows-recording-regression.yml",
+        "scripts/sprint-043-patch-003-test.mjs"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/scripts/lib/clarity-harness-scan.mjs",
+          "token": "agentic-secretary:clarity-harness-authoritative-scan:v1"
+        }
+      ],
+      "contentDigest": "6be2d1b858f45a45a9b2576784c528f2d3168b373bdd369d0bc0dff3fa38278d",
+      "tests": [
+        "yasashii-HS-001",
+        "yasashii-HS-002",
+        "yasashii-HS-003",
+        "yasashii-HS-004",
+        "yasashii-HS-005",
+        "yasashii-HS-006",
+        "yasashii-HS-007",
+        "yasashii-HS-008",
+        "yasashii-HS-009",
+        "yasashii-HS-010",
+        "yasashii-HS-011",
+        "yasashii-HS-012",
+        "yasashii-HS-013",
+        "yasashii-HS-014",
+        "yasashii-HS-015",
+        "yasashii-HS-016"
+      ],
+      "delegation": "Read-only bounded scan and synthetic fixture writes only; Windows native verification stays in the existing Yasashii workflow",
+      "noTouch": [
+        "public or private source",
+        "customer repository apply",
+        "provider or connector write",
+        "release",
+        "install or cache",
+        "actual Xmind"
       ]
     }
   ]
