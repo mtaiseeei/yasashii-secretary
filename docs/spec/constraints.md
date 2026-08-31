@@ -422,3 +422,16 @@
 19. private receiptの`nextPermission=yasashii-prewrite-only`、`writesAuthorized=false`を守る。Sprint 041 prewrite PASS前のClarity製品writeは0件とし、不一致、欠落、falsy、dirty、tamperではfail-closed停止する。
 20. Yasashii固有の文体、`copy/yasashii.json`、`styles/yasashii.md`、`edition.json`、`secretary-overlay/**`、`README.md`、`LICENSE`、`AGENTS.md`、repo-owned `docs/**`、`harness@yasashii-harness`を保護する。downstream-ownedを製品同期で変更しない。
 21. release、push、tag、GitHub Release、Marketplace、installed cache、new session、利用者workspace migration、Mac mini、実Xmind、実host、外部connectorはSprint 041〜043の対象外とし、`not-run`を実施済みへ昇格しない。
+
+## 24. Clarity包括scanとWindows native境界
+
+1. Harness authoritative laneはgeneric scanと別budgetで先行し、state、必要spec、Current contract／progress／feedback、guidance、package manifestをbounded readする。全Repo全文読込や上限撤廃で包括性を偽らない。
+2. stateはOrchestrator execution truth、contractはrequirements、progressはGenerator self-report、feedbackはEvaluator validationである。progressやstateだけからEvaluator PASSを推測せず、同じCurrent SprintをDecision／Execution／ValidationとEvidence参照へ束ねる。
+3. Current valid／TBD／missing／invalid／巨大state、feedback absent／unreadable、Secret／binary／symlink／permission／missing、truncated／partialを固有coverageとreasonで示す。filename順、mtime、過去fileの全Item化をfallbackにしない。
+4. authoritative lane後だけ残余budgetでgeneric scanを行い、非Harness Repoの候補、順序、上限、安全意味を変えない。
+5. preview／cancelはfilesystem、runtime、journal、Git、network、external provider write 0件。applyはsynthetic fixtureの物理Repo内Clarity所有pathだけとし、dirty／staged／untracked、HEAD、branch、remoteを保持する。
+6. Patch 002のancestor alias／physical identity、一般root既定拒否、Clarity限定opt-in、root自身／root内symlink／差替え／TOCTOU拒否を維持する。
+7. Windows nativeではdrive letter、backslash、空白、日本語、CRLF、case collision、reserved／invalid path、prefix siblingを実filesystemで評価する。symlinkとjunctionは別capabilityとし、SKIP／NOT-RUNをPASSへ数えない。
+8. `.github/workflows/windows-recording-regression.yml`の`windows-native`、Node 22、既存0.9.2回帰、`timeout-minutes: 10`を保持する。public／private workflow pathや過去runをYasashiiへ流用しない。
+9. public／private／FableのPASSは設計入力であり、Yasashii PASSではない。Yasashii source、detached clean checkout、Git-free archive、exact candidateに因果するWindows runを独立確認する。
+10. exact candidate固定後の既存PR #12同branchへの通常pushと因果Windows CIだけを既存承認範囲とする。force、merge、tag、Release、Marketplace、install／cache、実Xmind、実顧客Repo apply、remote変更へ拡張しない。

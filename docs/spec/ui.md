@@ -432,3 +432,7 @@ Hookが動いても毎回interruptしない。disabled／trust未承認／failur
 projects表示はlifecycleを主表示のまま保ち、Clarity mode、Attention件数、最重要項目、link healthを短く添える。daily morningは予定、TODO、中断点の後に「今日の要確認」を独立表示する。Clarity ItemをTODOへ混ぜず、「タスクにして」等の明示依頼時だけ既存task導線へ委譲する。
 
 Markdown／Mermaid／Xmindは「正本ではない再生成可能な表示」と明示する。Xmindは既定OFF。ON時はprovider状態と選択理由を示し、MCP external writeとlocal `.xmind` fallbackのどちらも対象・影響のpreview後に確認する。localを「完全offline／無料」と断定しない。
+
+Harness Repoのinit previewでは、最初に「現在のSprintで決まっていること／実行報告／独立検証」を一つのCurrent bundleとして示す。state、contract、progress、feedbackのrole名とcoverageを併記し、progressの完了表現を「検証済み」へ言い換えない。過去Sprintは必要なEvidence参照だけに畳み、1 file 1 Itemの大量表示をしない。
+
+coverageはauthoritative／generic laneを分け、`確認済み / 除外 / 未確認 / 見つからない`と理由を平易に示す。valid／TBD／missing／invalid、巨大state、feedback未作成、Secret／binary／symlink／permission／missing、truncated／partialを「全部確認済み」へ丸めない。Windows結果もPASS／FAIL／SKIP／NOT-RUN、native実行の有無を分け、public／privateや別OSの結果をYasashii検証済みとして表示しない。

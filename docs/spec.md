@@ -103,6 +103,8 @@ Decision／Execution／Validation／Attention／Driftを所有する。Xmindは�
 Clarity専用command-only Hookだけを同梱する。詳細な固定tuple、62件の単一割当、250＋CLX20＋XV4＋E2E4の検証面は
 `docs/spec/clarity.md`を正本とする。
 
+2026-08-31、public Sprint 050 Patch 004とprivate同Patchのfresh独立PASSを固定入力として、YasashiiへHarness正本優先scanとWindows native互換を適応する。これは既存17機能／62 behaviorの再定義ではなく、新規F77と`yasashii-HS-001〜016`による拡張である。public／private／FableのPASSはYasashii PASSへ流用せず、Yasashii開始HEAD `9009f892f678fbcbde9978e0bceb803d3f1ad7d5`からの実差分、source／detached clean／Git-free、既存PR #12に因果するWindows runを独立評価する。詳細は`docs/spec/clarity.md`と`sprint-043-patch-003`を正本とする。
+
 ## ひとことで
 
 **1つのprivate GitHub repoで、秘書・一般プロジェクト・選択したチャットの文脈を一緒に育て、後から探せる秘書。**
@@ -136,7 +138,7 @@ Gmail等の公式コネクタは従来どおり都度参照し、Chatworkと明�
 | ファイル | 内容 |
 |---|---|
 | [product.md](spec/product.md) | 目的、対象ユーザー、G1〜G14、成功状態、非ゴール |
-| [features.md](spec/features.md) | F01〜F76 とユーザーから見た振る舞い |
+| [features.md](spec/features.md) | F01〜F77 とユーザーから見た振る舞い |
 | [clarity.md](spec/clarity.md) | Project Clarityの固定入力、17機能／62 behavior単一割当、Yasashii境界、検証面 |
 | [constraints.md](spec/constraints.md) | 安全・記憶保護・secret・single private repo・同期同意などの不変条件 |
 | [domain.md](spec/domain.md) | 三層記憶、一般／開発プロジェクト、更新台帳、timeline、Chatwork／Google Chatの取得・検索状態、時刻・索引・Git規約 |
@@ -194,6 +196,7 @@ Gmail等の公式コネクタは従来どおり都度参照し、Chatworkと明�
 | [sprint-041](sprints/sprint-041.md) | Project Clarityの固定tuple、private receipt、path分類、protected snapshotを製品write前にfail-closed検査する | sprint-040-patch-001 done |
 | [sprint-042](sprints/sprint-042.md) | Project Clarity 17機能／62 behavior、generic storage、Hook、Xmind、collaboration、Yasashii overlayを統合する | sprint-041 fresh Evaluator PASS |
 | [sprint-043](sprints/sprint-043.md) | 同一candidateのsource／clean／Git-free、250＋CLX20＋XV4＋E2E4、fresh評価、source receiptを閉じる | sprint-042 fresh Evaluator PASS |
+| [sprint-043-patch-003](sprints/sprint-043-patch-003.md) | Harness正本をreserved laneで先に読む包括scan、意味別Current bundle、Yasashii固有Windows native／inventory／外部live gate | sprint-043-patch-002 done |
 
 既存 sprint-001〜006 と各 patch の契約・progress・feedback は履歴として保持する。
 sprint-007 は製品方針転換で白紙化され、旧計画と実装は `backup/sprint-007-010-plan` に退避済みである。

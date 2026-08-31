@@ -151,10 +151,38 @@ XmindはYasashiiで既定OFF。ON時はcapableなXmind MCPを第1優先、local 
 
 62 behaviorはPrimary／CLX／XV／E2Eの少なくとも1つへ割り当てるが、同じpublic behaviorを複数のYasashii behaviorへ複製しない。case本文の意味、Severity、期待副作用、conditional NOT-RUNを勝手に緩和しない。実Xmind MCP、実host live、外部connector、release／cacheはnot-runでも、adapter／provider／確認境界とoffline caseは必須である。
 
-## この3 SprintのNon-scope
+## Sprint 043 Patch 003 — Harness包括scanの固定入力とCase
+
+固定上流はpublic accepted product／test candidate `fe3eab06d4fbd0b5b26d995129156f2fb2537dd2`、fresh PASS feedback `348cb1825a7f7e228e71e3799e2fdff0ea9b464e`、final state `4c37eaba23ace106b02709637ec7cde7cbf8bafc`と、private accepted product／test candidate `a980208db3728fc2d12e61435b03cd4b33e79a29`、fresh PASS feedback `b0c2138b8dcf96c144344e96307a22d38b4af349`、final state `ed4068e57e1da32e4fc1d4bfa2680393e2e00eb3`である。Yasashii開始点はHEAD `9009f892f678fbcbde9978e0bceb803d3f1ad7d5`、tree `de744087388b60d0f0f2db221b204c57a0c31bcf`。上流のstate／contract／progress／feedbackは設計根拠であり、Yasashii製品bytesやPASSではない。
+
+publicのHS-001〜016は意味とSeverityを維持し、Yasashii固有IDとしてF77へ一度だけ割り当てる。
+
+| ID | Severity | 不変の観測意味 |
+|---|---|---|
+| yasashii-HS-001 | Critical | 2 MiB超Harnessでもauthoritative reserved laneが現在判断の正本を確保する |
+| yasashii-HS-002 | Critical | non-Harness／partial／invalidを分け、完全Harnessへ誤昇格しない |
+| yasashii-HS-003 | Critical | state／contract／progress／feedbackを意味分離し一つのCurrent bundleへ統合する |
+| yasashii-HS-004 | Critical | feedback absentを`evaluation-not-yet-recorded`として別状態にする |
+| yasashii-HS-005 | Critical | Current valid／TBD／missing／invalidを維持し、安全なbounded fallbackだけを根拠つきで使う |
+| yasashii-HS-006 | Critical | 巨大stateをboundedに扱い、解決不能をpartialへ分類する |
+| yasashii-HS-007 | Critical | Secret-like／binary／symlink／permission／missingを本文非露出で分類する |
+| yasashii-HS-008 | High | authoritative／generic別budget、coverage、partial理由を正直に示す |
+| yasashii-HS-009 | High | 過去文書を1 file 1 Item化せずCurrent bundleを決定的に生成する |
+| yasashii-HS-010 | Critical | ancestor alias／physicalでidentity、候補、coverage digestを一致させる |
+| yasashii-HS-011 | Critical | preview／cancel／synthetic apply／failureで所有pathとGit／external安全を守る |
+| yasashii-HS-012 | Critical | Windows drive／backslash／空白／日本語／CRLFをnative filesystemで扱う |
+| yasashii-HS-013 | Critical | Windows case collision／reserved／invalid／prefix siblingをfail closedにする |
+| yasashii-HS-014 | Critical | symlink／junction capabilityを別々に観測しSKIP／NOT-RUNをPASSへ数えない |
+| yasashii-HS-015 | Critical | 既存Yasashii Windows workflowとexact candidate／PR runを因果固定する |
+| yasashii-HS-016 | Critical | portable inventoryと既存Clarity／0.9.2／Git-free回帰を同じcandidateで守る |
+
+既存F60〜F76、17機能／62 behavior、Primary 250、CLX 20、XV 4、E2E 4、`yasashii-CF-*`、`yasashii-AR-*`の意味・Severity・初回割当は変更しない。Patch 003の16 CaseはF77の受入拡張であり、62 behaviorへ重複加算しない。
+
+## Project Clarity展開のNon-scope
 
 - release、push、tag、GitHub Release、Marketplace snapshot、installed plugin／cache、new session、loaded version確認。
 - 実Xmind MCP、実local `.xmind` write、実Claude／Codex host live、外部connector。
 - public／private sourceの変更、private実装の同梱、利用者workspace migration、Mac mini同期。
 - Project lifecycle、Notion property／relation、TODO正本、memory意味判定の新しい所有権。
 - 新しい統一attestation、collector、実外部dataを必須化すること。
+- Sprint 043 Patch 003では、force push、merge、tag、GitHub Release、Marketplace、install／cache、実Xmind、実顧客Repo apply、privateの`05/02/10_sources/Notion`実装を含めない。通常pushと因果Windows CIはexact candidate固定後の外部live gateだけに限定する。

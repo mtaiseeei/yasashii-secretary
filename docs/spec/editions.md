@@ -338,3 +338,9 @@ public Hook 3 pathはbyte-syncする。Yasashii adapter、`edition.json`、copy�
 XmindのYasashii既定はOFF。ON時のpriorityは1. capable Xmind MCP、2. 明示承認済みlocal `.xmind`。default、ON／OFF、capability、selected、reason、verified、approvalを別fieldにし、MCP不可時のlocal自動writeを禁止する。固定4象限visualはedition間で変えない。
 
 Project Clarity以外のSkillへHookを追加しない。projects、daily、weekly、memory-care、update等は既存router／Skill入口でClarity-awareになり、Clarity routerの責務を広げない。release、push、tag、cache、install、new session、live Xmind／host／connectorはsource適用と別phaseである。
+
+Sprint 043 Patch 003の固定入力はpublic product／test candidate `fe3eab06d4fbd0b5b26d995129156f2fb2537dd2`とprivate product／test candidate `a980208db3728fc2d12e61435b03cd4b33e79a29`である。上流2版のfresh PASSとfinal stateはYasashii適応の根拠だが、Yasashii PASS、Windows verified、release readyを意味しない。
+
+public accepted product／test差分のうち、`plugins/secretary/scripts/clarity.mjs`、`plugins/secretary/scripts/lib/clarity-core.mjs`、新規`plugins/secretary/scripts/lib/clarity-harness-scan.mjs`はcommon byte-sync候補とする。`plugins/secretary/collaboration-inventory.json`、`scripts/lib/sprint-049-inventory.mjs`、Yasashii固有Patch suite／fixture／actual action report、既存`.github/workflows/windows-recording-regression.yml`はadapted／supporting候補であり、public／privateのtest番号やworkflow pathをblind copyしない。Generatorは開始HEADからのactual diff、before／public／private／after digest、mode、actionでroleを排他的に確定する。
+
+Yasashiiのcopy／style／identity、17 Skills／62 behavior、Hook／Projects／daily／weekly／task／memory／build／update、generic storage、overlay、existing 0.9.2 Windows regressionはprotected面である。privateの`vault/05_secretary`、`02` fallback、`vault/10_sources`、Notion実装、private root guidance、private customer dataはexcludedとし、source／fixture／tracked evidenceへ混入させない。overlay applyの二回目追加差分は0件とする。

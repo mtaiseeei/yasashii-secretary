@@ -222,6 +222,8 @@ runtime-only observationとしてboundedに観測できるが、他Skillへ意�
 public→private→Yasashiiの固定handoff順序、Yasashii固有copy／overlay／identity、`harness@yasashii-harness`を維持し、
 release、cache、実host、実Xmindをsourceのoffline PASSへ混ぜない。
 
+Harness Repoの初期化では、一般scanが2 MiB上限へ達しても、現在判断に必要なstate、spec、Current contract／progress／feedback、guidance、package manifestを先に確認する。stateは実行状態、contractは要件、progressはGenerator自己報告、feedbackはEvaluator検証として別の意味を保ち、同じCurrent Sprintを一つの判断束へまとめる。読めない・存在しない・部分的な範囲は理由つきで示し、progressだけから独立PASSを推測しない。Windows対応はnative runnerで独立確認し、public／privateのPASSやmacOS上のWindows風文字列をYasashiiの検証済みへ昇格しない。
+
 ## ゴール
 
 1. 非エンジニアが説明に沿って導入し、初回5問以内で `secretary/` を安全に生成したうえで、1つのprivate GitHub repoを作成・初回pushできる。
@@ -339,6 +341,7 @@ release、cache、実host、実Xmindをsourceのoffline PASSへ混ぜない。
 - 明示memory authorizationを、削除、外部送信、公開、権限拡張、Secret取扱い、プロジェクト化など、別確認が必要な操作の包括許可へ拡張しない。
 - 公開Agentic版、private版、Yasashii版の評価を共有しない。Sprint 040でpush、tag、release、marketplace、cache、実workspaceまたはexternal serviceへの変更を行わず、private版は別repoの別Sprintで扱う。
 - Project ClarityをJira／Linear／Notion／GitHub Issuesの代替、生きた`TODO.md`、自動task起票、会議録／チャット本文の複製、単一進捗率へ拡張しない。private `05/02/10_sources/Notion`実装、実Xmind／host live、release／push／cacheはSprint 041〜043へ含めない。
+- Harness包括scanを全Repo全文index、全Git履歴読込、全過去SprintのItem化、global／per-file上限撤廃へ拡張しない。Sprint 043 Patch 003では実顧客Repo apply、実Xmind、private固有実装、version／release／Marketplace／install／cacheを扱わない。
 
 ## 承認済みの条件付き判断
 

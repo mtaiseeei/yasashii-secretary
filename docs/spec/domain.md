@@ -679,3 +679,15 @@ Yasashiiの`xmind.enabled`既定はfalse。provider capability、priority、sele
 ### link、sync、Drift
 
 linkはprepare／accept／finalizeで双方identity／digest／authorityを確認する。syncはpull-onlyで自己rootへだけwriteし、authorityはPrimary／Reference／Shared derivedを一意に持つ。DriftはDecision側と実装側のEvidenceを示し、片側根拠が弱ければ`possible_drift`に留める。resolutionは新Eventとして残す。
+
+### Harness authoritative scan
+
+Harness Repoの初期候補は、一般fileからのgeneric candidateとは別のauthoritative laneを持つ。
+
+- `HarnessDetection`: `harness / non-harness / partial / invalid`とreason。Currentは`valid / TBD / missing / invalid / unresolved-large-state`を区別する。
+- `AuthoritativeSource`: `state / spec-index / required-spec / contract / progress / feedback / guidance / package-manifest`。各sourceは`inspected / excluded / uninspected / not-found`と固有reasonを持つ。
+- `CurrentBundle`: 同じCurrent SprintのDecision、Execution、ValidationとEvidence locatorを一つに束ねる。state=`orchestrator-execution-truth`、contract=`requirements`、progress=`generator-self-report`、feedback=`evaluator-validation`を固定roleとする。
+- `LaneCoverage`: authoritative／genericごとのlimit、used bytes／files／entries、partial、reason、digest。`truncated`だけを完全coverageと表現しない。
+- `ValidationState`: feedback absentは`evaluation-not-yet-recorded`、読めない場合はreason付きunknown、FAIL／PASSはfeedbackで実際に観測した場合だけ設定する。
+
+fallbackはstate内の明示Next Plannedまたはboundedに解決できる直近記録だけを根拠つき・`inferred=true`・`partial=true`で使う。曖昧またはunsafeならbundleを確定しない。tracked Clarity dataには正本本文やabsolute pathを複製せず、repo-relative locator、digest、短いsummary、観測時刻だけを持つ。

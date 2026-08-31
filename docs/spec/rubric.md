@@ -116,6 +116,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 43. **Clarity Hookとmanual fallback**: 未初期化、linked、disabled、trust未承認、通常Bash、他Skill、`material=false`、同時Stopを実行する。runtime-only observationは許すがcanonical／external write、semantic route、nonmaterial checkpoint、他Skill Hookは0件で、手動status／review／checkpointが動く。
 44. **Xmind provider選択**: 既定OFF、capable MCP、MCP unavailable／capability不足／失敗、local指定、承認、拒否を操作し、MCP-first、local preview、明示承認、fixed visual、無承認write 0、未検証の非昇格を確認する。
 45. **link／sync／Driftとtask協働**: reciprocal handshake、pull-only、authority conflict、possible／confirmed Drift、明示task委譲を操作する。相手root write、暗黙push、last-write-wins、自動task化、memory二重保存、Harness state置換を0件にする。
+46. **Harness包括scan／Windows native**: 2 MiB超Harness、non-Harness、Current valid／TBD／missing／invalid、feedback absent、巨大state、Secret／binary／symlink／permission／missingを実fixtureで操作する。authoritative／generic lane、4 role、Current bundle、partial reason、preview／apply安全を確認し、Windows nativeでdrive／backslash／空白／日本語／CRLF、collision／reserved／invalid／prefix sibling、symlink／junction別capabilityを実行する。既存Yasashii workflowのNode 22、0.9.2回帰、10分timeoutとexact candidate因果runを確認し、SKIP／NOT-RUNや上流PASSをYasashii PASSへ数えない。
 
 個人化された文面の完全一致はassertしない。設定の読込、許可された分岐、既定へのフォールバック、確認フローを評価する。
 
@@ -148,6 +149,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 | C23 | link・sync・Drift | reciprocal identity、authority、pull-only、conflict、cross-root write 0 | **5** |
 | C24 | projection・Xmind | deterministic Markdown／Mermaid、MCP-first、承認付きlocal fallback、fixed visual | ≥4 |
 | C25 | Yasashii安全・統合・handoff | generic storage、Projects分離、overlay、17／62、250＋20＋4＋4、固定receipt | **5** |
+| C26 | Clarity包括scan・Windows native | reserved lane、正本意味、coverage、generic無回帰、Windows native、因果CI | **5** |
 
 ## スコアアンカー
 
@@ -283,6 +285,11 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 - 5: public17→Yasashii17と62 behaviorが一対一で、generic `secretary/projects/open/<project>/clarity/`だけへ保存する。Projects lifecycleとClarity責務、task明示委譲、memory重複防止、Harness state非置換、自動update／connector 0が成立する。固定public／private tuple、private PASS receipt、Yasashii prewrite receipt、path role、actual action／diff、protected snapshotが一致し、Yasashii copy／style／identity／overlay／`harness@yasashii-harness`を保護する。同一candidateのprimary 250／CLX20／XV4／E2E4、source／clean／Git-free、既存回帰が0 FAILである。
 - 4以下: behavior欠落／重複、private `05/02/10_sources/Notion`混入、generic storage以外へのwrite、project lifecycle乗取り、自動task化、memory二重保存、Harness state置換、自動connector／update、fixed tuple／receipt不一致、role overlap／未分類／stale、Yasashii固有surface変化、公開`evaluatorPass=true`化、release／cache／live昇格、必須case未実行／FAILが1件でもある。→不合格。
 
+### C26 Clarity包括scan・Windows native【ゼロ許容】
+
+- 5: genericが2 MiB上限へ達してもauthoritative reserved laneがstate、必要spec、Current contract／progress／feedback、guidance／packageを先にbounded readする。4 roleを混同せず一つのCurrent bundleへまとめ、valid／TBD／missing／invalid／巨大state、feedback absent／unreadable、Secret／binary／symlink／permission／missing、truncated／partialを固有coverageで返す。非Harness generic意味、Patch 002 alias／identity、preview／cancel write 0、synthetic apply所有path、Git／network不変を維持する。Windows nativeでpath／CRLF／collision／reserved／invalid／prefix sibling／symlink／junctionを実行し、既存workflowの`windows-native`、Node 22、0.9.2回帰、10分timeout、exact candidate因果runが0 FAIL。`yasashii-HS-001〜016`は意味・Severity・F77単一割当を守り、public／private／Fable PASS、SKIP／NOT-RUN、別OS模擬を流用しない。
+- 4以下: authoritative正本の取りこぼし、progressからPASS推測、過去fileの大量Item化、coverage誤表示、unbounded read、非Harness回帰、Secret／path／Git境界違反、Windows native未実行、capability不足のPASS化、workflow既存条件の破壊、上流PASS流用、Case重複／欠落／Severity弱体化が1件でもある。→不合格。
+
 ## Project Clarity Yasashiiの検証方法（safe harbor）
 
 - `docs/spec/clarity.md`の17機能／62 behavior単一割当を正本とし、同一candidateへprimary 250、CLX 20、XV 4、E2E 4を対応づける。case本文、Severity、期待副作用、conditional NOT-RUNの意味を固定public candidateから緩和しない。
@@ -291,6 +298,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 - Hookはhost eventごとのpayload normalization、runtime observation、material、canonical／external write、semantic route、checkpoint、timingを記録する。実host live未実施はNOT-RUNとし、1 hostの結果を他へ流用しない。
 - UI／projectionは生成Markdown、raw Mermaidまたはrender、Xmind adapter request／response、承認済み隔離local `.xmind` validationを証拠にできる。実Xmind MCP／local writeを合格のために自動実行せず、fakeをverifiedへしない。
 - command、exit code、case ID、期待／観測、fixture root、前後digest、PASS／FAIL／NOT-RUN理由、candidate identityがあれば十分とする。新しいcollector／統一attestation、実顧客data、無許可network／release／cache／liveを追加条件にしない。
+- Sprint 043 Patch 003では、lane別limit／usage／coverage／partial reason、4 role／fallback、Current bundle／Evidence locator、before／after tree・Git・network、Windows capability／workflow run、actual path／action／digest、overlay二回目差分、source／clean／Git-free結果をsafe harborとする。browser screenshotはUI変更がないため不要である。
 
 ## スプリント別の重点
 
@@ -337,6 +345,7 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 | 041 | fixed public／private tuple、private PASS receipt、`yasashii-prewrite-only`、path role、protected snapshot、unknown／mismatch／falsy／dirty／tamper fail-closed、PASS前製品write 0、Yasashii prewrite receipt |
 | 042 | public F64〜F80→Yasashii F60〜F76、62 behavior、generic storage、Projects／Clarity責務、Hook 3 path byte-sync、Xmind OFF／MCP-first／local承認、task／memory／build／update協働、overlay／identity保護 |
 | 043 | exact same candidate、source／clean／Git-free、17／62 matrix、primary 250＋CLX20＋XV4＋E2E4、全回帰、fresh独立評価、source handoff／receipt、external／live NOT-RUN |
+| 043-patch-003 | F77、yasashii-HS-001〜016、Harness reserved lane、Current 4 role bundle、honest coverage、generic／alias／Git安全、Yasashii Windows native、actual path分類、source／clean／Git-free、既存PR #12因果CI |
 
 ## 差し戻し分類
 
@@ -347,6 +356,8 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 - active Sprintでの基準厳格化、緩和、Non-scope化はPlanner提案とユーザー承認を要する。契約済み証拠形式を満たす限り、Evaluatorは別の統一attestation基盤を追加の必須条件にしない。
 
 ## 更新履歴
+
+- 2026-08-31: Sprint 043 Patch 003としてF77、検証方法46、C26、`yasashii-HS-001〜016`を追加した。public／private Patch004の意味を上流入力にしつつ、Yasashii固有のsingle Feature割当、reserved lane、4 role、partial coverage、Windows native／既存workflow／因果CI、上流PASS非継承を固定した。
 
 - 2026-08-29: private Project Clarityのfresh PASS receiptとユーザー承認に基づき、Yasashii版F60〜F76、62 behavior、C20〜C25、Sprint 041〜043を追加した。generic storage、Clarity専用command-only Hook、Xmind既定OFF／MCP-first／local明示承認、fixed visual、primary 250＋CLX20＋XV4＋E2E4、public `evaluatorPass=false`、release／cache／live NOT-RUNを固定した。
 

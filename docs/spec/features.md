@@ -490,7 +490,7 @@ Yasashiiへの入力は、固定base `3c472dd9a2b5299f27741ae2c418094486b7d035`�
 Yasashii固有の文体、copy、style、`edition.json`、overlay正本／metadata、README、LICENSE、repo-owned docs、
 Harness履歴を保護し、公開版のPASSをYasashii版へ昇格しない。
 
-## Project Clarity Yasashii（F60〜F76）
+## Project Clarity Yasashii（F60〜F77）
 
 固定public candidateの17機能／62 behavior bulletをYasashiiへ一対一で対応させる。全62件の単一割当ID、件数内訳、公開版との対応は[clarity.md](clarity.md)を正本とし、この節は利用者から見た機能の索引とする。
 
@@ -562,6 +562,12 @@ Skill、Hook、host inventory、manifest、marketplace metadata、archive／clea
 
 secretary、projects、daily、weekly、task collaboration、memory-care、build、update、onboarding、templates、rules、host／release inventory、edition handoffを実内容で棚卸しする。各surfaceのread／write／delegate／no-touchと正本を明示し、自動task化、memory二重保存、Harness state置換、自動update／connectorを負検査する。（4 behavior）
 
+### F77 Harness正本優先の包括scanとWindows native互換
+
+Harness Repoのinit previewは、一般scanの2 MiB上限と独立したreserved laneで`docs/sprints/state.md`、`docs/spec.md`と必要spec、Current contract／progress／feedback、`AGENTS.md`、`CLAUDE.md`、package manifestを先にbounded readする。state／contract／progress／feedbackの意味を混ぜず、一つのCurrent bundleへまとめ、valid／TBD／missing／invalid／巨大stateと、feedback absent／unreadable、Secret／binary／symlink／permission／missing、truncated／partialを理由つきcoverageで示す。authoritative lane後の残余budgetでgeneric scanを続け、非Harness Repoの既存意味は変えない。
+
+同じ挙動をWindows nativeでdrive letter、backslash、空白、日本語、CRLF、case collision、reserved／invalid path、prefix sibling、symlink／junction別capabilityまで検証する。preview／cancelはwrite 0、synthetic applyは所有path限定、Git／remote／network不変とし、既存ancestor alias安全境界を維持する。Yasashiiの既存Windows workflow、0.9.2回帰、Node 22、10分timeoutへ実在suiteを結線し、SKIP／NOT-RUN、public／private PASS、別OS模擬をYasashii PASSへ数えない。
+
 ## Gテーマと機能の対応
 
 | テーマ | 主な機能 |
@@ -579,4 +585,4 @@ secretary、projects、daily、weekly、task collaboration、memory-care、build
 | G11 | F30 F31 F36 F40 F41 F42 F43 F44 F45 F46 F47 F48 F49 F50 F51 F52 F53 F54 F55 F56 F57 F58 |
 | G12 | F04 F16 F20 F41 F42 F49 F55 F57 F58 |
 | G13 | F05 F07 F12 F44 F49 F59 |
-| G14 | F28 F51 F52 F54 F60 F61 F62 F63 F64 F65 F66 F67 F68 F69 F70 F71 F72 F73 F74 F75 F76 |
+| G14 | F28 F51 F52 F54 F60 F61 F62 F63 F64 F65 F66 F67 F68 F69 F70 F71 F72 F73 F74 F75 F76 F77 |
