@@ -37,3 +37,17 @@ jobs:
       - name: Yasashii Clarity Harness scan and Windows native regression
         shell: pwsh
         run: node scripts/sprint-043-patch-003-test.mjs --require-windows
+      - name: Preserve exact reviewed candidate (no worktree or Git credentials)
+        if: always()
+        shell: pwsh
+        run: |
+          git archive --format=zip --output="$env:RUNNER_TEMP/clarity-review-candidate.zip" HEAD
+          if ($LASTEXITCODE -ne 0) { throw "candidate-archive-failed" }
+      - name: Upload candidate for independent diagnosis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clarity-review-candidate-${{ github.run_id }}
+          path: ${{ runner.temp }}/clarity-review-candidate.zip
+          retention-days: 3
+          if-no-files-found: error
