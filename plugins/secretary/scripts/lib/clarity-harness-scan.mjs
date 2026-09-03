@@ -5,7 +5,7 @@ import { basename, extname, isAbsolute, join, relative, resolve, sep, win32 } fr
 // agentic-secretary:clarity-harness-authoritative-scan:v1
 export const HARNESS_SCAN_LIMITS = Object.freeze({
   maxReadBytes: 512 * 1024,
-  maxFiles: 16,
+  maxFiles: 24,
   maxEntries: 32,
   maxFileBytes: 96 * 1024,
   maxStateSectionBytes: 128 * 1024,
@@ -293,9 +293,14 @@ function parseState(source) {
 
 function parseSpecReferences(source) {
   if (source.coverage !== "inspected") return [];
+  const references = [];
+  const referencePattern = /(?:(?<!`)`((?:docs\/)?spec\/[a-z0-9_.-]+\.md)`(?!`)|\((?:\.\/)?((?:docs\/)?spec\/[a-z0-9_.-]+\.md)\))/giu;
+  for (const match of source.content.matchAll(referencePattern)) {
+    const referenced = normalizeRelative(match[1] || match[2]);
+    references.push({ index: match.index, path: referenced.startsWith("docs/") ? referenced : `docs/${referenced}` });
+  }
   const paths = [];
-  for (const match of source.content.matchAll(/\((?:\.\/)?(spec\/[a-z0-9_.-]+\.md)\)/giu)) {
-    const path = `docs/${normalizeRelative(match[1])}`;
+  for (const { path } of references.sort((left, right) => left.index - right.index)) {
     if (!paths.includes(path)) paths.push(path);
     if (paths.length >= HARNESS_SCAN_LIMITS.maxSpecReferences) break;
   }
