@@ -129,6 +129,11 @@ try {
   record("yasashii-HS-001", "PASS", "reserved-lane-before-generic", () => {
     assert.equal(baseReport.harness.detection.kind, "harness");
     assert.equal(baseReport.lanes.generic.partial, true);
+    assert(baseReport.lanes.implementation.inspected.some((row) => row.path.startsWith("src/")));
+    assert(baseReport.lanes.implementation.bytesRead > 0);
+    assert(baseReport.lanes.implementation.bytesRead <= baseReport.lanes.implementation.limits.maxReadBytes);
+    assert(baseReport.inspected.findIndex((row) => row.path.startsWith("src/")) < baseReport.inspected.findIndex((row) => row.path.startsWith("scripts/")));
+    assert.equal(new Set(baseReport.inspected.map((row) => row.path)).size, baseReport.inspected.length);
     for (const role of ["orchestrator-execution-truth", "requirements", "generator-self-report", "evaluator-validation"]) assert.equal(source(baseReport, role).coverage, "inspected");
     assert.deepEqual(baseReport.harness.sources.filter((row) => row.role === "requirements-reference").map((row) => [row.path, row.coverage]), [
       ["docs/spec/product.md", "inspected"], ["docs/spec/features.md", "inspected"], ["docs/spec/constraints.md", "inspected"],

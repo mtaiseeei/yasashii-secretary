@@ -42,6 +42,12 @@ export const CLARITY_LIMITS = Object.freeze({
   maxCandidates: 24,
   maxReportRows: 80,
 });
+const IMPLEMENTATION_SCAN_LIMITS = Object.freeze({
+  maxEntries: 120,
+  maxFiles: 48,
+  maxReadBytes: 512 * 1024,
+});
+const implementationRootNames = new Set(["app", "lib", "src"]);
 
 const decisionStatuses = new Set(["unknown", "exploring", "proposed", "confirmed", "rejected", "superseded"]);
 const executionStatuses = new Set(["unknown", "not_started", "in_progress", "implemented", "verified", "operational", "rolled_back"]);
@@ -1083,53 +1089,88 @@ function scanGenericRepository(rootValue, { excludeHarnessState = false } = {}) 
     uninspected: [],
     candidates: [],
   };
-  const queue = [root];
-  while (queue.length) {
-    const dir = queue.shift();
-    let entries;
-    try { entries = readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name, "en")); }
-    catch { reportRow(report, "uninspected", { path: dir === root ? "." : relativePath(root, dir), reason: "directory-unreadable" }); continue; }
-    for (const entry of entries) {
-      if (report.entriesSeen >= CLARITY_LIMITS.maxEntries || report.filesRead >= CLARITY_LIMITS.maxFiles || report.bytesRead >= CLARITY_LIMITS.maxReadBytes) {
-        report.truncated = true;
-        reportRow(report, "uninspected", { path: dir === root ? "." : relativePath(root, dir), reason: "scan-limit-reached" });
-        queue.length = 0;
-        break;
+  const implementation = {
+    limits: { ...IMPLEMENTATION_SCAN_LIMITS }, entriesSeen: 0, filesRead: 0, bytesRead: 0,
+    inspected: [], excluded: [], uninspected: [], omittedReportRows: 0, partial: false, partialReasons: [],
+  };
+  let globalLimitReached = false;
+  const addRow = (lane, bucket, row) => {
+    reportRow(report, bucket, row);
+    if (lane) reportRow(lane, bucket, row);
+  };
+  const scanQueue = (initial, lane = null, { skipImplementationRoots = false } = {}) => {
+    const queue = [...initial];
+    while (queue.length) {
+      const dir = queue.shift();
+      let entries;
+      try { entries = readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name, "en")); }
+      catch { addRow(lane, "uninspected", { path: dir === root ? "." : relativePath(root, dir), reason: "directory-unreadable" }); continue; }
+      for (const entry of entries) {
+        if (lane && (lane.entriesSeen >= lane.limits.maxEntries || lane.filesRead >= lane.limits.maxFiles || lane.bytesRead >= lane.limits.maxReadBytes)) {
+          lane.partial = true;
+          lane.partialReasons.push("implementation-lane-limit");
+          addRow(lane, "uninspected", { path: relativePath(root, dir), reason: "implementation-lane-limit" });
+          return;
+        }
+        if (report.entriesSeen >= CLARITY_LIMITS.maxEntries || report.filesRead >= CLARITY_LIMITS.maxFiles || report.bytesRead >= CLARITY_LIMITS.maxReadBytes) {
+          globalLimitReached = true;
+          addRow(lane, "uninspected", { path: dir === root ? "." : relativePath(root, dir), reason: "scan-limit-reached" });
+          return;
+        }
+        report.entriesSeen += 1;
+        if (lane) lane.entriesSeen += 1;
+        const absolute = join(dir, entry.name);
+        const rel = relativePath(root, absolute);
+        if (excludeHarnessState && rel === "docs/sprints/state.md") { addRow(lane, "excluded", { path: rel, reason: "harness-authoritative-source" }); continue; }
+        if (entry.isSymbolicLink()) { addRow(lane, "excluded", { path: rel, reason: "symlink-not-followed" }); continue; }
+        if (entry.isDirectory()) {
+          if (skipImplementationRoots && dir === root && implementationRootNames.has(entry.name.toLowerCase())) continue;
+          if (excludedDirectories.has(entry.name) || entry.name.startsWith(".clarity-init-")) addRow(lane, "excluded", { path: rel, reason: "excluded-directory" });
+          else queue.push(absolute);
+          continue;
+        }
+        if (!entry.isFile()) { addRow(lane, "excluded", { path: rel, reason: "non-regular-file" }); continue; }
+        if (sensitiveNamePattern.test(rel)) { addRow(lane, "excluded", { path: rel, reason: "sensitive-name" }); continue; }
+        let size;
+        try { size = statSync(absolute).size; } catch { addRow(lane, "uninspected", { path: rel, reason: "stat-failed" }); continue; }
+        if (size > CLARITY_LIMITS.maxFileBytes) { addRow(lane, "excluded", { path: rel, reason: "file-too-large", size }); continue; }
+        if (lane && lane.bytesRead + size > lane.limits.maxReadBytes) {
+          lane.partial = true;
+          if (!lane.partialReasons.includes("implementation-lane-limit")) lane.partialReasons.push("implementation-lane-limit");
+          addRow(lane, "uninspected", { path: rel, reason: "implementation-lane-limit", size });
+          continue;
+        }
+        let bytes;
+        try { bytes = readFileSync(absolute); } catch { addRow(lane, "uninspected", { path: rel, reason: "file-unreadable" }); continue; }
+        if (looksBinary(bytes, rel)) { addRow(lane, "excluded", { path: rel, reason: "binary" }); continue; }
+        report.filesRead += 1;
+        report.bytesRead += bytes.length;
+        if (lane) { lane.filesRead += 1; lane.bytesRead += bytes.length; }
+        const content = bytes.toString("utf8");
+        if (containsSecret(content)) { addRow(lane, "excluded", { path: rel, reason: "secret-like-content" }); continue; }
+        addRow(lane, "inspected", { path: rel, size: bytes.length });
+        if (report.candidates.length >= CLARITY_LIMITS.maxCandidates) continue;
+        const classification = classifyCandidate(rel, content);
+        if (!classification) continue;
+        report.candidates.push({
+          path: rel,
+          title: titleFrom(content, rel),
+          contentDigest: sha256(bytes),
+          ...classification,
+        });
       }
-      report.entriesSeen += 1;
-      const absolute = join(dir, entry.name);
-      const rel = relativePath(root, absolute);
-      if (excludeHarnessState && rel === "docs/sprints/state.md") { reportRow(report, "excluded", { path: rel, reason: "harness-authoritative-source" }); continue; }
-      if (entry.isSymbolicLink()) { reportRow(report, "excluded", { path: rel, reason: "symlink-not-followed" }); continue; }
-      if (entry.isDirectory()) {
-        if (excludedDirectories.has(entry.name) || entry.name.startsWith(".clarity-init-")) reportRow(report, "excluded", { path: rel, reason: "excluded-directory" });
-        else queue.push(absolute);
-        continue;
-      }
-      if (!entry.isFile()) { reportRow(report, "excluded", { path: rel, reason: "non-regular-file" }); continue; }
-      if (sensitiveNamePattern.test(rel)) { reportRow(report, "excluded", { path: rel, reason: "sensitive-name" }); continue; }
-      let size;
-      try { size = statSync(absolute).size; } catch { reportRow(report, "uninspected", { path: rel, reason: "stat-failed" }); continue; }
-      if (size > CLARITY_LIMITS.maxFileBytes) { reportRow(report, "excluded", { path: rel, reason: "file-too-large", size }); continue; }
-      let bytes;
-      try { bytes = readFileSync(absolute); } catch { reportRow(report, "uninspected", { path: rel, reason: "file-unreadable" }); continue; }
-      if (looksBinary(bytes, rel)) { reportRow(report, "excluded", { path: rel, reason: "binary" }); continue; }
-      report.filesRead += 1;
-      report.bytesRead += bytes.length;
-      const content = bytes.toString("utf8");
-      if (containsSecret(content)) { reportRow(report, "excluded", { path: rel, reason: "secret-like-content" }); continue; }
-      reportRow(report, "inspected", { path: rel, size: bytes.length });
-      if (report.candidates.length >= CLARITY_LIMITS.maxCandidates) continue;
-      const classification = classifyCandidate(rel, content);
-      if (!classification) continue;
-      report.candidates.push({
-        path: rel,
-        title: titleFrom(content, rel),
-        contentDigest: sha256(bytes),
-        ...classification,
-      });
     }
-  }
+  };
+  let rootEntries = [];
+  try { rootEntries = readdirSync(root, { withFileTypes: true }); } catch { /* root scan below records the failure */ }
+  const implementationRoots = rootEntries
+    .filter((entry) => entry.isDirectory() && implementationRootNames.has(entry.name.toLowerCase()))
+    .sort((left, right) => left.name.localeCompare(right.name, "en"))
+    .map((entry) => join(root, entry.name));
+  scanQueue(implementationRoots, implementation);
+  if (!globalLimitReached) scanQueue([root], null, { skipImplementationRoots: true });
+  report.truncated = globalLimitReached || implementation.partial;
+  report.implementationLane = implementation;
   if (!report.candidates.length) {
     const fallback = report.inspected[0];
     if (fallback) report.candidates.push({ path: fallback.path, title: basename(fallback.path), contentDigest: sha256(fallback.path), kind: "repository-area", source: "file", decisionStatus: "unknown", humanConfirmed: false });
@@ -1170,6 +1211,7 @@ function scanRepositoryImpl(rootValue) {
     },
     lanes: {
       authoritative: authoritative.lane,
+      implementation: generic.implementationLane,
       generic: {
         limits: generic.limits,
         entriesSeen: generic.entriesSeen,

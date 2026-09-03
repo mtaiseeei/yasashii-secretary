@@ -584,7 +584,7 @@
           "token": "agentic-secretary:clarity-root-policy:v1"
         }
       ],
-      "contentDigest": "792c67c9a6ae1caa813fc3ca002d0934c9e51b6a0c084f41c24c0dbd1174615f",
+      "contentDigest": "c54e6fdacc87a79e5b4781e5def351762396b7f00928588b91cf3e7a2fc5b32e",
       "tests": [
         "yasashii-AR-001",
         "yasashii-AR-002",
@@ -628,7 +628,7 @@
           "token": "agentic-secretary:clarity-harness-authoritative-scan:v1"
         }
       ],
-      "contentDigest": "bb18b1a7cc72c057a201164a415d61c68a8c493c8ff75b2ce670ebbc5b35b3b1",
+      "contentDigest": "496f96cc2e208f505893b34b63da112b3cb2968ea5530cdb263f94342ae24b15",
       "tests": [
         "yasashii-HS-001",
         "yasashii-HS-002",
