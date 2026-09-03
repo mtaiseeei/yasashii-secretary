@@ -49,7 +49,7 @@ import { applyDrift, commitClarityOwned, recordDriftWaiver } from "./lib/clarity
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { safeWritePath } from "./lib/safe-fs.mjs";
-import { resolveClarityRoot, rootPolicyFor, withClarityRootRequest } from "./lib/clarity-root.mjs";
+import { resolveClarityRoot, rootPolicyFor, serializeClarityCliFailure, withClarityRootRequest } from "./lib/clarity-root.mjs";
 
 function usage(message = "") {
   const prefix = message ? `${message}\n\n` : "";
@@ -150,7 +150,8 @@ function render(command, result, json) {
           const status = role.status === "not-recorded" ? "評価記録はまだありません" : `${role.status} / ${role.coverage}${role.reason ? `（${role.reason}）` : ""}`;
           process.stdout.write(`  - ${label}: ${status}\n`);
         }
-        process.stdout.write(`- Harness正本枠: ${authoritative?.bytesRead || 0}/${authoritative?.limits?.maxReadBytes || 0} bytes、確認${authoritative?.inspected?.length || 0}／除外${authoritative?.excluded?.length || 0}／未確認${authoritative?.uninspected?.length || 0}／不存在${authoritative?.notFound?.length || 0}、partial=${Boolean(authoritative?.partial)}\n`);
+        const authoritativeUsage = authoritative?.redactedUsage ? `最大${authoritative?.bytesReadAtMost || authoritative?.limits?.maxReadBytes || 0} bytes（機密本文の長さは非表示）` : `${authoritative?.bytesRead || 0}/${authoritative?.limits?.maxReadBytes || 0} bytes`;
+        process.stdout.write(`- Harness正本枠: ${authoritativeUsage}、確認${authoritative?.inspected?.length || 0}／除外${authoritative?.excluded?.length || 0}／未確認${authoritative?.uninspected?.length || 0}／不存在${authoritative?.notFound?.length || 0}、partial=${Boolean(authoritative?.partial)}\n`);
         process.stdout.write(`- 一般scan枠: ${generic?.bytesRead || 0}/${generic?.limits?.maxReadBytes || 0} bytes、確認${generic?.inspected?.length || 0}／除外${generic?.excluded?.length || 0}／未確認${generic?.uninspected?.length || 0}、partial=${Boolean(generic?.partial)}\n`);
       } else if (preview.scan?.harness?.detection?.kind && preview.scan.harness.detection.kind !== "non-harness") {
         process.stdout.write(`- Harness判定: ${preview.scan.harness.detection.kind}（${preview.scan.harness.detection.reason}）\n`);
@@ -353,14 +354,7 @@ try {
   });
 } catch (error) {
   const known = error instanceof ClarityError || typeof error?.code === "string";
-  const output = {
-    ok: false,
-    code: known ? error.code : "unexpected-error",
-    message: error instanceof Error ? error.message : String(error),
-    changed: error?.details?.changed ?? false,
-    nextAction: error?.details?.nextAction || "原因を確認し、変更前の状態を保ったまま再実行してください",
-    ...(known && Object.keys(error.details || {}).length ? { details: error.details } : {}),
-  };
+  const output = serializeClarityCliFailure(error);
   process.stderr.write(`${JSON.stringify(output, null, 2)}\n`);
   process.exit(known ? (error.exitCode || 3) : 3);
 }

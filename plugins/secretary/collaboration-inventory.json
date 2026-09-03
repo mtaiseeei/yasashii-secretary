@@ -93,7 +93,7 @@
           "token": "yasashii-secretary:clarity-collaboration:projects:v1"
         }
       ],
-      "contentDigest": "f40b5e7b8fefb076fbac3beb3adfef9b4fe41bb60218318f67a21b02c5cb2963",
+      "contentDigest": "bcef5f685646192c52564bc98e726a42d29f0f0ecff6bddf2b97c00509a347f8",
       "tests": [
         "CLX-002",
         "CLX-003",
@@ -126,7 +126,7 @@
           "token": "yasashii-secretary:clarity-collaboration:daily:v1"
         }
       ],
-      "contentDigest": "72fe3794891032533cdaa2cabe490c6c040bf7bd5529cfbdf491db06ffcb2cea",
+      "contentDigest": "68c2c67e3d2fd17d422d3b4071ab47b04389b0d2199cfce363b2268d3d380103",
       "tests": [
         "CLX-007"
       ],
@@ -154,7 +154,7 @@
           "token": "yasashii-secretary:clarity-collaboration:weekly:v1"
         }
       ],
-      "contentDigest": "696b2f14a785da10970830d91b34b32c9a71153c00719dfd0f430cb433710679",
+      "contentDigest": "483579fe49c6e7e3c2a059c605ebbd469320a02bf7885d7dd7287ce2c7d1aec5",
       "tests": [
         "CLX-008"
       ],
@@ -183,7 +183,7 @@
           "token": "yasashii-secretary:clarity-collaboration:projects:v1"
         }
       ],
-      "contentDigest": "71426b28d54f216b4a0a354de66462e53a853f7a8bac332196f436acb726fc7c",
+      "contentDigest": "0c6f7bd443d26475e29932ab4bd4399e92cd483534a4f61ab6485566a9bcfdec",
       "tests": [
         "CLX-009",
         "CLX-010"
@@ -447,7 +447,7 @@
           "token": "agentic-secretary:clarity-collaboration:hook:v1"
         }
       ],
-      "contentDigest": "9dff9fce3cd83b1d8d8a1bddd7a9bd2bde5bfd7ecbd0467b8b426d4e95421771",
+      "contentDigest": "5d5bb08f6ac9c336a5f8f12b213678d12966afa0e619f897232d9565f2b81373",
       "tests": [
         "CLX-019"
       ],
@@ -541,7 +541,7 @@
           "token": "yasashii-secretary:canonical-repo-observation:v1"
         }
       ],
-      "contentDigest": "928b1590f14f0f4f300a36ece410728167dd67f81bd8bf59b66eb961a39b17c4",
+      "contentDigest": "778d5ee0d904e23805a4388daec4a0d21822743cf5b8edcd57a38a14151e7cce",
       "tests": [
         "yasashii-CF-001",
         "yasashii-CF-002",
@@ -584,7 +584,7 @@
           "token": "agentic-secretary:clarity-root-policy:v1"
         }
       ],
-      "contentDigest": "4274ee1cc7716c7f39b21a9f30a400e1733dd2ff88b6d6c5752d526c4c544421",
+      "contentDigest": "792c67c9a6ae1caa813fc3ca002d0934c9e51b6a0c084f41c24c0dbd1174615f",
       "tests": [
         "yasashii-AR-001",
         "yasashii-AR-002",
@@ -628,7 +628,7 @@
           "token": "agentic-secretary:clarity-harness-authoritative-scan:v1"
         }
       ],
-      "contentDigest": "6be2d1b858f45a45a9b2576784c528f2d3168b373bdd369d0bc0dff3fa38278d",
+      "contentDigest": "2b2c33b568fdd0724bde1a981d6222ead41a54fa70405dc9af41da76bd29f860",
       "tests": [
         "yasashii-HS-001",
         "yasashii-HS-002",

@@ -8,6 +8,7 @@ import {
   attention,
   findCanonicalItem,
   history,
+  inspectRepoIdentity,
 } from "./clarity-core.mjs";
 import { runExternalSync } from "./external-ops.mjs";
 import { resolveClarityRoot, withClarityRootObservation } from "./clarity-root.mjs";
@@ -237,8 +238,8 @@ function recordDriftWaiverImpl(rootValue, input, { apply = false } = {}) {
 function commitClarityOwnedImpl(rootValue, { message = "Project Clarity checkpoint", apply = false } = {}) {
   const root = resolveClarityRoot(rootValue).root;
   const safeMessage = line(message, "commit message", 160);
-  const top = git(root, ["rev-parse", "--show-toplevel"])?.trim();
-  fail(top && resolve(top) === root, "clarity-commit-non-git", "Clarity commitはGit top-levelでだけ実行できます。");
+  const repoIdentity = inspectRepoIdentity(root);
+  fail(repoIdentity.kind === "git", "clarity-commit-non-git", "Clarity commitはGit top-levelでだけ実行できます。");
   const changedText = git(root, ["diff", "--name-only", "HEAD", "--", ".clarity", "CLARITY.md"]);
   const changedPaths = String(changedText || "").split(/\r?\n/u).filter(Boolean).sort();
   for (const path of changedPaths) {

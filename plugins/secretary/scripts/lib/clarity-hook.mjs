@@ -468,8 +468,12 @@ export function serializeHookResult(host, event, result) {
   return event === "Stop" ? {} : null;
 }
 
-export function serializeHookFailure(host, event) {
-  const message = "Project Clarity Hookはdegradedです。canonical dataは変更していません。manualの clarity status / review / checkpoint / doctorを使い、Codexでは /hooks でtrust／disabled状態を確認してください。";
+export function serializeHookFailure(host, event, error = null) {
+  const safeCode = ["clarity-root-changed", "clarity-git-config-unsupported"].includes(error?.code) ? error.code : null;
+  const reason = safeCode && /^[a-z0-9-]+$/u.test(error?.details?.reason || "")
+    ? `（${safeCode} / reason: ${error.details.reason} / changed:false）`
+    : "";
+  const message = `Project Clarity Hookはdegradedです${reason}。canonical dataは変更していません。manualの clarity status / review / checkpoint / doctorを使い、Codexでは /hooks でtrust／disabled状態を確認してください。`;
   if (event === "SessionStart") return { systemMessage: message, hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: message } };
   if (event === "Stop") return { systemMessage: message };
   return { systemMessage: message };

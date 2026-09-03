@@ -28,7 +28,7 @@ try {
   const output = serializeHookResult(normalized.host, normalized.event, semantic);
   if (output) process.stdout.write(`${JSON.stringify(output)}\n`);
   });
-} catch {
-  const output = serializeHookFailure(normalized.host, normalized.event);
+} catch (error) {
+  const output = serializeHookFailure(normalized.host, normalized.event, error);
   process.stdout.write(`${JSON.stringify(output)}\n`);
 }

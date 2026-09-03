@@ -356,7 +356,11 @@ function observeCanonicalRepoImpl(record) {
     if ((mode & 0o555) === 0) return { ...base, sourceKind: "local-checkout", availability: "unreadable", reason: "canonical-repo-unreadable" };
     const repoIdentity = inspectRepoIdentity(root);
     const git = canonicalGit(root);
-    const firstFile = safeCanonicalFile(root, pointer.firstFile);
+    const firstFile = safeCanonicalFile(root, pointer.firstFile, {
+      maxBytes: pointer.firstFile === "docs/sprints/state.md"
+        ? CANONICAL_METADATA_MAX_BYTES
+        : CANONICAL_ENTRY_MAX_BYTES,
+    });
     const clarity = canonicalClarity(root);
     const reports = [firstFile, ...clarity.reports];
     const inspected = reports.filter((row) => row.inspected).map(({ parsed: _parsed, ...row }) => row);
