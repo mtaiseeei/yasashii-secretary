@@ -302,14 +302,49 @@ function parseSpecReferences(source) {
   return paths;
 }
 
+function structuredFeedbackVerdict(content) {
+  const values = [];
+  let fenced = null;
+  let inComment = false;
+  for (const rawLine of String(content ?? "").split(/\r?\n/u)) {
+    let line = rawLine;
+    while (line.length > 0) {
+      if (inComment) {
+        const end = line.indexOf("-->");
+        if (end < 0) { line = ""; break; }
+        line = line.slice(end + 3);
+        inComment = false;
+        continue;
+      }
+      const start = line.indexOf("<!--");
+      if (start < 0) break;
+      const end = line.indexOf("-->", start + 4);
+      if (end < 0) { line = line.slice(0, start); inComment = true; break; }
+      line = `${line.slice(0, start)}${line.slice(end + 3)}`;
+    }
+    const fenceMatch = line.match(/^ {0,3}(`{3,}|~{3,})/u);
+    if (fenceMatch) {
+      if (!fenced) fenced = { char: fenceMatch[1][0], length: fenceMatch[1].length };
+      else if (fenceMatch[1][0] === fenced.char && fenceMatch[1].length >= fenced.length) fenced = null;
+      continue;
+    }
+    if (fenced) continue;
+    const field = line.match(/^\s*(?:[-*+]\s*)?(?:\*\*|__)?(?:Verdict|判定)(?:\*\*|__)?\s*[:：]\s*(.*?)\s*$/iu);
+    if (!field) continue;
+    const value = field[1].replace(/^[*_`\s]+|[*_`\s]+$/gu, "").trim();
+    if (/^(?:PASS|合格)(?:\s*[（(].*[）)])?$/iu.test(value)) values.push("passed");
+    else if (/^(?:FAIL|不合格)(?:\s*[（(].*[）)])?$/iu.test(value)) values.push("failed");
+    else if (/^verification-scope-issue(?:\s*[（(].*[）)])?$/iu.test(value)) values.push("verification-scope-issue");
+  }
+  const unique = [...new Set(values)];
+  return unique.length === 1 ? unique[0] : "recorded-unclassified";
+}
+
 function roleStatus(source, state) {
   if (source.role === "evaluator-validation" && source.coverage === "not-found" && source.reason === "evaluation-not-yet-recorded") return "not-recorded";
   if (source.coverage !== "inspected") return source.coverage;
   if (source.role === "evaluator-validation") {
-    if (/\bVerdict:\s*\*\*PASS\*\*|\bVerdict:\s*PASS\b/iu.test(source.content)) return "passed";
-    if (/\bVerdict:\s*\*\*FAIL\*\*|\bVerdict:\s*FAIL\b/iu.test(source.content)) return "failed";
-    if (/verification-scope-issue/iu.test(source.content)) return "verification-scope-issue";
-    return "recorded-unclassified";
+    return structuredFeedbackVerdict(source.content);
   }
   if (source.role === "orchestrator-execution-truth") return state.currentStatus || "status-unresolved";
   return "available";
@@ -319,7 +354,8 @@ function executionStatus(status) {
   if (["active"].includes(status)) return "in_progress";
   if (["awaiting-eval"].includes(status)) return "implemented";
   if (["done", "done-by-user-decision"].includes(status)) return "implemented";
-  return "not_started";
+  if (status === "planned") return "not_started";
+  return "unknown";
 }
 
 export function scanHarnessAuthoritative(rootValue) {

@@ -146,6 +146,17 @@ try {
     assert.deepEqual(bundle.roles.map((row) => row.role), ["orchestrator-execution-truth", "requirements", "generator-self-report", "evaluator-validation"]);
     assert.equal(bundle.roles.at(-1).status, "failed");
     assert.equal(baseReport.candidates.filter((row) => row.source === "harness-authoritative").length, 1);
+    const japanese = harnessFixture("clarity-hs003-japanese", { large: false }); cleanup.push(japanese);
+    write(japanese, "docs/feedback/sprint-043-patch-003.md", "# 独立評価\n\n**判定:** 合格\n\n- verification-scope-issueの分類根拠: 該当なし\n");
+    const japaneseReport = scanRepository(japanese);
+    assert.equal(source(japaneseReport, "evaluator-validation").status, "passed");
+    assert.equal(japaneseReport.candidates[0].validationStatus, "passed");
+    const unknown = harnessFixture("clarity-hs003-unknown", { state: "# State\n\n- Current ID: sprint-043-patch-003（状態欄なし）\n- Next Planned: TBD\n", large: false }); cleanup.push(unknown);
+    const unknownReport = scanRepository(unknown);
+    assert.equal(unknownReport.harness.state.currentStatus, null);
+    assert.equal(unknownReport.candidates[0].executionStatus, "unknown");
+    const planned = harnessFixture("clarity-hs003-planned", { state: stateText({ status: "planned" }), large: false }); cleanup.push(planned);
+    assert.equal(scanRepository(planned).candidates[0].executionStatus, "not_started");
   });
 
   record("yasashii-HS-004", "PASS", "feedback-absence-is-not-scan-limit", () => {
