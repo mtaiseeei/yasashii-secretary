@@ -1,0 +1,1281 @@
+{
+  "schemaVersion": 1,
+  "kind": "yasashii-project-clarity-prewrite-receipt",
+  "sprint": "sprint-041",
+  "status": "prewrite-verified",
+  "fixedInputs": {
+    "yasashiiBase": "c6cfb40a6026c5447a8ec4729f517adb4cc51031",
+    "public": {
+      "product": "5f08d454c05576fcff8ab32c10c00887b4c15a96",
+      "treeSha256": "1fbffe636565355b875dcde35ff05d26cd7e15f00710c1c88a563866749037c5",
+      "commonSha256": "4aa6e8d4b21aa9e0020cfaa6edefd5ff0e6640fd2e8f937db00478190142f849",
+      "handoffPath": "/private/tmp/project-clarity-handoff-20260829/ready-handoff.json",
+      "handoffFileSha256": "09c3fa1289fa0af4d31c084a74ab108ce5cf85bcf3b3e7c9320cab72758d83c0",
+      "publicationStatus": "public-user-decision-risk-accepted",
+      "evaluatorPass": false
+    },
+    "private": {
+      "product": "d5598226213004d55781ca033985589907ae7b5d",
+      "tree": "920aea5d09b1aa51fcb5ebe23ab242a538c50445",
+      "feedbackCommit": "556c80117c7a1db8f2dd4eabb997277d47e02a51",
+      "feedbackSha256": "aa502ca0b3b53ece16822edc39b60b9a587b93c15f701ce1ad6578c2b9f47774",
+      "receiptPath": "/private/tmp/agentic-secretary-my-vault-clarity/scripts/fixtures/sprint-050/private-pass-receipt.json",
+      "receiptFileSha256": "bf6893f3891b10b9b86669308e123008f09eae05d6d8330a477eb1614a456745",
+      "receiptInternalSha256": "0aac84a3d1beadcc7820a495205f292c4491e1758c5c9349a8ee523e68e82122",
+      "feedbackVerdict": "PASS"
+    }
+  },
+  "authorization": {
+    "downstreamOrder": [
+      "agentic-secretary-my-vault",
+      "yasashii-secretary"
+    ],
+    "inputPermission": "yasashii-prewrite-only",
+    "writesAuthorized": false,
+    "applyAuthorized": false,
+    "releaseAuthorized": false,
+    "publicPatchAuthorized": false,
+    "nextScope": {
+      "sprint": "sprint-042",
+      "operation": "yasashii-product-apply-only",
+      "authorizedNow": false
+    }
+  },
+  "verification": {
+    "handoff": "PASS",
+    "privateReceipt": "PASS",
+    "fixedBase": "PASS",
+    "sourceBoundary": "PASS",
+    "overlayDeclarations": "PASS",
+    "yasashiiIdentity": "PASS",
+    "publicEvaluatorPassPreserved": true,
+    "privatePassNotPromotedToPublic": true
+  },
+  "pathRoles": {
+    "rows": [
+      {
+        "path": "plugins/secretary/.claude-plugin/plugin.json",
+        "source": "private-required-manifest",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/.claude-plugin/plugin.json",
+          "mode": "100644",
+          "sha256": "e5973cf4014e73d887153fff7b05066dcf5eea993636a4d075f75dfeecdafb52",
+          "size": 429
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/.codex-plugin/plugin.json",
+        "source": "private-required-manifest",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/.codex-plugin/plugin.json",
+          "mode": "100644",
+          "sha256": "28c3a5ec9cb3747a79fc8435e260f8c373214e12a6a8f4659c2186dc2c09fb2d",
+          "size": 1418
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/clarity/schemas/event.schema.json",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "host-neutral-common-core",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/clarity/schemas/evidence.schema.json",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "host-neutral-common-core",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/clarity/schemas/item.schema.json",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "host-neutral-common-core",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/clarity/schemas/project.schema.json",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "host-neutral-common-core",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/clarity/schemas/state.schema.json",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "host-neutral-common-core",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/clarity/secretary-adapter.json",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/collaboration-inventory.json",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/hooks/hooks.json",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "public-hook-byte-sync-fixed",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/host-inventory.json",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/host-inventory.json",
+          "mode": "100644",
+          "sha256": "cc19a55dc7d5b132a77f685800dce37f1b06e9da7a141a4381ef6b265b25026e",
+          "size": 2799
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/release-inventory.json",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/rules/common-language.md",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "host-neutral-common-core",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/rules/common-language.md",
+          "mode": "100644",
+          "sha256": "ad2690834858d00ed917c0acd0ec118531b64fb90e2f56d91b469bf02e8f57c3",
+          "size": 4043
+        },
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/rules/conversation-contract.md",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "host-neutral-common-core",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/rules/conversation-contract.md",
+          "mode": "100644",
+          "sha256": "e779828be8c3265fee685ea496a4f19fc3c741605a837a24249156d19bc194f5",
+          "size": 5368
+        },
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/rules/plain-language.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/rules/plain-language.md",
+          "mode": "100644",
+          "sha256": "22895f5d23fe0a584012ff55874aefba9c2d2540a0a2f9d4d470096618c64f85",
+          "size": 1728
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/rules/rule-manifest.json",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/rules/rule-manifest.json",
+          "mode": "100644",
+          "sha256": "1ea1d4edc40724f9b8f7823edb14d889a562739fc8d8edf1b5a586f21732645b",
+          "size": 1545
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/rules/safety.md",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "host-neutral-common-core",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/rules/safety.md",
+          "mode": "100644",
+          "sha256": "565c9006d3ad1b4eda5e5b87cdb7e62096739c0e1eb65abfefbe33a50bdb1e48",
+          "size": 2430
+        },
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/scripts/clarity-hook.mjs",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "public-hook-byte-sync-fixed",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/scripts/clarity-secretary.mjs",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/scripts/clarity.mjs",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "host-neutral-common-core",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/scripts/collaboration-router.mjs",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/scripts/lib/clarity-core.mjs",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "host-neutral-common-core",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/scripts/lib/clarity-drift.mjs",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "host-neutral-common-core",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/scripts/lib/clarity-hook.mjs",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "public-hook-byte-sync-fixed",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/scripts/lib/clarity-link.mjs",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "host-neutral-common-core",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/scripts/lib/clarity-projection.mjs",
+        "source": "public-common",
+        "role": "byte-sync",
+        "reason": "host-neutral-common-core",
+        "actions": [
+          "read",
+          "copy",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "mode-and-bytes-equal-fixed-public-product"
+      },
+      {
+        "path": "plugins/secretary/scripts/lib/clarity-secretary.mjs",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/scripts/lib/collaboration-router.mjs",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/scripts/project-tools.mjs",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/scripts/project-tools.mjs",
+          "mode": "100755",
+          "sha256": "27137a1e894dd83cfb77fa7e9fa7d6bd7951c8cbd225b0acf03dddc1e485b65f",
+          "size": 43876
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/build/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/build/SKILL.md",
+          "mode": "100644",
+          "sha256": "fe88f2630ba4ff90631274157758c890f7eac63f313a96077633923042e4f0ec",
+          "size": 5671
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/chatwork/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/chatwork/SKILL.md",
+          "mode": "100644",
+          "sha256": "be773dbfb68ad995927d3b1cca48280d8c239418d2c6c8e46299fdc49ce4cd02",
+          "size": 7968
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/clarity/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": null,
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/connections/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/connections/SKILL.md",
+          "mode": "100644",
+          "sha256": "77885d780506773b3cad5dd8417b8506dcdfbf376a5e6b2a23ecdbad5754153f",
+          "size": 5812
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/daily/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/daily/SKILL.md",
+          "mode": "100644",
+          "sha256": "1e719c3cd11b7cf2fdae7084aa2d5bd2096ae5ab59172a0c2071194d62b140e9",
+          "size": 9771
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/google-chat/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/google-chat/SKILL.md",
+          "mode": "100644",
+          "sha256": "1eb2dd83cd0529b5a6b37ad2b9a08f9cc67973018d9c69530430ba8f0fadcfdf",
+          "size": 15822
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/memory-care/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/memory-care/SKILL.md",
+          "mode": "100644",
+          "sha256": "188b07c29ca0ae8fa48e1f1910a50e0c422d1de1c92edbb20d181664c5e1860c",
+          "size": 15685
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/onboarding/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/onboarding/SKILL.md",
+          "mode": "100644",
+          "sha256": "a2a3332d7726d2b6cb590687f18a0fc8033d655e2efb8eff4040fa243239479e",
+          "size": 19696
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/projects/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/projects/SKILL.md",
+          "mode": "100644",
+          "sha256": "8d8059d75fa2f740dd3aabe661c8533df4e95bbc5163c6cc67ad9a781833a0ab",
+          "size": 11317
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/secretary/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/secretary/SKILL.md",
+          "mode": "100644",
+          "sha256": "4f03c788c97db9dec08cc40926a6b7e280a9e32797327d6f2a8777880bd45438",
+          "size": 15029
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/setup-google/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/setup-google/SKILL.md",
+          "mode": "100644",
+          "sha256": "384e1f7c06789cf277a7ef110b2a8a290b890d7c01c0600c9a165c6baf9ba5be",
+          "size": 8567
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/setup-microsoft/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/setup-microsoft/SKILL.md",
+          "mode": "100644",
+          "sha256": "42c574ebc2c9944540d27494f2ebc5187ba716d81e51eb90bceafd279b6c834b",
+          "size": 8757
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/setup-notion/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/setup-notion/SKILL.md",
+          "mode": "100644",
+          "sha256": "c8b9de21c1a661610e05fbd41459f85c304d1ca1386d7a8c4b065d9774c1b275",
+          "size": 6496
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/update/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/update/SKILL.md",
+          "mode": "100644",
+          "sha256": "31ceb8d511def2bc5606db2d6653f728153c06003c1297334e2ba7143d6908c4",
+          "size": 11632
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/skills/weekly/SKILL.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/skills/weekly/SKILL.md",
+          "mode": "100644",
+          "sha256": "8d77c49c2bd087c47e7b60b32f1875f1d78387f13e4dec427738b60150226c2c",
+          "size": 5233
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/templates/AGENTS.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/templates/AGENTS.md",
+          "mode": "100644",
+          "sha256": "0bd57ec94676dab3ba91bf12a54314ce3e9229984bd254898b964e79b5d8d62f",
+          "size": 12171
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      },
+      {
+        "path": "plugins/secretary/templates/CLAUDE.md",
+        "source": "public-common",
+        "role": "adapted",
+        "reason": "yasashii-edition-adaptation-required",
+        "actions": [
+          "read",
+          "adapt",
+          "write"
+        ],
+        "before": {
+          "path": "plugins/secretary/templates/CLAUDE.md",
+          "mode": "100644",
+          "sha256": "d1d60ccc0f0d39cb844dcb10e6b6132f392657b8dfdec9548e5f3cc3e1843886",
+          "size": 1822
+        },
+        "postcondition": "declared-yasashii-transformation-and-identity-invariants-pass"
+      }
+    ],
+    "counts": {
+      "publicCommon": 44,
+      "privateRequiredAdditions": 2,
+      "byteSync": 16,
+      "adapted": 30,
+      "supporting": 2,
+      "excluded": 9,
+      "protected": 9,
+      "productTotal": 46
+    },
+    "intersections": {
+      "byteSyncAdapted": [],
+      "productDownstreamOwned": [],
+      "productHarnessRoleOwned": [],
+      "productExcluded": [],
+      "productProtected": []
+    },
+    "unknown": [],
+    "unclassified": [],
+    "unused": [],
+    "stale": [],
+    "blindCopy": 0,
+    "plannedApplyWrites": 46,
+    "observedPrewriteProductWrites": 0,
+    "manifestSha256": "433d6e2597be4a504e9da6b1b78f6d701377006521b55379554fb37e9cfc32f5",
+    "supporting": [
+      {
+        "id": "public-ready-handoff",
+        "domain": "external-fixed-input",
+        "path": "/private/tmp/project-clarity-handoff-20260829/ready-handoff.json",
+        "role": "supporting",
+        "actions": [
+          "read"
+        ],
+        "writes": 0
+      },
+      {
+        "id": "private-pass-receipt",
+        "domain": "external-fixed-input",
+        "path": "/private/tmp/agentic-secretary-my-vault-clarity/scripts/fixtures/sprint-050/private-pass-receipt.json",
+        "role": "supporting",
+        "actions": [
+          "read"
+        ],
+        "writes": 0
+      }
+    ],
+    "excluded": [
+      {
+        "domain": "public-source",
+        "pattern": ".git/**",
+        "role": "excluded",
+        "actions": [],
+        "writes": 0
+      },
+      {
+        "domain": "public-source",
+        "pattern": ".harness/**",
+        "role": "excluded",
+        "actions": [],
+        "writes": 0
+      },
+      {
+        "domain": "public-source",
+        "pattern": "docs/spec/**",
+        "role": "excluded",
+        "actions": [],
+        "writes": 0
+      },
+      {
+        "domain": "public-source",
+        "pattern": "docs/sprints/**",
+        "role": "excluded",
+        "actions": [],
+        "writes": 0
+      },
+      {
+        "domain": "public-source",
+        "pattern": "docs/progress/**",
+        "role": "excluded",
+        "actions": [],
+        "writes": 0
+      },
+      {
+        "domain": "public-source",
+        "pattern": "docs/feedback/**",
+        "role": "excluded",
+        "actions": [],
+        "writes": 0
+      },
+      {
+        "domain": "public-source",
+        "pattern": "README.md",
+        "role": "excluded",
+        "actions": [],
+        "writes": 0
+      },
+      {
+        "domain": "public-source",
+        "pattern": "plugins/secretary/rules/copy/**",
+        "role": "excluded",
+        "actions": [],
+        "writes": 0
+      },
+      {
+        "domain": "public-source",
+        "pattern": "plugins/secretary/rules/styles/**",
+        "role": "excluded",
+        "actions": [],
+        "writes": 0
+      }
+    ],
+    "protected": [
+      {
+        "id": "yasashii-readme",
+        "domain": "yasashii-fixed-base",
+        "patterns": [
+          "README.md"
+        ],
+        "role": "protected",
+        "actions": [
+          "read",
+          "protect"
+        ],
+        "writes": 0,
+        "fileCount": 1,
+        "sha256": "51b6e5f207aaf9ece4e4683c9d19860940113a412b352cd8ed78e9c3b2232497"
+      },
+      {
+        "id": "license",
+        "domain": "yasashii-fixed-base",
+        "patterns": [
+          "LICENSE"
+        ],
+        "role": "protected",
+        "actions": [
+          "read",
+          "protect"
+        ],
+        "writes": 0,
+        "fileCount": 1,
+        "sha256": "e0e1f1e4499eb41b66a5be20d24b8d4dec722c755746193634873a51675c7bba"
+      },
+      {
+        "id": "repo-agents",
+        "domain": "yasashii-fixed-base",
+        "patterns": [
+          "AGENTS.md",
+          "CLAUDE.md"
+        ],
+        "role": "protected",
+        "actions": [
+          "read",
+          "protect"
+        ],
+        "writes": 0,
+        "fileCount": 2,
+        "sha256": "945f0e573288b1f5f0028a8e01ba032031e0179f8b81036304fe7d7fc4d51e3b"
+      },
+      {
+        "id": "repo-owned-docs",
+        "domain": "yasashii-fixed-base",
+        "patterns": [
+          "docs/**"
+        ],
+        "role": "protected",
+        "actions": [
+          "read",
+          "protect"
+        ],
+        "writes": 0,
+        "fileCount": 398,
+        "sha256": "b10c050fc2da673c53c079d57790df20aa48c587baba7ea74f119a3b2d830b8c"
+      },
+      {
+        "id": "yasashii-copy-style",
+        "domain": "yasashii-fixed-base",
+        "patterns": [
+          "plugins/secretary/rules/copy/yasashii.json",
+          "plugins/secretary/rules/styles/yasashii.md"
+        ],
+        "role": "protected",
+        "actions": [
+          "read",
+          "protect"
+        ],
+        "writes": 0,
+        "fileCount": 2,
+        "sha256": "a7a140ec724d414321c4b39ec3503b2b770a28d1aa61a4b1cb041138c2ac4c73"
+      },
+      {
+        "id": "yasashii-edition-identity",
+        "domain": "yasashii-fixed-base",
+        "patterns": [
+          "plugins/secretary/edition.json"
+        ],
+        "role": "protected",
+        "actions": [
+          "read",
+          "protect"
+        ],
+        "writes": 0,
+        "fileCount": 1,
+        "sha256": "3366d69bfd0d72c117a004a151a7fcf2786d89dab7b3cc4642fb0b1256c7fbcd"
+      },
+      {
+        "id": "overlay-definitions",
+        "domain": "yasashii-fixed-base",
+        "patterns": [
+          "secretary-overlay/**"
+        ],
+        "role": "protected",
+        "actions": [
+          "read",
+          "protect"
+        ],
+        "writes": 0,
+        "fileCount": 8,
+        "sha256": "1e615bae3548a02f5463339e66c2b84daa1d6096e2ec195d87cc8ead1c16b4a7"
+      },
+      {
+        "id": "marketplace-identity",
+        "domain": "yasashii-fixed-base",
+        "patterns": [
+          ".agents/plugins/marketplace.json",
+          ".claude-plugin/marketplace.json"
+        ],
+        "role": "protected",
+        "actions": [
+          "read",
+          "protect"
+        ],
+        "writes": 0,
+        "fileCount": 2,
+        "sha256": "91e734ade4ab7bafeeb4a5394bcfc7d601dcc8222334bdc5303f73f319eed890"
+      },
+      {
+        "id": "release-history",
+        "domain": "yasashii-fixed-base",
+        "patterns": [
+          "plugins/secretary/CHANGELOG.md",
+          "plugins/yasashii-secretary/CHANGELOG.md",
+          "scripts/master-release-gate.mjs",
+          "scripts/archive-release-gate.mjs",
+          "scripts/check-release-integrity.py"
+        ],
+        "role": "protected",
+        "actions": [
+          "read",
+          "protect"
+        ],
+        "writes": 0,
+        "fileCount": 5,
+        "sha256": "58d7d96c24b0a2c7411520a15b0d501ee7c0e7f3fa0e43f010c2e3e5260030a8"
+      }
+    ]
+  },
+  "protectedBefore": {
+    "fixedBase": "c6cfb40a6026c5447a8ec4729f517adb4cc51031",
+    "groups": [
+      {
+        "id": "yasashii-readme",
+        "patterns": [
+          "README.md"
+        ],
+        "algorithm": "sorted-path-NUL-mode-NUL-bytes-NUL",
+        "fileCount": 1,
+        "sha256": "51b6e5f207aaf9ece4e4683c9d19860940113a412b352cd8ed78e9c3b2232497"
+      },
+      {
+        "id": "license",
+        "patterns": [
+          "LICENSE"
+        ],
+        "algorithm": "sorted-path-NUL-mode-NUL-bytes-NUL",
+        "fileCount": 1,
+        "sha256": "e0e1f1e4499eb41b66a5be20d24b8d4dec722c755746193634873a51675c7bba"
+      },
+      {
+        "id": "repo-agents",
+        "patterns": [
+          "AGENTS.md",
+          "CLAUDE.md"
+        ],
+        "algorithm": "sorted-path-NUL-mode-NUL-bytes-NUL",
+        "fileCount": 2,
+        "sha256": "945f0e573288b1f5f0028a8e01ba032031e0179f8b81036304fe7d7fc4d51e3b"
+      },
+      {
+        "id": "repo-owned-docs",
+        "patterns": [
+          "docs/**"
+        ],
+        "algorithm": "sorted-path-NUL-mode-NUL-bytes-NUL",
+        "fileCount": 398,
+        "sha256": "b10c050fc2da673c53c079d57790df20aa48c587baba7ea74f119a3b2d830b8c"
+      },
+      {
+        "id": "yasashii-copy-style",
+        "patterns": [
+          "plugins/secretary/rules/copy/yasashii.json",
+          "plugins/secretary/rules/styles/yasashii.md"
+        ],
+        "algorithm": "sorted-path-NUL-mode-NUL-bytes-NUL",
+        "fileCount": 2,
+        "sha256": "a7a140ec724d414321c4b39ec3503b2b770a28d1aa61a4b1cb041138c2ac4c73"
+      },
+      {
+        "id": "yasashii-edition-identity",
+        "patterns": [
+          "plugins/secretary/edition.json"
+        ],
+        "algorithm": "sorted-path-NUL-mode-NUL-bytes-NUL",
+        "fileCount": 1,
+        "sha256": "3366d69bfd0d72c117a004a151a7fcf2786d89dab7b3cc4642fb0b1256c7fbcd"
+      },
+      {
+        "id": "overlay-definitions",
+        "patterns": [
+          "secretary-overlay/**"
+        ],
+        "algorithm": "sorted-path-NUL-mode-NUL-bytes-NUL",
+        "fileCount": 8,
+        "sha256": "1e615bae3548a02f5463339e66c2b84daa1d6096e2ec195d87cc8ead1c16b4a7"
+      },
+      {
+        "id": "marketplace-identity",
+        "patterns": [
+          ".agents/plugins/marketplace.json",
+          ".claude-plugin/marketplace.json"
+        ],
+        "algorithm": "sorted-path-NUL-mode-NUL-bytes-NUL",
+        "fileCount": 2,
+        "sha256": "91e734ade4ab7bafeeb4a5394bcfc7d601dcc8222334bdc5303f73f319eed890"
+      },
+      {
+        "id": "release-history",
+        "patterns": [
+          "plugins/secretary/CHANGELOG.md",
+          "plugins/yasashii-secretary/CHANGELOG.md",
+          "scripts/master-release-gate.mjs",
+          "scripts/archive-release-gate.mjs",
+          "scripts/check-release-integrity.py"
+        ],
+        "algorithm": "sorted-path-NUL-mode-NUL-bytes-NUL",
+        "fileCount": 5,
+        "sha256": "58d7d96c24b0a2c7411520a15b0d501ee7c0e7f3fa0e43f010c2e3e5260030a8"
+      }
+    ],
+    "snapshotSha256": "27161cb3cf9cec3167bbf2dec231aff572dd1993f79febca17a87df2d4a1b165"
+  },
+  "sourceInventory": {
+    "differences": 19,
+    "roleOwned": [
+      {
+        "path": "docs/feedback/sprint-041.md",
+        "owner": "evaluator",
+        "changeStatus": "added"
+      },
+      {
+        "path": "docs/progress/sprint-041.md",
+        "owner": "generator",
+        "changeStatus": "added"
+      },
+      {
+        "path": "docs/spec.md",
+        "owner": "planner",
+        "changeStatus": "modified"
+      },
+      {
+        "path": "docs/spec/clarity.md",
+        "owner": "planner",
+        "changeStatus": "added"
+      },
+      {
+        "path": "docs/spec/constraints.md",
+        "owner": "planner",
+        "changeStatus": "modified"
+      },
+      {
+        "path": "docs/spec/domain.md",
+        "owner": "planner",
+        "changeStatus": "modified"
+      },
+      {
+        "path": "docs/spec/editions.md",
+        "owner": "planner",
+        "changeStatus": "modified"
+      },
+      {
+        "path": "docs/spec/features.md",
+        "owner": "planner",
+        "changeStatus": "modified"
+      },
+      {
+        "path": "docs/spec/product.md",
+        "owner": "planner",
+        "changeStatus": "modified"
+      },
+      {
+        "path": "docs/spec/rubric.md",
+        "owner": "planner",
+        "changeStatus": "modified"
+      },
+      {
+        "path": "docs/spec/ui.md",
+        "owner": "planner",
+        "changeStatus": "modified"
+      },
+      {
+        "path": "docs/sprints/sprint-041.md",
+        "owner": "planner",
+        "changeStatus": "added"
+      },
+      {
+        "path": "docs/sprints/sprint-042.md",
+        "owner": "planner",
+        "changeStatus": "added"
+      },
+      {
+        "path": "docs/sprints/sprint-043.md",
+        "owner": "planner",
+        "changeStatus": "added"
+      },
+      {
+        "path": "docs/sprints/state.md",
+        "owner": "orchestrator",
+        "changeStatus": "modified"
+      }
+    ],
+    "gateOwned": [
+      {
+        "path": "scripts/lib/sprint-041-prewrite.mjs",
+        "owner": "sprint-041-generator",
+        "changeStatus": "added"
+      },
+      {
+        "path": "scripts/sprint-041-prewrite.mjs",
+        "owner": "sprint-041-generator",
+        "changeStatus": "added"
+      },
+      {
+        "path": "scripts/sprint-041-regression.sh",
+        "owner": "sprint-041-generator",
+        "changeStatus": "added"
+      },
+      {
+        "path": "scripts/sprint-041-test.mjs",
+        "owner": "sprint-041-generator",
+        "changeStatus": "added"
+      }
+    ],
+    "productConflicts": 0,
+    "unknown": 0
+  },
+  "overlay": {
+    "definitionDigest": {
+      "algorithm": "sorted-path-NUL-mode-NUL-bytes-NUL",
+      "fileCount": 7,
+      "sha256": "566387aedcdc030ef566af59d17419e018da6104925b0c2f0da72796bce7fdb3"
+    },
+    "mappingPath": "secretary-overlay/mapping.json",
+    "anchorsPath": "secretary-overlay/anchors.json",
+    "downstreamOwnedPath": "secretary-overlay/downstream-owned.json",
+    "syncWorkflow": "scripts/sync-secretary-overlay.mjs"
+  },
+  "yasashiiIdentity": {
+    "edition": "yasashii-secretary",
+    "copyPath": "rules/copy/yasashii.json",
+    "harnessRepository": "https://github.com/mtaiseeei/yasashii-harness",
+    "harnessInstallId": "harness@yasashii-harness"
+  },
+  "writeAccounting": {
+    "clarityProductWrites": 0,
+    "publicWrites": 0,
+    "privateWrites": 0,
+    "upstreamWrites": 0,
+    "remoteWrites": 0,
+    "externalWrites": 0,
+    "receiptWrites": 1
+  },
+  "externalStates": {
+    "push": "not-run",
+    "tag": "not-run",
+    "release": "not-run",
+    "githubRelease": "not-run",
+    "marketplace": "not-run",
+    "installedCache": "not-run",
+    "newSession": "not-run",
+    "realWorkspace": "not-run",
+    "realXmind": "not-run",
+    "realHost": "not-run",
+    "connectors": "not-run"
+  },
+  "provenance": {
+    "baseSource": "git-fixed-base-archive:01dfe9e600c59473cc323cff0a22d554b93e2035be51eb0b013e8b8889918a8f",
+    "receiptDeterministic": true,
+    "evaluatorVerdict": null,
+    "orchestratorStateWritten": false
+  },
+  "receiptSha256": "fed303e8d56ed428d1fcf595ca4580d9903728aa7b89a9705a898fe812fde547"
+}

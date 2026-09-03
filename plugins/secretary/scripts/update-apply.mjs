@@ -16,10 +16,15 @@ import {
 } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { removeSafe, safeWritePath, workingRoot, writeFileAtomicSafe } from "./lib/safe-fs.mjs";
+import { removeSafe, safeWritePath, writeFileAtomicSafe } from "./lib/safe-fs.mjs";
 import { runExternalSync } from "./lib/external-ops.mjs";
 import { assertWorkspaceEdition, inspectWorkspaceEdition, loadEditionConfig } from "./lib/edition-guard.mjs";
 import { applyConversationMigration, planConversationMigration } from "./lib/conversation-migration.mjs";
+import {
+  observeUpdateDirectory,
+  parseUpdateGitPath,
+  sameUpdateDirectoryIdentity,
+} from "./lib/update-root-identity.mjs";
 
 const EXIT_USAGE = 2;
 const EXIT_REFUSED = 3;
@@ -143,26 +148,52 @@ function git(workspace, args, options = {}) {
   return run("git", args, { ...options, cwd: workspace });
 }
 
-function safeWorkspace(value) {
+function inspectUpdateWorkspace(value) {
   const candidate = resolve(value ?? ".");
-  let workspace;
+  let workspaceObservation;
   try {
     // realpathで参照先をworkspaceとして採用する前に、入力pathの全componentを確認する。
-    workspace = workingRoot(candidate);
+    workspaceObservation = observeUpdateDirectory(candidate);
   } catch {
-    fail("workspaceを安全に読み取れないため、更新を開始しません。", EXIT_REFUSED);
+    throw new Error("workspaceを安全に読み取れないため、更新を開始しません。");
   }
+  const workspace = workspaceObservation.path;
   const top = git(workspace, ["rev-parse", "--show-toplevel"]);
-  if (top.status !== 0 || resolve(top.stdout.trim()) !== workspace) {
-    fail("workspace rootのGitリポジトリで実行してください。更新は開始していません。", EXIT_REFUSED);
+  let gitTopObservation;
+  try {
+    gitTopObservation = observeUpdateDirectory(parseUpdateGitPath(top));
+  } catch {
+    throw new Error("workspace rootのGitリポジトリで実行してください。更新は開始していません。");
+  }
+  if (!sameUpdateDirectoryIdentity(workspaceObservation.identity, gitTopObservation.identity)) {
+    throw new Error("workspace rootのGitリポジトリで実行してください。更新は開始していません。");
   }
   const gitDirectory = git(workspace, ["rev-parse", "--absolute-git-dir"]);
-  if (gitDirectory.status !== 0) fail("Gitの状態を確認できないため、更新を開始しません。", EXIT_REFUSED);
-  const gitDir = resolve(gitDirectory.stdout.trim());
-  if (!existsSync(gitDir) || lstatSync(gitDir).isSymbolicLink()) {
-    fail("Git管理領域が安全でないため、更新を開始しません。", EXIT_REFUSED);
+  let gitDirObservation;
+  try {
+    gitDirObservation = observeUpdateDirectory(parseUpdateGitPath(gitDirectory));
+  } catch {
+    throw new Error("Git管理領域が安全でないため、更新を開始しません。");
   }
-  return { workspace, gitDir };
+  return { requested: candidate, workspace, workspaceObservation, gitTopObservation, gitDir: gitDirObservation.path, gitDirObservation };
+}
+
+function revalidateUpdateWorkspace(observation) {
+  const current = inspectUpdateWorkspace(observation.requested);
+  if (!sameUpdateDirectoryIdentity(observation.workspaceObservation.identity, current.workspaceObservation.identity)
+    || !sameUpdateDirectoryIdentity(observation.gitTopObservation.identity, current.gitTopObservation.identity)
+    || !sameUpdateDirectoryIdentity(observation.gitDirObservation.identity, current.gitDirObservation.identity)) {
+    throw new Error("workspace rootまたはGit管理領域が確認後に変わったため、更新を開始しません。");
+  }
+  return current;
+}
+
+function safeWorkspace(value) {
+  try {
+    return inspectUpdateWorkspace(value);
+  } catch (error) {
+    fail(error instanceof Error ? error.message : "workspaceを安全に読み取れないため、更新を開始しません。", EXIT_REFUSED);
+  }
 }
 
 function pluginName(config) {
@@ -556,7 +587,8 @@ function guardEdition(workspace, pluginRoot, entry) {
 
 function start(args, scriptDir) {
   requireClaudePluginUpdater(args);
-  const { workspace, gitDir } = safeWorkspace(args.values.get("--workspace"));
+  const workspaceObservation = safeWorkspace(args.values.get("--workspace"));
+  const { workspace, gitDir } = workspaceObservation;
   const currentPluginRoot = args.values.get("--current-plugin-root") ?? resolve(scriptDir, "..");
   const { config, editionState } = guardEdition(workspace, currentPluginRoot, "update");
   const currentPlugin = safePluginRoot(currentPluginRoot, config);
@@ -604,6 +636,8 @@ function start(args, scriptDir) {
   if (trackedSecretRisk(workspace)) fail("資格情報らしき内容または安全に検査できないtracked fileを検出したため、commit・表示・更新を行わず停止しました。", EXIT_REFUSED);
   const scope = args.values.get("--scope") ?? "user";
   if (!ALLOWED_SCOPES.has(scope)) fail("pluginのscopeが不明なため更新を停止しました。", EXIT_REFUSED);
+  try { revalidateUpdateWorkspace(workspaceObservation); }
+  catch (error) { fail(error instanceof Error ? error.message : "workspace rootを再確認できないため、更新を開始しません。", EXIT_REFUSED); }
   const protection = protectionCommit(workspace, currentPlugin.version, diagnosis.latestVersion, config);
   const pluginBackup = backupPlugin(currentPlugin.root, gitDir, scope, config);
   const session = {

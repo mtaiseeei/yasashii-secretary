@@ -1,0 +1,294 @@
+{
+  "schemaVersion": 1,
+  "reportId": "yasashii-sprint-043-patch-002-actual-action",
+  "fixedInputs": {
+    "publicCandidate": "51329fc05ea0e9e66f64aa5c3bf2ee2db168ed58",
+    "publicTree": "c0b82e802389450b774fa9b4a433e94e19e87028",
+    "publicEvaluatorPass": "0f0407758f854633814b485b84e46af8a508044c",
+    "publicFinalState": "68b77d0b557d34840c8b68916a2877e1a5d7b7a3",
+    "privateVerificationCandidate": "5abad512ec415d0e6ca832653dd66eb90f8b2c45",
+    "privateProduct": "c92dfe53ba7345db57ac0e625e2d6ded8bc0bc38",
+    "privateEvaluatorPass": "54e61975cecdc79bbbf54fa203a35528db0da8df",
+    "privateFinalState": "5eec49fa5418b0fc612dd230420370ce68bb591e",
+    "yasashiiStartHead": "0763010ecc654091c3caa456eee7e18671311bda",
+    "yasashiiStartTree": "4ae64d5194cec20bc8720c7910a143299736a41b"
+  },
+  "rows": [
+    {
+      "path": "plugins/secretary/scripts/clarity-hook.mjs",
+      "role": "public-byte-sync",
+      "actualAction": "byte-sync",
+      "actualDiff": "changed",
+      "beforeDigest": "8cf657ae6a9f1c0fdbd2ce96aa73c1917c3105e3d5488cebc92e80db385ceea3",
+      "publicDigest": "2579e3628bfb85e1783eebe70d23bcae9cef3b882edacc09d3c3896f507fc663",
+      "privateDigest": "2579e3628bfb85e1783eebe70d23bcae9cef3b882edacc09d3c3896f507fc663",
+      "afterDigest": "2579e3628bfb85e1783eebe70d23bcae9cef3b882edacc09d3c3896f507fc663",
+      "publicMode": "100644",
+      "afterMode": "100644",
+      "sourceMarker": null
+    },
+    {
+      "path": "plugins/secretary/scripts/clarity.mjs",
+      "role": "public-byte-sync",
+      "actualAction": "byte-sync",
+      "actualDiff": "changed",
+      "beforeDigest": "9d336c245e3db3e973433670ebef5af5d6394f57a7dcaa443249b0887543398a",
+      "publicDigest": "ceac93212b2d30b28534fb48ac103570cbe4e23004014c3177a3d3e886b4f50a",
+      "privateDigest": "ceac93212b2d30b28534fb48ac103570cbe4e23004014c3177a3d3e886b4f50a",
+      "afterDigest": "ceac93212b2d30b28534fb48ac103570cbe4e23004014c3177a3d3e886b4f50a",
+      "publicMode": "100644",
+      "afterMode": "100644",
+      "sourceMarker": null
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/clarity-core.mjs",
+      "role": "public-byte-sync",
+      "actualAction": "byte-sync",
+      "actualDiff": "changed",
+      "beforeDigest": "49ccac57d074baa01c4b50dd7203e13f0669c79ae3dd6e89078c8281489db5ac",
+      "publicDigest": "fdd9157acc885bfcb567a3321fa97a0607ce70bb2827fedc4513b538526db9af",
+      "privateDigest": "fdd9157acc885bfcb567a3321fa97a0607ce70bb2827fedc4513b538526db9af",
+      "afterDigest": "fdd9157acc885bfcb567a3321fa97a0607ce70bb2827fedc4513b538526db9af",
+      "publicMode": "100644",
+      "afterMode": "100644",
+      "sourceMarker": null
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/clarity-drift.mjs",
+      "role": "public-byte-sync",
+      "actualAction": "byte-sync",
+      "actualDiff": "changed",
+      "beforeDigest": "7d243edfdc10b4c906f82186cfb1dab41a89f99366e41604bfca194261701c61",
+      "publicDigest": "ef9bffe6d2e5579f2540453132a96b4c67daf48bf37b85b2d8efbfbbe8c74699",
+      "privateDigest": "ef9bffe6d2e5579f2540453132a96b4c67daf48bf37b85b2d8efbfbbe8c74699",
+      "afterDigest": "ef9bffe6d2e5579f2540453132a96b4c67daf48bf37b85b2d8efbfbbe8c74699",
+      "publicMode": "100644",
+      "afterMode": "100644",
+      "sourceMarker": null
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/clarity-hook.mjs",
+      "role": "public-byte-sync",
+      "actualAction": "byte-sync",
+      "actualDiff": "changed",
+      "beforeDigest": "c85137b5b5b0abce9fc1da454218c205e090aa086daaa26cdcb17b924165aa48",
+      "publicDigest": "acd4203e95ddcdf3fe86c27e10b082d40f9a0fe7ec28d824a8227b64dfdff1cf",
+      "privateDigest": "acd4203e95ddcdf3fe86c27e10b082d40f9a0fe7ec28d824a8227b64dfdff1cf",
+      "afterDigest": "acd4203e95ddcdf3fe86c27e10b082d40f9a0fe7ec28d824a8227b64dfdff1cf",
+      "publicMode": "100644",
+      "afterMode": "100644",
+      "sourceMarker": null
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/clarity-link.mjs",
+      "role": "public-byte-sync",
+      "actualAction": "byte-sync",
+      "actualDiff": "changed",
+      "beforeDigest": "78bfb47121d99440fb9348556ca53e310312044044c34dc5eab076d46fcbafd4",
+      "publicDigest": "0c25692eceb9143d44fa34c47a14925a29f5a4cc2f3b637875a1e0ec9872e681",
+      "privateDigest": "0c25692eceb9143d44fa34c47a14925a29f5a4cc2f3b637875a1e0ec9872e681",
+      "afterDigest": "0c25692eceb9143d44fa34c47a14925a29f5a4cc2f3b637875a1e0ec9872e681",
+      "publicMode": "100644",
+      "afterMode": "100644",
+      "sourceMarker": null
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/clarity-projection.mjs",
+      "role": "public-byte-sync",
+      "actualAction": "byte-sync",
+      "actualDiff": "changed",
+      "beforeDigest": "c432a87dbc4e8da610270b7e0b7396aa26dd2e87cd5c7e7b3701a6f98c821b81",
+      "publicDigest": "bff15bd5eb9e073511c33d27dcd42e429e735067fd8ce1b0453fd2de90603153",
+      "privateDigest": "bff15bd5eb9e073511c33d27dcd42e429e735067fd8ce1b0453fd2de90603153",
+      "afterDigest": "bff15bd5eb9e073511c33d27dcd42e429e735067fd8ce1b0453fd2de90603153",
+      "publicMode": "100644",
+      "afterMode": "100644",
+      "sourceMarker": null
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/clarity-root.mjs",
+      "role": "public-byte-sync",
+      "actualAction": "add",
+      "actualDiff": "changed",
+      "beforeDigest": null,
+      "publicDigest": "bc33787c157e0941c9a07822ce9caa9a69107e57b6d1bf47e41a61668739d13d",
+      "privateDigest": "bc33787c157e0941c9a07822ce9caa9a69107e57b6d1bf47e41a61668739d13d",
+      "afterDigest": "bc33787c157e0941c9a07822ce9caa9a69107e57b6d1bf47e41a61668739d13d",
+      "publicMode": "100644",
+      "afterMode": "100644",
+      "sourceMarker": null
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/safe-fs.mjs",
+      "role": "public-byte-sync",
+      "actualAction": "byte-sync",
+      "actualDiff": "changed",
+      "beforeDigest": "ea2c474fede5619cab8ba652356819557cb6ed662a1f4271da63a9cada944fab",
+      "publicDigest": "e24f157e96095731bbb411b869ab6089bd45ffff456dc82367de4d9d4ffcf9f2",
+      "privateDigest": "e24f157e96095731bbb411b869ab6089bd45ffff456dc82367de4d9d4ffcf9f2",
+      "afterDigest": "e24f157e96095731bbb411b869ab6089bd45ffff456dc82367de4d9d4ffcf9f2",
+      "publicMode": "100644",
+      "afterMode": "100644",
+      "sourceMarker": null
+    },
+    {
+      "path": "plugins/secretary/collaboration-inventory.json",
+      "role": "yasashii-adapted",
+      "actualAction": "adapt",
+      "actualDiff": "changed",
+      "beforeDigest": "1feb8ec7652fa2135d89ebefd18bf8306d7aa1c00733d6e93b660b03688df804",
+      "publicDigest": "fdb1e4799c2418b2597254aab1ba8644c23f7e1bada6762bcde1d4ad207a77f0",
+      "privateDigest": "a33af3daa1ebc11b444a0972b1cc62a3ce7a3455433371a76966469f18abb4be",
+      "afterDigest": "82e6f75085082e4ef03978adf666427875f38bf10d084becd9f0511dc892ca26",
+      "publicMode": "100644",
+      "afterMode": "100644",
+      "sourceMarker": "yasashii-secretary:clarity-collaboration-inventory:v1"
+    },
+    {
+      "path": "plugins/secretary/scripts/clarity-secretary.mjs",
+      "role": "yasashii-adapted",
+      "actualAction": "adapt",
+      "actualDiff": "changed",
+      "beforeDigest": "bed4fa879448eebe8a0f97df79aaf1ae1a2bcc362e62fc266a07412a9ba78135",
+      "publicDigest": "a8561862a4b3877711f7a8fe7c7ee7ae292ae428b21d62d8fbb9f86cdeb35630",
+      "privateDigest": "47066a5b32c0d65a90d598404eee101e1d005925836e86369e91a38217978d83",
+      "afterDigest": "619f341174a1ae412efd6ce0a66b2abdc367dbf915216b75a8b6b4de8be57fae",
+      "publicMode": "100644",
+      "afterMode": "100644",
+      "sourceMarker": "yasashii-secretary:clarity-secretary-adapter:v1"
+    },
+    {
+      "path": "plugins/secretary/scripts/lib/clarity-secretary.mjs",
+      "role": "yasashii-adapted",
+      "actualAction": "adapt",
+      "actualDiff": "changed",
+      "beforeDigest": "32e2a0b4b0654396bf4364e4e4c89d1f6bfe2cbbaa4e8a517f3332889f941a63",
+      "publicDigest": "84b1010bd77722336c5a2758f8d6671b7ce6d13a1f5f33b115c5dc300d5c5b83",
+      "privateDigest": "f13a37c539d5cf614288f1dec2da1deb7a8a3ff466b52d75c030e9c3801cab9d",
+      "afterDigest": "ed63c94569d8755d42ae25fb7428bd5734fd192c2ed36b0a1875c9bf3c93fcbf",
+      "publicMode": "100644",
+      "afterMode": "100644",
+      "sourceMarker": "yasashii-secretary:canonical-repo-observation:v1"
+    }
+  ],
+  "supporting": [
+    "scripts/fixtures/sprint-043-patch-002/target-cases.json",
+    "scripts/fixtures/sprint-043-patch-002/actual-action-report.json",
+    "scripts/lib/sprint-049-inventory.mjs",
+    "scripts/sprint-042-collaboration-test.mjs",
+    "scripts/sprint-043-patch-001-test.mjs",
+    "scripts/sprint-043-patch-002-baseline.mjs",
+    "scripts/sprint-043-patch-002-test.mjs",
+    "scripts/sprint-043-patch-002-classification.mjs",
+    "scripts/sprint-043-patch-002-overlay-test.mjs",
+    "scripts/sprint-043-patch-002-portability.mjs",
+    "scripts/sprint-043-patch-002-regression.sh"
+  ],
+  "protected": [
+    {
+      "path": "README.md",
+      "digest": "9279992d56f37763aca4ed4944a68f7314720a48ef24b4ac58d9ce510f08c234"
+    },
+    {
+      "path": "LICENSE",
+      "digest": "b6d97ac224e82462221382f7af3c40051489be2312daf6e706c5a5ad15c13ec9"
+    },
+    {
+      "path": "AGENTS.md",
+      "digest": "dd4343eb57b108bc54f867f458040d3315060da4ccf3df476106323401f7b5da"
+    },
+    {
+      "path": "CLAUDE.md",
+      "digest": "d3262d37b69a3c09d7540f9fb635ab41f827e96eaf04fc722aa83d173619b446"
+    },
+    {
+      "path": "plugins/secretary/edition.json",
+      "digest": "663c14cc51b92a936a1dbaf34d5ab4f7ded65f20d57ad0ed645dfd3e8d9bf7b7"
+    },
+    {
+      "path": "plugins/secretary/rules/copy/yasashii.json",
+      "digest": "b730ece91753ab562da363b6b085adbffbbe9c3958c3983abef31098a6224e7a"
+    },
+    {
+      "path": "plugins/secretary/rules/styles/yasashii.md",
+      "digest": "50c9df0ff79fb43d5e051eb0c42070e31393b210a7fb78076c6e7e6996b1699c"
+    },
+    {
+      "path": "plugins/secretary/templates/identity.json",
+      "digest": "1d64c072506547b986f21e76c02206095c5dcebec2c5385e748b3aa31634d2eb"
+    },
+    {
+      "path": "plugins/secretary/rules/rule-manifest.json",
+      "digest": "61d91fb17a8086d3ae1243f985ff577a0a9527fa4efa8e482b9c9f6d59b41a07"
+    },
+    {
+      "path": "plugins/secretary/.claude-plugin/plugin.json",
+      "digest": "f583304d7f51c5a0999ae8387090e8b380402c0f69ec8730ceab5e50fb6d4bf0"
+    },
+    {
+      "path": "plugins/secretary/.codex-plugin/plugin.json",
+      "digest": "f7ba3ebfb742da5537569d9de9e020996a8f23154cbcf60f2915712baac2b836"
+    },
+    {
+      "path": "plugins/secretary/hooks/hooks.json",
+      "digest": "7ac60c7f280c965321ced1658dd7fcdad1b481f09bd6eee5cf8153278b5bc40b"
+    },
+    {
+      "path": "scripts/fixtures/sprint-041/yasashii-prewrite-receipt.json",
+      "digest": "1acd8364471650c0c1f53f222ab204c322d3a366f3cbf8d033798e9bbb55bbb0"
+    },
+    {
+      "path": "scripts/fixtures/sprint-043/source-pass-receipt.json",
+      "digest": "7165ca062b4be963039e70f7847b2bcc93848150b3afecaba22ed561ff5e24f0"
+    },
+    {
+      "path": "scripts/fixtures/sprint-043-xmind-zen/manifest.json",
+      "digest": "6e20ea0c214fd4fcc397e61c7087c64ef2a7f5c2a3a190eefedf8647f1593f36"
+    },
+    {
+      "path": "scripts/fixtures/sprint-043-xmind-zen/styles.json",
+      "digest": "56ed3d1b6c0e4fc85751e9b0d1ef54cc696bba3b65d654a78a79f0f0e82f4b5d"
+    },
+    {
+      "path": "secretary-overlay/downstream-owned.json",
+      "digest": "e574e7d9c558e3b9ad38528b0c879bce17d1b932fbef95804e8cfc99dffdfe4c"
+    }
+  ],
+  "harnessDocs": [
+    "docs/progress/sprint-043-patch-002.md"
+  ],
+  "counts": {
+    "byteSync": 9,
+    "adapted": 3,
+    "supporting": 11,
+    "protected": 17,
+    "harnessDocs": 1,
+    "unknown": 0,
+    "stale": 0,
+    "unused": 0,
+    "unclassified": 0,
+    "overlap": 0
+  },
+  "externalOperations": [
+    {
+      "name": "release/install/cache/live",
+      "status": "NOT-RUN",
+      "count": 0
+    },
+    {
+      "name": "public/private source write",
+      "status": "NOT-RUN",
+      "count": 0
+    },
+    {
+      "name": "remote/network/provider",
+      "status": "NOT-RUN",
+      "count": 0
+    },
+    {
+      "name": "real workspace/customer repo/Xmind",
+      "status": "NOT-RUN",
+      "count": 0
+    }
+  ]
+}

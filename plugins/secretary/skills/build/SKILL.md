@@ -80,6 +80,13 @@ CodexではMarketplace `yasashii-harness`、install ID `harness@yasashii-harness
 
 ## 3. 導入済みならループへ接続する
 
+<!-- yasashii-secretary:clarity-collaboration:build:v1 -->
+
+Project Clarityのstatus、Attention、Decision／Execution／Validation／Driftは、Plannerへ渡すread-only contextとして参照できる。
+ただしClarity Item、Event、projectionをHarnessの`docs/spec/**`、`docs/sprints/state.md`、Sprint契約、progress、feedbackの
+代わりにしない。HarnessのPlanner → Generator → Evaluator、Current ID、所有者境界、独立評価を置き換えず、
+Clarityの閲覧だけからHarnessを起動しない。開発依頼が現在の用件で明示されたときだけ既存入口へ接続する。
+
 `using-harness` を開き、続いて `harness-loop` の手順に従います。進行は正式名称を隠さず、短い役割を添えます。
 
 - **Planner（計画）**: 対象ユーザー、成功条件、範囲を決めてSprint契約にする。

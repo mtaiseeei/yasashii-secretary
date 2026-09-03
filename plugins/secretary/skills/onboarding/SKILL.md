@@ -158,6 +158,13 @@ credential、commit history、home path解析、directory列挙は行わない�
 
 Q1の保存確認を別turnで明示了承された場合だけ、ここへ進む。
 
+<!-- yasashii-secretary:clarity-collaboration:onboarding:v1 -->
+
+Project Clarityは任意機能として案内する。新規workspace作成だけでClarityを初期化せず、Project作成、TODO、memory、
+外部connector、Xmind fileを追加しない。Agentic public版のXmind integration既定はOFFであり、ON／OFF設定と
+provider接続・capability・verified・課金承認を別に扱う。利用者が後からClarityを明示した場合だけ、
+`clarity` Skillのread-only previewから始める。MCP不可時もlocal `.xmind`へ自動writeしない。
+
 「いまは『道具』の段階です。秘書ディレクトリを用意しています」と一言添えてから、次を行う。
 
 最初のdirectory・fileを書き込む前に、必ず共通edition guardを実行する。
@@ -219,6 +226,8 @@ node "${SECRETARY_PLUGIN_ROOT}/scripts/edition-guard.mjs" --workspace . --plugin
        └── preferences.md
    ```
    `secretary/identity.json` は `display_name`、stable `secretary_id`、`actor_type=ai-secretary`、`aliases` を持つ。
+   `secretary/projects/open/<project>/clarity/`はClarityを明示導入したProjectだけに後から作る任意領域であり、
+   onboardingでは生成しない。
 5. `${SECRETARY_PLUGIN_ROOT}/workspace-templates/` の中身を、`secretary/` の中ではなく作業中フォルダのrootへコピーする。
    これにより `.github/workflows/chatwork-sync.yml` と `chatwork/` が通常project、`secretary/` と同じrepoに並ぶ。Google ChatはCloud準備と接続用JSONの取得後、専用wizardで選んだ通常スペースだけを同じrepoへ追加する。
    既存ファイルと重なる場合は無確認で上書きせず、変更前に対象を示して確認する。
@@ -263,6 +272,7 @@ git の英語エラーが出たら、そのまま見せず「何が起きて・�
 - 新規生成workflowのbot名は `secretary[bot]`。既存workspaceのbot名やworkflowは変更しない。
 - 秘書名、stable ID、AI種別を設定し、利用者の呼び方とは別であること。別repo呼び出しはname Skillで効果と対象fileを示し、明示確認後だけ有効化できること。
 - 次に試せる操作として /chatwork でルーム接続、または「Google Chatを設定したい」でCloud準備へ進めることと、「設定はいつでも『設定変えたい』で変更できます」という案内。
+- Project Clarityは任意で、Agentic版のXmind integration既定はOFFであること。使う場合は「クラリティを初期化」と明示し、read-only previewから始めること。
 
 ここでは内容と安全条件だけをrouterへ返す。通常報告の項目数、prefix、Markdown構造、完成例は持たず、
 `plain-language.md` から解決される「最終応答serializer」に任せる。

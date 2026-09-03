@@ -417,3 +417,22 @@ Chatwork／Google Chat wizardは両editionで同じ画面、copy、DOM、focus�
 - プロジェクト候補確認、一般PJ作成、フル昇格、別repo開発PJ接続は、確認前の副作用を0件にする。
 - すべてのユーザー向け出力は日本語。コマンド名・ファイル名・エラー名は原形を保つ。
 - 外部CLI・HTTPの待機は有限時間で終了し、timeout時は現在状態と再試行／中止の選択肢を示す。
+## Project Clarityの対話体験
+
+最初に答える問いは「今、人が考える必要があるのは何か」とする。通常表示は、結論、理由、根拠、選べる次の行動の順にし、重要項目を最大3件程度へ絞る。残りのAttention、idea、正常項目は件数と詳細pathへ畳む。Attentionがなければ、不安を煽らず「現在、判断が必要な項目はありません」と短く示す。
+
+4象限の日本語は、`stabilize`=定着・検証、`execute`=実行待ち、`validate`=暫定実装・要再確認、`decide`=設計・意思決定とする。AI推定には「推定」、未検証には「未検証」、Evidence不足には「根拠不足」を添える。internal enum、score、host payload、hook stageを通常表示の主語にしない。
+
+initはread-only previewから始め、project名、Repo identity、候補数、確信度が低い件数、除外・未確認範囲、作成予定path、file競合、Git変更予定、projection capabilityを示す。明示確認前にfile、runtime、journal、commitを作らない。
+
+Driftは対象、Decision、実装、双方の根拠、確信度を示し、「実装を合わせる／Decisionを変える／例外を承認／追加調査」から必要な選択だけを提示する。根拠不足は`possible_drift`として断定しない。
+
+Hookが動いても毎回interruptしない。disabled／trust未承認／failureでは「Hookは動いていません。`clarity status`／`review`／`checkpoint`は手動で使えます」と変更有無を分けて示す。Hookが他Skillやmemory／task候補を自動実行したように表示しない。
+
+projects表示はlifecycleを主表示のまま保ち、Clarity mode、Attention件数、最重要項目、link healthを短く添える。daily morningは予定、TODO、中断点の後に「今日の要確認」を独立表示する。Clarity ItemをTODOへ混ぜず、「タスクにして」等の明示依頼時だけ既存task導線へ委譲する。
+
+Markdown／Mermaid／Xmindは「正本ではない再生成可能な表示」と明示する。Xmindは既定OFF。ON時はprovider状態と選択理由を示し、MCP external writeとlocal `.xmind` fallbackのどちらも対象・影響のpreview後に確認する。localを「完全offline／無料」と断定しない。
+
+Harness Repoのinit previewでは、最初に「現在のSprintで決まっていること／実行報告／独立検証」を一つのCurrent bundleとして示す。state、contract、progress、feedbackのrole名とcoverageを併記し、progressの完了表現を「検証済み」へ言い換えない。過去Sprintは必要なEvidence参照だけに畳み、1 file 1 Itemの大量表示をしない。
+
+coverageはauthoritative／generic laneを分け、`確認済み / 除外 / 未確認 / 見つからない`と理由を平易に示す。valid／TBD／missing／invalid、巨大state、feedback未作成、Secret／binary／symlink／permission／missing、truncated／partialを「全部確認済み」へ丸めない。Windows結果もPASS／FAIL／SKIP／NOT-RUN、native実行の有無を分け、public／privateや別OSの結果をYasashii検証済みとして表示しない。

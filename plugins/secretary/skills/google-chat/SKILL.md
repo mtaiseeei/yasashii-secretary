@@ -5,6 +5,11 @@ description: Google Workspace版Google ChatのCloud準備、OAuth接続、通常
 
 # Google Chat（少し高度な設定）
 
+<!-- yasashii-secretary:clarity-collaboration:connector:v1 -->
+
+このSkillは、現在の依頼でGoogle Chatの接続・設定・検索が明示された場合だけ使う。Project Clarityの閲覧、Item作成、
+Attention、HookからOAuth、取得、network、設定変更を行わない。Clarityから参照する場合も既存の確認境界を省略しない。
+
 ## plugin root（必須）
 
 このSKILL.mdの実ファイル絶対pathを `SECRETARY_SKILL_FILE` に入れ、最初に1回だけ解決する。

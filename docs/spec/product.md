@@ -207,6 +207,23 @@ AGENTS／CLAUDE identity管理節、最小台帳を`0.10.1`新規導入相当へ
 既存6操作が確認を要求する境界は変えない。公開AgenticでのPASSは設計入力として使えるが、Yasashiiの合格根拠にはせず、
 固定baseから宣言済みcommon／adapted pathだけを適用して、実Yasashii sourceで独立評価する。
 
+### G14 Project Clarity — 今、人が考える必要があることを示す
+
+Project Clarityは、タスク数や単一の進捗率ではなく、決まっていること、実行したこと、確かめたこと、
+今判断が必要なこと、Decisionと実装のずれを分けて示す。Projectsは作成・完了・再開等のlifecycleを所有し、
+ClarityはDecision／Execution／Validation／Attention／Driftを所有する。
+
+Standalone Repo、Secretary-local Project、Linked External Repo、Portfolioを同じcoreで扱う。Yasashiiの保存先は
+`secretary/projects/open/<project>/clarity/`とし、private版の`05/02`構造を持ち込まない。Xmindは既定OFFで、
+ON時はcapableなXmind MCPを優先し、local `.xmind`は対象と影響を示した明示承認後だけ使う。
+
+Clarity専用command-only Hookだけを狭い例外として同梱する。通常のBashや他Skillのpayloadは、初期化／linked済みrootで
+runtime-only observationとしてboundedに観測できるが、他Skillへ意味routeせず、canonical／external writeを行わない。
+public→private→Yasashiiの固定handoff順序、Yasashii固有copy／overlay／identity、`harness@yasashii-harness`を維持し、
+release、cache、実host、実Xmindをsourceのoffline PASSへ混ぜない。
+
+Harness Repoの初期化では、一般scanが2 MiB上限へ達しても、現在判断に必要なstate、spec、Current contract／progress／feedback、guidance、package manifestを先に確認する。stateは実行状態、contractは要件、progressはGenerator自己報告、feedbackはEvaluator検証として別の意味を保ち、同じCurrent Sprintを一つの判断束へまとめる。読めない・存在しない・部分的な範囲は理由つきで示し、progressだけから独立PASSを推測しない。Windows対応はnative runnerで独立確認し、public／privateのPASSやmacOS上のWindows風文字列をYasashiiの検証済みへ昇格しない。
+
 ## ゴール
 
 1. 非エンジニアが説明に沿って導入し、初回5問以内で `secretary/` を安全に生成したうえで、1つのprivate GitHub repoを作成・初回pushできる。
@@ -234,6 +251,7 @@ AGENTS／CLAUDE identity管理節、最小台帳を`0.10.1`新規導入相当へ
 23. 初回の呼び方を4経路から選び、安全な候補を確認してから保存できる。既存変更では現役3正本を一括同期し、Yasashiiの言葉遣いとedition境界を保ったまま、配布物を利用者中立にできる。
 24. `0.10.0`を導入済みの利用者がPlugin更新後に残るローカルidentity移行を理解し、read-only診断と別確認を経て、自由記述を失わず`0.10.1`新規導入相当へ揃えられる。
 25. 明示された低リスクmemory依頼が、依頼確認の反復なしで一度だけ完了する。曖昧な内容、pending、訂正、意味重複、部分成功、scope外操作を区別し、再試行でも安全に続きから再開できる。
+26. Project Clarityが4モードで動き、Decision×Executionの4象限、根拠つきAttention、Driftを最大3件程度の分かりやすい表示で示せる。既存taskとProjects lifecycleを置換せず、manual fallback、固定projection、pull-only link／syncを安全に使える。
 
 ## 成功状態
 
@@ -289,7 +307,7 @@ AGENTS／CLAUDE identity管理節、最小台帳を`0.10.1`新規導入相当へ
 - cc-company の部署制、必須 `case-NNN`、`patterns/` 自動統合は導入しない。
 - 同意前のschedule push、確認なしの予期しない手動同期、public repoへのChatwork保存は行わない。復元機能「昨日の状態に戻して」は今回作らない。
 - 濃いキャラクター（関西弁・執事風等）のプリセットは同梱しない。例ペアを育てる方法は本プラグインの必須導線にしない。
-- hooks は同梱しない。採用する場合は先に不変条件を再定義する。
+- genericな自動化Hook、Harness Hook、projects／daily／weekly／memory-care／update等の独立Hookは同梱しない。例外はProject Clarityの成立に必要なcommand-only lifecycle Hook 1組だけであり、未初期化／未linkedは高速no-op、Hook内network／LLM／Xmind／全scan／connector／updateは0件とする。
 - dashboard は G1 の完了条件にしない。sprint-012 で明示判断する。
 - 常設Webアプリ、外部公開サーバー、汎用dashboardは作らない。例外としてChatwork／Google Chat設定用の共通ローカルwizardを提供する。
 - public配布repoへのChatwork Repository Secret、同期workflow、room設定、履歴の配置は行わない。
@@ -322,6 +340,8 @@ AGENTS／CLAUDE identity管理節、最小台帳を`0.10.1`新規導入相当へ
 - 既存workspace identity migrationの確認を、user-scope routing、過去author書換え、利用者文書のGrep置換、pushの許可へ拡張しない。
 - 明示memory authorizationを、削除、外部送信、公開、権限拡張、Secret取扱い、プロジェクト化など、別確認が必要な操作の包括許可へ拡張しない。
 - 公開Agentic版、private版、Yasashii版の評価を共有しない。Sprint 040でpush、tag、release、marketplace、cache、実workspaceまたはexternal serviceへの変更を行わず、private版は別repoの別Sprintで扱う。
+- Project ClarityをJira／Linear／Notion／GitHub Issuesの代替、生きた`TODO.md`、自動task起票、会議録／チャット本文の複製、単一進捗率へ拡張しない。private `05/02/10_sources/Notion`実装、実Xmind／host live、release／push／cacheはSprint 041〜043へ含めない。
+- Harness包括scanを全Repo全文index、全Git履歴読込、全過去SprintのItem化、global／per-file上限撤廃へ拡張しない。Sprint 043 Patch 003では実顧客Repo apply、実Xmind、private固有実装、version／release／Marketplace／install／cacheを扱わない。
 
 ## 承認済みの条件付き判断
 

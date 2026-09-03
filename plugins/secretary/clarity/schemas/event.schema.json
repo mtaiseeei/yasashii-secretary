@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentic-secretary://clarity/event.schema.json",
+  "title": "ClarityEvent",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schemaVersion", "eventId", "type", "itemId", "actor", "occurredAt", "payload"],
+  "properties": {
+    "schemaVersion": { "enum": [1, 2] },
+    "eventId": { "type": "string", "pattern": "^cv_[a-f0-9]{20}$" },
+    "type": { "enum": ["item.discovered", "decision.pending", "decision.proposed", "decision.confirmed", "decision.rejected", "decision.superseded", "execution.changed", "validation.changed", "alignment.changed", "disposition.changed", "evidence.linked", "checkpoint.recorded", "attention.resolved", "attention.override", "link.accepted", "link.finalized", "link.disabled", "sync.applied", "sync.conflict.detected", "sync.conflict.resolved", "drift.waiver.recorded"] },
+    "itemId": { "type": ["string", "null"], "pattern": "^ci_[a-f0-9]{20}$" },
+    "actor": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "payload": { "type": "object" }
+  }
+}

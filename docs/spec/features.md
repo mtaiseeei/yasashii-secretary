@@ -490,6 +490,84 @@ Yasashiiへの入力は、固定base `3c472dd9a2b5299f27741ae2c418094486b7d035`�
 Yasashii固有の文体、copy、style、`edition.json`、overlay正本／metadata、README、LICENSE、repo-owned docs、
 Harness履歴を保護し、公開版のPASSをYasashii版へ昇格しない。
 
+## Project Clarity Yasashii（F60〜F77）
+
+固定public candidateの17機能／62 behavior bulletをYasashiiへ一対一で対応させる。全62件の単一割当ID、件数内訳、公開版との対応は[clarity.md](clarity.md)を正本とし、この節は利用者から見た機能の索引とする。
+
+### F60 Project Clarity identityと4モード
+
+正式名称はProject Clarity、日本語表示はクラリティ、namespaceは`clarity`とする。Standalone Repo、Secretary-local Project、Linked External Repo、Portfolioを同じcoreで扱い、後からlinkしてもimmutableなProject IDと履歴を変えない。（3 behavior）
+
+### F61 Event／Evidence／Stateの正本分離
+
+状態遷移はappend-only Event、根拠は本文を複製しない最小Evidence、現在状態は決定的に再構築できるStateへ分ける。Markdown／Mermaid／Xmindは再生成可能なprojectionであり、Secret、transcript全文、顧客本文を保存しない。（3 behavior）
+
+### F62 決定×実行クラリティマトリクス
+
+DecisionとExecutionから`stabilize`／`execute`／`validate`／`decide`を常に再計算する。AI推定を明示正本や人間確認なしに`confirmed`へ進めず、`idea`、期限前`deferred`、`rejected`／`superseded`を現在Attentionから適切に分ける。（3 behavior）
+
+### F63 Attention Engine
+
+無承認実装、決定済み未実行、Drift、validation失敗、stale、authority／sync conflict、Evidence不足等を理由つきで抽出する。起動時とdailyは最大3件程度を結論→理由→根拠→選択の順で示し、単一進捗率や不透明なAI scoreを主要価値にしない。（3 behavior）
+
+### F64 Standalone init／review／doctor／migration
+
+Clarity未導入Repoをboundedかつread-onlyに解析し、作成予定、候補、競合、除外・未確認範囲をpreviewする。明示確認後だけ初期化し、retryを冪等にする。doctorはmode、schema、Hook、link、projection、lockを診断し、migration／cleanupはpreviewとapplyを分ける。（3 behavior）
+
+### F65 Clarity Skill／決定的CLI／manual fallback
+
+利用者向け入口は`clarity` Skill 1つとし、status、init、scan、review、checkpoint、decide、validate、drift、map、xmind、link、sync、portfolio、history、doctor、migrateを扱う。反復処理はsafe path、atomic write、JSON output、partial failure、idempotent retryを持つCLIへ分け、Hookが動かなくても手動で完遂できる。（3 behavior）
+
+### F66 Claude Code／Codex共通command-only lifecycle Hook
+
+plugin rootの共通`hooks/hooks.json`と軽量command router 1組でhost payloadを正規化する。SessionStart、PostToolUse、PreCompact、compact後再開、Stop、SessionEndをboundedに扱い、未初期化／未linkedはno-opとする。disabled／trust未承認はdegradedとして示し、他Skill Hook、memory意味判定、Hook内network／LLM／Xmind／全scanを追加しない。（5 behavior）
+
+### F67 Markdown／Mermaid projection
+
+overview、Attention、4象限一覧とmatrix／project structure／dependency／state flowを同じStateから決定的に生成する。描画不能でもraw `.mmd`とMarkdownを残す。q1右上青、q2左上緑、q3左下黄、q4右下赤を固定し、色だけでなくemoji／label／意味文を併記する。（4 behavior）
+
+### F68 Xmind provider projection
+
+YasashiiのXmind既定はOFF。ON時はcapableなXmind MCPを第1優先、local `.xmind`を明示承認後の第2優先とし、provider状態、preview、確認、固定4象限、2 Sheet相当、stable ID、既存branch保持、edit proposalを一体で守る。MCPからlocalへ自動fallbackせず、Hook内ではproviderを呼ばない。（8 behavior）
+
+### F69 generic Secretary-local統合
+
+保存先は`secretary/projects/open/<project>/clarity/`。既存`PROJECT.md`、Decision／memory、project resolverを再利用し、Clarity Item本文をPROJECTへ埋め込まない。Projectsがlifecycleと`canonicalRepo`、ClarityがDecision／Execution／Validation／Attention／Driftを所有する。private版の`05/02`、`vault/10_sources`、Notion実装は同梱しない。（4 behavior）
+
+### F70 daily／weekly／Portfolio統合
+
+daily morningは予定・TODO・中断点と分けた「今日の要確認」を最大3件程度示す。eveningとweeklyはDecision、実装観測、Drift、Attention増減、lag、長期滞留を分ける。Portfolioはopen projectの最小projectionだけを集め、closedと全Item本文を通常読込しない。（3 behavior）
+
+### F71 reciprocal link handshake
+
+prepare／accept／finalizeで双方のProject ID、Repo identity、link ID、digest、authorityを相互確認する。Link metadataへSecret、資格情報、absolute local path、顧客本文を保存せず、既存Standalone IDを維持してduplicate／tamper／target不一致を副作用0件で拒否する。（3 behavior）
+
+### F72 pull sync／authority／conflict
+
+相手exportをread-only取得し、自Repoのimport projectionだけをpreview後に更新する。fieldごとにPrimary／Reference／Shared derivedを持ち、Primary重複、last-write-wins、cross-root write、暗黙pushを拒否する。conflict resolutionは新Eventとして残す。（3 behavior）
+
+### F73 Decision／implementation Drift Detection
+
+Decision／spec／ADR／顧客合意とcode／commit／test／成果物Evidenceを比較する。根拠が弱ければ`possible_drift`、両側根拠が揃えば`drift`とし、Decision変更、実装修正、例外承認のいずれでも履歴を消さない。（3 behavior）
+
+### F74 Clarityの安全性・競合安全性・冪等性
+
+working root、symlink／junction、path traversal、dirty／staged変更、Secret、schema、lockを安全側に扱う。concurrent Hookはatomic write／lock／一意eventで破損と重複を防ぎ、failed apply／migration／sync／checkpointは利用者差分を巻き戻さずpartialとretryで一状態へ収束する。（3 behavior）
+
+### F75 public-first Yasashii適用と固定handoff
+
+Skill、Hook、host inventory、manifest、marketplace metadata、archive／clean checkoutをYasashii identityと整合させる。host／実行面ごとのsupportedとverifiedを分け、固定public handoffとprivate PASS receiptから共通path、adaptation、除外・保護path、rollbackを固定する。push／tag／Release／marketplace／cache／実downstreamは別phaseとする。（4 behavior）
+
+### F76 Clarity-aware collaboration surface inventory
+
+secretary、projects、daily、weekly、task collaboration、memory-care、build、update、onboarding、templates、rules、host／release inventory、edition handoffを実内容で棚卸しする。各surfaceのread／write／delegate／no-touchと正本を明示し、自動task化、memory二重保存、Harness state置換、自動update／connectorを負検査する。（4 behavior）
+
+### F77 Harness正本優先の包括scanとWindows native互換
+
+Harness Repoのinit previewは、一般scanの2 MiB上限と独立したreserved laneで`docs/sprints/state.md`、`docs/spec.md`と必要spec、Current contract／progress／feedback、`AGENTS.md`、`CLAUDE.md`、package manifestを先にbounded readする。state／contract／progress／feedbackの意味を混ぜず、一つのCurrent bundleへまとめ、valid／TBD／missing／invalid／巨大stateと、feedback absent／unreadable、Secret／binary／symlink／permission／missing、truncated／partialを理由つきcoverageで示す。authoritative lane後の残余budgetでgeneric scanを続け、非Harness Repoの既存意味は変えない。
+
+同じ挙動をWindows nativeでdrive letter、backslash、空白、日本語、CRLF、case collision、reserved／invalid path、prefix sibling、symlink／junction別capabilityまで検証する。preview／cancelはwrite 0、synthetic applyは所有path限定、Git／remote／network不変とし、既存ancestor alias安全境界を維持する。Yasashiiの既存Windows workflow、0.9.2回帰、Node 22、10分timeoutへ実在suiteを結線し、SKIP／NOT-RUN、public／private PASS、別OS模擬をYasashii PASSへ数えない。
+
 ## Gテーマと機能の対応
 
 | テーマ | 主な機能 |
@@ -507,3 +585,4 @@ Harness履歴を保護し、公開版のPASSをYasashii版へ昇格しない。
 | G11 | F30 F31 F36 F40 F41 F42 F43 F44 F45 F46 F47 F48 F49 F50 F51 F52 F53 F54 F55 F56 F57 F58 |
 | G12 | F04 F16 F20 F41 F42 F49 F55 F57 F58 |
 | G13 | F05 F07 F12 F44 F49 F59 |
+| G14 | F28 F51 F52 F54 F60 F61 F62 F63 F64 F65 F66 F67 F68 F69 F70 F71 F72 F73 F74 F75 F76 F77 |

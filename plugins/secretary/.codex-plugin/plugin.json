@@ -1,6 +1,6 @@
 {
   "name": "yasashii-secretary",
-  "version": "0.10.3",
+  "version": "0.11.0",
   "description": "非エンジニア向けAI秘書。記憶、通常のプロジェクト、選択したChatwork／Google Chat履歴を安全に管理します。",
   "author": {
     "name": "mtaiseeei",
@@ -17,6 +17,7 @@
     "productivity"
   ],
   "skills": "./skills/",
+  "hooks": "./hooks/hooks.json",
   "interface": {
     "displayName": "Yasashii Secretary",
     "shortDescription": "日々の仕事を整理する非エンジニア向けAI秘書",

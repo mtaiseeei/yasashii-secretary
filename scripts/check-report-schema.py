@@ -12,7 +12,7 @@ from pathlib import Path
 ENTRYPOINT_REL = Path("rules/plain-language.md")
 EXPECTED_USER_SURFACES = {
     *(Path("skills") / name / "SKILL.md" for name in (
-        "build", "chatwork", "connections", "daily", "google-chat", "memory-care", "name",
+        "build", "chatwork", "clarity", "connections", "daily", "google-chat", "memory-care", "name",
         "onboarding", "projects", "secretary", "settings", "setup-google", "setup-microsoft",
         "setup-notion", "update", "weekly",
     )),
@@ -151,8 +151,8 @@ def validate(plugin: Path) -> list[str]:
         errors.append(f"unexpected user-facing surface: {path}")
     for path in sorted(EXPECTED_USER_SURFACES - surface_inventory):
         errors.append(f"expected user-facing surface missing from inventory: {path}")
-    if len(surfaces) != 21:
-        errors.append(f"unexpected user-facing surface count: {len(surfaces)} (expected 21)")
+    if len(surfaces) != 22:
+        errors.append(f"unexpected user-facing surface count: {len(surfaces)} (expected 22)")
 
     schema_owners = {owner}
     for path in surfaces:
@@ -191,7 +191,7 @@ def main() -> int:
         for error in errors:
             print(f"SCHEMA_ERROR {error}", file=sys.stderr)
         return 1
-    print("SCHEMA_OK owner=active-edition-style entrypoint=rules/plain-language.md surfaces=21 conflicts=0 states=5")
+    print("SCHEMA_OK owner=active-edition-style entrypoint=rules/plain-language.md surfaces=22 conflicts=0 states=5")
     print("PASS=1 FAIL=0")
     return 0
 

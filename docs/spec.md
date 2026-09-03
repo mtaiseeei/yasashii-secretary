@@ -95,6 +95,15 @@ PASSの参照記録であってYasashiiへ適用する製品bytesではない。
 manifest／builder runから機械導出し、公開版のPASSはYasashii版へ引き継がない。明示memory依頼の一度限り実行、依頼と内容の
 不確実性分離、pending、純追加訂正、内容重複抑止、checkpoint partial、memory scope gate、既存6操作を実Yasashii sourceで
 検証する。Yasashii固有の文体、copy、`edition.json`、overlay正本／metadata、README、LICENSE、repo-owned docs、Harness履歴を保護する。
+2026-08-29、Project Clarityを固定public candidateからprivate my-vaultの独立PASSを経てYasashiiへ展開する方針を承認した。
+公開版は`public-user-decision-risk-accepted`かつ`evaluatorPass=false`のまま扱い、private PASS receiptが許す
+`yasashii-prewrite-only`を製品writeやrelease権限へ広げない。公開F64〜F80の17機能／62 behaviorをYasashii F60〜F76へ
+一対一で正本化し、保存先はgeneric `secretary/projects/open/<project>/clarity/`とする。Projectsはlifecycle、Clarityは
+Decision／Execution／Validation／Attention／Driftを所有する。Xmindは既定OFF、MCP-first、local fallbackは明示承認必須、
+Clarity専用command-only Hookだけを同梱する。詳細な固定tuple、62件の単一割当、250＋CLX20＋XV4＋E2E4の検証面は
+`docs/spec/clarity.md`を正本とする。
+
+2026-08-31、public Sprint 050 Patch 004とprivate同Patchのfresh独立PASSを固定入力として、YasashiiへHarness正本優先scanとWindows native互換を適応する。これは既存17機能／62 behaviorの再定義ではなく、新規F77と`yasashii-HS-001〜016`による拡張である。public／private／FableのPASSはYasashii PASSへ流用せず、Yasashii開始HEAD `9009f892f678fbcbde9978e0bceb803d3f1ad7d5`からの実差分、source／detached clean／Git-free、既存PR #12に因果するWindows runを独立評価する。詳細は`docs/spec/clarity.md`と`sprint-043-patch-003`を正本とする。
 
 ## ひとことで
 
@@ -122,13 +131,15 @@ Gmail等の公式コネクタは従来どおり都度参照し、Chatworkと明�
 | G11 | 2つの完成品を安全に育てる | `agentic-secretary` を上流、`yasashii-secretary` を狭いoverlayの下流とし、共通安全性・Git系譜・0.8.0配布準備・会話可読性・edition衝突停止を守る |
 | G12 | 呼び方と配布物を利用者中立にする | host提供済み文脈→Git→OSの順で安全な表示名候補をbest effortで示し、4経路と保存前確認を守る。既存設定変更では現役表示を同期し、配布物は個人名・端末固有path・私用環境へ依存しない |
 | G13 | 「覚えて」を一度で安全に完了する | 明示された低リスクmemory依頼は内部分類の再確認を挟まず一度だけ実行し、内容の不確実性、pending、訂正、重複、部分成功、scope境界を正直に扱う |
+| G14 | Project Clarityで今考えることを示す | 決定×実行、Attention、Drift、4モード、Clarity専用Hook、projection、public→private→Yasashii固定handoff |
 
 ## 詳細仕様
 
 | ファイル | 内容 |
 |---|---|
-| [product.md](spec/product.md) | 目的、対象ユーザー、G1〜G13、成功状態、非ゴール |
-| [features.md](spec/features.md) | F01〜F59 とユーザーから見た振る舞い |
+| [product.md](spec/product.md) | 目的、対象ユーザー、G1〜G14、成功状態、非ゴール |
+| [features.md](spec/features.md) | F01〜F77 とユーザーから見た振る舞い |
+| [clarity.md](spec/clarity.md) | Project Clarityの固定入力、17機能／62 behavior単一割当、Yasashii境界、検証面 |
 | [constraints.md](spec/constraints.md) | 安全・記憶保護・secret・single private repo・同期同意などの不変条件 |
 | [domain.md](spec/domain.md) | 三層記憶、一般／開発プロジェクト、更新台帳、timeline、Chatwork／Google Chatの取得・検索状態、時刻・索引・Git規約 |
 | [ui.md](spec/ui.md) | 対話UX、更新の説明と確認、プロジェクト候補確認、Chatwork／Google Chat wizardの簡潔な日本語、3行報告、先回り提案 |
@@ -182,6 +193,10 @@ Gmail等の公式コネクタは従来どおり都度参照し、Chatworkと明�
 | [sprint-039](sprints/sprint-039.md) | 固定Agentic candidateのhandoff manifestから英語の秘書名、stable identity、AI author、別repo routing、安全な改名をYasashii overlayへ同期 | sprint-038-patch-002 |
 | [sprint-039-patch-001](sprints/sprint-039-patch-001.md) | 固定Agentic `0.10.1`候補から、既存`0.10.0` workspaceの完全identity migration、更新後handoff、Yasashii保護回帰を同期 | sprint-039 done |
 | [sprint-040](sprints/sprint-040.md) | 公開PASS済みの明示memory authorizationを固定handoffから実Yasashii sourceへ適用し、固有surfaceを保護して独立評価 | sprint-039-patch-001 done |
+| [sprint-041](sprints/sprint-041.md) | Project Clarityの固定tuple、private receipt、path分類、protected snapshotを製品write前にfail-closed検査する | sprint-040-patch-001 done |
+| [sprint-042](sprints/sprint-042.md) | Project Clarity 17機能／62 behavior、generic storage、Hook、Xmind、collaboration、Yasashii overlayを統合する | sprint-041 fresh Evaluator PASS |
+| [sprint-043](sprints/sprint-043.md) | 同一candidateのsource／clean／Git-free、250＋CLX20＋XV4＋E2E4、fresh評価、source receiptを閉じる | sprint-042 fresh Evaluator PASS |
+| [sprint-043-patch-003](sprints/sprint-043-patch-003.md) | Harness正本をreserved laneで先に読む包括scan、意味別Current bundle、Yasashii固有Windows native／inventory／外部live gate | sprint-043-patch-002 done |
 
 既存 sprint-001〜006 と各 patch の契約・progress・feedback は履歴として保持する。
 sprint-007 は製品方針転換で白紙化され、旧計画と実装は `backup/sprint-007-010-plan` に退避済みである。
@@ -225,3 +240,4 @@ sprint-007 は製品方針転換で白紙化され、旧計画と実装は `back
 35. Yasashiiへの共通機能同期は、合格済みAgentic完全SHAをreview済みbaseとして記録し、宣言済みoverlayを二回適用して追加差分0件を確認する。Yasashii固有copy、identity、manifest、README、repo-owned docsを上流値で上書きしない。
 36. 秘書自身の英語名は利用者の呼び方と分離し、stable identity、AI author、canonical workspaceを維持する。user-scope routingはopt-inの製品管理blockだけを扱い、人名文脈を誤routingせず、改名では履歴をblind replaceしない。
 37. 明示された低リスクmemory依頼は、依頼そのものを再確認せず一度だけ実行する。ただし内容の不確実性は推測で埋めず、pending、純追加訂正、意味内容の重複抑止、checkpoint単位の部分成功、memory scope gateを適用する。既存6操作と安全境界を維持し、公開版のPASSをYasashii版のPASSとして扱わない。
+38. Project Clarityは生きたtaskやProjects lifecycleの新しい正本を作らない。`secretary/projects/open/<project>/clarity/`へ状態・Evidence・Attention・Driftを置き、Clarity専用command-only Hookだけを持つ。固定public Hook 3 pathはbyte-syncし、Yasashii adapter／overlay／style／identity／`harness@yasashii-harness`を保護する。private `05/02/10_sources/Notion`実装、無承認Xmind、release／cache／liveを同梱・実施済みにしない。

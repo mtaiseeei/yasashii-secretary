@@ -1,6 +1,9 @@
-import { createHash } from "node:crypto";
-import { readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { createHash, randomBytes } from "node:crypto";
+import { closeSync, fsyncSync, openSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
+
+const TEMP_CREATE_ATTEMPTS = 16;
+const INITIAL_TEMP_NONCE = "0000000000000000";
 
 export function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -44,27 +47,112 @@ export function planConversationMigration({ body, oldSection, newSection, marker
   };
 }
 
+function createOwnedSiblingTemp(target, purpose) {
+  const parent = dirname(target);
+  const targetName = basename(target);
+  for (let attempt = 0; attempt < TEMP_CREATE_ATTEMPTS; attempt += 1) {
+    const nonce = attempt === 0 ? INITIAL_TEMP_NONCE : randomBytes(8).toString("hex");
+    const path = join(parent, `.${targetName}.${purpose}-${process.pid}-${nonce}`);
+    try {
+      return { path, descriptor: openSync(path, "wx", 0o600), createAttempts: attempt + 1 };
+    } catch (error) {
+      if (error?.code === "EEXIST") continue;
+      throw error;
+    }
+  }
+  throw new Error("conversation-migration-temp-collision");
+}
+
+function closeOwnedTemp(owned) {
+  if (owned.descriptor === null) return;
+  closeSync(owned.descriptor);
+  owned.descriptor = null;
+}
+
+function writeOwnedTemp(owned, bytes) {
+  writeFileSync(owned.descriptor, bytes);
+  fsyncSync(owned.descriptor);
+  closeOwnedTemp(owned);
+}
+
+function cleanupOwnedTemp(owned) {
+  let closeError = null;
+  try { closeOwnedTemp(owned); } catch (error) { closeError = error; }
+  let unlinkError = null;
+  try { unlinkSync(owned.path); } catch (error) {
+    if (error?.code !== "ENOENT") unlinkError = error;
+  }
+  if (closeError || unlinkError) {
+    throw new AggregateError([closeError, unlinkError].filter(Boolean), "conversation-migration-temp-cleanup-failed");
+  }
+}
+
+function atomicReplace(target, bytes, purpose) {
+  const owned = createOwnedSiblingTemp(target, purpose);
+  try {
+    writeOwnedTemp(owned, bytes);
+    renameSync(owned.path, target);
+    return owned.path;
+  } catch (error) {
+    try {
+      cleanupOwnedTemp(owned);
+    } catch (cleanupError) {
+      throw new AggregateError([error, cleanupError], "conversation-migration-atomic-replace-failed");
+    }
+    throw error;
+  }
+}
+
 export function applyConversationMigration({ target, plan, oldSection, newSection, simulateFailure = null }) {
   const before = readFileSync(target);
-  if (sha256(before) !== plan.beforeHash || plan.action !== "change") throw new Error("migration-plan-stale");
+  const beforeHash = sha256(before);
+  if (beforeHash !== plan.beforeHash) throw new Error("migration-plan-stale");
+  if (plan.action === "already-applied") {
+    return { changed: false, before, afterHash: beforeHash, temporaryPath: null, temporaryCreateAttempts: 0 };
+  }
+  if (plan.action !== "change") throw new Error("migration-plan-stale");
   const beforeText = before.toString("utf8");
   if (occurrences(beforeText, oldSection) !== 1) throw new Error("migration-ownership-changed");
   const after = Buffer.from(beforeText.replace(oldSection, newSection), "utf8");
-  const temp = join(dirname(target), `.${target.split("/").at(-1)}.conversation-migration-${process.pid}`);
+  const owned = createOwnedSiblingTemp(target, "conversation-migration");
+  let renamed = false;
   try {
-    writeFileSync(temp, after, { mode: 0o600 });
+    writeOwnedTemp(owned, after);
     if (simulateFailure === "before-rename") throw new Error("simulated-before-rename");
-    renameSync(temp, target);
+    renameSync(owned.path, target);
+    renamed = true;
     if (simulateFailure === "after-rename") throw new Error("simulated-after-rename");
-    return { changed: true, before, afterHash: sha256(after) };
+    return {
+      changed: true,
+      before,
+      afterHash: sha256(after),
+      temporaryPath: owned.path,
+      temporaryCreateAttempts: owned.createAttempts,
+    };
   } catch (error) {
-    try { unlinkSync(temp); } catch { /* rename済み、または未作成 */ }
-    writeFileSync(target, before);
+    if (!renamed) {
+      try {
+        cleanupOwnedTemp(owned);
+      } catch (cleanupError) {
+        throw new AggregateError([error, cleanupError], "conversation-migration-apply-cleanup-failed");
+      }
+      throw error;
+    }
+    try {
+      const rollbackTemporaryPath = atomicReplace(target, before, "conversation-migration-rollback");
+      error.conversationMigration = {
+        temporaryPath: owned.path,
+        rollbackTemporaryPath,
+        restoredHash: sha256(readFileSync(target)),
+      };
+    } catch (rollbackError) {
+      throw new AggregateError([error, rollbackError], "conversation-migration-rollback-failed");
+    }
     throw error;
   }
 }
 
 export function rollbackConversationMigration(target, backup) {
-  writeFileSync(target, backup);
-  return { restoredHash: sha256(readFileSync(target)), expectedHash: sha256(backup) };
+  const temporaryPath = atomicReplace(target, backup, "conversation-migration-rollback");
+  return { restoredHash: sha256(readFileSync(target)), expectedHash: sha256(backup), temporaryPath };
 }

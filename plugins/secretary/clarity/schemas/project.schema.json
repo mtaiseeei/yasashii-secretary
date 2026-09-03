@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentic-secretary://clarity/project.schema.json",
+  "title": "ClarityProject",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schemaVersion", "clarityProjectId", "name", "mode", "createdAt", "repoIdentity", "secretaryLink", "compatibility", "rootEntry"],
+  "properties": {
+    "schemaVersion": { "enum": [1, 2] },
+    "clarityProjectId": { "type": "string", "pattern": "^cp_[a-f0-9]{20}$" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "mode": { "enum": ["standalone", "secretary-local", "linked-external", "portfolio"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "repoIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "rootName", "remote", "branch", "head"],
+      "properties": {
+        "kind": { "enum": ["git", "non-git"] },
+        "rootName": { "type": "string", "minLength": 1 },
+        "remote": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "repository"],
+          "properties": {
+            "status": { "enum": ["available", "missing", "redacted", "unparsed", "not-applicable"] },
+            "repository": { "type": ["string", "null"] }
+          }
+        },
+        "branch": { "type": ["string", "null"] },
+        "head": { "type": ["string", "null"] }
+      }
+    },
+    "secretaryLink": { "type": ["object", "null"] },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reader", "writer"],
+      "properties": {
+        "reader": { "$ref": "#/$defs/versionRange" },
+        "writer": { "$ref": "#/$defs/versionRange" }
+      }
+    },
+    "rootEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "status"],
+      "properties": {
+        "path": { "const": "CLARITY.md" },
+        "status": { "enum": ["managed-block", "external-conflict"] }
+      }
+    }
+  },
+  "$defs": {
+    "versionRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min", "max"],
+      "properties": {
+        "min": { "type": "integer", "minimum": 1 },
+        "max": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

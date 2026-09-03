@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentic-secretary://clarity/item.schema.json",
+  "title": "ClarityItem",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schemaVersion", "itemId", "title", "areaPath", "kind", "disposition", "deferredUntil", "owner", "decisionOwner", "dependencies", "externalRefs", "confidence", "timestamps", "attention", "decision", "execution", "validation", "alignment"],
+  "properties": {
+    "schemaVersion": { "enum": [1, 2] },
+    "itemId": { "type": "string", "pattern": "^ci_[a-f0-9]{20}$" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "areaPath": { "type": "string", "minLength": 1 },
+    "kind": { "type": "string", "minLength": 1 },
+    "disposition": { "enum": ["required", "candidate", "idea", "deferred", "rejected"] },
+    "deferredUntil": { "type": ["string", "null"], "format": "date" },
+    "owner": { "type": ["string", "null"] },
+    "decisionOwner": { "type": ["string", "null"] },
+    "dependencies": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "externalRefs": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "confidence": { "enum": ["unknown", "observed", "verified"] },
+    "timestamps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["createdAt", "updatedAt"],
+      "properties": {
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "attention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "reasons"],
+      "properties": {
+        "level": { "enum": ["not_evaluated", "critical", "high", "medium", "low", "none"] },
+        "reasons": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    },
+    "attentionContext": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "impact": { "type": "number" },
+        "urgency": { "type": "number" },
+        "signals": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "humanOverride": {
+          "type": ["object", "null"],
+          "properties": { "level": { "enum": ["critical", "high", "medium", "low", "none"] }, "reason": { "type": "string" }, "rank": { "type": "number" } }
+        }
+      }
+    },
+    "decision": { "$ref": "#/$defs/decision" },
+    "execution": { "$ref": "#/$defs/execution" },
+    "validation": { "$ref": "#/$defs/validation" },
+    "alignment": { "$ref": "#/$defs/alignment" },
+    "quadrant": { "enum": ["stabilize", "execute", "validate", "decide"] },
+    "quadrantLabel": { "type": "string" },
+    "quadrantMeaning": { "type": "string" },
+    "inProgress": { "type": "boolean" },
+    "activeMatrix": { "type": "boolean" },
+    "attentionEligible": { "type": "boolean" },
+    "attentionReasons": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+  },
+  "$defs": {
+    "evidenceRefs": { "type": "array", "items": { "type": "string", "pattern": "^ce_[a-f0-9]{20}$" }, "uniqueItems": true },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "source", "humanConfirmed", "authority", "evidenceRefs", "updatedAt"],
+      "properties": {
+        "status": { "enum": ["unknown", "exploring", "proposed", "confirmed", "rejected", "superseded"] },
+        "source": { "type": "string" },
+        "humanConfirmed": { "type": "boolean" },
+        "authority": { "type": "string" },
+        "evidenceRefs": { "$ref": "#/$defs/evidenceRefs" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "authority", "evidenceRefs", "updatedAt"],
+      "properties": {
+        "status": { "enum": ["unknown", "not_started", "in_progress", "implemented", "verified", "operational", "rolled_back"] },
+        "authority": { "type": "string" },
+        "evidenceRefs": { "$ref": "#/$defs/evidenceRefs" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidenceRefs", "updatedAt"],
+      "properties": {
+        "status": { "enum": ["unknown", "pending", "passed", "failed", "waived"] },
+        "evidenceRefs": { "$ref": "#/$defs/evidenceRefs" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "alignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidenceRefs", "updatedAt"],
+      "properties": {
+        "status": { "enum": ["unknown", "aligned", "possible_drift", "drift", "not_applicable"] },
+        "evidenceRefs": { "$ref": "#/$defs/evidenceRefs" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

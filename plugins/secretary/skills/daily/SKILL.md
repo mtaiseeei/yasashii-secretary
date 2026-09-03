@@ -38,11 +38,14 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 
 ## morning: 今日の入口
 
+<!-- yasashii-secretary:clarity-collaboration:daily:v1 -->
+
 1. `node "${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.mjs" resume-check <secretary>`を実行する。しおりがあれば`resume-read`で**中断点**を確認するが、自動で消さない。
 2. 同じNode.js helperの`timeline <secretary> --type journal`で直近の`next`（翌日以降への申し送り）を確認する。
 3. `node "${SECRETARY_PLUGIN_ROOT}/scripts/workspace-tools.mjs" todo-list <secretary>`で未完TODOを確認する。
 4. `project-tools.mjs list <secretary>`でopenの進行中PJだけを確認し、各`PROJECT.md`の状態・待ち・次の入口と、PJ参照つきTODOを分けて扱う。closedは明示依頼がない限り存在確認・探索・候補表示しない。
 5. 中断点、申し送り、PJ状態、待ち、TODOを混ぜずに、今日の入口として返す内容を整理する。外部予定も必要なら続けてdailyを1回だけ行う。
+6. `node "${SECRETARY_PLUGIN_ROOT}/scripts/clarity-secretary.mjs" daily <secretary> --mode morning`を実行し、予定・TODO・中断点とは別の`今日の要確認` sectionとして最大3件だけ添える。通常参照はopen PJだけで、closed、全Item本文、外部connectorをClarity経由で読まない。source failureは取得できた範囲と未確認範囲を分ける。
 
 `_resume.md`は中断した作業の文脈、journalの`next`は翌日以降への申し送り、TODOは実行項目である。
 同じ内容を3か所へ複製しない。現在の依頼が再開作業なら先に実行し、中断点が不要になったことまで明示されていれば同じturnで`resume-clear`を1回呼ぶ。
@@ -103,6 +106,7 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 4. 途中の作業を再開する文脈が必要なら`_resume.md`、翌日以降に実行する確定事項ならjournalの`next`、
    実行項目ならTODOを使う。同じ内容を複数へ記録しない。
 5. 週次要約は作らない。当日の活動、未完事項、次の入口を内容としてrouterへ返し、出力形は最終応答serializerに任せる。
+6. `node "${SECRETARY_PLUGIN_ROOT}/scripts/clarity-secretary.mjs" daily <secretary> --mode evening`の結果から、Decision、実装観測、候補、Drift、持越しAttentionを別項目で添える。Clarity ItemをTODO一覧へ混ぜず、この閲覧からtaskを自動作成しない。
 
 PJ参照つきTODOを扱う場合も、`PROJECT.md`は状態・待ち・次の入口、`inbox/todo.md`は実行項目の正本として分ける。
 完了済みPJは通常の進行中表示へ出さず、明示参照や再開依頼では`projects` skillへ渡して確認する。

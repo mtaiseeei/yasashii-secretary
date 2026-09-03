@@ -112,6 +112,11 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 39. **checkpoint partial**: 複数保存先の途中に代表failureを入れ、成功済み、未完了、失敗理由が区別される。retryでは未完了だけを実行し、最終状態に重複・partial残骸がない。
 40. **memory scope gateと既存6操作**: memory保存は一度で進む一方、削除、外部送信、公開、権限拡張、Secret、プロジェクト化を含む既存の確認対象は確認前副作用0件を保つ。
 41. **負ケースとYasashii分離**: 明示依頼でない相談、引用、否定、第三者の発話をmemory依頼へ昇格しない。Yasashiiの平易なcopyを実runtimeで確認し、公開Agentic出力や公開PASSだけでYasashii合格を作らない。
+42. **Clarityの最初の表示**: 無承認実装、決定済み未実行、根拠不足、正常項目を混在させ、最大3件程度の結論→理由→根拠→選択と畳まれた残件を確認する。推定・未検証を断定せず、TODO一覧へ変換しない。
+43. **Clarity Hookとmanual fallback**: 未初期化、linked、disabled、trust未承認、通常Bash、他Skill、`material=false`、同時Stopを実行する。runtime-only observationは許すがcanonical／external write、semantic route、nonmaterial checkpoint、他Skill Hookは0件で、手動status／review／checkpointが動く。
+44. **Xmind provider選択**: 既定OFF、capable MCP、MCP unavailable／capability不足／失敗、local指定、承認、拒否を操作し、MCP-first、local preview、明示承認、fixed visual、無承認write 0、未検証の非昇格を確認する。
+45. **link／sync／Driftとtask協働**: reciprocal handshake、pull-only、authority conflict、possible／confirmed Drift、明示task委譲を操作する。相手root write、暗黙push、last-write-wins、自動task化、memory二重保存、Harness state置換を0件にする。
+46. **Harness包括scan／Windows native**: 2 MiB超Harness、non-Harness、Current valid／TBD／missing／invalid、feedback absent、巨大state、Secret／binary／symlink／permission／missingを実fixtureで操作する。authoritative／generic lane、4 role、Current bundle、partial reason、preview／apply安全を確認し、Windows nativeでdrive／backslash／空白／日本語／CRLF、collision／reserved／invalid／prefix sibling、symlink／junction別capabilityを実行する。既存Yasashii workflowのNode 22、0.9.2回帰、10分timeoutとexact candidate因果runを確認し、SKIP／NOT-RUNや上流PASSをYasashii PASSへ数えない。
 
 個人化された文面の完全一致はassertしない。設定の読込、許可された分岐、既定へのフォールバック、確認フローを評価する。
 
@@ -138,6 +143,13 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 | C17 | 秘書identity・routing・安全な改名 | 英語名、stable identity、AI author、canonical resolver、managed block、人名誤routing防止、分類付き改名、overlay保護 | **5** |
 | C18 | 既存workspace identity migration | 更新後handoff、read-only診断、別確認、identity／AGENTS／CLAUDE／台帳、自由記述保護、local checkpoint、rollback、冪等性、履歴保護 | **5** |
 | C19 | 明示memory authorization・内容冪等性・Yasashii下流分離 | run-once、不確実性分離、pending、純追加訂正、内容dedupe、partial、scope gate、固定handoff、固有surface保護、独立評価 | **5** |
+| C20 | Clarity正本・状態モデル | Event／Evidence／State、Decision×Execution、AI推定非確定、4モード | **5** |
+| C21 | Attention・Yasashii UX | bounded output、結論→理由→根拠→選択、Drift、平易さ、未検証表示 | ≥4 |
+| C22 | Clarity Hook・host truth | command-only router、no-op／degraded、manual fallback、競合安全、host結果分離 | **5** |
+| C23 | link・sync・Drift | reciprocal identity、authority、pull-only、conflict、cross-root write 0 | **5** |
+| C24 | projection・Xmind | deterministic Markdown／Mermaid、MCP-first、承認付きlocal fallback、fixed visual | ≥4 |
+| C25 | Yasashii安全・統合・handoff | generic storage、Projects分離、overlay、17／62、250＋20＋4＋4、固定receipt | **5** |
+| C26 | Clarity包括scan・Windows native | reserved lane、正本意味、coverage、generic無回帰、Windows native、因果CI | **5** |
 
 ## スコアアンカー
 
@@ -241,6 +253,53 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 - 5: 明示された低リスクmemory依頼が再確認なしで一度だけ実行され、request／content uncertainty、pending、append-only訂正、意味内容dedupe、checkpoint partial、memory scope gate、既存6操作が実runtime goldenで成立する。固定base／公開製品commit／両candidate ID／schema 3 digestが一致し、manifestと実runから導出したparity／adapted／supportingが排他的で、実actionとactual diffに未分類・未利用・staleがない。parityのbyte／mode、adaptedのtransformer／anchor occurrence／実application／final digest、supportingの実利用、copy後adapt trace、`publicWholeTree`と負fixture、overlay二回目差分0件、Yasashii固有surface不変が成立する。実Yasashii sourceの専用15/15、Sprint 038／010／safety、release integrity、Git-free archive、inventory 17/17が全PASSし、公開PASSを流用せず、UI／external write 0件である。
 - 4以下: 明示依頼の再確認または複数実行、依頼でない発話の保存、曖昧内容の推測保存、pending消失、訂正の破壊的置換、同義内容の重複、partialの完全成功表示、retryの成功済み再実行、memory scope外の確認省略、既存6操作の後退、fixed input不一致、role重複、未分類・未利用・stale path、実action／actual diff不一致、parity byte／mode不一致、adapted transformer／anchor／適用回数／digest不一致、supportingの製品差分、copy後adapt trace欠落、`publicWholeTree`または負fixtureの偽PASS、overlay再適用差分、Yasashii固有surface変化、必須suite／inventory未達、公開PASSによる代替、UI変更、外部writeのいずれかが1件でもある。→不合格。
 
+### C20 Clarity正本・状態モデル【ゼロ許容】
+
+- 5: immutable IDと4モード、append-only Event、最小Evidence、再構築Stateが成立する。Decision／Execution／Validation／Alignmentが独立し、全組合せ、`rolled_back`、`superseded`、`idea`、期限前後`deferred`が固定4象限へ決定的に分類される。AI推定・draft・古いproposalが人間確認なしに確定しない。
+- 4以下: ID不安定、Event破壊更新、本文複製、State再構築不能、DecisionとExecutionの混同、4象限の誤分類、AI推定の確定、既存正本の置換が1件でもある。→不合格。
+
+### C21 Attention・Yasashii UX
+
+- 5: 「今、人が考える必要があるのは何か」へ最大3件程度で結論→理由→根拠→選択を返し、Drift、無承認実装、決定済み未実行を正しく優先する。idea／正常項目は畳み、推定・未検証・根拠不足・source unreachableを断定しない。Yasashiiの平易さを保ち、正式名称や安全境界を省略しない。
+- 4: 主要Attentionと選択、平易さ、安全境界は成立し、軽微な順序・copy改善だけが残る。
+- 3以下: 全件羅列、task一覧化、理由／根拠なし、Drift誤断定、idea優先、不安を煽る表示、bounded output違反、幼稚な言い換え、安全説明省略のいずれか。→不合格。
+
+### C22 Clarity Hook・host truth【ゼロ許容】
+
+- 5: 固定public Hook 3 pathがbyte一致し、hostの`type: command`で動くClarity専用router 1組がpayloadを正規化する。初期化／linked済みrootのbounded lifecycle eventとEdit／Write／test候補を観測し、通常Bash／他Skill payloadはruntime-only nonmaterial observationに留まる。canonical／external write 0、semantic route 0、`material=false`のStop checkpoint 0、未初期化／未linked／disabled／trust未承認はno-op、manual fallback、同時発火安全、host結果分離が成立する。
+- 4以下: Hook 3 path不一致、prompt／agent／LLM Hook依存、他Skill独立Hook、memory意味推測、通常payloadのcanonical／external writeまたはsemantic route、nonmaterial checkpoint、Hook内network／LLM／Xmind／全scan／connector／update、1 host結果の全host昇格が1件でもある。→不合格。
+
+### C23 link・sync・Drift【ゼロ許容】
+
+- 5: prepare／accept／finalizeが双方のID／Repo identity／digestを照合し、pull syncはpreview後に自Repoだけを更新する。authorityが一意で、conflict、stale、schema不一致、deleteを隠さず、last-write-wins／cross-root write／暗黙pushが0件。Driftは双方のEvidenceを示し、根拠不足はpossibleに留める。
+- 4以下: 相手Repoへの直接write、absolute pathのtracked保存、identity改ざん受理、Primary重複、conflict消去、暗黙network／push、根拠なしDrift確定、履歴消去が1件でもある。→不合格。
+
+### C24 projection・Xmind
+
+- 5: Markdown／Mermaid／選択Xmind providerが同じStateから決定的に生成される。Yasashii既定OFF、ON時MCP-first、provider capability／priority／selected／reason／verified分離、承認付きlocal fallback、2 Sheet相当、stable ID、既存branch保持、edit proposalが成立する。TL緑`#16A34A`、TR青`#2563EB`、BL黄`#D97706`、BR赤`#DC2626`、上「決まっている」／下「まだ決まっていない」を色・emoji・label・意味文で守る。
+- 4: 必須projection、provider resolver、承認付きlocal fallback、fixed visualは成立し、明示承認がないreal MCP external-liveだけが正直なNOT-RUNである。isolated fakeをverifiedへしない。
+- 3以下: projectionの正本化、非決定出力、OFF無視、capable MCPよりlocal優先、自動local write、preview／confirm欠落、無承認write、fakeのverified昇格、fixed visual不一致、Xmind変更の直接確定、Hook内provider呼出しのいずれか。→不合格。
+
+### C25 Yasashii安全・統合・handoff【ゼロ許容】
+
+- 5: public17→Yasashii17と62 behaviorが一対一で、generic `secretary/projects/open/<project>/clarity/`だけへ保存する。Projects lifecycleとClarity責務、task明示委譲、memory重複防止、Harness state非置換、自動update／connector 0が成立する。固定public／private tuple、private PASS receipt、Yasashii prewrite receipt、path role、actual action／diff、protected snapshotが一致し、Yasashii copy／style／identity／overlay／`harness@yasashii-harness`を保護する。同一candidateのprimary 250／CLX20／XV4／E2E4、source／clean／Git-free、既存回帰が0 FAILである。
+- 4以下: behavior欠落／重複、private `05/02/10_sources/Notion`混入、generic storage以外へのwrite、project lifecycle乗取り、自動task化、memory二重保存、Harness state置換、自動connector／update、fixed tuple／receipt不一致、role overlap／未分類／stale、Yasashii固有surface変化、公開`evaluatorPass=true`化、release／cache／live昇格、必須case未実行／FAILが1件でもある。→不合格。
+
+### C26 Clarity包括scan・Windows native【ゼロ許容】
+
+- 5: genericが2 MiB上限へ達してもauthoritative reserved laneがstate、必要spec、Current contract／progress／feedback、guidance／packageを先にbounded readする。4 roleを混同せず一つのCurrent bundleへまとめ、valid／TBD／missing／invalid／巨大state、feedback absent／unreadable、Secret／binary／symlink／permission／missing、truncated／partialを固有coverageで返す。非Harness generic意味、Patch 002 alias／identity、preview／cancel write 0、synthetic apply所有path、Git／network不変を維持する。Windows nativeでpath／CRLF／collision／reserved／invalid／prefix sibling／symlink／junctionを実行し、既存workflowの`windows-native`、Node 22、0.9.2回帰、10分timeout、exact candidate因果runが0 FAIL。`yasashii-HS-001〜016`は意味・Severity・F77単一割当を守り、public／private／Fable PASS、SKIP／NOT-RUN、別OS模擬を流用しない。
+- 4以下: authoritative正本の取りこぼし、progressからPASS推測、過去fileの大量Item化、coverage誤表示、unbounded read、非Harness回帰、Secret／path／Git境界違反、Windows native未実行、capability不足のPASS化、workflow既存条件の破壊、上流PASS流用、Case重複／欠落／Severity弱体化が1件でもある。→不合格。
+
+## Project Clarity Yasashiiの検証方法（safe harbor）
+
+- `docs/spec/clarity.md`の17機能／62 behavior単一割当を正本とし、同一candidateへprimary 250、CLX 20、XV 4、E2E 4を対応づける。case本文、Severity、期待副作用、conditional NOT-RUNの意味を固定public candidateから緩和しない。
+- Sprint 041は固定tuple、private receipt、authorization、path role、protected snapshotとfail-closed負例だけを検証し、PASS前のClarity製品writeを0件にする。Sprint 042は17／62と各機能の正負case、Sprint 043は250＋20＋4＋4を全再実行する。
+- 隔離temporary Repo／合成HOME、同一bytesのclean checkout／Git-free archive、固定時刻、failure injection、before／after tree・Git snapshot、JSON parse、content digestを使う。
+- Hookはhost eventごとのpayload normalization、runtime observation、material、canonical／external write、semantic route、checkpoint、timingを記録する。実host live未実施はNOT-RUNとし、1 hostの結果を他へ流用しない。
+- UI／projectionは生成Markdown、raw Mermaidまたはrender、Xmind adapter request／response、承認済み隔離local `.xmind` validationを証拠にできる。実Xmind MCP／local writeを合格のために自動実行せず、fakeをverifiedへしない。
+- command、exit code、case ID、期待／観測、fixture root、前後digest、PASS／FAIL／NOT-RUN理由、candidate identityがあれば十分とする。新しいcollector／統一attestation、実顧客data、無許可network／release／cache／liveを追加条件にしない。
+- Sprint 043 Patch 003では、lane別limit／usage／coverage／partial reason、4 role／fallback、Current bundle／Evidence locator、before／after tree・Git・network、Windows capability／workflow run、actual path／action／digest、overlay二回目差分、source／clean／Git-free結果をsafe harborとする。browser screenshotはUI変更がないため不要である。
+
 ## スプリント別の重点
 
 | Sprint | 重点 |
@@ -283,6 +342,10 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 | 039 | accepted Agentic `3fa8d97e...`／digest `c810f60c...`、16 commonPaths（13 byte parity＋3 anchors、`external-ops.mjs`／`safe-git.mjs`を含む）、英語名／stable identity／AI author、名前Skill、canonical resolver、user-scope managed block、direct／human routing、分類付き改名／rollback、Yasashii固有surface保護、Windows残余の正直な区別、外部write禁止 |
 | 039-patch-001 | fixed Agentic HEAD `ba4fe4de...`／製品commit `3ef7928...`／digest `a7d74a7...`、20 commonPaths（16 byte parity＋4 anchors）、既存`0.10.0`のread-only診断、更新後handoff、別確認、identity／AGENTS／CLAUDE／台帳、自由記述保護、所有path checkpoint、完全rollback、retry／rerun、user-scope別確認、Yasashii `0.10.1`候補、3版PASS前release hold |
 | 040 | fixed base `3c472dd...`／公開製品commit `9acea13...`／public candidate `36a5c5f...`／Yasashii isolated candidate `4bc8716...`／schema 3 digest `e515842...`、排他的parity／adapted／supporting、manifest／実action／actual diff機械照合、anchor occurrence／application実測、copy後adapt trace、`publicWholeTree`／負fixture、run-once、request／content hedge、pending、append-only訂正、内容dedupe、checkpoint partial、scope gate、既存6操作、実runtime golden、専用15/15、Sprint 038／010／safety、overlay冪等、release integrity、Git-free archive、inventory 17/17、Yasashii固有surface保護、独立PASS、UI／外部write 0件 |
+| 041 | fixed public／private tuple、private PASS receipt、`yasashii-prewrite-only`、path role、protected snapshot、unknown／mismatch／falsy／dirty／tamper fail-closed、PASS前製品write 0、Yasashii prewrite receipt |
+| 042 | public F64〜F80→Yasashii F60〜F76、62 behavior、generic storage、Projects／Clarity責務、Hook 3 path byte-sync、Xmind OFF／MCP-first／local承認、task／memory／build／update協働、overlay／identity保護 |
+| 043 | exact same candidate、source／clean／Git-free、17／62 matrix、primary 250＋CLX20＋XV4＋E2E4、全回帰、fresh独立評価、source handoff／receipt、external／live NOT-RUN |
+| 043-patch-003 | F77、yasashii-HS-001〜016、Harness reserved lane、Current 4 role bundle、honest coverage、generic／alias／Git安全、Yasashii Windows native、actual path分類、source／clean／Git-free、既存PR #12因果CI |
 
 ## 差し戻し分類
 
@@ -293,6 +356,10 @@ wizardはrunning UIをbrowserで操作し、desktop／mobileのスクリーン�
 - active Sprintでの基準厳格化、緩和、Non-scope化はPlanner提案とユーザー承認を要する。契約済み証拠形式を満たす限り、Evaluatorは別の統一attestation基盤を追加の必須条件にしない。
 
 ## 更新履歴
+
+- 2026-08-31: Sprint 043 Patch 003としてF77、検証方法46、C26、`yasashii-HS-001〜016`を追加した。public／private Patch004の意味を上流入力にしつつ、Yasashii固有のsingle Feature割当、reserved lane、4 role、partial coverage、Windows native／既存workflow／因果CI、上流PASS非継承を固定した。
+
+- 2026-08-29: private Project Clarityのfresh PASS receiptとユーザー承認に基づき、Yasashii版F60〜F76、62 behavior、C20〜C25、Sprint 041〜043を追加した。generic storage、Clarity専用command-only Hook、Xmind既定OFF／MCP-first／local明示承認、fixed visual、primary 250＋CLX20＋XV4＋E2E4、public `evaluatorPass=false`、release／cache／live NOT-RUNを固定した。
 
 - 2026-08-26: ユーザーの明示承認により、active Sprint 040の旧schema 2固定件数条件を、公開Agentic Sprint 040 Patch 001で独立PASSしたschema 3条件へ置換した。固定入力を`9acea13...`／`36a5c5f...`／`4bc8716...`／`e515842...`へ更新し、parity／adapted／supportingの排他分類、manifest／実action／actual diffの同一run照合、anchor出現・実適用、copy後adapt trace、`publicWholeTree`と負fixtureをC19へ反映した。memory挙動、既存6操作、Yasashii固有surface、独立評価、採点閾値、Non-scopeは変更していない。
 - 2026-08-26: 公開Agentic Sprint 040の独立PASS済み明示memory authorizationをYasashiiの次メインSprintとして契約化し、検証方法50、必須会話35〜41、C19を追加した。固定handoff、実runtime golden、下流固有surface保護、専用15/15と既存回帰、inventory 17/17、公開PASS非継承を5/5条件とする。

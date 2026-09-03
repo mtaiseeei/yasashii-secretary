@@ -45,6 +45,12 @@ node "${SECRETARY_PLUGIN_ROOT}/scripts/update-diagnose.mjs" --workspace .
 ledger、marker、履歴、設定、Git、pluginを変更せず停止します。edition切替や削除は案内しません。
 最後に `${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` から解決される最終応答serializerを1回だけ適用します。
 
+<!-- yasashii-secretary:clarity-collaboration:update:v1 -->
+
+Project ClarityのHook、SessionStart、status／review／checkpointからこのupdate Skillを起動しない。Clarity利用中でも
+毎sessionの最新版照会、network、plugin install／update、workspace migrationを行わない。利用者が現在の用件として
+plugin更新の確認または実行を明示した場合だけ、このSkillのread-only診断から始め、既存の別turn確認境界を維持する。
+
 ## 読み取り専用診断で絶対に行わないこと
 
 - pluginのinstall/update、marketplaceの更新

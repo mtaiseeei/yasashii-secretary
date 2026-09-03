@@ -1,0 +1,661 @@
+{
+  "schemaVersion": 1,
+  "inventoryId": "yasashii-secretary-clarity-collaboration-v1",
+  "marker": "yasashii-secretary:clarity-collaboration-inventory:v1",
+  "digestAlgorithm": "sha256(path-NUL-mode-NUL-bytes-NUL)",
+  "editionContract": {
+    "publicSource": "agentic-secretary@5f08d454c05576fcff8ab32c10c00887b4c15a96",
+    "publicEvaluatorPass": false,
+    "privatePredecessor": "agentic-secretary-my-vault@d5598226213004d55781ca033985589907ae7b5d",
+    "currentEdition": "yasashii-secretary",
+    "candidateStatus": "candidate-unverified",
+    "downstreamOrder": [
+      "agentic-secretary-my-vault",
+      "yasashii-secretary"
+    ],
+    "downstreamImplementationIncluded": true,
+    "privateValuesIncluded": false
+  },
+  "surfaces": [
+    {
+      "id": "secretary-router",
+      "role": "Natural-language intent selection without execution",
+      "edition": "common-core",
+      "paths": [
+        "plugins/secretary/skills/secretary/SKILL.md",
+        "plugins/secretary/scripts/collaboration-router.mjs",
+        "plugins/secretary/scripts/lib/collaboration-router.mjs"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/skills/secretary/SKILL.md",
+          "token": "yasashii-secretary:clarity-collaboration-router:v1"
+        }
+      ],
+      "contentDigest": "8162c08e69efce1349eecf9f142ea536dd4b941d35ae760b472565b1db7e57d7",
+      "tests": [
+        "CLX-001",
+        "CLX-018"
+      ],
+      "delegation": "Select one existing Skill; the router itself executes nothing",
+      "noTouch": [
+        "current non-Clarity intent",
+        "file",
+        "adapter",
+        "command",
+        "external service"
+      ]
+    },
+    {
+      "id": "clarity-skill",
+      "role": "Own Decision, Execution, Validation, Attention, and Drift",
+      "edition": "common-core",
+      "paths": [
+        "plugins/secretary/skills/clarity/SKILL.md"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/skills/clarity/SKILL.md",
+          "token": "yasashii-secretary:clarity-collaboration:clarity:v1"
+        }
+      ],
+      "contentDigest": "a59d3f107937894c49909a0caee0a57a89941f030b845ae86faf3de03923ecd8",
+      "tests": [
+        "CLX-001",
+        "CLX-009",
+        "CLX-010",
+        "CLX-018"
+      ],
+      "delegation": "Explicit operations only through their existing owner Skill",
+      "noTouch": [
+        "project lifecycle",
+        "task canonical",
+        "general memory",
+        "Harness state",
+        "plugin update",
+        "connector"
+      ]
+    },
+    {
+      "id": "projects-lifecycle",
+      "role": "Own create, open, closed, complete, reopen, canonicalRepo and expose bounded Clarity summary",
+      "edition": "common-core-with-downstream-adapter-seam",
+      "paths": [
+        "plugins/secretary/skills/projects/SKILL.md",
+        "plugins/secretary/scripts/project-tools.mjs",
+        "plugins/secretary/scripts/clarity-secretary.mjs",
+        "plugins/secretary/scripts/lib/clarity-secretary.mjs",
+        "plugins/secretary/clarity/secretary-adapter.json"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/skills/projects/SKILL.md",
+          "token": "yasashii-secretary:clarity-collaboration:projects:v1"
+        }
+      ],
+      "contentDigest": "bcef5f685646192c52564bc98e726a42d29f0f0ecff6bddf2b97c00509a347f8",
+      "tests": [
+        "CLX-002",
+        "CLX-003",
+        "CLX-004",
+        "CLX-005",
+        "CLX-006"
+      ],
+      "delegation": "Project Decision to existing add-decision seam; Clarity link preparation remains preview-first",
+      "noTouch": [
+        "general memory duplication",
+        "peer Repo write",
+        "fetch",
+        "pull",
+        "push",
+        "remote"
+      ]
+    },
+    {
+      "id": "daily-attention",
+      "role": "Add bounded 今日の要確認 separately from schedule, TODO, and resume state",
+      "edition": "common-core",
+      "paths": [
+        "plugins/secretary/skills/daily/SKILL.md",
+        "plugins/secretary/scripts/clarity-secretary.mjs",
+        "plugins/secretary/scripts/lib/clarity-secretary.mjs"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/skills/daily/SKILL.md",
+          "token": "yasashii-secretary:clarity-collaboration:daily:v1"
+        }
+      ],
+      "contentDigest": "68c2c67e3d2fd17d422d3b4071ab47b04389b0d2199cfce363b2268d3d380103",
+      "tests": [
+        "CLX-007"
+      ],
+      "delegation": "Read open Project minimum projection only",
+      "noTouch": [
+        "schedule canonical",
+        "TODO canonical",
+        "resume canonical",
+        "connector",
+        "closed Project"
+      ]
+    },
+    {
+      "id": "weekly-portfolio",
+      "role": "Add Attention change, resolved Drift and lag separately from journal summary",
+      "edition": "common-core",
+      "paths": [
+        "plugins/secretary/skills/weekly/SKILL.md",
+        "plugins/secretary/scripts/clarity-secretary.mjs",
+        "plugins/secretary/scripts/lib/clarity-secretary.mjs"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/skills/weekly/SKILL.md",
+          "token": "yasashii-secretary:clarity-collaboration:weekly:v1"
+        }
+      ],
+      "contentDigest": "483579fe49c6e7e3c2a059c605ebbd469320a02bf7885d7dd7287ce2c7d1aec5",
+      "tests": [
+        "CLX-008"
+      ],
+      "delegation": "Read journal and open Project minimum projection through separate seams",
+      "noTouch": [
+        "journal canonical",
+        "closed Project",
+        "full Item body",
+        "connector"
+      ]
+    },
+    {
+      "id": "task-seams",
+      "role": "Keep local TODO and downstream Notion task creation behind explicit existing boundaries",
+      "edition": "public-seam-private-implementation-protected",
+      "paths": [
+        "plugins/secretary/skills/projects/SKILL.md",
+        "plugins/secretary/scripts/clarity-secretary.mjs",
+        "plugins/secretary/scripts/lib/clarity-secretary.mjs",
+        "plugins/secretary/clarity/secretary-adapter.json",
+        "plugins/secretary/edition.json"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/skills/projects/SKILL.md",
+          "token": "yasashii-secretary:clarity-collaboration:projects:v1"
+        }
+      ],
+      "contentDigest": "0c6f7bd443d26475e29932ab4bd4399e92cd483534a4f61ab6485566a9bcfdec",
+      "tests": [
+        "CLX-009",
+        "CLX-010"
+      ],
+      "delegation": "Explicit local task to project-tools:add-todo; explicit downstream task to fixed adapter",
+      "noTouch": [
+        "automatic task creation",
+        "Notion schema",
+        "downstream protected Skill"
+      ]
+    },
+    {
+      "id": "memory-care",
+      "role": "Avoid duplicating Project Decision and Clarity Event in general memory",
+      "edition": "common-core",
+      "paths": [
+        "plugins/secretary/skills/memory-care/SKILL.md",
+        "plugins/secretary/rules/conversation-contract.md"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/skills/memory-care/SKILL.md",
+          "token": "yasashii-secretary:clarity-collaboration:memory:v1"
+        },
+        {
+          "path": "plugins/secretary/rules/conversation-contract.md",
+          "token": "agentic-secretary:clarity-collaboration:conversation:v1"
+        }
+      ],
+      "contentDigest": "800b8a65b444a00e1d0b63dae432e70a114f3099982c6cfb83f6e5cbc1de2250",
+      "tests": [
+        "CLX-011"
+      ],
+      "delegation": "Reference existing Project Decision or Clarity Event; use memory-care only for explicit non-duplicate memory",
+      "noTouch": [
+        "duplicate memory",
+        "Hook semantic classification",
+        "transcript copy"
+      ]
+    },
+    {
+      "id": "build-harness",
+      "role": "Pass Clarity as read-only context without replacing Harness canonical files or roles",
+      "edition": "yasashii-host-routing-with-common-safety",
+      "paths": [
+        "plugins/secretary/skills/build/SKILL.md",
+        "plugins/secretary/edition.json"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/skills/build/SKILL.md",
+          "token": "yasashii-secretary:clarity-collaboration:build:v1"
+        }
+      ],
+      "contentDigest": "1bf0297c54fa61bc345d25a566c5b1be1bf2418f073c53d6ee25545c675aabd9",
+      "tests": [
+        "CLX-012"
+      ],
+      "delegation": "Explicit development request to installed Yasashii Harness only",
+      "noTouch": [
+        "Harness spec",
+        "Harness Sprint",
+        "Harness state",
+        "Harness feedback",
+        "implicit install"
+      ]
+    },
+    {
+      "id": "update-release",
+      "role": "Keep update read-only first and release stages separate",
+      "edition": "yasashii-host-routing-with-fixed-downstream-handoff",
+      "paths": [
+        "plugins/secretary/skills/update/SKILL.md",
+        "plugins/secretary/release-inventory.json"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/skills/update/SKILL.md",
+          "token": "yasashii-secretary:clarity-collaboration:update:v1"
+        }
+      ],
+      "contentDigest": "33926d6b38a81914dfa01de8278d3a223b7770971b860806e1bf33bee58ed3e3",
+      "tests": [
+        "CLX-013"
+      ],
+      "delegation": "Explicit plugin update request enters existing read-only diagnose and separate confirmation flow",
+      "noTouch": [
+        "Hook-triggered update",
+        "per-session network",
+        "automatic migration",
+        "release promotion"
+      ]
+    },
+    {
+      "id": "onboarding-templates",
+      "role": "Copy optional Clarity guidance and Agentic Xmind default OFF without initializing Clarity",
+      "edition": "common-template-with-edition-default-copy",
+      "paths": [
+        "plugins/secretary/skills/onboarding/SKILL.md",
+        "plugins/secretary/templates/AGENTS.md",
+        "plugins/secretary/templates/CLAUDE.md",
+        "plugins/secretary/edition.json"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/skills/onboarding/SKILL.md",
+          "token": "yasashii-secretary:clarity-collaboration:onboarding:v1"
+        },
+        {
+          "path": "plugins/secretary/templates/AGENTS.md",
+          "token": "yasashii-secretary:clarity-collaboration:workspace-template:v1"
+        }
+      ],
+      "contentDigest": "c83aeb265da4beafcd77eb9aac6f08159e0e10d38ba94fa43bc8d32722afb473",
+      "tests": [
+        "CLX-014"
+      ],
+      "delegation": "Later explicit Clarity request to clarity Skill preview",
+      "noTouch": [
+        "automatic Clarity init",
+        "automatic Xmind write",
+        "private path",
+        "Yasashii style"
+      ]
+    },
+    {
+      "id": "rules-serializer",
+      "role": "Render bounded natural Japanese Attention as conclusion, reason, evidence, choice",
+      "edition": "common-contract-plus-yasashii-style",
+      "paths": [
+        "plugins/secretary/rules/plain-language.md",
+        "plugins/secretary/rules/common-language.md",
+        "plugins/secretary/rules/conversation-contract.md",
+        "plugins/secretary/rules/safety.md",
+        "plugins/secretary/rules/rule-manifest.json",
+        "adapters/neutral-base.json",
+        "plugins/secretary/rules/styles/yasashii.md"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/rules/common-language.md",
+          "token": "agentic-secretary:clarity-collaboration:language:v1"
+        }
+      ],
+      "contentDigest": "736c58da81e228df97e25c5c16509ba0552f36a5112955e980c0d66350afabad",
+      "tests": [
+        "CLX-015"
+      ],
+      "delegation": "Apply the single final serializer after all tool calls",
+      "noTouch": [
+        "fixed Clarity report schema",
+        "more than three primary Attention items",
+        "certainty inflation"
+      ]
+    },
+    {
+      "id": "host-inventory",
+      "role": "Separate supported, verified, degraded, trust, disabled and manual fallback per host surface",
+      "edition": "public-common-host-contract",
+      "paths": [
+        "plugins/secretary/host-inventory.json",
+        "plugins/secretary/.claude-plugin/plugin.json",
+        "plugins/secretary/.codex-plugin/plugin.json"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/host-inventory.json",
+          "token": "yasashii-secretary:clarity-collaboration:host:v1"
+        }
+      ],
+      "contentDigest": "4879c4e4444481cfc7da7509e8ff797fd8dba87f494966eac63affbc4ce0a8fc",
+      "tests": [
+        "CLX-016"
+      ],
+      "delegation": "Manual fallback remains available when Hook is untrusted, disabled, or failed",
+      "noTouch": [
+        "cross-host verified promotion",
+        "trust inference",
+        "canonical write in degraded state"
+      ]
+    },
+    {
+      "id": "edition-handoff",
+      "role": "Bind fixed public/private inputs, Yasashii apply state, protected paths and candidate-unverified truth",
+      "edition": "yasashii-applied-after-private",
+      "paths": [
+        "plugins/secretary/release-inventory.json",
+        "plugins/secretary/edition.json",
+        "scripts/fixtures/sprint-041/yasashii-prewrite-receipt.json"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/release-inventory.json",
+          "token": "yasashii-secretary:clarity-collaboration:release:v1"
+        },
+        {
+          "path": "scripts/fixtures/sprint-041/yasashii-prewrite-receipt.json",
+          "token": "yasashii-project-clarity-prewrite-receipt"
+        }
+      ],
+      "contentDigest": "655483d73ed88b580482875d74931ba4ab60d726ac92e4018860c1c568d3cfac",
+      "tests": [
+        "CLX-017",
+        "CLX-020"
+      ],
+      "delegation": "Current Yasashii source application only; release and external-live stages stay closed",
+      "noTouch": [
+        "private protected path",
+        "Yasashii protected path",
+        "downstream state",
+        "release",
+        "cache"
+      ]
+    },
+    {
+      "id": "external-connectors",
+      "role": "Keep Chatwork, Google Chat, Google, Microsoft and Notion behind explicit existing entries",
+      "edition": "common-safety-host-specific-execution",
+      "paths": [
+        "plugins/secretary/skills/chatwork/SKILL.md",
+        "plugins/secretary/skills/google-chat/SKILL.md",
+        "plugins/secretary/skills/connections/SKILL.md",
+        "plugins/secretary/skills/setup-google/SKILL.md",
+        "plugins/secretary/skills/setup-microsoft/SKILL.md",
+        "plugins/secretary/skills/setup-notion/SKILL.md"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/skills/chatwork/SKILL.md",
+          "token": "yasashii-secretary:clarity-collaboration:connector:v1"
+        },
+        {
+          "path": "plugins/secretary/skills/google-chat/SKILL.md",
+          "token": "yasashii-secretary:clarity-collaboration:connector:v1"
+        }
+      ],
+      "contentDigest": "99ef377311bb5d5ef4a327e373c6b528e34e4d5a9a6fe4e6a5a247525449e6d6",
+      "tests": [
+        "CLX-018"
+      ],
+      "delegation": "Only an explicit service request selects the existing connector Skill",
+      "noTouch": [
+        "Clarity-triggered connector",
+        "implicit OAuth",
+        "implicit network",
+        "implicit external write"
+      ]
+    },
+    {
+      "id": "clarity-hook",
+      "role": "Observe bounded Clarity lifecycle events through the only Hook manifest and router",
+      "edition": "common-core",
+      "paths": [
+        "plugins/secretary/hooks/hooks.json",
+        "plugins/secretary/scripts/clarity-hook.mjs",
+        "plugins/secretary/scripts/lib/clarity-hook.mjs"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/hooks/hooks.json",
+          "token": "agentic-secretary:clarity-collaboration:hook:v1"
+        }
+      ],
+      "contentDigest": "5d5bb08f6ac9c336a5f8f12b213678d12966afa0e619f897232d9565f2b81373",
+      "tests": [
+        "CLX-019"
+      ],
+      "delegation": "Manual clarity Skill fallback only",
+      "noTouch": [
+        "other Skill Hook",
+        "memory semantic classification",
+        "network",
+        "Xmind",
+        "connector",
+        "update"
+      ]
+    },
+    {
+      "id": "xmind-editions",
+      "role": "Keep only edition default different while provider priority, approval gate and fixed visual remain common",
+      "edition": "agentic-off-private-on-yasashii-off",
+      "paths": [
+        "plugins/secretary/release-inventory.json",
+        "plugins/secretary/edition.json",
+        "plugins/secretary/skills/clarity/SKILL.md"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/release-inventory.json",
+          "token": "yasashii-secretary:clarity-collaboration:release:v1"
+        },
+        {
+          "path": "plugins/secretary/skills/clarity/SKILL.md",
+          "token": "yasashii-secretary:clarity-collaboration:clarity:v1"
+        }
+      ],
+      "contentDigest": "4045e4ae42df51f5b3dcf1ef76f331d28f7332f650ddec0848aa2a79b39fcd41",
+      "tests": [
+        "CLX-014",
+        "CLX-017",
+        "CLX-020"
+      ],
+      "delegation": "ON selects capable MCP first; local native only after explicit preview approval",
+      "noTouch": [
+        "automatic local fallback",
+        "unapproved cloud write",
+        "unapproved local write",
+        "edition-specific visual"
+      ]
+    },
+    {
+      "id": "package-release-inventory",
+      "role": "Expose collaboration inventory from both host manifests and keep source, release, cache and loaded state separate",
+      "edition": "yasashii-source-candidate",
+      "paths": [
+        "plugins/secretary/release-inventory.json",
+        "plugins/secretary/.claude-plugin/plugin.json",
+        "plugins/secretary/.codex-plugin/plugin.json",
+        ".claude-plugin/marketplace.json",
+        ".agents/plugins/marketplace.json"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/release-inventory.json",
+          "token": "yasashii-secretary:clarity-collaboration:release:v1"
+        }
+      ],
+      "contentDigest": "e9ba8665bcca994bb00135c90cf4f7690707db172fd407d2bd020e4307ae2444",
+      "tests": [
+        "CLX-016",
+        "CLX-017",
+        "CLX-020"
+      ],
+      "delegation": "Release and downstream stages remain separately gated",
+      "noTouch": [
+        "tag",
+        "GitHub Release",
+        "marketplace publish",
+        "installed cache",
+        "loaded session"
+      ]
+    },
+    {
+      "id": "canonical-repo-reader",
+      "role": "Read an available local canonical Repo with bounded current evidence for Project status, daily, weekly and Portfolio",
+      "edition": "yasashii-adapted-common-core-read-only",
+      "paths": [
+        "plugins/secretary/scripts/clarity-secretary.mjs",
+        "plugins/secretary/scripts/lib/clarity-secretary.mjs",
+        "plugins/secretary/clarity/secretary-adapter.json"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/scripts/lib/clarity-secretary.mjs",
+          "token": "yasashii-secretary:canonical-repo-observation:v1"
+        }
+      ],
+      "contentDigest": "778d5ee0d904e23805a4388daec4a0d21822743cf5b8edcd57a38a14151e7cce",
+      "tests": [
+        "yasashii-CF-001",
+        "yasashii-CF-002",
+        "yasashii-CF-003",
+        "yasashii-CF-004",
+        "yasashii-CF-005",
+        "yasashii-CF-006",
+        "yasashii-CF-007"
+      ],
+      "delegation": "Read only the declared local canonical Repo; remote-only evidence remains unavailable without network",
+      "noTouch": [
+        "clone",
+        "fetch",
+        "pull",
+        "push",
+        "canonical Repo write",
+        "Secret value",
+        "binary body",
+        "full source copy"
+      ]
+    },
+    {
+      "id": "clarity-root-policy",
+      "role": "Resolve declared Clarity Repo roots to a stable physical root while preserving the generic closed default",
+      "edition": "yasashii-common-core-internal-opt-in",
+      "paths": [
+        "plugins/secretary/scripts/clarity.mjs",
+        "plugins/secretary/scripts/lib/clarity-core.mjs",
+        "plugins/secretary/scripts/lib/clarity-drift.mjs",
+        "plugins/secretary/scripts/lib/clarity-hook.mjs",
+        "plugins/secretary/scripts/lib/clarity-link.mjs",
+        "plugins/secretary/scripts/lib/clarity-projection.mjs",
+        "plugins/secretary/scripts/lib/clarity-root.mjs",
+        "plugins/secretary/scripts/lib/clarity-secretary.mjs",
+        "plugins/secretary/scripts/lib/safe-fs.mjs"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/scripts/lib/clarity-root.mjs",
+          "token": "agentic-secretary:clarity-root-policy:v1"
+        }
+      ],
+      "contentDigest": "c54e6fdacc87a79e5b4781e5def351762396b7f00928588b91cf3e7a2fc5b32e",
+      "tests": [
+        "yasashii-AR-001",
+        "yasashii-AR-002",
+        "yasashii-AR-003",
+        "yasashii-AR-004",
+        "yasashii-AR-005",
+        "yasashii-AR-006",
+        "yasashii-AR-007",
+        "yasashii-AR-008",
+        "yasashii-AR-009",
+        "yasashii-AR-010",
+        "yasashii-AR-011",
+        "yasashii-AR-012",
+        "yasashii-AR-013",
+        "yasashii-AR-014"
+      ],
+      "delegation": "Only declared Clarity Repo-root entrypoints opt in; Drift source locators retain their own closed policy",
+      "noTouch": [
+        "generic workingRoot default",
+        "Repo-root symlink",
+        "internal symlink",
+        "root-external locator",
+        "Git mutation",
+        "user-facing flag"
+      ]
+    },
+    {
+      "id": "clarity-harness-scanner",
+      "role": "Scan Harness authoritative state, requirements, Generator report and Evaluator validation before the bounded generic lane",
+      "edition": "yasashii-adapted-common-core-read-only",
+      "paths": [
+        "plugins/secretary/scripts/clarity.mjs",
+        "plugins/secretary/scripts/lib/clarity-core.mjs",
+        "plugins/secretary/scripts/lib/clarity-harness-scan.mjs",
+        ".github/workflows/windows-recording-regression.yml",
+        "scripts/sprint-043-patch-003-test.mjs"
+      ],
+      "markers": [
+        {
+          "path": "plugins/secretary/scripts/lib/clarity-harness-scan.mjs",
+          "token": "agentic-secretary:clarity-harness-authoritative-scan:v1"
+        }
+      ],
+      "contentDigest": "496f96cc2e208f505893b34b63da112b3cb2968ea5530cdb263f94342ae24b15",
+      "tests": [
+        "yasashii-HS-001",
+        "yasashii-HS-002",
+        "yasashii-HS-003",
+        "yasashii-HS-004",
+        "yasashii-HS-005",
+        "yasashii-HS-006",
+        "yasashii-HS-007",
+        "yasashii-HS-008",
+        "yasashii-HS-009",
+        "yasashii-HS-010",
+        "yasashii-HS-011",
+        "yasashii-HS-012",
+        "yasashii-HS-013",
+        "yasashii-HS-014",
+        "yasashii-HS-015",
+        "yasashii-HS-016"
+      ],
+      "delegation": "Read-only bounded scan and synthetic fixture writes only; Windows native verification stays in the existing Yasashii workflow",
+      "noTouch": [
+        "public or private source",
+        "customer repository apply",
+        "provider or connector write",
+        "release",
+        "install or cache",
+        "actual Xmind"
+      ]
+    }
+  ]
+}

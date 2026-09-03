@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "collaborationMarker": "yasashii-secretary:clarity-collaboration:release:v1",
+  "edition": "yasashii-secretary",
+  "candidateVersion": "0.11.0",
+  "publicationStatus": "candidate-unverified",
+  "releaseState": {
+    "sourcePrepared": true,
+    "evaluatorPassed": false,
+    "tagCreated": false,
+    "githubReleaseCreated": false,
+    "marketplacePublishedOrRefreshed": false,
+    "installedCacheUpdated": false,
+    "loadedInNewSession": false,
+    "downstreamApplied": true
+  },
+  "distribution": {
+    "claudeCode": {
+      "marketplace": ".claude-plugin/marketplace.json",
+      "manifest": "plugins/secretary/.claude-plugin/plugin.json",
+      "skills": "plugins/secretary/skills",
+      "hooks": "plugins/secretary/hooks/hooks.json"
+    },
+    "codex": {
+      "marketplace": ".agents/plugins/marketplace.json",
+      "manifest": "plugins/secretary/.codex-plugin/plugin.json",
+      "skills": "plugins/secretary/skills",
+      "hooks": "plugins/secretary/hooks/hooks.json"
+    }
+  },
+  "skills": {
+    "count": 17,
+    "names": [
+      "build",
+      "chatwork",
+      "clarity",
+      "connections",
+      "daily",
+      "google-chat",
+      "memory-care",
+      "name",
+      "onboarding",
+      "projects",
+      "secretary",
+      "settings",
+      "setup-google",
+      "setup-microsoft",
+      "setup-notion",
+      "update",
+      "weekly"
+    ]
+  },
+  "clarityHook": {
+    "manifest": "plugins/secretary/hooks/hooks.json",
+    "router": "plugins/secretary/scripts/clarity-hook.mjs",
+    "events": [
+      "SessionStart",
+      "PostToolUse",
+      "PreCompact",
+      "Stop",
+      "SessionEnd"
+    ],
+    "manualFallback": [
+      "status",
+      "attention",
+      "review",
+      "checkpoint",
+      "doctor"
+    ]
+  },
+  "hostStatusArtifact": "plugins/secretary/host-inventory.json",
+  "collaborationInventory": "plugins/secretary/collaboration-inventory.json",
+  "xmind": {
+    "editions": [
+      {
+        "id": "agentic-secretary",
+        "defaultEnabled": false,
+        "selected": null,
+        "reason": "runtime capabilityと利用者設定を確認するまでproviderを選択しません。",
+        "verified": false
+      },
+      {
+        "id": "yasashii-secretary",
+        "defaultEnabled": false,
+        "selected": null,
+        "reason": "Yasashii版は既定OFFです。明示ON後もcapable Xmind MCPを第1優先にし、localはpreviewと明示承認後だけ選択します。",
+        "verified": false
+      },
+      {
+        "id": "agentic-secretary-my-vault",
+        "defaultEnabled": true,
+        "selected": null,
+        "reason": "downstream handoff後に別Harnessで適用・評価します。",
+        "verified": false
+      }
+    ],
+    "providers": [
+      {
+        "id": "xmind-mcp",
+        "priority": 1,
+        "capability": {
+          "available": false,
+          "connected": false,
+          "create": false,
+          "read": false,
+          "update": false,
+          "fixedColor": false,
+          "fixedPlacement": false
+        },
+        "selected": false,
+        "reason": "実Xmind MCPは未接続・未検証です。capability確認前に選択しません。",
+        "verified": false
+      },
+      {
+        "id": "local-native",
+        "priority": 2,
+        "capability": {
+          "available": false,
+          "connected": false,
+          "create": true,
+          "read": true,
+          "update": true,
+          "fixedColor": true,
+          "fixedPlacement": true
+        },
+        "selected": false,
+        "reason": "既知構造の生成はできますが、実Xmind Appでのopenabilityは未検証です。MCP不可時も自動選択しません。",
+        "verified": false,
+        "previewRequired": true,
+        "explicitApprovalRequired": true,
+        "writeWithoutApproval": false
+      }
+    ],
+    "visualContract": {
+      "topAxis": "決まっている",
+      "bottomAxis": "まだ決まっていない",
+      "quadrants": [
+        {
+          "position": "top-left",
+          "emoji": "🟢",
+          "label": "定着・検証",
+          "meaning": "安定している",
+          "color": "#16A34A"
+        },
+        {
+          "position": "top-right",
+          "emoji": "🔵",
+          "label": "実行待ち",
+          "meaning": "あとは進めるだけ",
+          "color": "#2563EB"
+        },
+        {
+          "position": "bottom-left",
+          "emoji": "🟡",
+          "label": "暫定実装・要再確認",
+          "meaning": "注意して確認する",
+          "color": "#D97706"
+        },
+        {
+          "position": "bottom-right",
+          "emoji": "🔴",
+          "label": "設計・意思決定",
+          "meaning": "人間の判断が必要",
+          "color": "#DC2626"
+        }
+      ]
+    }
+  },
+  "documentation": [
+    "docs/spec/clarity.md",
+    "plugins/secretary/skills/clarity/SKILL.md"
+  ],
+  "handoff": "scripts/fixtures/sprint-041/yasashii-prewrite-receipt.json",
+  "fixedSource": {
+    "publicProduct": "5f08d454c05576fcff8ab32c10c00887b4c15a96",
+    "publicEvaluatorPass": false,
+    "privateProduct": "d5598226213004d55781ca033985589907ae7b5d",
+    "yasashiiPrewriteReceipt": "scripts/fixtures/sprint-041/yasashii-prewrite-receipt.json"
+  }
+}

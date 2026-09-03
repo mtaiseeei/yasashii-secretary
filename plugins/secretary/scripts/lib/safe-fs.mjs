@@ -17,9 +17,10 @@ import {
 import { dirname, isAbsolute, join, parse, relative, resolve, sep } from "node:path";
 
 export class FilesystemBoundaryError extends Error {
-  constructor(message, code = "filesystem-boundary") {
+  constructor(message, code = "filesystem-boundary", details = {}) {
     super(message);
     this.code = code;
+    this.details = details;
   }
 }
 
@@ -43,7 +44,21 @@ function isPlatformRootAlias(path) {
   } catch { return false; }
 }
 
-export function workingRoot(value) {
+const rootGuards = new Map();
+
+export function registerWorkingRootGuard(rootValue, guard) {
+  const root = realpathSync(resolve(rootValue));
+  if (typeof guard !== "function") rootGuards.delete(root);
+  else rootGuards.set(root, guard);
+  return root;
+}
+
+function checkWorkingRootGuard(root) {
+  const guard = rootGuards.get(root);
+  if (guard) guard();
+}
+
+export function workingRoot(value, { allowAncestorSymlinks = false } = {}) {
   const requested = resolve(value || ".");
   const root = parse(requested).root;
   let cursor = root;
@@ -51,13 +66,38 @@ export function workingRoot(value) {
   for (const component of components) {
     cursor = join(cursor, component);
     const componentStat = lstatOptional(cursor);
-    if (componentStat?.isSymbolicLink() && !isPlatformRootAlias(cursor)) {
+    if (!componentStat?.isSymbolicLink() || isPlatformRootAlias(cursor)) continue;
+    if (!allowAncestorSymlinks) {
       throw new FilesystemBoundaryError("working rootの途中にsymlinkがあるため、変更を止めました。", "working-root-unsafe");
+    }
+    if (cursor === requested) {
+      throw new FilesystemBoundaryError("working root自身がsymlinkのため、変更を止めました。物理Repoのdirectoryを指定してください。", "root-self-symlink");
+    }
+    let target;
+    try { target = realpathSync(cursor); }
+    catch {
+      throw new FilesystemBoundaryError("working rootより上のancestor symlinkが壊れているため、変更を止めました。", "ancestor-symlink-broken");
+    }
+    let targetStat;
+    try { targetStat = statSync(target); }
+    catch {
+      throw new FilesystemBoundaryError("working rootより上のancestor symlinkの実体を確認できないため、変更を止めました。", "ancestor-symlink-broken");
+    }
+    if (!targetStat.isDirectory()) {
+      throw new FilesystemBoundaryError("working rootより上のancestor symlinkがdirectory以外を指すため、変更を止めました。", "ancestor-symlink-not-directory");
     }
   }
   const stat = lstatOptional(requested);
+  if (stat?.isSymbolicLink() && isPlatformRootAlias(requested)) {
+    const physical = realpathSync(requested);
+    if (!statSync(physical).isDirectory()) {
+      throw new FilesystemBoundaryError("working rootが通常のdirectoryではないため、変更を止めました。", "working-root-unsafe");
+    }
+    return physical;
+  }
   if (!stat?.isDirectory() || stat.isSymbolicLink()) {
-    throw new FilesystemBoundaryError("working rootが通常のdirectoryではないため、変更を止めました。", "working-root-unsafe");
+    const code = allowAncestorSymlinks && stat?.isSymbolicLink() ? "root-self-symlink" : "working-root-unsafe";
+    throw new FilesystemBoundaryError("working rootが通常のdirectoryではないため、変更を止めました。", code);
   }
   return realpathSync(requested);
 }
@@ -84,33 +124,42 @@ function deepestExisting(path, stop) {
 
 export function safeWritePath(rootValue, value) {
   const root = workingRoot(rootValue);
+  checkWorkingRootGuard(root);
   const target = lexicalTarget(root, value);
-  const { cursor, stat, suffix } = deepestExisting(target, root);
-  if (stat.isSymbolicLink()) {
-    let resolved;
-    try { resolved = realpathSync(cursor); } catch {
-      throw new FilesystemBoundaryError("壊れたsymlinkを含むため、変更を止めました。", "symlink-boundary");
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const { cursor, stat, suffix } = deepestExisting(target, root);
+    if (stat.isSymbolicLink()) {
+      let resolved;
+      try { resolved = realpathSync(cursor); }
+      catch (error) {
+        if (error?.code === "ENOENT") continue;
+        throw new FilesystemBoundaryError("壊れたsymlinkを含むため、変更を止めました。", "symlink-boundary");
+      }
+      if (!insideOrSame(root, resolved)) {
+        throw new FilesystemBoundaryError("symlink経由でworking rootの外は変更できません。", "symlink-boundary");
+      }
     }
-    if (!insideOrSame(root, resolved)) {
+    let resolvedAncestor;
+    try { resolvedAncestor = realpathSync(cursor); }
+    catch (error) {
+      if (error?.code === "ENOENT") continue;
+      throw new FilesystemBoundaryError("書込み先の実体を確認できないため、変更を止めました。", "filesystem-boundary");
+    }
+    if (!insideOrSame(root, resolvedAncestor)) {
       throw new FilesystemBoundaryError("symlink経由でworking rootの外は変更できません。", "symlink-boundary");
     }
+    const resolvedTarget = resolve(resolvedAncestor, ...suffix);
+    if (!insideOrSame(root, resolvedTarget) || resolvedTarget === root) {
+      throw new FilesystemBoundaryError("working rootの外は変更できません。", "filesystem-boundary");
+    }
+    return resolvedTarget;
   }
-  let resolvedAncestor;
-  try { resolvedAncestor = realpathSync(cursor); } catch {
-    throw new FilesystemBoundaryError("書込み先の実体を確認できないため、変更を止めました。", "filesystem-boundary");
-  }
-  if (!insideOrSame(root, resolvedAncestor)) {
-    throw new FilesystemBoundaryError("symlink経由でworking rootの外は変更できません。", "symlink-boundary");
-  }
-  const resolvedTarget = resolve(resolvedAncestor, ...suffix);
-  if (!insideOrSame(root, resolvedTarget) || resolvedTarget === root) {
-    throw new FilesystemBoundaryError("working rootの外は変更できません。", "filesystem-boundary");
-  }
-  return resolvedTarget;
+  throw new FilesystemBoundaryError("書込み先が同時に変わったため、安全を確認できません。", "filesystem-target-changed");
 }
 
 export function safeDeletePath(rootValue, value) {
   const root = workingRoot(rootValue);
+  checkWorkingRootGuard(root);
   const target = lexicalTarget(root, value);
   const parent = dirname(target) === root ? root : safeWritePath(root, dirname(target));
   const finalTarget = resolve(parent, target.slice(dirname(target).length + 1));

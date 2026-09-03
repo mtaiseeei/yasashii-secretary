@@ -399,3 +399,39 @@
 9. 実Yasashii sourceで専用15/15、Sprint 038、Sprint 010、安全回帰、overlay record／apply／check／reapply、release integrity、Git-free archive、conversation core inventory 17/17を実行し、固定candidateとclean treeに結びつくcommand／結果を記録する。
 10. Sprint 040ではUIを変更しない。push、tag、Release、marketplace、installed plugin／cache、利用者workspace、Mac mini、remote、external serviceへのwriteはNon-scopeとする。private版は別repoの別Sprintで独立適用・独立評価する。
 11. Yasashiiへのwrite前gateは、`publicWholeTree`のroot／exclusionsを実path列挙へ使い、control path混入を拒否する。不存在／複数出現／実変換点ではないanchor、transformer不一致、copy後adaptを含むaction trace欠落を負例で検出し、manifest宣言の写経や固定値でPASSにしない。
+## Project Clarityの正本・Hook・Yasashii境界
+
+1. Project Clarityは生きた実行taskの新しい正本を作らない。PJ内`TODO.md`、task自動起票、会議録／チャット本文の恒久コピー、進捗率だけの健康判定を禁止する。
+2. Projectsは作成、open／closed、complete／reopen、`canonicalRepo`を所有する。Clarityはimmutable ID、Event、Evidence、State、Decision／Execution／Validation、Attention、link、Drift、projectionを所有し、所有権を交換しない。
+3. YasashiiのClarity正本は`secretary/projects/open/<project>/clarity/`に置く。private版の`05/02`、`vault/10_sources`、Notion property／relation、private root guidanceを同梱しない。
+4. Eventはappend-only、Evidenceは最小locatorと短いsummary、Stateと表示物は再構築可能なprojectionとする。AI推定、draft、古いproposalだけで状態を確定しない。
+5. init、migration、cleanup、sync、Xmind applyはpreviewとapplyを分ける。拒否、取消、確認不足、競合ではcanonical Clarity、Git、journal、runtime、外部serviceへの副作用を0件にする。
+6. working root、Git top-level、edition identity、Clarity identityを確認し、root外symlink／junction、path traversal、absolute path injection、cross-root write、禁止path writeを拒否する。
+7. linked Repoは相手exportをread-only取得し、自Repoのimport projectionだけを更新するpull-onlyとする。暗黙fetch／pull／push、branch／remote／visibility変更、last-write-winsを禁止する。
+8. authorityはfieldごとにPrimary／Reference／Shared derivedを一意に持つ。Primary重複、identity／link／digest不一致、schema非互換は停止して選択を返す。
+9. Secret、OAuth token、private key、`.env`値、credential、transcript全文、顧客本文、local absolute pathをtracked Clarity dataへ保存しない。
+10. 既存dirty、staged、unstaged、untracked、HEAD、branch、remoteを利用者の状態として保持する。Clarity write／rollback／commitは所有pathだけを対象にし、pushしない。
+11. HookはProject Clarity専用で、hostの`type: command`で動く軽量router 1組だけを持つ。prompt／agent／LLM Hookへ依存せず、Claude Code／Codex payload差はadapterで正規化する。
+12. Clarity初期化／linked済みrootではSessionStart、PostToolUse、PreCompact、compact後再開、Stop、SessionEndをboundedに観測できる。通常Bash／他Skill payloadはruntime-only nonmaterial observationを許すが、canonical／external write 0、semantic route 0、`material=false`のStop checkpoint 0件とする。
+13. 未初期化／未linked、disabled、trust未承認は高速no-opとする。Hook内network／LLM／Xmind／全Repo scan／connector／updateを禁止する。同時発火はatomic write／lock／一意eventで破損と重複を防ぐ。
+14. projects、daily、weekly、memory-care、updateその他のSkillへ独立Hookを追加せず、一般memory候補やtask候補をHookで意味判定しない。
+15. `plugins/secretary/hooks/hooks.json`、`plugins/secretary/scripts/clarity-hook.mjs`、`plugins/secretary/scripts/lib/clarity-hook.mjs`は固定public candidateからbyte-syncする。Yasashii adapter／overlay／copy／style／identity／manifest／marketplace／Harness IDは適応または保護する。
+16. Xmindは既定OFF。ON時はcapableなXmind MCPを第1優先、local `.xmind`を第2優先とする。cloud／network／credit／external writeとlocal fallbackは別々に対象・影響を示して明示確認し、MCP不可時の自動local writeを禁止する。
+17. TL緑`#16A34A`、TR青`#2563EB`、BL黄`#D97706`、BR赤`#DC2626`、上「決まっている」／下「まだ決まっていない」をMermaid／Xmindで共通にする。色だけで意味を伝えない。
+18. 固定public handoffのstatusは`public-user-decision-risk-accepted`、`evaluatorPass=false`のまま保持する。private PASSをpublic PASS、実host、実Xmind、release許可へ読み替えない。
+19. private receiptの`nextPermission=yasashii-prewrite-only`、`writesAuthorized=false`を守る。Sprint 041 prewrite PASS前のClarity製品writeは0件とし、不一致、欠落、falsy、dirty、tamperではfail-closed停止する。
+20. Yasashii固有の文体、`copy/yasashii.json`、`styles/yasashii.md`、`edition.json`、`secretary-overlay/**`、`README.md`、`LICENSE`、`AGENTS.md`、repo-owned `docs/**`、`harness@yasashii-harness`を保護する。downstream-ownedを製品同期で変更しない。
+21. release、push、tag、GitHub Release、Marketplace、installed cache、new session、利用者workspace migration、Mac mini、実Xmind、実host、外部connectorはSprint 041〜043の対象外とし、`not-run`を実施済みへ昇格しない。
+
+## 24. Clarity包括scanとWindows native境界
+
+1. Harness authoritative laneはgeneric scanと別budgetで先行し、state、必要spec、Current contract／progress／feedback、guidance、package manifestをbounded readする。全Repo全文読込や上限撤廃で包括性を偽らない。
+2. stateはOrchestrator execution truth、contractはrequirements、progressはGenerator self-report、feedbackはEvaluator validationである。progressやstateだけからEvaluator PASSを推測せず、同じCurrent SprintをDecision／Execution／ValidationとEvidence参照へ束ねる。
+3. Current valid／TBD／missing／invalid／巨大state、feedback absent／unreadable、Secret／binary／symlink／permission／missing、truncated／partialを固有coverageとreasonで示す。filename順、mtime、過去fileの全Item化をfallbackにしない。
+4. authoritative lane後だけ残余budgetでgeneric scanを行い、非Harness Repoの候補、順序、上限、安全意味を変えない。
+5. preview／cancelはfilesystem、runtime、journal、Git、network、external provider write 0件。applyはsynthetic fixtureの物理Repo内Clarity所有pathだけとし、dirty／staged／untracked、HEAD、branch、remoteを保持する。
+6. Patch 002のancestor alias／physical identity、一般root既定拒否、Clarity限定opt-in、root自身／root内symlink／差替え／TOCTOU拒否を維持する。
+7. Windows nativeではdrive letter、backslash、空白、日本語、CRLF、case collision、reserved／invalid path、prefix siblingを実filesystemで評価する。symlinkとjunctionは別capabilityとし、SKIP／NOT-RUNをPASSへ数えない。
+8. `.github/workflows/windows-recording-regression.yml`の`windows-native`、Node 22、既存0.9.2回帰、`timeout-minutes: 10`を保持する。public／private workflow pathや過去runをYasashiiへ流用しない。
+9. public／private／FableのPASSは設計入力であり、Yasashii PASSではない。Yasashii source、detached clean checkout、Git-free archive、exact candidateに因果するWindows runを独立確認する。
+10. exact candidate固定後の既存PR #12同branchへの通常pushと因果Windows CIだけを既存承認範囲とする。force、merge、tag、Release、Marketplace、install／cache、実Xmind、実顧客Repo apply、remote変更へ拡張しない。

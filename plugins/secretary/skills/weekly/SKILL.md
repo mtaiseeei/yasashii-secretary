@@ -26,6 +26,8 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 
 ## 1. 週次ふりかえり
 
+<!-- yasashii-secretary:clarity-collaboration:weekly:v1 -->
+
 通常の週次ふりかえりはopen PJとjournalだけを対象にし、`projects/closed/`は存在確認も探索もしない。
 closed、完了、終了、過去案件を利用者が明示した場合だけ、指定範囲を`projects` Skillへ委譲する。
 
@@ -39,6 +41,7 @@ closed、完了、終了、過去案件を利用者が明示した場合だけ�
 4. topicや外部事実を補う場合は、現在の会話で実コネクタから得た事実だけを使い、
    サービス名＋URL/ID＋日付を行内に記す。外部本文を複製しない。journalに出典がある場合は原文のまま保つ。
 5. 閲覧だけではファイル、journal、git commitを変更しない。
+6. `node "${SECRETARY_PLUGIN_ROOT}/scripts/clarity-secretary.mjs" weekly <secretary>`を実行し、open PJのAttention増減、解消済みAttention、解消Drift、長期滞留を独立したProject Clarity sectionへ添える。前回比較が無い場合は増減を推測せず「前回集計なし」とする。closed、全Item本文、外部connectorをClarity経由で自動読込しない。
 
 ### 保存は明示されたときだけ
 

@@ -160,6 +160,33 @@ closed、完了、終了、過去案件の明示指定時だけ `--closed`／`--
 `reopen ... --reason "<再開理由>" --next "<次の入口>" --confirm` を同じturnで1回使う。不足があれば1問だけ確認し、closedからopenへ戻す。
 過去の完了記録は消さない。
 
+## Project Clarityとの協働
+
+<!-- yasashii-secretary:clarity-collaboration:projects:v1 -->
+
+ClarityはProjectの作成・完了・再開・`canonicalRepo`を所有しない。これらは上記のprojects操作を正本のまま使う。
+Clarityを追加するときは、まずgeneric resolverのread-only previewを返し、利用者が対象を確認した後だけapplyする。
+
+```text
+node ${SECRETARY_PLUGIN_ROOT}/scripts/clarity-secretary.mjs init <secretary> <project> --json
+node ${SECRETARY_PLUGIN_ROOT}/scripts/clarity-secretary.mjs init <secretary> <project> --apply --json
+```
+
+`PROJECT.md`本文へClarity Itemを埋め込まず、`project-tools.mjs show`ではmode、Attention、link health、詳細pointerだけを短く添える。
+通常はopenだけを参照し、legacyは読み取り専用、closedは利用者が明示した場合だけ`status ... --closed`で参照する。
+完了・再開ではProject folder全体が既存の原子的操作で移動するため、Clarity IDとEvent履歴を再作成・複製しない。
+別repo開発PJの`canonicalRepo`は`create-dev-pointer`が作る`PROJECT.md`の「正本repo」をprojects正本として扱う。
+Clarityはread-onlyのlink候補として参照するだけで、相手Repoへのwrite、fetch、pull、push、branch／remote変更を行わない。
+
+Project固有Decisionは次のadapterから既存`add-decision` seamへ一度だけ委譲する。Decision本文を一般memoryやClarity Eventへ複製しない。
+
+```text
+node ${SECRETARY_PLUGIN_ROOT}/scripts/clarity-secretary.mjs decide <secretary> <project> \
+  --decision "<確認済み判断>" --current "<現在状況>" --next "<次の入口>" --json
+```
+
+Clarity Itemを作っただけではTODOを作らない。「これをタスク化して」と明示された場合だけ`task-route ... --explicit`で既存task seamへの委譲先を確認し、既存の確認境界に従う。public共通coreはdownstream固有のtask実装を持たず、fixed handoffだけを返す。
+
 ## 7. 開発プロジェクトはbuildを維持する
 
 「作って」「開発したい」「アプリ／ツールにして」は一般PJへ吸収せず、

@@ -5,6 +5,7 @@ import { basename, dirname, join, parse, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { copyTreeNoFollow, safeWritePath, workingRoot } from "./lib/safe-fs.mjs";
 import { journalAppend, todoAdd } from "./lib/secretary-store.mjs";
+import { renderSecretaryProjectClaritySummary } from "./lib/clarity-secretary.mjs";
 
 class ProjectError extends Error {
   constructor(message, code = 3) {
@@ -496,7 +497,12 @@ function cmdShow(argv) {
   const { positional, options } = parseOptions(argv);
   const [sec, name] = positional;
   if (!sec || !name) usage("show <secretary> <project> [--closed]");
-  console.log(readProject(secretaryRoot(sec), name, { closedOnly: Boolean(options.get("--closed")) }).markdown.trimEnd());
+  const root = secretaryRoot(sec);
+  const project = readProject(root, name, { closedOnly: Boolean(options.get("--closed")) });
+  let summary = "";
+  try { summary = renderSecretaryProjectClaritySummary(root, name, { closedOnly: Boolean(options.get("--closed")) }); }
+  catch { /* Project本体の表示はClarity source failureで失敗させない。 */ }
+  console.log(`${project.markdown.trimEnd()}${summary}`);
 }
 
 function cmdAddDecision(argv) {
