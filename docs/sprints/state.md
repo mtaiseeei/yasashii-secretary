@@ -5,12 +5,22 @@
 - Current ID: sprint-044
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 1
+- Lineage Dispatches: 2
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
 
 ## 2026-09-07 0.12.0版適応開始
+
+- fresh独立Evaluator `/root/evaluator_yasashii_044` のfeedback全文をmainが確認し、Phase A FAIL / verification-scope-issueを採用。product finding0、blocking verification-infra V-01が1件。CIのCRLF実hashは同じGit blobのLF→CRLF変換値と一致し、意味markerは成功している。現候補の必須suiteはVoice2/1／update未実行のためPASSではない。Retry0／Spec0／Lineage2／strong／noneを維持し、追加Generatorはユーザー判断までdispatchしない。
+- 推奨する限定修正は既存052検査のtext hashにCRLF→LFだけを適用し、期待hash・marker・surface数・assert・timeout・製品runtimeを不変に保つこと。修正候補push／既存Windows1回／fresh増分評価までの可否を非同期質問として提示済み。追加runnerや全wrapper再実行は提案しない。
+- 運用証拠: EvaluatorのNode確認はsandboxで取得不能と記録されており、表示0を実測として採用しない。mainの実測はarchive前／隔離Claude終了後とも13、Claude対象残留0。Evaluator実行中のpeakは未測定で、host上限遵守の完全な実測証明へ広げない。次dispatchには取得不能時はescalated読取で実測する指示を再提示する。
+
+- Windows run34070811154は00:46:37 UTCにfailureで終了。旧0.9.2 native12/0、HS16/0・SKIP0／NOTRUN0、Git45/0、会話migration9/0は成功したが、Voice2/1でconversation-contract.mdのraw hash不一致、後続updateはskipped。全log `/private/tmp/secretary-yasashii-044-check.SsbIHd/windows-34070811154.log` をfresh Evaluatorへ渡し、最終分類を待つ。同一候補の再実行はしない。main exact Git-free archive14/14は成功。
+- 同じcandidateをClaude Code2.1.232の空の隔離cwd／setting-sources空／tools・MCP空／no-session-persistenceで1回source-loadした。session `ea7e79c9-84ec-4f4e-a7d1-af5bd6fd32f8`、inline yasashii-secretary0.12.0・17 Skills、SessionStart／Stop exit0・stderr0、resultOK、parser warning0。log `/private/tmp/secretary-yasashii-044-check.SsbIHd/claude-source-load.jsonl`。正式install／通常利用workspace／Codex確認とは区別し、実userdataは非接触。
+
+- 候補 `a38d7dc6bef58e2bcfd9433c8b29e9d557447b24`／tree `79420843e3c869fbe4fc9987e53d9ebbd4dcc5e7` をcommitしてclean確認、候補branchだけに通常pushした。既存Windows run `34070811154`／job `101587680262` を1回dispatch、head／branch一致を確認して実行中。fixed source／Git-free archiveは `/private/tmp/secretary-yasashii-044-check.SsbIHd/`。
+- fresh独立Evaluatorのdispatch予約としてLineage1→2（上限10未満）、Retry0／Spec0／strong／noneを維持。resolver指定Sol/high、fresh、launch-unverified。実差分・既存bounded回帰・同候補Windowsを根拠にPhase A判定し、未実行のhostやhistorical結果をPASSへ昇格しない。Fableは既存未送信draft保護により不使用。main／tag／Release／installは未実施。
 
 - Generator044のhandoffをmainが全文と実差分で確認した。F82共通helper／6 callsite、F83／F84／Clarity、版固有anchor／inventory／metadataを適応済み。MacはVoice3、migration9、core43、Hook40、P0014、P00221、P00312+Windows未実行4、update16、release整合、archive14、overlay再適用差分0。旧期待値・marker漏れ等の初回FAILと再検査をprogressへ保持し、既存履歴fixtureは不変。stateはawaiting-evalとし候補固定へ進む。Windows・実host・独立評価は未完了でPASSへ昇格しない。
 
