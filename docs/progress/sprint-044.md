@@ -100,3 +100,25 @@ Windowsはmainの通常push後、既存`.github/workflows/windows-recording-regr
 
 - 状態は評価待ちであり、Generatorから独立PASSは主張しない。MacではCRLF限定の実装とoverlay期待bytesを確認したが、Windows nativeはこのGeneratorではNOT-RUNである。
 - Orchestratorが新candidateをcommit／pushした後、既存`.github/workflows/windows-recording-regression.yml`をexact headで1回だけ実行し、Voice 3／0と、その後のupdate 16／0を含むjob全体を確認する。旧runのfailureや今回のMac結果をWindows PASSへ昇格しない。
+
+## V-02限定対応（Windows checkoutのGit履歴）
+
+- 対応開始HEAD: `9db9341342a649bf87221639eac309dcf2d602f3`。V-01はresolved、Windows run `34076583606`のVoice 3 PASS／0 FAIL、update 0 PASS／1 FAIL、job failure、V-02の`verification-scope-issue`分類を履歴として維持する。
+- 既存Windows workflowの`actions/checkout@v4`へ`fetch-depth: 0`だけを設定し、`git rev-list HEAD`を使う既存update検査へ公開0.7.0 revisionを含むGit履歴を供給する。trigger、permissions、runner、Node 22、10分timeout、job／step、製品、fixture、期待値、case／assertは変更していない。
+- 今回も変更対象はverification surfaceだけで、製品コードは0行である。V-01に続く2回連続の検証側だけの修正であり、ユーザーが承認したV-02限定範囲を越える新runner、framework、test、schema、`.gitattributes`、Git設定は追加していない。
+
+### 限定検証
+
+最初のsandbox内`pgrep node | wc -l`はprocess list取得エラーと偽の0を返したため採用せず、権限を上げたread-only再計測で18を確認してから検査を開始した。
+
+| Command | Result |
+|---|---|
+| `pgrep node \| wc -l`（escalated read-only） | 18。開始上限40未満 |
+| `ruby -e "require 'yaml'; ... YAML.load_file(...)"` | PASS。既存parserでYAMLを読め、`windows-native` jobを確認 |
+| `git merge-base --is-ancestor 604ce1f... HEAD`とhistorical manifest読取 | PASS。revisionはHEAD履歴に存在し、legacy manifest versionは`0.7.0` |
+| `git diff --check`／限定diff | PASS。空白error 0。workflow差分はcheckoutの`with.fetch-depth: 0`だけ |
+
+### Evaluatorへの追加引き渡し
+
+- 状態は評価待ちであり、Generatorから独立PASSは主張しない。Orchestratorがcommit／pushした新candidateで、既存Windows workflowをexact headに対して1回だけ実行し、native 12／0、HS 16／0・SKIP 0・NOT-RUN 0、Git 45／0、migration 9／0、Voice 3／0、update 16／0とjob全体greenを確認する。
+- 既存update検査には、履歴から得る旧0.7.0テキストとcurrent checkoutテキストを比較する面がある。完全履歴のMacでは16／0だった一方、Windows checkoutのCRLFで次の差が現れる可能性は残る。これは承認されたcheckout履歴設定修正の範囲外なので、検査・製品・fixtureは変更せず、fresh Evaluatorが実CI結果から分類する。

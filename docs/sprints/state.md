@@ -5,12 +5,16 @@
 - Current ID: sprint-044
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 4
+- Lineage Dispatches: 5
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
 
 ## 2026-09-07 0.12.0版適応開始
+
+- V-02 Generator完了、mainは実diffとhandoffを確認。既存checkoutにfetch-depth:0の2行だけを追加、YAML／0.7.0履歴存在／diff成功、実測Node18。製品0、test変更0。Windows前のreadonly診断で、032の旧CHANGELOG sectionとmigration比較2か所がGit archiveのLFとWindows checkoutのCRLFだけで不一致になることも確認（LF比較true／CRLF比較false、内容不変）。この2か所のCRLF限定比較修正を同じ候補へ含める可否をユーザーに質問した。未承認箇所は変更せず、既知の不一致を残したCI消費を避けるため候補push／Windows1回は回答後へ保留。V-02の旧正式FAILを保持、fresh独立評価はまだ。
+
+- ユーザー「続けてください」によりV-02の既存CI履歴取得設定だけの修正、候補push、Windows検証1回、fresh独立評価を承認。製品・fixture・検査基準は変更しない。fresh GeneratorをLineage4→5で予約、Retry0／Spec0／strong／none。resolverはSol/high、fresh、launch-unverified（implementation-issue入力は承認済み修正dispatchの経路のみ、finding分類はverification-scope-issueを保持）。前回に続き検証側だけの修正となるため、検証規模ガードは今回の限定修正承認の範囲で扱い、新検査追加や基盤拡大は行わない。
 
 - fresh独立Evaluator `/root/evaluator_yas044_crlf` の追記全文と実runをmainが確認し、current Phase A FAIL / verification-scope-issueを採用。V-01 RESOLVED、V-02 OPEN（検証側の履歴不足）、product finding0。Mac完全履歴update16/0、実履歴0.7.0存在とCIdepth1を独立確認。Retry0／Spec0／Lineage4／strong／noneを保持し、追加のcheckout履歴設定修正はユーザー回答まで待つ。旧FAILは保持。正式install／公開は未実施。
 
