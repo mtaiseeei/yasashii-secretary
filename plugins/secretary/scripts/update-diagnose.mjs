@@ -87,13 +87,14 @@ function completeRelease(sections) {
 }
 
 function parseChangelog(markdown) {
+  const normalized = markdown.replace(/\r\n?/g, "\n");
   const releases = new Map();
   const duplicates = new Set();
-  const matches = [...markdown.matchAll(/^## \[(\d+\.\d+\.\d+)\](?:\s+-\s+[^\n]+)?$/gm)];
+  const matches = [...normalized.matchAll(/^## \[(\d+\.\d+\.\d+)\](?:\s+-\s+[^\n]+)?$/gm)];
   for (let index = 0; index < matches.length; index += 1) {
     const start = matches[index].index + matches[index][0].length;
-    const end = index + 1 < matches.length ? matches[index + 1].index : markdown.length;
-    const body = markdown.slice(start, end);
+    const end = index + 1 < matches.length ? matches[index + 1].index : normalized.length;
+    const body = normalized.slice(start, end);
     const sections = {};
     const sectionMatches = [...body.matchAll(/^### (対象者|変わること|設定・ファイルへの影響|必要な操作|互換性上の注意)$/gm)];
     for (let sectionIndex = 0; sectionIndex < sectionMatches.length; sectionIndex += 1) {

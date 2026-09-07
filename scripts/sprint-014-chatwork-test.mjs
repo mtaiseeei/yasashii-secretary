@@ -142,8 +142,18 @@ function makeSearchFixture(name, addOnSecondPull = false) {
   const bin = join(root, "bin"); mkdirSync(bin);
   const gitBin = join(bin, "fake-git.mjs");
   const ghBin = join(bin, "fake-gh.mjs");
-  writeFileSync(gitBin, `#!/usr/bin/env node\nimport{appendFileSync,readFileSync,writeFileSync,mkdirSync}from'node:fs';import{join}from'node:path';const a=process.argv.slice(2);appendFileSync(process.env.FAKE_LOG,'git '+a.join(' ')+'\\n');if(a[0]==='branch'&&a[1]==='--show-current'){process.stdout.write('main\\n');process.exit(0)}if(a[0]==='pull'){let n=0;try{n=Number(readFileSync(process.env.PULL_COUNT,'utf8'))}catch{}n++;writeFileSync(process.env.PULL_COUNT,String(n));if(n===2&&process.env.ADD_ON_SECOND==='1'){mkdirSync(join(process.env.SEARCH_ROOT,'chatwork','history'),{recursive:true});writeFileSync(join(process.env.SEARCH_ROOT,'chatwork','history','101.json'),JSON.stringify({messages:[{messageId:'900',roomId:'101',roomName:'営業',accountId:'7',accountName:'合成人物',sentAt:1784160900,body:'再検索で見つかる見積書'}]}));}}\n`);
-  writeFileSync(ghBin, `#!/usr/bin/env node\nimport{appendFileSync,existsSync,readFileSync,writeFileSync}from'node:fs';import{join}from'node:path';const a=process.argv.slice(2),state=join(process.env.SEARCH_ROOT,'run-state.json');appendFileSync(process.env.FAKE_LOG,'gh '+a.join(' ')+'\\n');if(process.env.GH_MODE==='permission'&&a[0]==='workflow'){process.stderr.write('Resource not accessible by integration');process.exit(1)}if(a[0]==='workflow'&&a[1]==='run'){const correlation=a.find(x=>x.startsWith('correlation_id='))?.slice(15);writeFileSync(state,JSON.stringify({correlation,createdAt:new Date().toISOString()}));process.exit(0)}if(a[0]==='run'&&a[1]==='list'){if(!existsSync(state))process.stdout.write('[]');else{const s=JSON.parse(readFileSync(state));process.stdout.write(JSON.stringify([{databaseId:77,status:'queued',conclusion:null,createdAt:s.createdAt,headBranch:'main',workflowName:'Chatwork sync',displayTitle:'Chatwork sync ['+s.correlation+']'}]))}process.exit(0)}if(a[0]==='run'&&a[1]==='watch'){if(['failure','auth','rate','network','partial'].includes(process.env.GH_MODE))process.exit(1);if(process.env.GH_MODE==='timeout')await new Promise(r=>setTimeout(r,1000));}if(a[0]==='run'&&a[1]==='view'){const logs={auth:'失敗種別: auth',rate:'失敗種別: rate-limit',network:'失敗種別: network',partial:'失敗種別: server'};process.stdout.write(logs[process.env.GH_MODE]||'workflow failed');}\n`);
+  writeFileSync(gitBin, `#!/usr/bin/env node\nimport{appendFileSync,readFileSync,writeFileSync,mkdirSync}from'node:fs';import{join}from'node:path';const a=process.argv.slice(2),root=process.env.SEARCH_ROOT;appendFileSync(process.env.FAKE_LOG,'git '+a.join(' ')+'\\n');if(a[0]==='branch'&&a[1]==='--show-current'){process.stdout.write('main\\n');process.exit(0)}if(a[0]==='rev-parse'&&a[1]==='--show-toplevel'){process.stdout.write(root+'\\n');process.exit(0)}if(a[0]==='symbolic-ref'){process.stdout.write('main\\n');process.exit(0)}if(a[0]==='remote'){process.stdout.write('https://example.invalid/repo.git\\n');process.exit(0)}if(a[0]==='fetch'){let n=0;try{n=Number(readFileSync(join(root,'fetch-sequence'),'utf8'))}catch{}n++;writeFileSync(join(root,'fetch-sequence'),String(n));writeFileSync(join(root,'fetch-head'),String(n).padStart(40,'0'));process.exit(0)}if(a[0]==='rev-parse'&&a[1]==='HEAD'){let h='0'.repeat(40);try{h=readFileSync(join(root,'head'),'utf8')}catch{}process.stdout.write(h+'\\n');process.exit(0)}if(a[0]==='rev-parse'&&a[1]==='FETCH_HEAD^{commit}'){process.stdout.write(readFileSync(join(root,'fetch-head'),'utf8')+'\\n');process.exit(0)}if(a[0]==='merge-base')process.exit(a[2]==='HEAD'?0:1);if(a[0]==='diff'||a[0]==='status')process.exit(0);if(a[0]==='pull'){writeFileSync(join(root,'head'),readFileSync(join(root,'fetch-head'),'utf8'));let n=0;try{n=Number(readFileSync(process.env.PULL_COUNT,'utf8'))}catch{}n++;writeFileSync(process.env.PULL_COUNT,String(n));if(n===2&&process.env.ADD_ON_SECOND==='1'){mkdirSync(join(root,'chatwork','history'),{recursive:true});writeFileSync(join(root,'chatwork','history','101.json'),JSON.stringify({messages:[{messageId:'900',roomId:'101',roomName:'営業',accountId:'7',accountName:'合成人物',sentAt:1784160900,body:'再検索で見つかる見積書'}]}));}}\n`);
+  writeFileSync(ghBin, `#!/usr/bin/env node
+import{appendFileSync,existsSync,readFileSync,writeFileSync}from'node:fs';import{join}from'node:path';
+const a=process.argv.slice(2),state=join(process.env.SEARCH_ROOT,'run-state.json');
+appendFileSync(process.env.FAKE_LOG,'gh '+a.join(' ')+'\\n');
+if(process.env.GH_MODE==='permission'&&a[0]==='workflow'){process.stderr.write('Resource not accessible by integration');process.exit(1)}
+if(a[0]==='workflow'&&a[1]==='run'){const correlation=a.find(x=>x.startsWith('correlation_id='))?.slice(15);writeFileSync(state,JSON.stringify({correlation,createdAt:new Date().toISOString()}));process.exit(0)}
+if(a[0]==='run'&&a[1]==='list'){if(!existsSync(state))process.stdout.write('[]');else{const s=JSON.parse(readFileSync(state));process.stdout.write(JSON.stringify([{databaseId:77,status:'queued',conclusion:null,createdAt:s.createdAt,headBranch:'main',workflowName:'Chatwork sync',displayTitle:'Chatwork sync ['+s.correlation+']'}]))}process.exit(0)}
+if(a[0]==='run'&&a[1]==='watch'){if(['failure','auth','rate','network','partial'].includes(process.env.GH_MODE))process.exit(1);if(process.env.GH_MODE==='timeout')await new Promise(r=>setTimeout(r,1000));}
+if(a[0]==='run'&&a[1]==='view'&&a.includes('--json')){process.stdout.write(JSON.stringify(process.env.GH_MODE==='timeout'?{status:'in_progress',conclusion:null}:{status:'completed',conclusion:'failure'}));process.exit(0)}
+if(a[0]==='run'&&a[1]==='view'&&a.includes('--log-failed')){const logs={auth:'失敗種別: auth',rate:'失敗種別: rate-limit',network:'失敗種別: network',partial:'失敗種別: server'};process.stdout.write(logs[process.env.GH_MODE]||'workflow failed');process.exit(0)}
+`);
   chmodSync(gitBin, 0o755); chmodSync(ghBin, 0o755);
   return { root, gitBin, ghBin, log: join(root, "events.log"), count: join(root, "pull-count"), addOnSecondPull };
 }
@@ -158,7 +168,7 @@ const ask = await runFlow(makeSearchFixture("search-ask"), null);
 check("not foundでhost向け3択を返す", ask.status === "needs-choice" && ask.choices.map((item) => item.value).join() === "sync,decline,review");
 const declinedTarget = makeSearchFixture("search-decline");
 const declined = await runFlow(declinedTarget, "decline");
-check("同期しないはdispatch・commit・push 0", declined.status === "sync-declined" && !readFileSync(declinedTarget.log, "utf8").includes("gh ") && !/commit|push/.test(readFileSync(declinedTarget.log, "utf8")));
+check("同期しないはdispatch・commit・push 0", declined.status === "sync-declined" && !readFileSync(declinedTarget.log, "utf8").includes("gh ") && !/^git (?:commit|push)(?: |$)/m.test(readFileSync(declinedTarget.log, "utf8")));
 const reviewTarget = makeSearchFixture("search-review");
 const review = await runFlow(reviewTarget, "review");
 check("room見直しは同期せずwizardへ戻す", review.status === "room-review-needed" && !readFileSync(reviewTarget.log, "utf8").includes("gh "));
@@ -167,16 +177,21 @@ const approved = await runFlow(approvedTarget, "sync");
 check("承認後だけdispatch→wait→success→pull→retry順", approved.status === "found" && approved.events.join() === "pull-before-search,search-local,structured-choice,dispatch,wait,success-confirmed,pull-after-sync,retry-same-query");
 const still = await runFlow(makeSearchFixture("search-still"), "sync");
 check("同期後not foundも存在しないと断定しない", still.status === "still-not-found" && still.possibleReasons.length === 5 && !still.message.includes("Chatworkに存在しません"));
-for (const [mode, code] of [["permission", "github-permission"], ["failure", "workflow-failure"], ["timeout", "timeout"]]) {
+for (const [mode, code] of [["permission", "dispatch-auth"], ["failure", "workflow-conclusion-failure"], ["timeout", "actions-run-timeout"]]) {
   const target = makeSearchFixture(`search-${mode}`);
   const result = await runFlow(target, "sync", mode, "50");
   const log = readFileSync(target.log, "utf8");
-  check(`manual sync ${mode}を区別し不要なpush 0`, result.status === "sync-failed" && result.error === code && !/commit|push/.test(log));
+  const logViews = log.match(/gh run view .* --log-failed/g) || [];
+  check(`manual sync ${mode}を区別し不要なpush 0`, result.status === "sync-failed" && result.error === code && !/^git (?:commit|push)(?: |$)/m.test(log)
+    && (mode === "failure" ? logViews.length === 1 : logViews.length === 0));
 }
 for (const [mode, code] of [["auth", "auth"], ["rate", "rate-limit"], ["network", "network"], ["partial", "partial-room"]]) {
   const target = makeSearchFixture(`search-${mode}`);
   const result = await runFlow(target, "sync", mode, "500");
-  check(`manual sync ${mode}の原因を安全に区別`, result.status === "sync-failed" && result.error === code && !result.message.includes(tokenMarker));
+  const log = readFileSync(target.log, "utf8");
+  check(`manual sync ${mode}の原因を安全に区別`, result.status === "sync-failed" && result.error === code && !result.message.includes(tokenMarker)
+    && (log.match(/gh run view .* --json status,conclusion/g) || []).length === 1
+    && (log.match(/gh run view .* --log-failed/g) || []).length === 1);
 }
 
 const wizardRoot = fixture("wizard");

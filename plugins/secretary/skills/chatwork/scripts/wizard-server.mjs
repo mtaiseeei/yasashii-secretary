@@ -3,11 +3,12 @@
 import { createServer } from "node:http";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, extname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { applyChatworkConfig } from "./config-transaction.mjs";
 import { dispatchCorrelatedWorkflow, watchCorrelatedWorkflow } from "../../../scripts/lib/actions-run.mjs";
 import { workingRoot, writeFileAtomicSafe } from "../../../scripts/lib/safe-fs.mjs";
-import { runExternal, runExternalSync } from "../../../scripts/lib/external-ops.mjs";
+import { runExternalSync } from "../../../scripts/lib/external-ops.mjs";
+import { ingestGit } from "../../../scripts/lib/git-ingest.mjs";
 import { createWizardSessionGuard } from "../../../scripts/lib/wizard-session.mjs";
 import { loadWizardProductIdentity, renderWizardProductIdentity } from "../../../scripts/lib/wizard-product-identity.mjs";
 
@@ -23,6 +24,39 @@ const productIdentity = loadWizardProductIdentity(pluginRoot);
 let dispatch = { status: "idle", operation: null, config: null, message: "" };
 let discovery = { status: "idle", message: "" };
 let discoveryConfirmed = false;
+
+function runSummary(run) {
+  if (!run) return null;
+  const repository = githubRepository();
+  return {
+    id: String(run.runId || run.id),
+    workflow: run.workflowFile || run.workflow,
+    branch: run.branch,
+    createdAt: run.createdAt,
+    ...(repository ? { url: `https://github.com/${repository.owner}/${repository.repository}/actions/runs/${String(run.runId || run.id)}` } : {}),
+  };
+}
+
+function failureDetail(error, run = error?.correlatedRun) {
+  const stage = error?.stage || "actions-run";
+  const code = String(error?.code || `${stage}-failed`);
+  const detail = { stage, code };
+  if (typeof error?.reason === "string") detail.reason = error.reason;
+  if (Array.isArray(error?.conflictPaths)) detail.conflictPaths = error.conflictPaths;
+  const summary = runSummary(run);
+  let message;
+  if (code === "branch-unconfirmed") message = "対象branchを確認できないため、GitHub Actionsは開始していません。branchを確認してから再実行してください。";
+  else if (stage === "run-correlation") message = "今回開始したGitHub Actionsのrunを確認できませんでした。古い成功runは使っていません。";
+  else if (stage === "git-ingest") message = `取得はGitHub上で完了しています${summary ? `（run ${summary.id}）` : ""}。この端末への取り込みだけ失敗しました。${error.message}`;
+  else if (stage === "result-missing") message = "GitHub Actionsは完了しましたが、今回の結果ファイルを確認できませんでした。";
+  else if (code === "workflow-conclusion-failure") message = "今回のGitHub Actionsが失敗しました。Actionsの実行内容とAPI Tokenの登録を確認してください。";
+  else if (code.endsWith("-auth")) message = "GitHub CLIの認証を確認できませんでした。GitHub Actionsの結果とは別の問題です。";
+  else if (code.endsWith("-timeout")) message = "GitHub Actionsの確認が時間切れになりました。実行結果は断定していません。";
+  else if (code.endsWith("-killed")) message = "GitHub Actionsの確認processが終了したため、実行結果は断定していません。";
+  else if (code.endsWith("-transport")) message = "GitHubとの通信に失敗しました。GitHub Actionsの結果は断定していません。";
+  else message = "GitHub Actionsの開始または結果確認に失敗しました。古い成功runは使っていません。";
+  return { detail, run: summary, message };
+}
 
 function origin() {
   const address = server.address();
@@ -84,6 +118,17 @@ function writeJson(path, value) {
   writeFileAtomicSafe(root, path, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 });
 }
 
+export function isCurrentSyncResult(sync, run, previousSync = null) {
+  const attemptedAt = Date.parse(String(sync?.attemptedAt || ""));
+  const runCreatedAt = Date.parse(String(run?.createdAt || ""));
+  return sync?.status === "success"
+    && Array.isArray(sync.results)
+    && Number.isFinite(attemptedAt)
+    && Number.isFinite(runCreatedAt)
+    && attemptedAt >= runCreatedAt
+    && sync.attemptedAt !== previousSync?.attemptedAt;
+}
+
 function send(response, status, body, type = "application/json; charset=utf-8") {
   response.writeHead(status, {
     "content-type": type,
@@ -122,12 +167,14 @@ async function runSync(mode, config) {
     return;
   }
   const gh = process.env.YASASHII_GH_BIN || "gh";
+  const previousSync = readJson(join(root, "chatwork", "state", "sync.json"), null);
   dispatch = {
     status: "dispatching",
     operation,
     config,
     message: operation === "initial" ? "初回取得の自動取得処理（GitHub Actions）を開始しています。" : "設定変更後の自動取得処理（GitHub Actions）を開始しています。",
   };
+  let correlatedRun = null;
   try {
     const run = await dispatchCorrelatedWorkflow({
       root,
@@ -135,32 +182,32 @@ async function runSync(mode, config) {
       workflowName: "Chatwork sync",
       inputs: { mode },
       gh,
-      discoveryTimeoutMs: Number(process.env.YASASHII_RUN_DISCOVERY_TIMEOUT_MS || 5_000),
-      pollIntervalMs: Number(process.env.YASASHII_RUN_POLL_MS || 250),
     });
-    const runSummary = { id: run.runId, workflow: run.workflowFile, branch: run.branch, createdAt: run.createdAt };
-    dispatch = { status: "waiting", operation, config, run: runSummary, message: "今回開始した自動取得処理（GitHub Actions）の完了を待っています。" };
+    correlatedRun = run;
+    const summary = runSummary(run);
+    dispatch = { status: "waiting", operation, config, run: summary, message: "今回開始した自動取得処理（GitHub Actions）の完了を待っています。" };
     await watchCorrelatedWorkflow({ root, run, gh, timeoutMs: 5 * 60_000 });
-    await runExternal(process.env.YASASHII_GIT_BIN || "git", ["pull", "--ff-only", "--no-rebase"], { cwd: root, timeoutMs: 60_000, label: "git pull" });
+    await ingestGit({ root, branch: run.branch, git: process.env.YASASHII_GIT_BIN || "git" });
+    const sync = readJson(join(root, "chatwork", "state", "sync.json"), null);
+    if (!isCurrentSyncResult(sync, run, previousSync)) {
+      throw Object.assign(new Error("今回の同期結果を確認できません。"), { code: "sync-not-current", stage: "result-missing", correlatedRun: run });
+    }
     dispatch = {
       status: "success",
       operation,
       config,
-      run: runSummary,
+      run: summary,
       message: operation === "initial" ? "初回取得が完了し、リポジトリへ反映しました。" : "設定変更後の同期が完了し、リポジトリへ反映しました。",
     };
   } catch (error) {
-    const unconfirmed = ["run-correlation-unconfirmed", "branch-unconfirmed", "run-list-invalid"].includes(error?.code);
+    const failed = failureDetail(error, correlatedRun);
     dispatch = {
       status: "failed",
       operation,
       config,
-      run: error?.correlatedRun ? { id: error.correlatedRun.runId, workflow: error.correlatedRun.workflowFile, branch: error.correlatedRun.branch, createdAt: error.correlatedRun.createdAt } : null,
-      message: unconfirmed
-        ? "今回開始した自動取得処理（GitHub Actions）を確認できませんでした。古い成功結果は使わず停止しました。Actions画面で今回の実行を確認してから再実行してください。"
-        : operation === "initial"
-          ? "今回の初回取得が失敗しました。古い成功結果へ切り替えず停止しました。Actions画面で今回の実行を確認してから再実行してください。"
-          : "設定は変更しましたが、今回の同期が失敗しました。古い成功結果へ切り替えず停止しました。Actions画面で今回の実行を確認してから再実行してください。",
+      run: failed.run,
+      failure: failed.detail,
+      message: failed.message,
     };
   }
 }
@@ -175,6 +222,7 @@ async function discoverRooms() {
     return rooms;
   }
   const gh = process.env.YASASHII_GH_BIN || "gh";
+  let correlatedRun = null;
   try {
     const run = await dispatchCorrelatedWorkflow({
       root,
@@ -182,27 +230,26 @@ async function discoverRooms() {
       workflowName: "Chatwork sync",
       inputs: { mode: "discover" },
       gh,
-      discoveryTimeoutMs: Number(process.env.YASASHII_RUN_DISCOVERY_TIMEOUT_MS || 5_000),
-      pollIntervalMs: Number(process.env.YASASHII_RUN_POLL_MS || 250),
     });
-    discovery = { status: "running", run: { id: run.runId, workflow: run.workflowFile, branch: run.branch, createdAt: run.createdAt }, message: "今回開始した自動取得処理（GitHub Actions）で参加中のルーム一覧を取得しています。" };
+    correlatedRun = run;
+    const summary = runSummary(run);
+    discovery = { status: "running", run: summary, message: "今回開始した自動取得処理（GitHub Actions）で参加中のルーム一覧を取得しています。" };
     await watchCorrelatedWorkflow({ root, run, gh, timeoutMs: 5 * 60_000 });
-    await runExternal(process.env.YASASHII_GIT_BIN || "git", ["pull", "--ff-only", "--no-rebase"], { cwd: root, timeoutMs: 60_000, label: "git pull" });
+    await ingestGit({ root, branch: run.branch, git: process.env.YASASHII_GIT_BIN || "git" });
     const rooms = readJson(join(root, "chatwork", "rooms.json"), { status: "not-discovered", rooms: [] });
-    if (rooms.status !== "ready") throw new Error("rooms-not-ready");
-    discovery = { status: "success", run: { id: run.runId, workflow: run.workflowFile, branch: run.branch, createdAt: run.createdAt }, message: "ルーム一覧を取得しました。" };
+    if (rooms.status !== "ready") throw Object.assign(new Error("今回のルーム一覧結果を確認できません。"), { code: "rooms-not-ready", stage: "result-missing", correlatedRun: run });
+    discovery = { status: "success", run: summary, message: "ルーム一覧を取得しました。" };
     discoveryConfirmed = true;
     return rooms;
   } catch (error) {
-    const unconfirmed = ["run-correlation-unconfirmed", "branch-unconfirmed", "run-list-invalid"].includes(error?.code);
+    const failed = failureDetail(error, correlatedRun);
     discovery = {
       status: "failed",
-      run: error?.correlatedRun ? { id: error.correlatedRun.runId, workflow: error.correlatedRun.workflowFile, branch: error.correlatedRun.branch, createdAt: error.correlatedRun.createdAt } : null,
-      message: unconfirmed
-        ? "今回開始したルーム一覧取得を確認できませんでした。古い成功結果は使わず停止しました。Actions画面で今回の実行を確認してから再実行してください。"
-        : "今回のルーム一覧取得が失敗しました。古い成功結果へ切り替えず停止しました。Actions画面の今回runとAPI Tokenの登録を確認してください。",
+      run: failed.run,
+      failure: failed.detail,
+      message: failed.message,
     };
-    throw Object.assign(new Error(discovery.message), { code: unconfirmed ? "run-unconfirmed" : "discovery-failed" });
+    throw Object.assign(new Error(discovery.message), { code: failed.detail.code, stage: failed.detail.stage });
   }
 }
 
@@ -265,8 +312,10 @@ const server = createServer(async (request, response) => {
   return send(response, 200, body, types[extname(name)]);
 });
 
-verifyPrivateRepo();
-server.listen(port, host, () => {
-  const address = server.address();
-  process.stdout.write(`Chatwork設定wizard: http://${host}:${address.port}/\n`);
-});
+if (import.meta.url === pathToFileURL(process.argv[1] || "").href) {
+  verifyPrivateRepo();
+  server.listen(port, host, () => {
+    const address = server.address();
+    process.stdout.write(`Chatwork設定wizard: http://${host}:${address.port}/\n`);
+  });
+}

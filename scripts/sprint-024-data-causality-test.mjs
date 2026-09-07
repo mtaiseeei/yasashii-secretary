@@ -96,6 +96,16 @@ try {
   const fakeGh = join(bin, "gh.mjs");
   writeFileSync(fakeGit, `#!/usr/bin/env node
 import{appendFileSync,existsSync,mkdirSync,readFileSync,writeFileSync}from'node:fs';import{join}from'node:path';
+const helperArgs=process.argv.slice(2),helperRoot=process.env.FAKE_ROOT;
+if(helperArgs[0]==='rev-parse'&&helperArgs[1]==='--show-toplevel'){process.stdout.write(helperRoot+'\\n');process.exit(0)}
+if(helperArgs[0]==='symbolic-ref'){process.stdout.write((process.env.FAKE_BRANCH||'main')+'\\n');process.exit(0)}
+if(helperArgs[0]==='remote'&&helperArgs[1]==='get-url'){process.stdout.write('https://example.invalid/repo.git\\n');process.exit(0)}
+if(helperArgs[0]==='fetch'){const p=join(helperRoot,'fetch-sequence'),n=(existsSync(p)?Number(readFileSync(p,'utf8')):0)+1;writeFileSync(p,String(n));writeFileSync(join(helperRoot,'fetch-head'),String(n).padStart(40,'0'));process.exit(0)}
+if(helperArgs[0]==='rev-parse'&&helperArgs[1]==='HEAD'){process.stdout.write((existsSync(join(helperRoot,'head'))?readFileSync(join(helperRoot,'head'),'utf8'):'0'.repeat(40))+'\\n');process.exit(0)}
+if(helperArgs[0]==='rev-parse'&&helperArgs[1]==='FETCH_HEAD^{commit}'){process.stdout.write(readFileSync(join(helperRoot,'fetch-head'),'utf8')+'\\n');process.exit(0)}
+if(helperArgs[0]==='merge-base'){process.exit(helperArgs[2]==='HEAD'?0:1)}
+if(helperArgs[0]==='diff'||helperArgs[0]==='status')process.exit(0)
+if(helperArgs[0]==='pull'){writeFileSync(join(helperRoot,'head'),readFileSync(join(helperRoot,'fetch-head'),'utf8'))}
 const a=process.argv.slice(2),root=process.env.FAKE_ROOT,log=join(root,'events.log');appendFileSync(log,'git '+a.join(' ')+'\\n');
 if(a[0]==='branch'&&a[1]==='--show-current'){process.stdout.write((process.env.FAKE_BRANCH||'main')+'\\n');process.exit(0)}
 if(a[0]==='pull'){const p=join(root,'pull-count');let n=existsSync(p)?Number(readFileSync(p,'utf8')):0;n++;writeFileSync(p,String(n));if(n===2&&process.env.FAKE_ADD_RESULT==='1'){if(process.env.FAKE_SERVICE==='google'){const d=join(root,'google-chat','history','fixture--SAFE');mkdirSync(d,{recursive:true});writeFileSync(join(d,'2026-07-19.md'),'# fixture\\n\\n今回runで見つかる語\\n')}else{const d=join(root,'chatwork','history');mkdirSync(d,{recursive:true});writeFileSync(join(d,'101.json'),JSON.stringify({messages:[{messageId:'1',roomId:'101',roomName:'fixture',accountId:'1',accountName:'fixture',sentAt:1784419200,body:'今回runで見つかる語'}]}))}}}
@@ -107,7 +117,8 @@ const a=process.argv.slice(2),root=process.env.FAKE_ROOT,statePath=join(root,'ru
 if(a[0]==='workflow'&&a[1]==='run'){const workflow=a[2],correlation=a.find(x=>x.startsWith('correlation_id='))?.slice(15),ref=a[a.indexOf('--ref')+1];writeFileSync(statePath,JSON.stringify({workflow,correlation,ref,createdAt:new Date().toISOString()}));process.exit(0)}
 if(a[0]==='run'&&a[1]==='list'){const old={databaseId:90,status:'completed',conclusion:'success',createdAt:'2020-01-01T00:00:00.000Z',headBranch:'main',workflowName:a.includes('chatwork-sync.yml')?'Chatwork sync':'Google Chat sync',displayTitle:'古い成功run'};if(!existsSync(statePath)){process.stdout.write(JSON.stringify([old]));process.exit(0)}const s=JSON.parse(readFileSync(statePath)),name=s.workflow==='chatwork-sync.yml'?'Chatwork sync':'Google Chat sync';const current={databaseId:200,status:mode==='current-failure'?'completed':'queued',conclusion:mode==='current-failure'?'failure':null,createdAt:s.createdAt,headBranch:mode==='wrong-branch'?'other':s.ref,workflowName:mode==='wrong-workflow'?'別workflow':name,displayTitle:name+' ['+s.correlation+']'};if(mode==='missing-time')delete current.createdAt;if(mode==='invalid-time')current.createdAt='not-a-date';if(mode==='none')process.stdout.write(JSON.stringify([old]));else process.stdout.write(JSON.stringify([old,current]));process.exit(0)}
 if(a[0]==='run'&&a[1]==='watch'){if(mode==='current-failure')process.exit(1);process.exit(0)}
-if(a[0]==='run'&&a[1]==='view'){process.stdout.write(process.env.FAKE_SERVICE==='google'?'GOOGLE_CHAT_ERROR=network\\nsecret-value-should-not-appear\\nhttps://accounts.example.invalid/oauth?code=hidden':'失敗種別: network\\nsecret-value-should-not-appear\\nチャット本文should-not-appear');process.exit(0)}
+if(a[0]==='run'&&a[1]==='view'&&a.includes('--json')){process.stdout.write(JSON.stringify({status:'completed',conclusion:mode==='current-failure'?'failure':'success'}));process.exit(0)}
+if(a[0]==='run'&&a[1]==='view'&&a.includes('--log-failed')){process.stdout.write(process.env.FAKE_SERVICE==='google'?'GOOGLE_CHAT_ERROR=network\\nsecret-value-should-not-appear\\nhttps://accounts.example.invalid/oauth?code=hidden':'失敗種別: network\\nsecret-value-should-not-appear\\nチャット本文should-not-appear');process.exit(0)}
 process.exit(0);
 `);
   chmodSync(fakeGit, 0o755);
@@ -146,7 +157,7 @@ process.exit(0);
       check(rejected.error?.code === "run-correlation-unconfirmed", `${service}は${mode}候補を未確認停止`);
     }
     const currentFailure = await directCase(service, "current-failure");
-    check(currentFailure.error?.runId === "200", `${service}は古い成功より今回失敗runを優先`);
+    check(currentFailure.error?.correlatedRun?.runId === "200", `${service}は古い成功より今回失敗runを優先`);
   }
 
   const wizardSource = readFileSync(join(repo, "plugins/secretary/skills/chatwork/scripts/wizard-server.mjs"), "utf8");
@@ -175,7 +186,7 @@ process.exit(0);
       });
       if (mode === "success") check(result.status === "found" && result.events.join() === "pull-before-search,search-local,structured-choice,dispatch,wait,success-confirmed,pull-after-sync,retry-same-query", `${service}成功は今回run確認後だけpull・再検索`);
       else if (mode === "current-failure") check(result.status === "sync-failed" && result.error === "network" && !result.events.includes("success-confirmed") && !result.events.includes("pull-after-sync"), `${service}今回失敗は古い成功へfallbackせず停止`);
-      else check(result.status === "sync-failed" && result.error === "run-unconfirmed" && !result.events.includes("pull-after-sync"), `${service}時刻欠落runはpull・再検索前に停止`);
+      else check(result.status === "sync-failed" && result.error === "run-correlation-unconfirmed" && result.stage === "run-correlation" && !result.events.includes("pull-after-sync"), `${service}時刻欠落runはpull・再検索前に停止`);
       const serialized = JSON.stringify(result);
       check(!serialized.includes("secret-value-should-not-appear") && !serialized.includes("accounts.example.invalid") && !serialized.includes("チャット本文should-not-appear"), `${service} run結果へSecret・本文・OAuth URLを出さない`);
     }

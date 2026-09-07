@@ -105,8 +105,8 @@ done
 check "active styleの内容依存serializer唯一正本はI1-I3境界を満たす" "serializer_contract_ok '$RULES'"
 check "安全・証拠境界はstyleから分離" \
   "grep -q 'push.*明示的に指示' '$SAFETY_RULES' && grep -q '実コネクタ' '$EVIDENCE_RULES' && grep -q 'edition.json.*4面copy' '$EVIDENCE_RULES' && ! grep -q '実コネクタの証跡が無い' '$RULES'"
-check "templates/tones/全16スキルは正本参照だけでschema重複0" \
-  "[ '${#REFERENCE_SURFACES[@]}' -eq 21 ] && [ '$reference_bad' -eq 0 ]"
+check "templates/tones/全17スキルは正本参照だけでschema重複0" \
+  "[ '${#REFERENCE_SURFACES[@]}' -eq 22 ] && [ '$reference_bad' -eq 0 ]"
 SCHEMA_OWNER_COUNT="$(grep -Rsl '^- やったこと:' "$PLUGIN/rules" "$PLUGIN/skills" "$PLUGIN/templates" --include='*.md' | wc -l | tr -d ' ')"
 check "現役固定schema所有ファイルは0件" \
   "[ '$SCHEMA_OWNER_COUNT' -eq 0 ]"
@@ -170,7 +170,7 @@ missing_pref_ref=0
 while IFS= read -r skill; do
   grep -q 'preferences.md' "$skill" || { printf '  preferences参照なし: %s\n' "$skill"; missing_pref_ref=$((missing_pref_ref+1)); }
 done < <(find "$PLUGIN/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | sort)
-check "全16スキルがpreferencesを参照" "[ '$missing_pref_ref' -eq 0 ] && [ \"\$(find '$PLUGIN/skills' -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')\" -eq 16 ]"
+check "全17スキルがpreferencesまたは専用共通契約を参照" "[ '$missing_pref_ref' -eq 0 ] && [ \"\$(find '$PLUGIN/skills' -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')\" -eq 17 ]"
 
 # 部分更新・追記・確認後のjournal/commit
 SEC="$WORK/main/secretary"
@@ -187,6 +187,20 @@ sed '/^- 口調:/d' "$PREF" > "$WORK/after-without-target"
 check "pref-setは対象行以外をbyte保持" "cmp -s '$WORK/before-without-target' '$WORK/after-without-target'"
 check "pref-setは手書き行を保持" "grep -q '手書きメモ: この行は保持する' '$PREF'"
 check "pref-setだけではjournalへ書かない" "[ \"\$(journal_lines '$SEC')\" -eq '$J0' ]"
+
+pref_first_person(){ CC_SECRETARY_NOW=2026-07-16T10:00 bash "$TOOLS" pref-set "$1" "言葉遣い" "一人称" "$2" >/dev/null 2>&1; }
+pref_first_person "$SEC" "  ぼく  "
+check "一人称は前後空白を除いて保存" "grep -q '^- 一人称: ぼく$' '$PREF'"
+pref_first_person "$SEC" "私"
+check "一人称のUnicode 1 code pointを保存" "grep -q '^- 一人称: 私$' '$PREF'"
+FP16="😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"; pref_first_person "$SEC" "$FP16"
+check "一人称のUnicode 16 code pointを保存" "grep -Fqx -- '- 一人称: $FP16' '$PREF'"
+cp "$PREF" "$WORK/first-person-reject-before.md"
+FP17="😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"; pref_first_person "$SEC" "$FP17"; FP17_RC=$?
+FP_NEWLINE=$'一行目\n二行目'; pref_first_person "$SEC" "$FP_NEWLINE"; FP_NEWLINE_RC=$?
+pref_first_person "$SEC" "token: leaked"; FP_SECRET_RC=$?
+check "一人称の17 code point・改行・secretを拒否" "[ '$FP17_RC' -eq 2 ] && [ '$FP_NEWLINE_RC' -eq 3 ] && [ '$FP_SECRET_RC' -eq 3 ]"
+check "一人称の拒否はpreferencesをbyte保持" "cmp -s '$WORK/first-person-reject-before.md' '$PREF'"
 
 cp "$PREF" "$WORK/note-before.md"
 SIZE_BEFORE="$(wc -c < "$PREF" | tr -d ' ')"
@@ -236,7 +250,7 @@ check "キャンセル相当の確認ターンはcommit副作用0" "[ \"\$(git -
 MISSING="$WORK/missing/secretary"; materialize "$MISSING" "未設定" "みじかく"
 rm "$MISSING/memory/preferences.md"
 bash "$TOOLS" pref-set "$MISSING" "基本" "お仕事・役割" "営業" >/dev/null 2>&1
-check "preferences欠落時はv2既定を安全に再生成" "grep -q '^- 口調: 丁寧（標準）$' '$MISSING/memory/preferences.md' && grep -q '^- 報告の詳しさ: みじかく$' '$MISSING/memory/preferences.md'"
+check "preferences欠落時はv2既定を安全に再生成" "grep -q '^- 一人称: 私$' '$MISSING/memory/preferences.md' && grep -q '^- 口調: 丁寧（標準）$' '$MISSING/memory/preferences.md' && grep -q '^- 報告の詳しさ: みじかく$' '$MISSING/memory/preferences.md'"
 check "欠落時も指定した役割だけ反映" "grep -q '^- お仕事・役割: 営業$' '$MISSING/memory/preferences.md'"
 
 PARTIAL="$WORK/partial/secretary"; materialize "$PARTIAL" "未設定" "みじかく"

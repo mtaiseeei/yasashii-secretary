@@ -47,6 +47,30 @@ function show(id, html, stateName = "ready") {
   renderWizardScreen(app, { id: `chatwork-${id}`, state: stateName, html });
 }
 
+function stageFailure(source = {}) {
+  const failure = source.failure || {};
+  const stage = failure.stage || "actions-run";
+  const code = failure.code || "actions-run-failed";
+  const run = source.run || {};
+  const copy = {
+    dispatch: ["GitHub Actionsを開始できませんでした。", code === "branch-unconfirmed" ? "対象branchを確認できなかったため、Actionsは開始していません。" : "GitHub CLIの接続と権限を確認して、もう一度お試しください。"],
+    "run-correlation": ["今回開始したGitHub Actionsを確認できませんでした。", "古い成功runへ切り替えず停止しました。Actions画面で今回のrunを確認してください。"],
+    "actions-run": ["今回のGitHub Actionsが完了しませんでした。", code === "workflow-conclusion-failure" ? "workflowの失敗を確認しました。Actionsの実行内容とAPI Tokenの登録を確認してください。" : "認証・通信・timeoutを確認できないため、workflowの成否は断定していません。"],
+    "git-ingest": ["取得結果をこの端末へ取り込めませんでした。", `取得はGitHub上で完了しています${run.id ? `（run ${escape(run.id)}）` : ""}。この端末への取り込みだけ失敗しました。`],
+    "result-missing": ["今回の取得結果を確認できませんでした。", "GitHub Actionsは完了しましたが、今回の結果ファイルが見つかりません。古い結果は使っていません。"],
+  }[stage] || ["今回の処理を完了できませんでした。", "状態を確認して、もう一度お試しください。"];
+  const conflicts = (failure.conflictPaths || []).map((path) => `<li><code>${escape(path)}</code></li>`).join("");
+  const manual = stage === "git-ingest" && ["diverged", "dirty-conflict"].includes(code) && run.branch
+    ? `<p>${code === "dirty-conflict" ? "表示されたdirty衝突を退避または解消した後" : "分岐した履歴を手動で解消した後"}、次のcommandで再試行できます。現在の状態を直ちに修復するcommandではありません。</p><pre class="failure-command"><code>git pull --ff-only --no-rebase origin refs/heads/${escape(run.branch)}</code></pre>`
+    : "";
+  const runLink = run.url ? `<p>${externalLink(run.url, `GitHub Actionsのrun ${run.id}を見る`)}</p>` : "";
+  return {
+    heading: copy[0],
+    lead: copy[1],
+    details: `${runLink}${conflicts ? `<p>競合path:</p><ul>${conflicts}</ul>` : ""}${manual}<p>${escape(source.message || "詳しい結果はありません。")}</p>`,
+  };
+}
+
 function renderToken() {
   state.step = 0; progress(0);
   show("prepare-connection", `<p class="eyebrow">接続 1 / 4</p><h1>Chatworkの接続情報を用意します。</h1>
@@ -121,7 +145,7 @@ async function discoverRooms() {
   try {
     const response = await fetch("/api/discover", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
     const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "ルーム一覧を取得できませんでした。");
+    if (!response.ok) throw Object.assign(new Error(result.error || "ルーム一覧を取得できませんでした。"), { result: result.discovery || result });
     state.rooms = result.rooms.rooms || [];
     if (state.rooms.length === 0) {
       show("discover-empty", '<p class="eyebrow">接続 4 / 4</p><h1>選べるChatworkルームはまだありません。</h1><p class="lead" data-copy-role="result">ルームが0件でも、接続の失敗ではありません。</p><p class="notice">Chatworkで参加ルームを確認してから、もう一度取得できます。</p><div class="actions" data-copy-role="actions"><button class="button button-secondary" data-action="back" aria-label="Chatworkの接続準備へ戻る">接続準備へ戻る</button><button class="button button-primary" data-action="retry" aria-label="Chatworkの参加ルームをもう一度取得する">参加ルームをもう一度取得する</button></div>', "empty");
@@ -131,7 +155,8 @@ async function discoverRooms() {
     }
     renderRooms();
   } catch (error) {
-    show("discover-failure", `<p class="eyebrow">接続を確認できません</p><h1>Chatworkのルームを取得できませんでした。</h1><p class="lead error" data-copy-role="error" role="alert">接続情報または通信状態を確認できませんでした。</p><p class="notice">GitHubへの登録と通信を確認して、もう一度お試しください。</p>${technicalDetails("管理者向け: エラーの詳しい内容", `<p>${escape(error.message)}</p>`, "admin")}${actions("Chatworkの接続を確認し直す", "接続準備へ戻る")}`, "error");
+    const failure = stageFailure(error.result || { message: error.message });
+    show("discover-failure", `<p class="eyebrow">接続を確認できません</p><h1>${failure.heading}</h1><p class="lead error" data-copy-role="error" role="alert">${failure.lead}</p><p class="notice">状態を確認して、もう一度お試しください。</p>${technicalDetails("管理者向け: エラーの詳しい内容", failure.details, "admin")}${actions("Chatworkの接続を確認し直す", "接続準備へ戻る")}`, "error");
     app.querySelector('[data-action="next"]').onclick = renderDiscovery;
     app.querySelector('[data-action="back"]').onclick = renderToken;
   }
@@ -256,9 +281,10 @@ async function renderResult() {
       window.setTimeout(renderResult, 2000);
       return;
     }
-    show(failed ? "settings-result-failure" : "settings-result", `<p class="eyebrow">設定 4 / 4</p><h1>${failed ? "Chatworkの設定は保存しましたが、最新メッセージを確認できませんでした。" : "Chatworkの設定を保存しました。"}</h1><p class="lead" data-copy-role="result">${failed ? "設定は残っています。接続を確認してから、もう一度取得できます。" : "次は保存したChatworkメッセージを検索できます。"}</p>
+    const stageCopy = failed ? stageFailure(result.dispatch) : null;
+    show(failed ? "settings-result-failure" : "settings-result", `<p class="eyebrow">設定 4 / 4</p><h1>${failed ? stageCopy.heading : "Chatworkの設定を保存しました。"}</h1><p class="lead" data-copy-role="result">${failed ? stageCopy.lead : "次は保存したChatworkメッセージを検索できます。"}</p>
       <dl class="summary"><div class="summary-row"><dt>現在の対象ルーム</dt><dd>${selectedRooms.map((room) => escape(room.name)).join("、")}</dd></div><div class="summary-row"><dt>現在の自動取得の間隔</dt><dd>${frequency[1]}</dd></div><div class="summary-row"><dt>自動実行</dt><dd>${automaticExecution ? "有効（自動取得・commit・push）" : "無効（手動のみ）"}</dd></div></dl>
-      <p class="notice">ルームの選択を外した場合も、保存済み履歴は削除していません。</p>${technicalDetails("詳しい説明: 保存結果", `<p>${escape(result.dispatch.message || "詳しい結果はありません。")}</p><p>自動実行が有効な場合は、GitHub ActionsがGitのcommit・pushで保存します。</p>`)}<div class="actions" data-copy-role="actions"><button class="button button-primary" data-action="close" aria-label="Chatworkの設定を終了して検索案内を見る">設定を終了する</button></div>`, failed ? "error" : "success");
+      <p class="notice">ルームの選択を外した場合も、保存済み履歴は削除していません。</p>${technicalDetails("詳しい説明: 保存結果", failed ? stageCopy.details : `<p>${escape(result.dispatch.message || "詳しい結果はありません。")}</p><p>自動実行が有効な場合は、GitHub ActionsがGitのcommit・pushで保存します。</p>`)}<div class="actions" data-copy-role="actions"><button class="button button-primary" data-action="close" aria-label="Chatworkの設定を終了して検索案内を見る">設定を終了する</button></div>`, failed ? "error" : "success");
     app.querySelector('[data-action="close"]').onclick = renderComplete;
     return;
   }
@@ -273,13 +299,14 @@ async function renderResult() {
   const partial = model.status === "partial";
   const zero = model.status === "empty";
   const screen = failed ? "initial-result-failure" : partial ? "initial-result-partial" : zero ? "initial-result-empty" : "initial-result";
-  const heading = failed ? "選んだChatworkルームを取得できませんでした。" : partial ? "一部のChatworkルームを取得できませんでした。" : "Chatworkの最初の取得が完了しました。";
-  const primary = failed ? "接続を確認してから、もう一度取得してください。" : partial ? "取得できたメッセージは保存しました。失敗したルームは接続を確認してください。" : zero ? "まだ保存するメッセージはありません。" : "取得したメッセージを保存しました。";
+  const stageCopy = failed ? stageFailure(result.dispatch) : null;
+  const heading = failed ? stageCopy.heading : partial ? "一部のChatworkルームを取得できませんでした。" : "Chatworkの最初の取得が完了しました。";
+  const primary = failed ? stageCopy.lead : partial ? "取得できたメッセージは保存しました。失敗したルームは接続を確認してください。" : zero ? "まだ保存するメッセージはありません。" : "取得したメッセージを保存しました。";
   show(screen, `<p class="eyebrow">設定 4 / 4</p><h1>${heading}</h1><p class="lead" data-copy-role="result">${primary}</p>
     <p class="hint" data-copy-role="selected-result-count">選んだルームで保存できたメッセージ: ${model.totalFetched}件</p>
     ${model.results.length ? `<ul class="result-list">${model.results.map((item) => `<li><strong>${escape(item.roomName)}</strong> — ${item.status === "success" ? `成功・${Number(item.fetched) || 0}件` : `失敗・${escape(item.message || "再実行してください")}`}</li>`).join("")}</ul>` : ""}
     ${zero ? '<p class="empty">次回以降の取得で、新しい内容を保存します。</p>' : ""}
-    ${technicalDetails("詳しい説明: 取得結果", `<p>${escape(result.dispatch.message || "詳しい結果はありません。")}</p>`)}
+    ${technicalDetails("詳しい説明: 取得結果", failed ? stageCopy.details : `<p>${escape(result.dispatch.message || "詳しい結果はありません。")}</p>`)}
     <div class="actions" data-copy-role="actions"><button class="button button-primary" data-action="close" aria-label="Chatworkの設定を終了して検索案内を見る">設定を終了する</button></div>`, failed ? "error" : partial ? "warning" : zero ? "empty" : "success");
   app.querySelector('[data-action="close"]').onclick = renderComplete;
 }

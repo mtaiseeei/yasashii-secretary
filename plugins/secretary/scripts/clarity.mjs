@@ -49,7 +49,13 @@ import { applyDrift, commitClarityOwned, recordDriftWaiver } from "./lib/clarity
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { safeWritePath } from "./lib/safe-fs.mjs";
-import { resolveClarityRoot, rootPolicyFor, serializeClarityCliFailure, withClarityRootRequest } from "./lib/clarity-root.mjs";
+import {
+  resolveClarityRoot,
+  rootPolicyFor,
+  serializeClarityCliFailure,
+  withClarityCliEventGitProbe,
+  withClarityRootRequest,
+} from "./lib/clarity-root.mjs";
 
 function usage(message = "") {
   const prefix = message ? `${message}\n\n` : "";
@@ -264,7 +270,8 @@ try {
   const { positional, options } = parse(rawArgs);
   const root = positional[0];
   if (!root) usage("repo／project rootを指定してください。");
-  withClarityRootRequest(() => {
+  const eventInput = command === "event" ? parseJson(options.get("--event-json"), "--event-json") : null;
+  const execute = () => withClarityRootRequest(() => {
   let result;
   if (command === "init") {
     if (options.get("--apply") && options.get("--cancel")) usage("--apply と --cancel は同時に指定できません。");
@@ -335,7 +342,7 @@ try {
     operationId: options.get("--operation-id") || null,
   }, { apply: Boolean(options.get("--apply")) });
   else if (command === "commit") result = commitClarityOwned(root, { message: options.get("--message") || "Project Clarity checkpoint", apply: Boolean(options.get("--apply")) });
-  else if (command === "event") result = appendEvent(root, parseJson(options.get("--event-json"), "--event-json"));
+  else if (command === "event") result = appendEvent(root, eventInput);
   else if (command === "evidence") result = appendEvidence(root, parseJson(options.get("--evidence-json"), "--evidence-json"));
   else if (command === "decide-project") {
     result = decideGenericProject(root, {
@@ -352,6 +359,8 @@ try {
   result = { ...result, rootPolicy: rootPolicyFor(resolvedRoot) };
   render(command, result, Boolean(options.get("--json")));
   });
+  if (command === "event") await withClarityCliEventGitProbe(root, execute);
+  else execute();
 } catch (error) {
   const known = error instanceof ClarityError || typeof error?.code === "string";
   const output = serializeClarityCliFailure(error);

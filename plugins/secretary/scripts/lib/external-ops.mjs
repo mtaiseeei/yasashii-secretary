@@ -40,6 +40,7 @@ export function runExternal(binary, args = [], {
     const child = spawn(binary, args, {
       cwd,
       env,
+      shell: false,
       detached: process.platform !== "win32",
       stdio: ["pipe", "pipe", "pipe"],
     });
@@ -221,6 +222,7 @@ export function runExternalSync(binary, args = [], options = {}) {
     encoding: "utf8",
     maxBuffer: Math.max(1024 * 1024, Math.ceil(maxBuffer * 3)),
     env: process.env,
+    shell: false,
   });
   if (result.error) throw result.error;
   let message;

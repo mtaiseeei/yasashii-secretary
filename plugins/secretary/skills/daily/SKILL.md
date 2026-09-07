@@ -23,6 +23,11 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 その日の要点を、**外部の予定（コネクタで都度参照）** と **ローカルの TODO** を突き合わせて、根拠つきで整理して返す。
 外部データは各サービスに置いたまま参照します（同期・コピーはしません）。
 
+日次の活動・決定・申し送りの原本がcanonical rootから安全に取得済みで、要求範囲（必要ならactive / archiveを含む）が
+確認できている場合は、`timeline`を追加実行せずLLMが問いに合わせて整理してよい。期間抽出、大量の記録、再現可能な一覧が
+必要なときだけ`timeline`を任意のread-only helperとして使う。安全境界で拒否された対象を直接Readで迂回せず、取得できた範囲と
+未取得範囲を分けて伝える。
+
 `${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
 `secretary/memory/preferences.md` を読む。整理した内容と安全条件だけをrouterへ返し、
 通常報告を独自に包装しない。最終出力形は同rule入口から解決される「最終応答serializer」だけを正本とする。
@@ -41,7 +46,8 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 <!-- yasashii-secretary:clarity-collaboration:daily:v1 -->
 
 1. `node "${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.mjs" resume-check <secretary>`を実行する。しおりがあれば`resume-read`で**中断点**を確認するが、自動で消さない。
-2. 同じNode.js helperの`timeline <secretary> --type journal`で直近の`next`（翌日以降への申し送り）を確認する。
+2. 直近の`next`（翌日以降への申し送り）を、すでに安全に取得済みのjournal原本から確認する。原本が未取得、対象期間が広い、
+   または再現可能な抽出が必要な場合だけ、同じNode.js helperの`timeline <secretary> --type journal`を使う。
 3. `node "${SECRETARY_PLUGIN_ROOT}/scripts/workspace-tools.mjs" todo-list <secretary>`で未完TODOを確認する。
 4. `project-tools.mjs list <secretary>`でopenの進行中PJだけを確認し、各`PROJECT.md`の状態・待ち・次の入口と、PJ参照つきTODOを分けて扱う。closedは明示依頼がない限り存在確認・探索・候補表示しない。
 5. 中断点、申し送り、PJ状態、待ち、TODOを混ぜずに、今日の入口として返す内容を整理する。外部予定も必要なら続けてdailyを1回だけ行う。
@@ -95,8 +101,10 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 
 ## evening: 今日の締め
 
-1. 今日の絶対日付を使い、`memory-tools.mjs timeline <secretary> --from <今日> --to <今日> --type all`をNode.jsで実行して
-   当日の活動と決定を確認する。timelineの閲覧だけでは成果物を作らない。
+1. 今日の絶対日付を使い、当日のjournalとdecision正本をcanonical rootから安全に取得して活動と決定を確認する。
+   すでに要求範囲を覆う原本が取得済みなら、`memory-tools.mjs timeline`は追加実行せずLLMが整理してよい。未取得、抽出範囲が
+   広い、または再現可能な一覧が必要な場合だけ`timeline <secretary> --from <今日> --to <今日> --type all`を使う。
+   `all`相当ではdecision正本を優先してjournalの`decided`を重ねず、取得失敗や範囲外は最新・0件と断定しない。閲覧だけでは成果物を作らない。
 2. `workspace-tools.mjs todo-list <secretary>`をNode.jsで実行して未完TODOを確認する。完了・持ち越しは対象を先に見せ、
    ユーザー確認後だけ`todo-done ... --confirm` / `todo-carry ... --confirm`を実行する。各シームがjournalへ1回だけ追記する。
 3. 当日のdecisionが0件なら会話を読み返す。決定候補があれば、ルーターとmemory-careの節目プロトコルをそのまま適用する。

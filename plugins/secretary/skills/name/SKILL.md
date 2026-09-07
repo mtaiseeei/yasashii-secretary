@@ -81,7 +81,7 @@ node "${SECRETARY_PLUGIN_ROOT}/scripts/secretary-name.mjs" migration-diagnose --
 無効化は影響を示して確認後、`routing-disable ... --confirm` を使う。managed blockだけを外し、identity、registry、履歴、authorは削除しない。
 
 直接呼びかけと「名前に聞いて」だけをroutingする。人間、顧客、取引先、author、引用、コード、file本文の同名はroutingしない。
-曖昧なら「秘書の<名前>への依頼ですか？」と一度だけ確認し、確認前は副作用0件とする。
+曖昧なら「この呼びかけは秘書への依頼ですか？」と一度だけ確認し、確認前は副作用0件とする。
 
 ## rename
 

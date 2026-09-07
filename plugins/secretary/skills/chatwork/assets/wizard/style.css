@@ -38,6 +38,8 @@ summary::after { content: ""; width: 10px; height: 10px; flex: 0 0 auto; border-
 details[open] summary::after { transform: rotate(-135deg) translate(-1px, -1px); }
 .details-body { padding: 0 12px 16px; }
 details p { margin: 12px 0 0; }
+.failure-command { max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+.failure-command code { white-space: inherit; }
 .setup-guide-image { width: 100%; height: auto; margin-top: 16px; display: block; border: 1px solid #d0d1d2; border-radius: 4px; background: #ffffff; }
 .setup-guide-steps { margin: 16px 0 0; padding-left: 24px; }
 .setup-guide-steps li + li { margin-top: 8px; }

@@ -475,6 +475,7 @@ else{spawn(process.execPath,[process.argv[1],"--child"],{stdio:"ignore",env:proc
   check("productionの直接execFileSync・spawnSync inventoryは0件", directSyncUsers.length === 0, directSyncUsers.map((path) => path.slice(repo.length + 1)).join(", "));
   const routedSources = [
     "scripts/lib/safe-git.mjs",
+    "scripts/lib/clarity-root.mjs",
     "scripts/update-apply.mjs",
     "scripts/workspace-repo.mjs",
     "skills/chatwork/scripts/wizard-server.mjs",
@@ -489,7 +490,10 @@ else{spawn(process.execPath,[process.argv[1],"--child"],{stdio:"ignore",env:proc
   ];
   check(
     "主要production callsiteを外部処理と記録保存の共通安全境界へ集約",
-    routedSources.every((path) => /external-ops\.mjs/.test(readFileSync(join(pluginRoot, path), "utf8")))
+    routedSources.every((path) => path.endsWith("search.mjs")
+      ? /git-ingest\.mjs/.test(readFileSync(join(pluginRoot, path), "utf8"))
+      : /external-ops\.mjs/.test(readFileSync(join(pluginRoot, path), "utf8")))
+      && /external-ops\.mjs/.test(readFileSync(join(pluginRoot, "scripts/lib/git-ingest.mjs"), "utf8"))
       && storageSources.every((path) => /secretary-store\.mjs/.test(readFileSync(join(pluginRoot, path), "utf8")))
       && /memory-tools\.mjs/.test(readFileSync(memoryTools, "utf8")),
   );

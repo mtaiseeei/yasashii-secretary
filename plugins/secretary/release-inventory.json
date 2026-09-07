@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "collaborationMarker": "yasashii-secretary:clarity-collaboration:release:v1",
   "edition": "yasashii-secretary",
-  "candidateVersion": "0.11.0",
+  "candidateVersion": "0.12.0",
   "publicationStatus": "candidate-unverified",
   "releaseState": {
     "sourcePrepared": true,
@@ -167,13 +167,16 @@
     }
   },
   "documentation": [
+    "README.md",
     "docs/spec/clarity.md",
-    "plugins/secretary/skills/clarity/SKILL.md"
+    "plugins/secretary/skills/clarity/SKILL.md",
+    "plugins/secretary/CHANGELOG.md"
   ],
   "handoff": "scripts/fixtures/sprint-041/yasashii-prewrite-receipt.json",
   "fixedSource": {
-    "publicProduct": "5f08d454c05576fcff8ab32c10c00887b4c15a96",
-    "publicEvaluatorPass": false,
+    "publicProduct": "767a7f3ecb15c0ffe6d2d8f71529c74bf671c154",
+    "publicEvaluatorPass": true,
+    "publicEvaluatorReceipt": "a2933904602fc839c72a5e6b9294a4362eb21ad0",
     "privateProduct": "d5598226213004d55781ca033985589907ae7b5d",
     "yasashiiPrewriteReceipt": "scripts/fixtures/sprint-041/yasashii-prewrite-receipt.json"
   }

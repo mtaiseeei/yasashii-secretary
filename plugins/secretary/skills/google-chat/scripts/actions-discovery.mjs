@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { dispatchCorrelatedWorkflow, watchCorrelatedWorkflow } from "../../../scripts/lib/actions-run.mjs";
 import { runExternal } from "../../../scripts/lib/external-ops.mjs";
+import { ingestGit } from "../../../scripts/lib/git-ingest.mjs";
 import { GOOGLE_CHAT_SECRET_NAMES } from "./oauth-session.mjs";
 import { GENERAL_DISCOVERY_RESULT, mergeDiscoveredSpaces, readDiscoveryResult } from "./discovery.mjs";
 
@@ -28,7 +29,7 @@ export async function discoverSpacesWithActions({
   correlationId = randomUUID(),
   syntheticResult = null,
 } = {}) {
-  const failed = (code, run = null) => ({
+  const failed = (code, stage, run = null) => ({
     correlationId,
     status: "failed",
     spaces: mergeDiscoveredSpaces(knownSpaces, { status: "failed", spaces: [] }).spaces,
@@ -36,6 +37,7 @@ export async function discoverSpacesWithActions({
     added: 0,
     missingKnown: false,
     code,
+    stage,
     run,
   });
   try {
@@ -43,7 +45,7 @@ export async function discoverSpacesWithActions({
       const result = readDiscoveryResult(syntheticResult.root, syntheticResult.path, correlationId);
       return { correlationId, ...mergeDiscoveredSpaces(knownSpaces, result), generatedAt: result.generatedAt, run: { synthetic: true } };
     }
-    if (!await requiredSecretsPresent({ root, gh, secretNames })) return failed("secret-missing");
+    if (!await requiredSecretsPresent({ root, gh, secretNames })) return failed("secret-missing", "dispatch");
     const run = await dispatchCorrelatedWorkflow({
       root,
       workflowFile,
@@ -52,20 +54,21 @@ export async function discoverSpacesWithActions({
       gh,
       git,
       correlationId,
-      discoveryTimeoutMs: Number(process.env.YASASHII_RUN_DISCOVERY_TIMEOUT_MS || 5_000),
-      pollIntervalMs: Number(process.env.YASASHII_RUN_POLL_MS || 250),
     });
-    let watchError = null;
     try { await watchCorrelatedWorkflow({ root, run, gh, timeoutMs: Number(process.env.YASASHII_GOOGLE_CHAT_ACTIONS_TIMEOUT_MS || 5 * 60_000) }); }
-    catch (error) { watchError = error; }
+    catch (error) { return failed(error?.code || "actions-run-failed", "actions-run", { id: run.runId, workflow: run.workflowFile, branch: run.branch }); }
     try {
-      await runExternal(git, ["pull", "--ff-only", "--no-rebase"], { cwd: root, timeoutMs: Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000), label: "git pull" });
-      const result = readDiscoveryResult(root, resultPath, correlationId);
-      return { correlationId, ...mergeDiscoveredSpaces(knownSpaces, result), generatedAt: result.generatedAt, run: { id: run.runId, workflow: run.workflowFile, branch: run.branch }, code: watchError?.code || null };
+      await ingestGit({ root, branch: run.branch, git });
     } catch (error) {
-      return failed(watchError?.code || error?.code || error?.kind || "discovery-result-missing", { id: run.runId, workflow: run.workflowFile, branch: run.branch });
+      return failed(error?.code || "inspect-failed", "git-ingest", { id: run.runId, workflow: run.workflowFile, branch: run.branch });
+    }
+    try {
+      const result = readDiscoveryResult(root, resultPath, correlationId);
+      return { correlationId, ...mergeDiscoveredSpaces(knownSpaces, result), generatedAt: result.generatedAt, run: { id: run.runId, workflow: run.workflowFile, branch: run.branch }, code: null };
+    } catch (error) {
+      return failed(error?.code || error?.kind || "discovery-result-missing", "result-missing", { id: run.runId, workflow: run.workflowFile, branch: run.branch });
     }
   } catch (error) {
-    return failed(error?.code || error?.kind || "discovery-failed", error?.correlatedRun ? { id: error.correlatedRun.runId, workflow: error.correlatedRun.workflowFile, branch: error.correlatedRun.branch } : null);
+    return failed(error?.code || error?.kind || "discovery-failed", error?.stage || "dispatch", error?.correlatedRun ? { id: error.correlatedRun.runId, workflow: error.correlatedRun.workflowFile, branch: error.correlatedRun.branch } : null);
   }
 }

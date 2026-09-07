@@ -29,12 +29,12 @@ try {
   const codexPlugin = JSON.parse(readFileSync(codexPluginPath, "utf8"));
   const entry = market.plugins?.[0] || {};
   const codexEntry = codexMarket.plugins?.[0] || {};
-  check("current Claude and Codex candidate version is 0.10.3", entry.version === "0.10.3" && plugin.version === "0.10.3" && codexPlugin.version === "0.10.3");
+  check("current Claude and Codex candidate version is 0.12.0", entry.version === "0.12.0" && plugin.version === "0.12.0" && codexPlugin.version === "0.12.0");
   check("author and MIT are present", JSON.stringify(entry.author) === JSON.stringify({ name: "mtaiseeei" }) && JSON.stringify(plugin.author) === JSON.stringify({ name: "mtaiseeei" }) && entry.license === "MIT" && plugin.license === "MIT");
   check("forkedFrom uses the single credit", entry.forkedFrom === "https://github.com/Shin-sibainu/cc-company");
   check("plugin source is present", entry.source === "./plugins/secretary" && existsSync(join(root, entry.source.slice(2))));
   check("Codex marketplace uses the formal local source", codexMarket.name === "yasashii-secretary" && codexEntry.name === "yasashii-secretary" && codexEntry.source?.source === "local" && codexEntry.source?.path === "./plugins/secretary");
-  check("Codex manifest uses the 16 shared skills", codexPlugin.name === "yasashii-secretary" && codexPlugin.skills === "./skills/" && readdirSync(join(root, "plugins/secretary/skills")).filter((name) => existsSync(join(root, "plugins/secretary/skills", name, "SKILL.md"))).length === 16);
+  check("Codex manifest uses the 17 shared skills and common Hook", codexPlugin.name === "yasashii-secretary" && codexPlugin.skills === "./skills/" && codexPlugin.hooks === "./hooks/hooks.json" && readdirSync(join(root, "plugins/secretary/skills")).filter((name) => existsSync(join(root, "plugins/secretary/skills", name, "SKILL.md"))).length === 17);
 } catch (error) {
   check(`distribution manifests parse (${error.message})`, false);
 }

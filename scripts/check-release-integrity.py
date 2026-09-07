@@ -18,7 +18,7 @@ REPOSITORY = "https://github.com/mtaiseeei/yasashii-secretary"
 FORKED_FROM = "https://github.com/Shin-sibainu/cc-company"
 AUTHOR = "mtaiseeei"
 EXPECTED_SKILLS = {
-    "build", "chatwork", "connections", "daily", "google-chat", "memory-care", "name",
+    "build", "chatwork", "clarity", "connections", "daily", "google-chat", "memory-care", "name",
     "onboarding", "projects", "secretary", "settings", "setup-google", "setup-microsoft",
     "setup-notion", "update", "weekly",
 }
@@ -100,8 +100,8 @@ def validate(root: Path) -> list[str]:
 
     if codex_plugin.get("name") != PLUGIN_NAME:
         errors.append("Codex plugin manifest name is missing or invalid")
-    if codex_plugin.get("version") != "0.10.3":
-        errors.append("Codex plugin manifest version must be 0.10.3")
+    if codex_plugin.get("version") != "0.12.0":
+        errors.append("Codex plugin manifest version must be 0.12.0")
     if codex_plugin.get("skills") != "./skills/":
         errors.append("Codex plugin manifest skills must be ./skills/")
     if codex_plugin.get("author", {}).get("name") != AUTHOR:
@@ -110,8 +110,10 @@ def validate(root: Path) -> list[str]:
         errors.append("Codex plugin manifest homepage/repository is missing or invalid")
     if codex_plugin.get("license") != "MIT":
         errors.append("Codex plugin manifest license must be MIT")
-    if any(field in codex_plugin for field in ("apps", "mcpServers", "hooks")):
+    if any(field in codex_plugin for field in ("apps", "mcpServers")):
         errors.append("Codex plugin manifest declares a nonexistent or unsupported companion")
+    if codex_plugin.get("hooks") != "./hooks/hooks.json":
+        errors.append("Codex plugin manifest must reference the common Hook manifest")
     codex_interface = codex_plugin.get("interface")
     if not isinstance(codex_interface, dict) or any(not codex_interface.get(field) for field in (
         "displayName", "shortDescription", "longDescription", "developerName", "category", "capabilities", "defaultPrompt"
@@ -124,8 +126,8 @@ def validate(root: Path) -> list[str]:
         errors.append(f"unexpected formal Skill: {name}")
     for name in sorted(EXPECTED_SKILLS - skill_names):
         errors.append(f"expected formal Skill missing: {name}")
-    if len(skill_names) != 16:
-        errors.append(f"Codex plugin must reference the 16 unique shared skills (found {len(skill_names)})")
+    if len(skill_names) != 17:
+        errors.append(f"Codex plugin must reference the 17 unique shared skills (found {len(skill_names)})")
     if (root / ".agents/skills").exists():
         errors.append("repo-local .agents/skills duplicates the formal bundled skills")
 

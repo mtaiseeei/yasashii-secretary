@@ -2,6 +2,120 @@
   "schemaVersion": 1,
   "anchors": [
     {
+      "id": "clarity-adapter-yasashii-marker",
+      "path": "plugins/secretary/clarity/secretary-adapter.json",
+      "match": "agentic-secretary:clarity-collaboration:adapter:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:adapter:v1"
+    },
+    {
+      "id": "collaboration-router-yasashii-marker",
+      "path": "plugins/secretary/scripts/lib/collaboration-router.mjs",
+      "match": "agentic-secretary:clarity-collaboration-router:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration-router:v1"
+    },
+    {
+      "id": "build-yasashii-marker",
+      "path": "plugins/secretary/skills/build/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:build:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:build:v1"
+    },
+    {
+      "id": "chatwork-yasashii-marker",
+      "path": "plugins/secretary/skills/chatwork/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:connector:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:connector:v1"
+    },
+    {
+      "id": "clarity-skill-yasashii-marker",
+      "path": "plugins/secretary/skills/clarity/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:clarity:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:clarity:v1"
+    },
+    {
+      "id": "connections-yasashii-marker",
+      "path": "plugins/secretary/skills/connections/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:connector:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:connector:v1"
+    },
+    {
+      "id": "daily-yasashii-marker",
+      "path": "plugins/secretary/skills/daily/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:daily:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:daily:v1"
+    },
+    {
+      "id": "google-chat-yasashii-marker",
+      "path": "plugins/secretary/skills/google-chat/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:connector:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:connector:v1"
+    },
+    {
+      "id": "memory-care-yasashii-marker",
+      "path": "plugins/secretary/skills/memory-care/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:memory:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:memory:v1"
+    },
+    {
+      "id": "onboarding-yasashii-marker",
+      "path": "plugins/secretary/skills/onboarding/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:onboarding:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:onboarding:v1"
+    },
+    {
+      "id": "projects-yasashii-marker",
+      "path": "plugins/secretary/skills/projects/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:projects:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:projects:v1"
+    },
+    {
+      "id": "secretary-yasashii-marker",
+      "path": "plugins/secretary/skills/secretary/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration-router:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration-router:v1"
+    },
+    {
+      "id": "setup-google-yasashii-marker",
+      "path": "plugins/secretary/skills/setup-google/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:connector:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:connector:v1"
+    },
+    {
+      "id": "setup-microsoft-yasashii-marker",
+      "path": "plugins/secretary/skills/setup-microsoft/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:connector:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:connector:v1"
+    },
+    {
+      "id": "setup-notion-yasashii-marker",
+      "path": "plugins/secretary/skills/setup-notion/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:connector:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:connector:v1"
+    },
+    {
+      "id": "update-yasashii-marker",
+      "path": "plugins/secretary/skills/update/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:update:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:update:v1"
+    },
+    {
+      "id": "weekly-yasashii-marker",
+      "path": "plugins/secretary/skills/weekly/SKILL.md",
+      "match": "agentic-secretary:clarity-collaboration:weekly:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:weekly:v1"
+    },
+    {
+      "id": "agents-template-yasashii-marker",
+      "path": "plugins/secretary/templates/AGENTS.md",
+      "match": "agentic-secretary:clarity-collaboration:workspace-template:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:workspace-template:v1"
+    },
+    {
+      "id": "claude-template-yasashii-marker",
+      "path": "plugins/secretary/templates/CLAUDE.md",
+      "match": "agentic-secretary:clarity-collaboration:workspace-template:v1",
+      "replacement": "yasashii-secretary:clarity-collaboration:workspace-template:v1"
+    },
+    {
       "id": "sprint-035-patch-001-yasashii-regression-routing",
       "path": "scripts/sprint-035-patch-001-regression.sh",
       "match": "check \"edition境界回帰\" node \"$ROOT/scripts/sprint-033-test.mjs\"",
@@ -100,8 +214,8 @@
     {
       "id": "settings-key-table",
       "path": "plugins/secretary/skills/settings/SKILL.md",
-      "match": "| セクション | キー | 値 |\n|---|---|---|\n| 基本 | 呼び方 | 短い自由入力（内部設定は1件1record） |\n| 基本 | お仕事・役割 | 短い自由入力（内部設定は1件1record） |\n| 基本 | 主に使うサービス | 短い自由入力（内部設定は1件1record） |\n| 言葉遣い | 口調 | 丁寧（標準）／フランク／きっちり敬語 |\n| 言葉遣い | 専門用語 | ふつう／ことば添え／そのままOK |\n| 言葉遣い | 報告の詳しさ | みじかく／くわしく |\n| 言葉遣い | 決定の確認 | 都度／まとめて |\n| 口調のお手本 | NG / OK | 短い例文（内部設定は1件1record） |",
-      "replacement": "| セクション | 日本語の項目名 | 内部の正式key | 入力の種類 |\n|---|---|---|---|\n| 基本 | 呼び方 | `基本.呼び方` | 短い自由入力 |\n| 基本 | お仕事・役割 | `基本.お仕事・役割` | 短い自由入力 |\n| 基本 | 主に使うサービス | `基本.主に使うサービス` | 短い自由入力 |\n| 言葉遣い | 口調 | `言葉遣い.口調` | 定義済みの選択肢 |\n| 言葉遣い | 専門用語 | `言葉遣い.専門用語` | 定義済みの選択肢 |\n| 言葉遣い | 報告の詳しさ | `言葉遣い.報告の詳しさ` | 定義済みの選択肢 |\n| 言葉遣い | 決定の確認 | `言葉遣い.決定の確認` | 定義済みの選択肢 |\n| 口調のお手本 | NG / OK | `口調のお手本.NG` / `口調のお手本.OK` | 短い例文 |"
+      "match": "| セクション | キー | 値 |\n|---|---|---|\n| 基本 | 呼び方 | 短い自由入力（内部設定は1件1record） |\n| 基本 | お仕事・役割 | 短い自由入力（内部設定は1件1record） |\n| 基本 | 主に使うサービス | 短い自由入力（内部設定は1件1record） |\n| 言葉遣い | 口調 | 丁寧（標準）／フランク／きっちり敬語 |\n| 言葉遣い | 一人称 | 前後空白を除く1〜16 Unicode code pointの改行なし文字列 |\n| 言葉遣い | 専門用語 | ふつう／ことば添え／そのままOK |\n| 言葉遣い | 報告の詳しさ | みじかく／くわしく |\n| 言葉遣い | 決定の確認 | 都度／まとめて |\n| 口調のお手本 | NG / OK | 短い例文（内部設定は1件1record） |",
+      "replacement": "| セクション | 日本語の項目名 | 内部の正式key | 入力の種類 |\n|---|---|---|---|\n| 基本 | 呼び方 | `基本.呼び方` | 短い自由入力 |\n| 基本 | お仕事・役割 | `基本.お仕事・役割` | 短い自由入力 |\n| 基本 | 主に使うサービス | `基本.主に使うサービス` | 短い自由入力 |\n| 言葉遣い | 口調 | `言葉遣い.口調` | 定義済みの選択肢 |\n| 言葉遣い | 一人称 | `言葉遣い.一人称` | 1〜16 Unicode code pointの改行なし文字列 |\n| 言葉遣い | 専門用語 | `言葉遣い.専門用語` | 定義済みの選択肢 |\n| 言葉遣い | 報告の詳しさ | `言葉遣い.報告の詳しさ` | 定義済みの選択肢 |\n| 言葉遣い | 決定の確認 | `言葉遣い.決定の確認` | 定義済みの選択肢 |\n| 口調のお手本 | NG / OK | `口調のお手本.NG` / `口調のお手本.OK` | 短い例文 |"
     },
     {
       "id": "update-description",
@@ -284,52 +398,22 @@
       "replacement": "# 変更履歴\n\n## [0.10.3] - 2026-08-27\n\n### 対象者\n\n- Yasashii Secretaryから別repoの開発projectへ進むとき、正しいやさしいハーネスを案内してほしい方。\n\n### 変わること\n\n- Claude CodeとCodexの両方で、Harnessのinstall IDを`harness@yasashii-harness`として案内します。\n- Overlayを再適用しても、Agentic版のHarness IDへ戻らないようにします。\n\n### 設定・ファイルへの影響\n\n- 記憶、プロジェクト、identity、チャット履歴、利用者workspaceは自動で変更しません。\n- `0.10.2`の明示memory依頼を一度だけ保存する契約と、安全確認の境界を維持します。\n\n### 必要な操作\n\n- pluginを更新したあと、新しいsessionを開始してください。workspace migrationはありません。\n\n### 互換性上の注意\n\n- `0.10.2`以前のrelease記録、migration、fixture、tagは履歴として維持します。\n\n## [0.10.2] - 2026-08-26\n\n### 対象者\n\n- 『これ覚えて』と頼んだあと、同じ内容をもう一度確認されず、そのまま記録してほしい方。\n\n### 変わること\n\n- 危険のない明示的な記憶依頼は、その依頼を一度だけ保存する許可として扱い、同じturnで記録まで進めます。\n- 推測、伝聞、条件付きの内容は、確定事項に言い換えず、その意味を保ったまま記録します。\n- 引用、仮定の話、取り消し、過去の記録についての質問は、新しい記憶として保存しません。\n- 書き込み途中の失敗、訂正、重複、local checkpoint失敗を区別し、保存できた範囲を正確に伝えます。\n\n### 設定・ファイルへの影響\n\n- 既存の記憶、プロジェクト、identity、チャット履歴を自動で変更しません。\n- 記憶の削除、外部送信・公開、Secret、権限変更、一括処理などは、これまでどおり別の確認が必要です。\n\n### 必要な操作\n\n- pluginを更新したあと、新しいsessionを開始してください。workspace migrationはありません。\n\n### 互換性上の注意\n\n- `0.10.1`のidentity migrationと、それ以前のrelease記録、fixture、tagは履歴として維持します。\n\n## [0.10.1] - 2026-08-14"
     },
     {
-      "id": "sprint-032-current-release-manifests-0100",
-      "path": "scripts/sprint-032-update-gate-test.mjs",
-      "match": "  check(\"current marketplace/pluginは0.10.1で一致\", market.plugins?.[0]?.version === \"0.10.1\" && pluginManifest.version === \"0.10.1\");",
-      "replacement": "  check(\"current marketplace/pluginは0.10.3で一致\", market.plugins?.[0]?.version === \"0.10.3\" && pluginManifest.version === \"0.10.3\");"
-    },
-    {
-      "id": "sprint-032-current-changelog-0100",
-      "path": "scripts/sprint-032-update-gate-test.mjs",
-      "match": "  check(\"canonical/legacy CHANGELOGは0.10.1先頭かつbyte一致\", readFileSync(candidateChangelog).equals(readFileSync(legacyChangelog)) && readFileSync(candidateChangelog, \"utf8\").startsWith(\"# 変更履歴\\n\\n## [0.10.1]\"));",
-      "replacement": "  check(\"canonical/legacy CHANGELOGは0.10.3先頭かつbyte一致\", readFileSync(candidateChangelog).equals(readFileSync(legacyChangelog)) && readFileSync(candidateChangelog, \"utf8\").startsWith(\"# 変更履歴\\n\\n## [0.10.3]\"));"
-    },
-    {
       "id": "sprint-032-current-edition",
       "path": "scripts/sprint-032-update-gate-test.mjs",
-      "match": "check(\"editionのcandidate/latest参照はagentic 0.10.1配布面と整合\", edition.edition === \"agentic-secretary\" && edition.distribution.marketplaceUrl.includes(\"agentic-secretary\") && edition.distribution.changelogUrl.endsWith(\"/plugins/secretary/CHANGELOG.md\"));",
-      "replacement": "check(\"editionのcandidate/latest参照はyasashii 0.10.3配布面と整合\", edition.edition === \"yasashii-secretary\" && edition.distribution.marketplaceUrl.includes(\"yasashii-secretary\") && edition.distribution.changelogUrl.endsWith(\"/plugins/yasashii-secretary/CHANGELOG.md\"));"
+      "match": "  check(\"editionのcandidate/latest参照はagentic 0.12.0配布面と整合\", edition.edition === \"agentic-secretary\" && edition.distribution.marketplaceUrl.includes(\"agentic-secretary\") && edition.distribution.changelogUrl.endsWith(\"/plugins/secretary/CHANGELOG.md\"));",
+      "replacement": "  check(\"editionのcandidate/latest参照はyasashii 0.12.0配布面と整合\", edition.edition === \"yasashii-secretary\" && edition.distribution.marketplaceUrl.includes(\"yasashii-secretary\") && edition.distribution.changelogUrl.endsWith(\"/plugins/yasashii-secretary/CHANGELOG.md\"));"
     },
     {
       "id": "sprint-032-current-marker",
       "path": "scripts/sprint-032-update-gate-test.mjs",
-      "match": "check(\"新規0.10.1 onboardingはneutral markerを作る\", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === \"agentic-secretary\", fresh.prepared.stderr);",
-      "replacement": "check(\"新規0.10.3 onboardingはneutral markerを作る\", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === \"yasashii-secretary\", fresh.prepared.stderr);"
+      "match": "  check(\"新規0.12.0 onboardingはneutral markerを作る\", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === \"agentic-secretary\", fresh.prepared.stderr);",
+      "replacement": "  check(\"新規0.12.0 onboardingはneutral markerを作る\", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === \"yasashii-secretary\", fresh.prepared.stderr);"
     },
     {
       "id": "sprint-032-current-ledger",
       "path": "scripts/sprint-032-update-gate-test.mjs",
-      "match": "check(\"新規0.10.1導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"agentic-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.10.1\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);",
-      "replacement": "check(\"新規0.10.3導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"yasashii-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.10.3\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);"
-    },
-    {
-      "id": "sprint-032-current-skill-inventory-0100",
-      "path": "scripts/sprint-032-update-gate-test.mjs",
-      "match": "  check(\"新規0.10.1配布物は主要skillと両wizardを含む\", [",
-      "replacement": "  check(\"新規0.10.3配布物は主要skillと両wizardを含む\", ["
-    },
-    {
-      "id": "sprint-032-same-version-0100",
-      "path": "scripts/sprint-032-update-gate-test.mjs",
-      "match": "  check(\"0.10.1→0.10.1はCTAなし・副作用0\", same.status === 0 && parse(same).status === \"same\" && parse(same).choices?.find((item) => item.id === \"proceed-update\")?.available === false && sameStart.status === 0 && JSON.stringify(workspaceSnapshot(fresh.workspace)) === JSON.stringify(sameBefore), `${same.stderr}${same.stdout}${sameStart.stderr}${sameStart.stdout}`);",
-      "replacement": "  check(\"0.10.3→0.10.3はCTAなし・副作用0\", same.status === 0 && parse(same).status === \"same\" && parse(same).choices?.find((item) => item.id === \"proceed-update\")?.available === false && sameStart.status === 0 && JSON.stringify(workspaceSnapshot(fresh.workspace)) === JSON.stringify(sameBefore), `${same.stderr}${same.stdout}${sameStart.stderr}${sameStart.stdout}`);"
-    },
-    {
-      "id": "sprint-032-downgrade-0100",
-      "path": "scripts/sprint-032-update-gate-test.mjs",
-      "match": "  check(\"0.10.1→0.8.0はdowngrade-blocked・副作用0\", downgrade.status === 0 && parse(downgrade).status === \"downgrade-blocked\" && parse(downgrade).choices?.find((item) => item.id === \"proceed-update\")?.available === false && downgradeStart.status === 0 && JSON.stringify(workspaceSnapshot(fresh.workspace)) === JSON.stringify(downgradeBefore), `${downgrade.stderr}${downgrade.stdout}${downgradeStart.stderr}${downgradeStart.stdout}`);",
-      "replacement": "  check(\"0.10.3→0.8.0はdowngrade-blocked・副作用0\", downgrade.status === 0 && parse(downgrade).status === \"downgrade-blocked\" && parse(downgrade).choices?.find((item) => item.id === \"proceed-update\")?.available === false && downgradeStart.status === 0 && JSON.stringify(workspaceSnapshot(fresh.workspace)) === JSON.stringify(downgradeBefore), `${downgrade.stderr}${downgrade.stdout}${downgradeStart.stderr}${downgradeStart.stdout}`);"
+      "match": "  check(\"新規0.12.0導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"agentic-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.12.0\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);",
+      "replacement": "  check(\"新規0.12.0導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"yasashii-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.12.0\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);"
     },
     {
       "id": "master-release-comment-0100",
@@ -350,22 +434,10 @@
       "replacement": "    check(\"plugin version 0.10.3\", plugin.version === \"0.10.3\");"
     },
     {
-      "id": "sprint-035-current-codex-version-0100",
-      "path": "scripts/sprint-035-test.mjs",
-      "match": "  assert.equal(codex.version, \"0.10.1\");",
-      "replacement": "  assert.equal(codex.version, \"0.10.3\");"
-    },
-    {
       "id": "sprint-038-current-release-0100",
       "path": "scripts/sprint-038-test.mjs",
       "match": "check(\"current release owners are 0.10.1 and historical 0.8 migration unchanged\", () => {\n  assert.equal(JSON.parse(readFileSync(join(root, \".claude-plugin/marketplace.json\"))).plugins[0].version, \"0.10.1\");\n  assert.equal(JSON.parse(readFileSync(join(root, \"plugins/secretary/.claude-plugin/plugin.json\"))).version, \"0.10.1\");\n  assert.ok(JSON.parse(readFileSync(join(root, \"plugins/secretary/.codex-plugin/plugin.json\"))).version.startsWith(\"0.10.1\"));\n  assert.equal(JSON.parse(readFileSync(join(root, \"plugins/secretary/migrations/0.7.0-to-0.8.0.json\"))).toVersion, \"0.8.0\");\n  const changelog = readFileSync(join(root, \"plugins/secretary/CHANGELOG.md\"), \"utf8\");\n  assert.match(changelog, /^# 変更履歴\\n\\n## \\[0\\.9\\.2\\]/);\n  assert.match(changelog, /## \\[0\\.9\\.1\\] - 2026-08-03/);\n});",
       "replacement": "check(\"current release owners are 0.10.3 and historical 0.10.1／0.8 migration remain unchanged\", () => {\n  assert.equal(JSON.parse(readFileSync(join(root, \".claude-plugin/marketplace.json\"))).plugins[0].version, \"0.10.3\");\n  assert.equal(JSON.parse(readFileSync(join(root, \"plugins/secretary/.claude-plugin/plugin.json\"))).version, \"0.10.3\");\n  assert.ok(JSON.parse(readFileSync(join(root, \"plugins/secretary/.codex-plugin/plugin.json\"))).version.startsWith(\"0.10.3\"));\n  assert.equal(JSON.parse(readFileSync(join(root, \"plugins/secretary/migrations/0.7.0-to-0.8.0.json\"))).toVersion, \"0.8.0\");\n  const changelog = readFileSync(join(root, \"plugins/secretary/CHANGELOG.md\"), \"utf8\");\n  assert.match(changelog, /^# 変更履歴\\n\\n## \\[0\\.10\\.3\\]/);\n  assert.match(changelog, /## \\[0\\.10\\.1\\] - 2026-08-14/);\n  assert.match(changelog, /## \\[0\\.9\\.2\\] - 2026-08-10/);\n  assert.match(changelog, /## \\[0\\.9\\.1\\] - 2026-08-03/);\n});"
-    },
-    {
-      "id": "sprint-038-patch-current-release-0100",
-      "path": "scripts/sprint-038-patch-001-test.mjs",
-      "match": "check(\"0.9.1 history remains and current release surfaces are exactly 0.10.1\", () => {\n  assert.equal(json(join(root, \".claude-plugin/marketplace.json\")).plugins[0].version, \"0.10.1\");\n  assert.equal(json(join(plugin, \".claude-plugin/plugin.json\")).version, \"0.10.1\");\n  assert.equal(json(join(plugin, \".codex-plugin/plugin.json\")).version, \"0.10.1\");\n  const canonical = readFileSync(join(plugin, \"CHANGELOG.md\"), \"utf8\");\n  const legacy = readFileSync(join(root, \"plugins/yasashii-secretary/CHANGELOG.md\"), \"utf8\");\n  assert.match(canonical, /^# 変更履歴\\n\\n## \\[0\\.9\\.2\\] - 2026-08-10/);\n  assert.match(canonical, /## \\[0\\.9\\.1\\] - 2026-08-03/);\n  assert.equal(legacy, canonical);\n});",
-      "replacement": "check(\"0.10.1 history remains and current release surfaces are exactly 0.10.3\", () => {\n  assert.equal(json(join(root, \".claude-plugin/marketplace.json\")).plugins[0].version, \"0.10.3\");\n  assert.equal(json(join(plugin, \".claude-plugin/plugin.json\")).version, \"0.10.3\");\n  assert.equal(json(join(plugin, \".codex-plugin/plugin.json\")).version, \"0.10.3\");\n  const canonical = readFileSync(join(plugin, \"CHANGELOG.md\"), \"utf8\");\n  const legacy = readFileSync(join(root, \"plugins/yasashii-secretary/CHANGELOG.md\"), \"utf8\");\n  assert.match(canonical, /^# 変更履歴\\n\\n## \\[0\\.10\\.3\\] - 2026-08-27/);\n  assert.match(canonical, /## \\[0\\.10\\.1\\] - 2026-08-14/);\n  assert.match(canonical, /## \\[0\\.9\\.2\\] - 2026-08-10/);\n  assert.match(canonical, /## \\[0\\.9\\.1\\] - 2026-08-03/);\n  assert.equal(legacy, canonical);\n});"
     },
     {
       "id": "sprint-035-yasashii-harness-commit",
@@ -420,6 +492,18 @@
       "path": "scripts/sprint-032-patch-001-readability-test.mjs",
       "match": "check(\"B: one short confirmation copy remains one natural paragraph\", () => {\n  const confirmation = contract.copy.surfaces.conversation.decisionConfirmation;\n  assert(!confirmation.includes(\"\\n\"));\n  assert(!confirmation.startsWith(\"- \"));\n});",
       "replacement": "check(\"B: explicit memory authorization remains one natural paragraph\", () => {\n  const authorization = contract.copy.surfaces.conversation.explicitMemory;\n  assert.equal(Object.hasOwn(contract.copy.surfaces.conversation, \"decisionConfirmation\"), false);\n  assert(!authorization.includes(\"\\n\"));\n  assert(!authorization.startsWith(\"- \"));\n});"
+    },
+    {
+      "id": "clarity-secretary-canonical-marker",
+      "path": "plugins/secretary/scripts/lib/clarity-secretary.mjs",
+      "match": "// agentic-secretary:canonical-repo-observation:v1",
+      "replacement": "// yasashii-secretary:canonical-repo-observation:v1"
+    },
+    {
+      "id": "sprint-052-yasashii-style-scope",
+      "path": "scripts/sprint-052-secretary-voice-test.mjs",
+      "match": "check(\"両editionは共通契約を読み、会話copyを分離\", () => {\n  for (const style of [\"agentic\", \"yasashii\"]) {\n    assert.match(read(`plugins/secretary/rules/styles/${style}.md`), /conversation-contract\\.md/u);\n    const copy = JSON.parse(read(`plugins/secretary/rules/copy/${style}.json`));\n    assert.ok(copy.surfaces.conversation.voice, `${style} voice copy`);\n  }\n});",
+      "replacement": "check(\"Yasashii editionは共通契約を読み、専用会話copyを使う\", () => {\n  assert.match(read(\"plugins/secretary/rules/styles/yasashii.md\"), /conversation-contract\\.md/u);\n  const copy = JSON.parse(read(\"plugins/secretary/rules/copy/yasashii.json\"));\n  assert.ok(copy.surfaces.conversation.voice, \"yasashii voice copy\");\n  assert.equal(existsSync(join(root, \"plugins/secretary/rules/styles/agentic.md\")), false);\n});"
     }
   ]
 }

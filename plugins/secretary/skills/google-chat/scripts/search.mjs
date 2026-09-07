@@ -3,7 +3,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { runExternalSync } from "../../../scripts/lib/external-ops.mjs";
+import { ingestGitSync } from "../../../scripts/lib/git-ingest.mjs";
 
 function files(root) {
   if (!existsSync(root)) return [];
@@ -14,14 +14,10 @@ export function searchGoogleChat({ root, query, space = "", sender = "", from = 
   root = resolve(root);
   if (!skipPull) {
     try {
-      runExternalSync(process.env.YASASHII_GIT_BIN || "git", ["pull", "--ff-only", "--no-rebase"], {
-        cwd: root,
-        timeoutMs: Number(process.env.YASASHII_CLI_TIMEOUT_MS || 30_000),
-        label: "git pull",
-      });
+      ingestGitSync({ root, git: process.env.YASASHII_GIT_BIN || "git" });
     } catch (error) {
-      if (error?.code === "timeout") return { status: "sync-failed", code: "timeout", message: "Gitの取り込みが時間切れになりました。保存済み履歴は変更していません。" };
-      return { status: "pull-failed", message: "最新のGit状態を取り込めませんでした。保存済み履歴は変更していません。" };
+      if (error?.code === "timeout") return { status: "sync-failed", code: "timeout", stage: "git-ingest", message: "Gitの取り込みが時間切れになりました。保存済み履歴は変更していません。" };
+      return { status: "pull-failed", code: error?.code || "inspect-failed", stage: "git-ingest", message: "最新のGit状態を取り込めませんでした。保存済み履歴は変更していません。" };
     }
   }
   const matches = [];

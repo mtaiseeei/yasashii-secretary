@@ -17,6 +17,7 @@ let pass = 0;
 const declaredWizardAssets = [
   "plugins/secretary/skills/chatwork/assets/wizard/app.js",
   "plugins/secretary/skills/chatwork/assets/wizard/common.js",
+  "plugins/secretary/skills/chatwork/assets/wizard/style.css",
   "plugins/secretary/skills/google-chat/assets/wizard/app.js",
 ];
 
@@ -74,7 +75,7 @@ check((googleChat.match(/bindSpaceSearch\(/g) || []).length >= 3, "Google Chat�
 
 const changedWizardAssets = execFileSync("git", ["diff", "HEAD", "--name-only", "--", "plugins/secretary/skills/*/assets/wizard/*"], { cwd: repo, encoding: "utf8" })
   .trim().split("\n").filter(Boolean);
-check(changedWizardAssets.every((path) => declaredWizardAssets.includes(path)), "変更したwizard assetを宣言済み共有3 pathに限定する");
+check(changedWizardAssets.every((path) => declaredWizardAssets.includes(path)), "変更したwizard assetを宣言済み共有4 pathに限定する");
 const digest = (path) => createHash("sha256").update(readFileSync(join(repo, path))).digest("hex");
 const neutral = JSON.parse(readFileSync(join(repo, "adapters/neutral-base.json"), "utf8"));
 const yasashiiBaseline = JSON.parse(readFileSync(join(repo, "scripts/fixtures/sprint-029/yasashii-copy-baseline.json"), "utf8"));

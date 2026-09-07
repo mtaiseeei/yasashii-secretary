@@ -58,15 +58,56 @@ function makeSearchFixture({ candidateMode }) {
   };
   const candidateOutput = candidateByMode[candidateMode] || ":";
   writeFileSync(fakeGit, `#!/bin/sh
+count=0
+[ -f "$FAKE_FLOW_ROOT/pull-count" ] && count=$(cat "$FAKE_FLOW_ROOT/pull-count")
+if [ "$1 $2" = "rev-parse --show-toplevel" ]; then
+  printf '%s\n' "$FAKE_FLOW_ROOT"
+  exit 0
+fi
+if [ "$1 $2 $3 $4" = "symbolic-ref --quiet --short HEAD" ]; then
+  echo main
+  exit 0
+fi
+if [ "$1 $2" = "branch --show-current" ]; then
+  echo main
+  exit 0
+fi
+if [ "$1 $2 $3" = "remote get-url origin" ]; then
+  echo 'fixture-origin'
+  exit 0
+fi
+if [ "$1" = "fetch" ]; then
+  if [ "$count" -eq 0 ]; then
+    echo '2222222222222222222222222222222222222222' > "$FAKE_FLOW_ROOT/fetch-head"
+  else
+    echo '3333333333333333333333333333333333333333' > "$FAKE_FLOW_ROOT/fetch-head"
+  fi
+  exit 0
+fi
+if [ "$1 $2" = "rev-parse HEAD" ]; then
+  case "$count" in
+    0) echo '1111111111111111111111111111111111111111' ;;
+    1) echo '2222222222222222222222222222222222222222' ;;
+    *) echo '3333333333333333333333333333333333333333' ;;
+  esac
+  exit 0
+fi
+if [ "$1 $2" = "rev-parse FETCH_HEAD^{commit}" ]; then
+  cat "$FAKE_FLOW_ROOT/fetch-head"
+  exit 0
+fi
+if [ "$1 $2" = "merge-base --is-ancestor" ]; then
+  [ "$3" = "HEAD" ] && exit 0
+  exit 1
+fi
+if [ "$1" = "diff" ] || [ "$1" = "status" ]; then exit 0; fi
 if [ "$1" = "pull" ]; then
-  count=0
-  [ -f "$FAKE_FLOW_ROOT/pull-count" ] && count=$(cat "$FAKE_FLOW_ROOT/pull-count")
   count=$((count + 1))
   printf '%s' "$count" > "$FAKE_FLOW_ROOT/pull-count"
   if [ "$count" -ge 2 ]; then printf '# fixture\n\n今回runで見つかった語\n' > "$FAKE_FLOW_ROOT/google-chat/history/fixture--AAA/2026-07-17.md"; fi
+  exit 0
 fi
-if [ "$1 $2" = "branch --show-current" ]; then echo main; fi
-exit 0
+exit 1
 `);
   writeFileSync(fakeGh, `#!/bin/sh
 if [ "$1 $2" = "workflow run" ]; then
@@ -176,7 +217,7 @@ try {
   const staleResult = JSON.parse(runOutput(process.execPath, [searchFlow, "--root", stale.root, "--query", "今回runで見つかった語", "--choice", "sync", "--timeout-ms", "500", "--run-discovery-timeout-ms", "300", "--run-poll-ms", "50"], {
     env: { ...process.env, YASASHII_GIT_BIN: stale.fakeGit, YASASHII_GH_BIN: stale.fakeGh, FAKE_FLOW_ROOT: stale.root },
   }));
-  check(staleResult.status === "sync-failed" && staleResult.error === "run-unconfirmed" && !staleResult.events.includes("pull-after-sync") && readFileSync(join(stale.root, "pull-count"), "utf8") === "1", "過去successだけなら未確認停止しpull／再検索しない", staleResult.events.join(","));
+  check(staleResult.status === "sync-failed" && staleResult.error === "run-correlation-unconfirmed" && staleResult.stage === "run-correlation" && !staleResult.events.includes("pull-after-sync") && !staleResult.events.includes("retry-same-query") && readFileSync(join(stale.root, "pull-count"), "utf8") === "1", "過去successだけなら未確認停止しpull／再検索しない", staleResult.events.join(","));
 
   for (const [candidateMode, label] of [
     ["missing", "createdAt欠落"],
@@ -187,7 +228,7 @@ try {
     const rejectedResult = JSON.parse(runOutput(process.execPath, [searchFlow, "--root", rejected.root, "--query", "今回runで見つかった語", "--choice", "sync", "--timeout-ms", "500", "--run-discovery-timeout-ms", "300", "--run-poll-ms", "50"], {
       env: { ...process.env, YASASHII_GIT_BIN: rejected.fakeGit, YASASHII_GH_BIN: rejected.fakeGh, FAKE_FLOW_ROOT: rejected.root },
     }));
-    check(rejectedResult.status === "sync-failed" && rejectedResult.error === "run-unconfirmed" && !rejectedResult.events.includes("success-confirmed") && !rejectedResult.events.includes("pull-after-sync") && readFileSync(join(rejected.root, "pull-count"), "utf8") === "1", `${label}の新規IDを候補外にして後続pull／再検索しない`, rejectedResult.events.join(","));
+    check(rejectedResult.status === "sync-failed" && rejectedResult.error === "run-correlation-unconfirmed" && rejectedResult.stage === "run-correlation" && !rejectedResult.events.includes("success-confirmed") && !rejectedResult.events.includes("pull-after-sync") && !rejectedResult.events.includes("retry-same-query") && readFileSync(join(rejected.root, "pull-count"), "utf8") === "1", `${label}の新規IDを候補外にして後続pull／再検索しない`, rejectedResult.events.join(","));
   }
 
   const delayed = makeSearchFixture({ candidateMode: "delayed-valid" });

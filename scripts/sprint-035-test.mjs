@@ -22,7 +22,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const plugin = join(root, "plugins/secretary");
 const resolver = join(plugin, "scripts/resolve-plugin-root.mjs");
 const expectedSkills = [
-  "build", "chatwork", "connections", "daily", "google-chat", "memory-care", "name", "onboarding",
+  "build", "chatwork", "clarity", "connections", "daily", "google-chat", "memory-care", "name", "onboarding",
   "projects", "secretary", "settings", "setup-google", "setup-microsoft", "setup-notion", "update", "weekly",
 ];
 
@@ -52,7 +52,7 @@ const runResolver = (skillFile, cwd = tmpdir()) => spawnSync(
   { cwd, encoding: "utf8", env: { PATH: process.env.PATH || "" } },
 );
 
-check("16 skills use one host-neutral root contract", () => {
+check("17 skills use one host-neutral root contract", () => {
   const actual = expectedSkills.filter((name) => existsSync(join(plugin, "skills", name, "SKILL.md")));
   assert.deepEqual(actual, expectedSkills);
   for (const name of actual) {
@@ -172,21 +172,26 @@ check("host-specific inventory covers all skills and distribution surfaces", () 
   assert.deepEqual(inventory.skills.map((entry) => entry.name).sort(), [...expectedSkills].sort());
   assert.equal(inventory.pluginRoot.strategy, "skill-file-realpath-v1");
   assert(inventory.claudeOnlyInventory.includes("slash commands"));
-  assert(inventory.claudeOnlyInventory.some((value) => value.includes("SessionStart")));
+  assert.equal(inventory.clarityHook.commonManifest, "hooks/hooks.json");
+  assert.equal(inventory.clarityHook.hosts.claudeCode.desktop.verified, false);
+  assert.equal(inventory.clarityHook.hosts.codex.app.verified, false);
   assert(inventory.codexOnlyInventory.some((value) => value.includes("$skill-name")));
   assert.equal(inventory.distributionSurfaces.claudeCode.manifest, ".claude-plugin/plugin.json");
   assert.equal(inventory.distributionSurfaces.codex.manifest, ".codex-plugin/plugin.json");
 });
 
-check("Codex and Claude formal manifests share the same 16 skills", () => {
+check("Codex and Claude formal manifests share the same 17 skills with host-specific Hook loading", () => {
   const edition = json(join(plugin, "edition.json"));
   const codex = json(join(plugin, ".codex-plugin/plugin.json"));
   const codexMarket = json(join(root, ".agents/plugins/marketplace.json"));
   const claude = json(join(plugin, ".claude-plugin/plugin.json"));
   assert.equal(codex.name, edition.edition);
   assert.equal(claude.name, edition.edition);
-  assert.equal(codex.version, "0.10.3");
+  assert.equal(codex.version, "0.12.0");
   assert.equal(codex.skills, "./skills/");
+  assert.equal(codex.hooks, "./hooks/hooks.json");
+  assert.equal(claude.skills, "./skills/");
+  assert.equal(Object.hasOwn(claude, "hooks"), false);
   assert.equal(codexMarket.plugins[0].source.path, "./plugins/secretary");
   assert.equal(codexMarket.name, edition.distribution.marketplaceId);
   assert(!existsSync(join(root, "adapters", "codex-app", "skills")));
@@ -318,8 +323,11 @@ check("development pointer guidance reads host IDs from edition config", () => {
   assert(projectSkill.includes(edition.harness.hosts.codex.installId));
 });
 
-check("Secretary distribution does not bundle Harness implementation", () => {
-  for (const path of ["harness", "agents", "commands", "hooks"]) assert(!existsSync(join(plugin, path)), path);
+check("Secretary distribution does not bundle Harness implementation and owns only the declared Clarity Hook", () => {
+  for (const path of ["harness", "agents", "commands"]) assert(!existsSync(join(plugin, path)), path);
+  const hooks = json(join(plugin, "hooks/hooks.json"));
+  assert.match(hooks.description, /Project Clarity only/u);
+  assert.deepEqual(Object.keys(hooks.hooks), ["SessionStart", "PostToolUse", "PreCompact", "Stop", "SessionEnd"]);
   const manifests = [
     json(join(plugin, ".claude-plugin/plugin.json")),
     json(join(plugin, ".codex-plugin/plugin.json")),

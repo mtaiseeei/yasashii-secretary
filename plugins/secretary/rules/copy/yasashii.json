@@ -6,7 +6,8 @@
       "decisionSuggestion": "この要点を決めごととして残しますか: <短い要点>",
       "topicSuggestion": "この要点を案件メモに残しますか: <短い要点>",
       "contentUncertainty": "誰から聞いたか・どのくらい確かか・訂正関係を保つ",
-      "projectSuggestion": "この内容は今後も続きそうです。プロジェクトとしてまとめますか？"
+      "projectSuggestion": "この内容は今後も続きそうです。プロジェクトとしてまとめますか？",
+      "voice": "共通契約の一人称は私が基本。いつも名前や私を付けず、保存・完了などの事実は実際の結果に合わせて伝える"
     },
     "diagnosis": {
       "unverifiedConnection": "接続状態は未確認",

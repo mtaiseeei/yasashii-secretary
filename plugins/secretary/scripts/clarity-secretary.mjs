@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-// yasashii-secretary:clarity-secretary-adapter:v1
-
 import { readFileSync } from "node:fs";
 import {
   applySecretaryProjectClarity,

@@ -109,7 +109,7 @@ function clarityRoot(record) {
 }
 
 function clarityEntry() {
-  return `<!-- yasashii-secretary:clarity-secretary-local:v1:start -->\n# Project Clarity\n\n- mode: secretary-local\n- 正本: \`.clarity/project.json\`、\`.clarity/events.jsonl\`、\`.clarity/evidence.jsonl\`\n- 状態: \`.clarity/state.json\`（Event／Evidenceから再構築可能）\n- Project lifecycleと実行タスクの正本は親Project側が維持します。\n<!-- yasashii-secretary:clarity-secretary-local:v1:end -->\n`;
+  return `<!-- agentic-secretary:clarity-secretary-local:v1:start -->\n# Project Clarity\n\n- mode: secretary-local\n- 正本: \`.clarity/project.json\`、\`.clarity/events.jsonl\`、\`.clarity/evidence.jsonl\`\n- 状態: \`.clarity/state.json\`（Event／Evidenceから再構築可能）\n- Project lifecycleと実行タスクの正本は親Project側が維持します。\n<!-- agentic-secretary:clarity-secretary-local:v1:end -->\n`;
 }
 
 function createCanonical(record) {

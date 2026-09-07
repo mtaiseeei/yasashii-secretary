@@ -22,15 +22,13 @@ function check(label, fn) {
   }
 }
 
-check("0.10.1 history remains and current release surfaces are exactly 0.10.3", () => {
-  assert.equal(json(join(root, ".claude-plugin/marketplace.json")).plugins[0].version, "0.10.3");
-  assert.equal(json(join(plugin, ".claude-plugin/plugin.json")).version, "0.10.3");
-  assert.equal(json(join(plugin, ".codex-plugin/plugin.json")).version, "0.10.3");
+check("0.9.1 history remains and current release surfaces are exactly 0.12.0", () => {
+  assert.equal(json(join(root, ".claude-plugin/marketplace.json")).plugins[0].version, "0.12.0");
+  assert.equal(json(join(plugin, ".claude-plugin/plugin.json")).version, "0.12.0");
+  assert.equal(json(join(plugin, ".codex-plugin/plugin.json")).version, "0.12.0");
   const canonical = readFileSync(join(plugin, "CHANGELOG.md"), "utf8");
   const legacy = readFileSync(join(root, "plugins/yasashii-secretary/CHANGELOG.md"), "utf8");
-  assert.match(canonical, /^# 変更履歴\n\n## \[0\.10\.3\] - 2026-08-27/);
-  assert.match(canonical, /## \[0\.10\.1\] - 2026-08-14/);
-  assert.match(canonical, /## \[0\.9\.2\] - 2026-08-10/);
+  assert.match(canonical, /^# 変更履歴\n\n## \[0\.12\.0\] - 2026-09-06/);
   assert.match(canonical, /## \[0\.9\.1\] - 2026-08-03/);
   assert.equal(legacy, canonical);
 });
@@ -72,7 +70,7 @@ check("README and build skill describe the same separate Harness release", () =>
 
 check("0.9.1 adds no workspace migration or bundled Harness agent", () => {
   assert.equal(existsSync(join(plugin, "migrations/0.9.0-to-0.9.1.json")), false);
-  for (const path of ["harness", "agents", "commands", "hooks", ".codex/agents"]) {
+  for (const path of ["harness", "agents", "commands", ".codex/agents"]) {
     assert.equal(existsSync(join(plugin, path)), false, path);
   }
   const manifests = [

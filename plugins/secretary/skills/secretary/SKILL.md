@@ -72,7 +72,6 @@ canonical workspace rootで次を実行する。
 ## 用件のふりわけ（2回目以降）
 
 ユーザーの自然な言い回しから、やりたいことを推測し、必要な機能スキルだけを段階ロードする。
-
 Clarityを含む用件は、まず次のread-only routerで所有Skillを確認できる。このrouterはSkillを実行せず、
 file、adapter、command、external serviceを変更・呼出ししない。結果の`selectedSkill`だけを段階ロード先として使い、
 現在の別用件をClarityへ寄せない。
@@ -82,6 +81,11 @@ node "${SECRETARY_PLUGIN_ROOT}/scripts/collaboration-router.mjs" "<現在の用�
 ```
 
 <!-- yasashii-secretary:clarity-collaboration-router:v1 -->
+
+日次・週次・timeline・プロジェクト昇格のread-only整理では、canonical rootから必要な原本と対象範囲が安全に取得済みなら、
+LLMがその内容を問いに合わせて整理してよい。`timeline` / `weekly` / `promotion-status` は、期間抽出・大量記録・再現可能な診断が
+有用な場合の任意helperであり、安全性を再証明するためだけに必須化しない。安全境界で拒否された対象は直接Readで迂回せず停止する。
+保存・削除・reindex・Git・昇格の書込みは、各Skillの既存helper、確認、rollbackの決定的シームから外さない。
 
 | こう言われたら | やりたいこと | 段階ロード先 |
 |---|---|---|

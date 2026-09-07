@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "description": "同期で書き換えず、yasashii-secretary自身が正本を持つfile。",
   "patterns": [
+    ".github/workflows/windows-recording-regression.yml",
     ".harness/**",
     "AGENTS.md",
     "CLAUDE.md",
@@ -9,9 +10,29 @@
     "README.md",
     "docs/**",
     "plugins/secretary/rules/styles/yasashii.md",
+    "plugins/secretary/CHANGELOG.md",
+    "plugins/yasashii-secretary/CHANGELOG.md",
+    "plugins/secretary/collaboration-inventory.json",
+    "plugins/secretary/conversation-core-inventory.json",
+    "plugins/secretary/host-inventory.json",
+    "plugins/secretary/release-inventory.json",
     "scripts/archive-release-gate.mjs",
     "scripts/check-release-integrity.py",
     "scripts/sprint-038-test.mjs",
-    "scripts/sprint-040-yasashii-source-test.mjs"
+    "scripts/sprint-040-yasashii-source-test.mjs",
+    "scripts/fixtures/sprint-041/**",
+    "scripts/fixtures/sprint-029/yasashii-copy-baseline.json",
+    "scripts/fixtures/sprint-038/current-wizard-assets.json",
+    "scripts/fixtures/sprint-042/**",
+    "scripts/fixtures/sprint-043/**",
+    "scripts/fixtures/sprint-043-patch-002/**",
+    "scripts/fixtures/sprint-043-patch-003/**",
+    "scripts/fixtures/sprint-043-xmind-zen/**",
+    "scripts/lib/sprint-041-prewrite.mjs",
+    "scripts/lib/sprint-043-source-receipt.mjs",
+    "scripts/lib/sprint-049-inventory.mjs",
+    "scripts/sprint-041-*",
+    "scripts/sprint-042-*",
+    "scripts/sprint-043-*"
   ]
 }

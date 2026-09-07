@@ -15,9 +15,9 @@ let failed = 0;
 const temporary = [];
 const testTmp = realpathSync(tmpdir());
 
-function check(condition, label) {
+function check(condition, label, detail = "") {
   if (condition) { passed += 1; process.stdout.write(`  PASS ${label}\n`); }
-  else { failed += 1; process.stderr.write(`  FAIL ${label}\n`); }
+  else { failed += 1; process.stderr.write(`  FAIL ${label}${detail ? `: ${detail}` : ""}\n`); }
 }
 
 function temp(prefix) {
@@ -215,8 +215,26 @@ try {
   mkdirSync(join(flowRoot, "google-chat", "history", "営業--AAA"), { recursive: true });
   const fakeGit = join(flowRoot, "bin", "git");
   const fakeGh = join(flowRoot, "bin", "gh");
-  writeFileSync(fakeGit, "#!/bin/sh\nif [ \"$1 $2\" = \"branch --show-current\" ]; then echo main; fi\nexit 0\n");
+  writeFileSync(fakeGit, `#!/bin/sh
+root="$FAKE_GH_ROOT"
+if [ "$1 $2" = "branch --show-current" ]; then echo main; exit 0; fi
+if [ "$1 $2" = "rev-parse --show-toplevel" ]; then printf '%s\n' "$root"; exit 0; fi
+if [ "$1 $2 $3" = "symbolic-ref --quiet --short" ]; then echo main; exit 0; fi
+if [ "$1 $2" = "remote get-url" ]; then echo https://example.invalid/repo.git; exit 0; fi
+if [ "$1" = "fetch" ]; then n=0; [ -f "$root/fetch-sequence" ] && n=$(cat "$root/fetch-sequence"); n=$((n+1)); printf '%s' "$n" > "$root/fetch-sequence"; printf '%040d' "$n" > "$root/fetch-head"; exit 0; fi
+if [ "$1 $2" = "rev-parse HEAD" ]; then [ -f "$root/head" ] && cat "$root/head" || printf '%040d\n' 0; exit 0; fi
+if [ "$1 $2" = "rev-parse FETCH_HEAD^{commit}" ]; then cat "$root/fetch-head"; printf '\n'; exit 0; fi
+if [ "$1 $2" = "merge-base --is-ancestor" ]; then [ "$3" = "HEAD" ] && exit 0 || exit 1; fi
+if [ "$1" = "diff" ] || [ "$1" = "status" ]; then exit 0; fi
+if [ "$1" = "pull" ]; then
+  cp "$root/fetch-head" "$root/head"
+  count_file="$root/pull-count"; count=0; [ -f "$count_file" ] && count=$(cat "$count_file"); count=$((count+1)); printf '%s' "$count" > "$count_file"
+  exit 0
+fi
+exit 0
+`);
   writeFileSync(fakeGh, `#!/bin/sh
+printf '%s|%s\n' "$FAKE_GH_MODE" "$*" >> "$FAKE_GH_ROOT/gh-commands.log"
 if [ "$1 $2" = "workflow run" ]; then
   count_file="$FAKE_GH_ROOT/dispatch-count"
   count=0
@@ -249,6 +267,12 @@ if [ "$1 $2" = "run watch" ]; then
   exit 1
 fi
 if [ "$1 $2" = "run view" ]; then
+  if [ "$4" = "--json" ]; then
+    if [ "$FAKE_GH_MODE" = "timeout" ]; then echo '{"status":"in_progress","conclusion":null}'
+    else echo '{"status":"completed","conclusion":"failure"}'
+    fi
+    exit 0
+  fi
   case "$FAKE_GH_MODE" in
     reauth) echo 'GOOGLE_CHAT_ERROR=reauthorization-needed' ;;
     admin) echo 'GOOGLE_CHAT_ERROR=admin-blocked' ;;
@@ -269,12 +293,15 @@ exit 0
   const declined = JSON.parse(flow("decline", "success").stdout);
   check(declined.status === "sync-declined" && declined.events.join(",") === "pull-before-search,search-local,structured-choice", "not found拒否はdispatch・commit・push 0件");
   const approved = JSON.parse(flow("sync", "success", "承認後に見つかった言葉").stdout);
-  check(approved.status === "found" && approved.events.join(",") === "pull-before-search,search-local,structured-choice,dispatch,wait,success-confirmed,pull-after-sync,retry-same-query", "承認時だけdispatch→wait→success→pull→同条件再検索");
+  check(approved.status === "found" && approved.events.join(",") === "pull-before-search,search-local,structured-choice,dispatch,wait,success-confirmed,pull-after-sync,retry-same-query", "承認時だけdispatch→wait→success→pull→同条件再検索", JSON.stringify(approved));
   const timeoutResult = JSON.parse(flow("sync", "timeout", "別の語", "20").stdout);
-  check(timeoutResult.status === "sync-failed" && timeoutResult.error === "timeout" && !timeoutResult.events.includes("pull-after-sync"), "timeoutを黙殺せず成功前pullを行わない");
+  check(timeoutResult.status === "sync-failed" && timeoutResult.error === "actions-run-timeout" && !timeoutResult.events.includes("pull-after-sync"), "timeoutを黙殺せず成功前pullを行わない", JSON.stringify(timeoutResult));
   for (const [mode, status, error] of [["reauth", "reauthorization-needed", "token-invalid"], ["admin", "admin-action-needed", "admin-blocked"], ["scope", "reauthorization-needed", "scope-insufficient"], ["audience", "admin-action-needed", "audience-mismatch"], ["api", "admin-action-needed", "api-disabled"], ["permission", "sync-failed", "permission-denied"], ["rate", "sync-failed", "rate-limit"], ["network", "sync-failed", "network"]]) {
     const result = JSON.parse(flow("sync", mode, `分類-${mode}`).stdout);
-    check(result.status === status && result.error === error && !result.events.includes("pull-after-sync"), `${mode}を区別し無限再試行しない`);
+    const commands = readFileSync(join(flowRoot, "gh-commands.log"), "utf8").split(/\r?\n/).filter((line) => line.startsWith(`${mode}|`));
+    check(result.status === status && result.error === error && !result.events.includes("pull-after-sync")
+      && commands.filter((line) => line.includes(" --json status,conclusion")).length === 1
+      && commands.filter((line) => line.includes(" --log-failed")).length === 1, `${mode}を実gh同様のJSON→log 1回で区別し無限再試行しない`, JSON.stringify(result));
   }
 } finally {
   for (const path of temporary.reverse()) rmSync(path, { recursive: true, force: true });

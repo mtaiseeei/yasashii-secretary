@@ -124,21 +124,29 @@ node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs add-todo <secretary> <pr
 
 ## 5. ライトからフルへ整理する
 
-次のいずれかに達したときだけ、その場で昇格を提案する。
+次のいずれかに達したときだけ、その場で昇格を提案する。件数は目安であり、LLMが安全に取得済みの
+実内容から、件数が少なくても昇格理由を判断してよい。
 
 1. Decisionsが10件を超えた。
-2. メモが10件を超えた、または状態以外の情報でPROJECT.mdが読みにくい。
+2. メモが10件を超えた、または状態以外の情報でPROJECT.mdが読みにくい（例: 判断・事実・作業の情報が混在して追いにくい）。
 3. PJ固有のガードレール、確認フロー、読む順序が必要になった。
 4. PJ直下の作業ファイルが10件を超えた。
 
-`promotion-status`は状態を読むだけで、ファイルを変更しない。理由を示して構造化質問で
-「フル運用へ整理する／今はライトのまま」を確認する。拒否時は何も変更しない。
+`promotion-status`は任意のread-only診断であり、昇格提案の必須前段ではない。対象PJのcanonical root、symlink境界、
+open / general / activeの状態を安全に確認できている場合、LLMは`PROJECT.md`、Decisions、メモ、作業fileの実内容から、
+「状態以外の情報で読みにくい」「PJ固有のガードレールが必要」といった具体的な理由を短く示してよい。
+件数が少ないことだけを理由に提案を抑えない。対象の安全な読み取りが拒否された場合は停止し、直接Readで迂回しない。
+提案では「フル運用へ整理する／今はライトのまま」を確認し、拒否時・確認前は何も変更しない。
 
 ```text
 node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs promotion-status <secretary> <project>
-node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs promote-full <secretary> <project> --confirm
+# 実内容に応じて必要なflagだけを付ける（常に両方を付けるわけではない）
+node ${SECRETARY_PLUGIN_ROOT}/scripts/project-tools.mjs promote-full <secretary> <project> [--hard-to-read] [--guardrail-needed] --confirm
 ```
 
+承認後だけ、LLMが示した理由に対応する`--hard-to-read`／`--guardrail-needed`と`--confirm`を既存の`promote-full`へ渡す。
+この`promote-full --confirm`が昇格の唯一の書込み経路であり、`PROJECT.md`等を直接分割しない。
+既存`promote-full`が内部で行うpath / symlink / secret検査、5ファイルの役割分離、索引更新、atomic rollbackを保ち、実行結果の成功・失敗を正直に伝える。
 承認後だけ `AGENTS.md`（指示・Start here・索引）、`PROJECT.md`（状態）、`DECISIONS.md`（判断）、
 `MEMORY.md`（事実）、`CLAUDE.md`（AGENTS.mdへのポインタ）へ分ける。`INDEX.md`は作らない。
 

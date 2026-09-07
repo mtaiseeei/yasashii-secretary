@@ -17,7 +17,7 @@ import {
   registerWorkingRootGuard,
   workingRoot,
 } from "./safe-fs.mjs";
-import { runExternalSync } from "./external-ops.mjs";
+import { runExternal, runExternalSync } from "./external-ops.mjs";
 
 // agentic-secretary:clarity-root-policy:v1
 // A physical root can be reached through more than one live alias request. Keep
@@ -223,7 +223,7 @@ function discoverRepositoryDirectories(root) {
       if (markerStat.isSymbolicLink()) return null;
       if (markerStat.isDirectory()) {
         const gitDir = resolveGitDirectory(marker).path;
-        return { gitDir, commonGitDir: gitDir };
+        return { top: resolveGitDirectory(cursor).path, gitDir, commonGitDir: gitDir };
       }
       if (!markerStat.isFile()) return null;
       const body = readGitControlFile(marker, "Git top-level marker").replaceAll("\r\n", "\n");
@@ -234,12 +234,65 @@ function discoverRepositoryDirectories(root) {
       const commonGitDir = existsSync(commonControl)
         ? resolveGitDirectory(resolve(gitDir, readGitControlFile(commonControl, "Git common directory marker").trim())).path
         : gitDir;
-      return { gitDir, commonGitDir };
+      return { top: resolveGitDirectory(cursor).path, gitDir, commonGitDir };
     }
     const parent = dirname(cursor);
     if (parent === cursor) return null;
     cursor = parent;
   }
+}
+
+function repositoryBoundarySnapshot(root) {
+  const directories = discoverRepositoryDirectories(root);
+  if (!directories) return { kind: "non-git" };
+  const top = resolveGitDirectory(directories.top);
+  const gitDir = resolveGitDirectory(directories.gitDir);
+  const commonGitDir = resolveGitDirectory(directories.commonGitDir);
+  assertGitDirectoryRelationship(top.path, gitDir.path, commonGitDir.path);
+  return {
+    kind: "git",
+    top: top.path,
+    topIdentity: top.identity,
+    gitDir: gitDir.path,
+    gitDirIdentity: gitDir.identity,
+    commonGitDir: commonGitDir.path,
+    commonGitDirIdentity: commonGitDir.identity,
+    configDigest: gitConfigDigest(gitDir.path, commonGitDir.path),
+  };
+}
+
+function hookProbeBoundarySnapshot(requestedRoot) {
+  const requested = resolve(requestedRoot);
+  const physicalRoot = workingRoot(requested, { allowAncestorSymlinks: true });
+  return {
+    requested,
+    physicalRoot,
+    rootIdentity: filesystemIdentity(physicalRoot),
+    aliases: aliasChain(requested).filter((row) => row.path !== requested),
+    markerDigest: gitMarkerDigest(physicalRoot),
+    discoveryEnvironmentDigest: gitDiscoveryEnvironmentDigest(),
+    repository: repositoryBoundarySnapshot(physicalRoot),
+  };
+}
+
+function assertHookProbeBoundaryUnchanged(before) {
+  let after;
+  try { after = hookProbeBoundarySnapshot(before.requested); }
+  catch (error) {
+    if (["root-self-symlink", "ancestor-symlink-broken", "ancestor-symlink-not-directory"].includes(error?.code)) throw error;
+    return rootChanged("filesystem-identity-unavailable");
+  }
+  if (after.physicalRoot !== before.physicalRoot) return rootChanged("alias-target-changed");
+  if (!sameIdentity(after.rootIdentity, before.rootIdentity)) return rootChanged("physical-root-replaced");
+  if (sha256(JSON.stringify(after.aliases)) !== sha256(JSON.stringify(before.aliases))) {
+    return rootChanged("ancestor-alias-changed");
+  }
+  if (after.markerDigest !== before.markerDigest
+    || after.discoveryEnvironmentDigest !== before.discoveryEnvironmentDigest
+    || sha256(JSON.stringify(after.repository)) !== sha256(JSON.stringify(before.repository))) {
+    return rootChanged("repo-git-identity-changed");
+  }
+  return after;
 }
 
 function assertSupportedRepositoryConfigs(root) {
@@ -308,24 +361,33 @@ function parseGitIdentityOutput(stdout) {
   return rows;
 }
 
-function probeGitIdentity(root) {
-  let result;
-  try {
-    result = gitProbeRunner("git", [
+function gitIdentityProbeRequest(root) {
+  return {
+    binary: "git",
+    args: [
       "-C", root,
       "rev-parse",
       "--path-format=absolute",
       "--show-toplevel",
       "--absolute-git-dir",
       "--git-common-dir",
-    ], {
+    ],
+    options: {
       encoding: "utf8",
       timeoutMs: GIT_IDENTITY_TIMEOUT_MS,
       maxBuffer: GIT_IDENTITY_MAX_BUFFER,
       allowFailure: true,
       label: "Clarity root Git identity inspection",
       env: { ...process.env, GIT_OPTIONAL_LOCKS: "0", GIT_TERMINAL_PROMPT: "0" },
-    });
+    },
+  };
+}
+
+function probeGitIdentity(root) {
+  let result;
+  try {
+    const request = gitIdentityProbeRequest(root);
+    result = gitProbeRunner(request.binary, request.args, request.options);
   } catch (error) {
     if (error?.code === "timeout") {
       throw new FilesystemBoundaryError("Clarity rootのRepo／Git identity確認が時間切れになったため、後続処理を行わず停止しました。", "timeout", { changed: false, timeoutMs: GIT_IDENTITY_TIMEOUT_MS });
@@ -611,6 +673,102 @@ export function withClarityGitProbeRunnerForTest(runner, callback) {
   gitProbeRunner = runner;
   try { return callback(); }
   finally { gitProbeRunner = previous; }
+}
+
+async function withClarityGitProbe(rootValues, callback, {
+  reportResolutionFailure = false,
+  fallbackInitialSnapshotToSync = false,
+  fallbackUnboundRequestToSync = false,
+} = {}) {
+  if (typeof callback !== "function") throw new TypeError("Clarity Hook Git probe callback is required");
+  // Test seamが明示したrunnerは上書きせず、既存の注入意味を維持する。
+  if (gitProbeRunner !== runExternalSync) return { executed: true, value: callback() };
+  const values = Array.isArray(rootValues) ? rootValues : [rootValues];
+  const prefetched = [];
+  const physicalRoots = new Set();
+  try {
+    for (const rootValue of values) {
+      let before;
+      try { before = hookProbeBoundarySnapshot(rootValue); }
+      catch (error) {
+        // CLI keeps its established resolver/error normalization when the
+        // optimization cannot establish an initial boundary. A change after
+        // an awaited probe is never eligible for this fallback.
+        if (fallbackInitialSnapshotToSync && prefetched.length === 0) {
+          return { executed: true, value: callback() };
+        }
+        throw error;
+      }
+      if (physicalRoots.has(before.physicalRoot)) continue;
+      physicalRoots.add(before.physicalRoot);
+      const { binary, args, options } = gitIdentityProbeRequest(before.physicalRoot);
+      let result;
+      let error;
+      try { result = await runExternal(binary, args, options); }
+      catch (caught) { error = caught; }
+      assertHookProbeBoundaryUnchanged(before);
+      prefetched.push({ binary, args, options, before, result, error });
+      // The synchronous resolver stops at the first thrown probe. Do not start
+      // a later parent-root probe after timeout, overflow, or spawn failure.
+      if (error) break;
+    }
+  } catch (error) {
+    if (reportResolutionFailure) throw error;
+    return { executed: false, value: undefined };
+  }
+
+  try { for (const entry of prefetched) assertHookProbeBoundaryUnchanged(entry.before); }
+  catch (error) {
+    if (reportResolutionFailure) throw error;
+    return { executed: false, value: undefined };
+  }
+
+  const prefetchedRunner = (binary, actualArgs = [], actualOptions = {}) => {
+    const entry = prefetched.find((candidate) => {
+      const sameEnvironment = Object.keys(candidate.options.env).length === Object.keys(actualOptions.env || {}).length
+        && Object.entries(candidate.options.env).every(([key, value]) => actualOptions.env?.[key] === value);
+      return binary === candidate.binary
+        && JSON.stringify(actualArgs) === JSON.stringify(candidate.args)
+        && actualOptions.cwd === candidate.options.cwd
+        && actualOptions.input === candidate.options.input
+        && actualOptions.encoding === candidate.options.encoding
+        && actualOptions.timeoutMs === candidate.options.timeoutMs
+        && actualOptions.maxBuffer === candidate.options.maxBuffer
+        && actualOptions.allowFailure === candidate.options.allowFailure
+        && actualOptions.label === candidate.options.label
+        && sameEnvironment;
+    });
+    if (!entry) {
+      if (fallbackUnboundRequestToSync) return runExternalSync(binary, actualArgs, actualOptions);
+      throw Object.assign(new Error("Clarity Hook Git probe request changed before use."), { code: "clarity-git-identity-unavailable" });
+    }
+    // Alias-root discovery legitimately resolves the same requested root twice
+    // in one synchronous Hook request. Revalidate on every use, but do not
+    // duplicate the already-bound external probe.
+    assertHookProbeBoundaryUnchanged(entry.before);
+    if (entry.error) throw entry.error;
+    return entry.result;
+  };
+
+  const previous = gitProbeRunner;
+  gitProbeRunner = prefetchedRunner;
+  try {
+    return { executed: true, value: callback() };
+  } finally {
+    gitProbeRunner = previous;
+  }
+}
+
+export function withClarityHookGitProbe(rootValues, callback, options = {}) {
+  return withClarityGitProbe(rootValues, callback, options);
+}
+
+export function withClarityCliEventGitProbe(rootValue, callback) {
+  return withClarityGitProbe(rootValue, callback, {
+    reportResolutionFailure: true,
+    fallbackInitialSnapshotToSync: true,
+    fallbackUnboundRequestToSync: true,
+  });
 }
 
 export function withClarityRootRevalidationObserverForTest(observer, callback) {

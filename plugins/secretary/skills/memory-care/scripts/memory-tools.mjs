@@ -38,7 +38,7 @@ import { runExternalSync } from "../../../scripts/lib/external-ops.mjs";
 import { canonicalMeaning, isMemoryDestination, meaningTuple } from "../../../scripts/lib/conversation-contract.mjs";
 
 function defaultPreferences() {
-  return "# 好み・環境（preferences.md v2）\n\n## 基本\n- 呼び方: あなた\n- お仕事・役割: 未設定\n- 主に使うサービス: まだ決めていない\n\n## 言葉遣い\n- 口調: 丁寧（標準）\n- 専門用語: ふつう\n- 報告の詳しさ: みじかく\n- 決定の確認: 都度\n\n## 口調のお手本\n- NG: なし\n- OK: 丁寧で、堅すぎず、次の行動が分かる伝え方\n\n## 秘書のメモ\n";
+  return "# 好み・環境（preferences.md v2）\n\n## 基本\n- 呼び方: あなた\n- お仕事・役割: 未設定\n- 主に使うサービス: まだ決めていない\n\n## 言葉遣い\n- 口調: 丁寧（標準）\n- 一人称: 私\n- 専門用語: ふつう\n- 報告の詳しさ: みじかく\n- 決定の確認: 都度\n\n## 口調のお手本\n- NG: なし\n- OK: 丁寧で、堅すぎず、次の行動が分かる伝え方\n\n## 秘書のメモ\n";
 }
 
 function validatePreference(section, key, rawValue) {
@@ -52,6 +52,10 @@ function validatePreference(section, key, rawValue) {
   ]);
   const id = `${section}:${key}`;
   if (free.has(id)) return value;
+  if (id === "言葉遣い:一人称") {
+    if ([...value].length > 16) usage("一人称は前後空白を除いて1〜16 Unicode code pointで指定");
+    return value;
+  }
   if (!fixed.has(id)) usage(`変更できない設定です: ${section} / ${key}`);
   if (!fixed.get(id).includes(value)) usage(`${key}は ${fixed.get(id).join("|")} から指定`);
   return value;

@@ -115,10 +115,18 @@ function currentCandidateCommit() {
   return runGit(candidateRoot, ["rev-parse", "HEAD"], { allowFailure: true });
 }
 
+function currentCandidateTree() {
+  return runGit(candidateRoot, ["rev-parse", "HEAD^{tree}"], { allowFailure: true });
+}
+
 function recordSnapshot() {
   const commit = currentCandidateCommit();
   if (commit !== base.baseCommit) {
     throw new Error(`recorded base mismatch: expected ${base.baseCommit}, observed ${commit || "unavailable"}`);
+  }
+  const tree = currentCandidateTree();
+  if (!base.baseTree || tree !== base.baseTree) {
+    throw new Error(`recorded tree mismatch: expected ${base.baseTree || "missing"}, observed ${tree || "unavailable"}`);
   }
   const files = candidateFiles().map((path) => ({
     path,
@@ -141,6 +149,10 @@ function verifySnapshot() {
     const error = new Error("upstream advance requires a new reviewed base record");
     error.exitCode = 2;
     throw error;
+  }
+  const tree = currentCandidateTree();
+  if (base.baseTree && tree && tree !== base.baseTree) {
+    throw new Error(`upstream tree identity changed: expected ${base.baseTree}, observed ${tree}`);
   }
   const expected = new Map(snapshot.files.map((entry) => [entry.path, entry]));
   const observedPaths = candidateFiles();
@@ -296,10 +308,10 @@ function verifyYasashiiExpected(expected) {
   requireValue(Boolean(ruleManifest.rules?.["yasashii-style"]) && !ruleManifest.rules?.["agentic-style"], "Yasashii style rule");
   if (failures.length) throw new Error(`Yasashii protected surface changed: ${failures.join(", ")}`);
 
-  const canonical = expected.get("plugins/secretary/CHANGELOG.md");
-  const legacy = expected.get("plugins/yasashii-secretary/CHANGELOG.md");
+  const canonical = expected.get("plugins/secretary/CHANGELOG.md") || readBytes(root, "plugins/secretary/CHANGELOG.md");
+  const legacy = expected.get("plugins/yasashii-secretary/CHANGELOG.md") || readBytes(root, "plugins/yasashii-secretary/CHANGELOG.md");
   requireValue(Boolean(canonical) && Boolean(legacy) && canonical.equals(legacy), "canonical/legacy CHANGELOG parity");
-  requireValue(Boolean(canonical) && canonical.toString("utf8").startsWith("# 変更履歴\n\n## [0.10.3]"), "0.10.3 CHANGELOG head");
+  requireValue(Boolean(canonical) && canonical.toString("utf8").startsWith("# 変更履歴\n\n## [0.12.0]"), "0.12.0 CHANGELOG head");
   if (failures.length) throw new Error(`Yasashii protected surface changed: ${failures.join(", ")}`);
 }
 

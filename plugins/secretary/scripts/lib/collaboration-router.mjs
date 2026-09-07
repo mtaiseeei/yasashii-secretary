@@ -61,7 +61,7 @@ const PROJECT_SUMMARY = /(?:プロジェクト|project|案件).*(?:まとめ|整
 const EXPLICIT_TASK = /(?:タスク化|todoに|todoへ|notion.*タスク|タスク.*notion|やることとして登録)/u;
 const MEMORY = /(?:覚えて|記憶して|案件メモ|思い出して|前回の続き|決定として残)/u;
 const BUILD = /(?:アプリ|ツール|サイト|機能).*(?:作って|開発|実装)|(?:作って|開発したい|実装して).*(?:アプリ|ツール|サイト|機能)/u;
-const UPDATE = /(?:最新版|バージョン).*(?:確認|更新|して)|(?:プラグイン|yasashii-secretary).*(?:更新|アップデート)|更新ある/u;
+const UPDATE = /(?:最新版|バージョン).*(?:確認|更新|して)|(?:プラグイン|agentic-secretary).*(?:更新|アップデート)|更新ある/u;
 const DAILY = /(?:今日やること|今日の予定|朝の段取り|今日始め|今日はここまで|終わりにしよう|今日.*(?:要確認|段取り))/u;
 const WEEKLY = /(?:今週|先週).*(?:振り返|活動|まとめ)|週次/u;
 const CONNECTIONS = /(?:繋がってる|つながってる|接続の調子|どれが使える|接続.*診断)/u;
@@ -73,11 +73,9 @@ export function routeSecretaryIntent(input) {
   // task／memory／build／update／project lifecycleは各既存Skillが所有し、Clarityが横取りしない。
   if (EXPLICIT_TASK.test(text)) {
     const notion = /notion/u.test(text);
-    return result("projects", notion ? "notion-task-not-included" : "local-todo-handoff", notion
-      ? "Notion task実装はYasashii版へ同梱していません。既存local TODO導線で扱える範囲を確認します。"
-      : "タスク化が明示されています。", {
+    return result(notion ? "notion-tasks" : "projects", notion ? "downstream-notion-task-handoff" : "local-todo-handoff", "タスク化が明示されています。", {
       explicit: true,
-      delegation: notion ? "project-tools:add-todo-after-user-choice" : "project-tools:add-todo",
+      delegation: notion ? "fixed-downstream-task-adapter" : "project-tools:add-todo",
       confirmationBoundary: "existing-task-boundary",
     });
   }

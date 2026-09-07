@@ -45,6 +45,8 @@ check_eval "projects skillはGoogle Chat・OAuthを追加しない" "! grep -qiE
 check_eval "routerはprojectsを段階ロード" "grep -q 'skills/projects/SKILL.md' '$ROUTER' && grep -q 'プロジェクトとしてまとめますか' '$ROUTER'"
 check_eval "routerは開発依頼をbuildに維持" "grep -q 'アプリ／ツールにして.*skills/build/SKILL.md' '$ROUTER'"
 check_eval "dailyはPJ状態とTODO正本を分離" "grep -q 'project-tools.mjs list' '$DAILY' && grep -q 'PROJECT.md.*状態.*inbox/todo.md.*実行項目' '$DAILY'"
+check_eval "read-only整理は安全な原本取得後にhelperを任意化" "grep -q '原本.*安全に取得済み' '$DAILY' && grep -q 'timeline.*任意' '$DAILY'"
+check_eval "projectsはpromotion-statusを必須前段にしない" "grep -q 'promotion-status.*任意' '$PROJECTS' && grep -q -- '--hard-to-read' '$PROJECTS' && grep -q -- '--guardrail-needed' '$PROJECTS'"
 check_eval "buildは別repoポインタだけを案内" "grep -q 'create-dev-pointer' '$BUILD' && grep -q '実装仕様、判断ログ' '$BUILD'"
 check_eval "配布AGENTSはライト→フルとTODO境界を説明" "grep -q 'PROJECT.md.*1枚' '$TEMPLATE' && grep -q 'PJ内に生きた.*TODO.md.*作らない' '$TEMPLATE' && grep -q 'INDEX.md.*作らない' '$TEMPLATE'"
 check_eval "project toolはcommit・push・remote操作を持たない" "! grep -qE 'git (commit|push|remote)|spawnSync\\([^,]+, *\\[[^]]*(commit|push|remote)' '$TOOL'"
@@ -128,6 +130,21 @@ check_eval "PJ直下10ファイル超を検出" "node -e \"const x=require(proce
 GUARD="$(new_sec guard)"; create "$GUARD" 固有規則
 p promotion-status "$GUARD" 固有規則 --guardrail-needed > "$WORK/guard-status.json"
 check_eval "PJ固有ガードレール必要を検出" "node -e \"const x=require(process.argv[1]);if(!x.eligible)process.exit(1)\" '$WORK/guard-status.json'"
+GUARD_HASH="$(find "$GUARD/projects/open/固有規則" -type f -exec shasum {} + | sort | shasum | awk '{print $1}')"
+p promote-full "$GUARD" 固有規則 --guardrail-needed >/dev/null 2>&1
+GUARD_RC=$?
+GUARD_AFTER="$(find "$GUARD/projects/open/固有規則" -type f -exec shasum {} + | sort | shasum | awk '{print $1}')"
+check_eval "低件数のflag付き昇格は確認前に停止し不変" "[ '$GUARD_RC' -eq 3 ] && [ '$GUARD_HASH' = '$GUARD_AFTER' ] && [ ! -e '$GUARD/projects/open/固有規則/AGENTS.md' ]"
+p promote-full "$GUARD" 固有規則 --guardrail-needed --confirm >/dev/null
+check_eval "承認後だけguardrail-needed付きpromote-fullが5役割を作る" "for f in AGENTS.md PROJECT.md DECISIONS.md MEMORY.md CLAUDE.md; do [ -f '$GUARD/projects/open/固有規則/'\"\$f\" ] || exit 1; done"
+HARD="$(new_sec hard)"; create "$HARD" 読みにくい整理
+HARD_HASH="$(find "$HARD/projects/open/読みにくい整理" -type f -exec shasum {} + | sort | shasum | awk '{print $1}')"
+p promote-full "$HARD" 読みにくい整理 --hard-to-read >/dev/null 2>&1
+HARD_RC=$?
+HARD_AFTER="$(find "$HARD/projects/open/読みにくい整理" -type f -exec shasum {} + | sort | shasum | awk '{print $1}')"
+check_eval "低件数hard-to-read昇格は確認前に不変" "[ '$HARD_RC' -eq 3 ] && [ '$HARD_HASH' = '$HARD_AFTER' ] && [ ! -e '$HARD/projects/open/読みにくい整理/AGENTS.md' ]"
+p promote-full "$HARD" 読みにくい整理 --hard-to-read --confirm >/dev/null
+check_eval "承認後だけhard-to-read付きpromote-fullが5役割を作る" "for f in AGENTS.md PROJECT.md DECISIONS.md MEMORY.md CLAUDE.md; do [ -f '$HARD/projects/open/読みにくい整理/'\"\$f\" ] || exit 1; done"
 HASH="$(find "$DEC/projects/open/判断多数" -type f -exec shasum {} + | sort | shasum | awk '{print $1}')"
 p promote-full "$DEC" 判断多数 >/dev/null 2>&1
 check_eval "昇格確認前は構成不変" "[ $? -eq 3 ] && [ '$HASH' = \"\$(find '$DEC/projects/open/判断多数' -type f -exec shasum {} + | sort | shasum | awk '{print \$1}')\" ]"

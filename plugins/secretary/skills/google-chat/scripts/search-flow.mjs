@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { dispatchCorrelatedWorkflow, watchCorrelatedWorkflow } from "../../../scripts/lib/actions-run.mjs";
 import { runExternal } from "../../../scripts/lib/external-ops.mjs";
+import { ingestGit } from "../../../scripts/lib/git-ingest.mjs";
 
 const args = new Map();
 for (let index = 2; index < process.argv.length; index += 2) {
@@ -18,8 +19,9 @@ const root = resolve(args.get("--root") || process.cwd());
 const query = (args.get("--query") || "").trim();
 const choice = args.get("--choice") || "ask";
 const timeout = Number(args.get("--timeout-ms") || 5 * 60_000);
-const runDiscoveryTimeout = Math.max(250, Math.min(timeout, Number(args.get("--run-discovery-timeout-ms") || 5_000)));
-const runPollInterval = Math.max(50, Number(args.get("--run-poll-ms") || 250));
+const runDiscoveryTimeout = args.has("--run-discovery-timeout-ms") ? Number(args.get("--run-discovery-timeout-ms")) : undefined;
+const runPollInterval = args.has("--run-poll-ms") ? Number(args.get("--run-poll-ms")) : undefined;
+const runPollMax = args.has("--run-poll-max-ms") ? Number(args.get("--run-poll-max-ms")) : undefined;
 const git = process.env.YASASHII_GIT_BIN || "git";
 const gh = process.env.YASASHII_GH_BIN || "gh";
 const searchScript = resolve(dirname(fileURLToPath(import.meta.url)), "search.mjs");
@@ -30,19 +32,26 @@ function output(value) {
 }
 
 function classify(error) {
-  const source = `${error?.stdout || ""}\n${error?.stderr || ""}`.toLowerCase();
-  if (["run-correlation-unconfirmed", "branch-unconfirmed", "run-list-invalid"].includes(error?.code)) return { status: "sync-failed", code: "run-unconfirmed", message: "今回開始した自動取得処理（GitHub Actions）を確認できませんでした。古い成功結果は使わず停止しました。Actions画面で今回の実行を確認してから再実行してください。" };
-  if (error?.killed || error?.code === "ETIMEDOUT" || /timed out|timeout/.test(source)) return { status: "sync-failed", code: "timeout", message: "今回開始した自動取得処理（GitHub Actions）の完了待ちが時間切れになりました。Actions画面で今回の実行を確認してから再実行してください。" };
-  if (/google_chat_error=(?:reauthorization-needed|reauth-required)/.test(source)) return { status: "reauthorization-needed", code: "token-invalid", message: "Google認証の同意が取り消されたか、refresh tokenが失効しています。既存履歴を残したまま再認証してください。" };
-  if (/google_chat_error=scope-insufficient/.test(source)) return { status: "reauthorization-needed", code: "scope-insufficient", message: "必要なread-only scopeが不足しています。既存履歴を残したまま再認証してください。" };
-  if (/google_chat_error=(?:admin-blocked|admin-or-scope-blocked)/.test(source)) return { status: "admin-action-needed", code: "admin-blocked", message: "Google Workspace管理者のAPI access controlsを確認してください。取得の再試行は行いません。" };
-  if (/google_chat_error=audience-mismatch/.test(source)) return { status: "admin-action-needed", code: "audience-mismatch", message: "OAuth Audienceと利用者のGoogle Workspace組織が一致していません。管理者へ確認してください。" };
-  if (/google_chat_error=api-disabled/.test(source)) return { status: "admin-action-needed", code: "api-disabled", message: "Google CloudでGoogle Chat APIが有効か確認してください。" };
-  if (/google_chat_error=permission-denied/.test(source)) return { status: "sync-failed", code: "permission-denied", message: "Google Chat APIへのアクセスが拒否されましたが、原因を特定できませんでした。APIの有効化、必要scope、管理者設定を順に確認してください。" };
-  if (/google_chat_error=rate-limit/.test(source)) return { status: "sync-failed", code: "rate-limit", message: "Google Chat APIの利用上限に達しました。時間を置いてから再実行してください。" };
-  if (/google_chat_error=network/.test(source)) return { status: "sync-failed", code: "network", message: "Google Chatへ接続できませんでした。前回の履歴は保持しています。" };
-  if (/resource not accessible|permission|forbidden|403/.test(source)) return { status: "sync-failed", code: "github-permission", message: "GitHub Actionsを実行する権限を確認してください。" };
-  if (/non-fast-forward|not possible to fast-forward|divergent|conflict/.test(source)) return { status: "sync-failed", code: "git-conflict", message: "remoteとlocalの変更が競合したため停止しました。前回の履歴は保持しています。" };
+  if (error?.stage === "git-ingest") return { status: "sync-failed", code: error.code, stage: error.stage, message: `GitHub上の取得後、この端末への取り込みだけ失敗しました。${error.message}` };
+  if (error?.code === "branch-unconfirmed") return { status: "sync-failed", code: error.code, stage: "dispatch", message: "対象branchを確認できないため、GitHub Actionsは開始していません。" };
+  if (error?.stage === "dispatch") return { status: "sync-failed", code: error.code, stage: error.stage, message: "GitHub Actionsを開始できませんでした。Actionsは未開始または開始未確認です。" };
+  if (error?.stage === "run-correlation") return { status: "sync-failed", code: error.code, stage: error.stage, message: "今回開始したGitHub Actionsのrunを確認できませんでした。古い成功runは使っていません。" };
+  const reasons = {
+    "google-reauthorization-needed": ["reauthorization-needed", "token-invalid", "Google認証の同意が取り消されたか、refresh tokenが失効しています。"],
+    "google-scope-insufficient": ["reauthorization-needed", "scope-insufficient", "必要なread-only scopeが不足しています。"],
+    "google-admin-blocked": ["admin-action-needed", "admin-blocked", "Google Workspace管理者のAPI access controlsを確認してください。"],
+    "google-audience-mismatch": ["admin-action-needed", "audience-mismatch", "OAuth Audienceと利用者の組織が一致していません。"],
+    "google-api-disabled": ["admin-action-needed", "api-disabled", "Google CloudでGoogle Chat APIが有効か確認してください。"],
+    "google-permission-denied": ["sync-failed", "permission-denied", "Google Chat APIへのアクセスが拒否されました。"],
+    "rate-limit": ["sync-failed", "rate-limit", "Google Chat APIの利用上限に達しました。"],
+    "service-network": ["sync-failed", "network", "Google Chatへ接続できませんでした。"],
+  };
+  if (reasons[error?.reason]) {
+    const [status, code, message] = reasons[error.reason];
+    return { status, code, stage: "actions-run", message };
+  }
+  if (error?.code === "workflow-conclusion-failure") return { status: "sync-failed", code: error.code, stage: "actions-run", message: "今回のGitHub Actionsが失敗しました。" };
+  if (error?.code?.endsWith("-timeout") || error?.code?.endsWith("-auth") || error?.code?.endsWith("-transport") || error?.code?.endsWith("-killed")) return { status: "sync-failed", code: error.code, stage: error.stage, message: "GitHub CLIの確認に失敗し、workflowの成否は断定していません。" };
   return { status: "sync-failed", code: "workflow-failure", message: "自動取得処理（GitHub Actions）が成功しませんでした。前回の履歴は保持しています。" };
 }
 
@@ -50,9 +59,9 @@ async function run(binary, argv, runTimeout = 60_000) {
   return runExternal(binary, argv, { cwd: root, timeoutMs: runTimeout, maxBuffer: 2 * 1024 * 1024, label: binary });
 }
 
-async function pull(stage) {
+async function pull(stage, branch) {
   events.push(stage);
-  await run(git, ["pull", "--ff-only", "--no-rebase"]);
+  return ingestGit({ root, branch, git });
 }
 
 async function search(stage) {
@@ -102,21 +111,12 @@ try {
     git,
     discoveryTimeoutMs: runDiscoveryTimeout,
     pollIntervalMs: runPollInterval,
+    pollMaxIntervalMs: runPollMax,
   });
   events.push("wait");
-  try {
-    await watchCorrelatedWorkflow({ root, run: dispatchedRun, gh, timeoutMs: timeout });
-  } catch (watchError) {
-    if (!watchError.killed && watchError.code !== "ETIMEDOUT") {
-      try {
-        const logs = await run(gh, ["run", "view", String(dispatchedRun.runId), "--log-failed"]);
-        watchError.stderr = `${watchError.stderr || ""}\n${logs.stdout || ""}\n${logs.stderr || ""}`;
-      } catch { /* 元の失敗を分類する */ }
-    }
-    throw watchError;
-  }
+  await watchCorrelatedWorkflow({ root, run: dispatchedRun, gh, timeoutMs: timeout });
   events.push("success-confirmed");
-  await pull("pull-after-sync");
+  await pull("pull-after-sync", dispatchedRun.branch);
   const retried = await search("retry-same-query");
   if (retried.status === "found") output(retried);
   else output({ status: "still-not-found", query, message: "取得は成功しましたが、保存済み履歴には見つかりませんでした。Google Chatに存在しないとは断定できません。", possibleReasons: ["未選択スペース", "組織の保持設定", "API取得範囲", "キーワードの差", "メッセージの編集・削除"] });
@@ -124,7 +124,7 @@ try {
   if (error.code === "choice-invalid") output({ status: "sync-failed", error: error.code, message: error.message });
   else {
     const detail = classify(error);
-    output({ status: detail.status, error: detail.code, message: detail.message });
+    output({ status: detail.status, error: detail.code, stage: detail.stage, message: detail.message });
   }
   process.exitCode = 4;
 }

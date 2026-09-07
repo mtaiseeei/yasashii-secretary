@@ -2,13 +2,22 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-043-patch-003
+- Current ID: sprint-044
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 8
+- Lineage Dispatches: 1
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
+
+## 2026-09-07 0.12.0版適応開始
+
+- Generator044のhandoffをmainが全文と実差分で確認した。F82共通helper／6 callsite、F83／F84／Clarity、版固有anchor／inventory／metadataを適応済み。MacはVoice3、migration9、core43、Hook40、P0014、P00221、P00312+Windows未実行4、update16、release整合、archive14、overlay再適用差分0。旧期待値・marker漏れ等の初回FAILと再検査をprogressへ保持し、既存履歴fixtureは不変。stateはawaiting-evalとし候補固定へ進む。Windows・実host・独立評価は未完了でPASSへ昇格しない。
+
+- public Phase A PASSの固定入力は `767a7f3ecb15c0ffe6d2d8f71529c74bf671c154`／tree `30b7619e7e779242dd263032c82bccd6ae91eaf1`、receipt `a2933904602fc839c72a5e6b9294a4362eb21ad0`。read-only source `/private/tmp/secretary-012-public-fixed.3gfsoW/source` のHEAD／tree／cleanを再確認した。source内feedbackは当時の履歴であり、後続PASS receiptと区別する。
+- private Phase A PASSもproduct `cbcf2c32efa5d6c343958603c9d740f5f26738de`、receipt `9b269563dd89f6552b0e382cfad724d378d51579` で確定済み。private値／adapterは本版へ持ち込まない。
+- 利用者の続行指示により、既存契約044を開始する。Yasashii開始HEAD `21d28913a8c7e8fcaa4299d5f235e44555407cc9`／branch `codex/release-0.12.0`、既存dirtyはPlannerのspec index／044契約とmain stateだけ。43 Patch003は最終統合candidateで未了criteriaを引き受ける044へsupersededとし、過去NOT-RUN／FAILは保持してPASSへ書き換えない。
+- 新mainのため旧Lineage8の履歴を残し0から開始、Generator dispatch予約で1へ更新。Retry0／Spec0／strong／none。resolverはhigh riskのgpt-5.6-sol/high、fresh isolated-work-unit、launch-unverified。GeneratorはYasashii製品・既存検査・progress044のみを所有し、正本／state／feedbackへ越境しない。3版main／tag／Release／installは引き続きPhase A全版PASS後。
 
 <!-- 2026-07-08: sprint-001 は再評価で合格（初回はクレジット方針の spec/実装不一致で不合格 →
      ユーザー確認で単段クレジットに正本改訂、回帰assert強化のうえ合格）。
@@ -78,7 +87,12 @@
 | sprint-043 | done | [contract](sprint-043.md) | [progress](../progress/sprint-043.md) | [feedback](../feedback/sprint-043.md) |
 | sprint-043-patch-001 | done | [contract](sprint-043-patch-001.md) | [progress](../progress/sprint-043-patch-001.md) | [feedback](../feedback/sprint-043-patch-001.md) |
 | sprint-043-patch-002 | done | [contract](sprint-043-patch-002.md) | [progress](../progress/sprint-043-patch-002.md) | [feedback](../feedback/sprint-043-patch-002.md) |
-| sprint-043-patch-003 | awaiting-eval | [contract](sprint-043-patch-003.md) | [progress](../progress/sprint-043-patch-003.md) | - |
+| sprint-043-patch-003 | superseded | [contract](sprint-043-patch-003.md) | [progress](../progress/sprint-043-patch-003.md) | - |
+| sprint-044 | awaiting-eval | [contract](sprint-044.md) | [progress](../progress/sprint-044.md) | - |
+
+## 0.12.0 release continuation
+
+- 2026-09-06: ユーザーがClarityを含む3版commit／merge／release、このMacのprivate導入、Harness counter resetを承認。元repoのmainは変更せず、21d28913a8c7e8fcaa4299d5f235e44555407cc9から隔離した本worktreeで準備する。新契約044をplannedとして受領。公開Agentic exact source candidateの技術gate独立PASSを待ち、公開/install全体PASSは開始条件にしない。043-patch-003の未了criteriaは最終統合candidateで評価し、旧feedbackやNOT-RUNをPASSに書き換えない。Generator未開始、counterは新main開始時にresetする。
 
 ## Deferred / Superseded
 - sprint-007: superseded — 2026-07-15 製品方針転換により白紙化、`backup/sprint-007-010-plan` に退避

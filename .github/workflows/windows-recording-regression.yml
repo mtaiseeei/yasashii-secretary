@@ -6,10 +6,22 @@ on:
     paths:
       - ".github/workflows/windows-recording-regression.yml"
       - "plugins/secretary/scripts/**"
+      - "plugins/secretary/rules/conversation-contract.md"
+      - "plugins/secretary/rules/styles/yasashii.md"
+      - "plugins/secretary/templates/**"
       - "plugins/secretary/skills/memory-care/scripts/**"
       - "plugins/secretary/skills/**/SKILL.md"
+      - "plugins/secretary/skills/chatwork/scripts/**"
+      - "plugins/secretary/skills/google-chat/scripts/**"
+      - "plugins/secretary/conversation-core-inventory.json"
+      - "plugins/secretary/host-inventory.json"
+      - "plugins/secretary/release-inventory.json"
+      - "scripts/sprint-032-update-gate-test.mjs"
       - "scripts/sprint-038-patch-002-windows-test.mjs"
+      - "scripts/sprint-038-patch-003-conversation-migration-test.mjs"
       - "scripts/sprint-043-patch-003-test.mjs"
+      - "scripts/sprint-051-git-ingest-test.mjs"
+      - "scripts/sprint-052-secretary-voice-test.mjs"
 
 permissions:
   contents: read
@@ -31,9 +43,22 @@ jobs:
           node --check plugins/secretary/skills/memory-care/scripts/memory-tools.mjs
           node --check plugins/secretary/scripts/project-tools.mjs
           node --check plugins/secretary/scripts/owner-name-transaction.mjs
+          node --check plugins/secretary/scripts/lib/git-ingest.mjs
       - name: Windows path, rollback, retry, and boundary regression
         shell: pwsh
         run: node scripts/sprint-038-patch-002-windows-test.mjs --require-windows
       - name: Yasashii Clarity Harness scan and Windows native regression
         shell: pwsh
         run: node scripts/sprint-043-patch-003-test.mjs --require-windows
+      - name: Git ingest helper and six callsites
+        shell: pwsh
+        run: node scripts/sprint-051-git-ingest-test.mjs --require-windows
+      - name: Conversation migration native path
+        shell: pwsh
+        run: node scripts/sprint-038-patch-003-conversation-migration-test.mjs --require-windows
+      - name: Secretary voice and preference inventory
+        shell: pwsh
+        run: node scripts/sprint-052-secretary-voice-test.mjs
+      - name: Current update candidate semantics
+        shell: pwsh
+        run: node scripts/sprint-032-update-gate-test.mjs
