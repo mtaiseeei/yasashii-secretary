@@ -182,3 +182,194 @@ greenになれば、今回greenだった製品面はsame-candidate／実diff確�
 - safe harbor外の新証拠基盤を要求していないか: yes。
 - 実装や他roleの正本へ越境していないか: yes。
 - 強いGeneratorへのescalationが必要か: no。既存検査の改行正規化に限定できる。
+
+---
+
+# Sprint 044 V-01限定修正後 fresh独立再評価 — Yasashii 0.12.0 downstream Phase A
+
+**判定:** 不合格（Phase A技術gate。Phase Bは未評価）
+
+**分類:** `verification-scope-issue`
+
+**評価対象:** Sprint 044 — Yasashii 0.12.0 downstream整合、V-01限定修正後
+
+**Escalation Recommendation:** `none`
+
+## 現在の結論
+
+exact candidate `f64d775043a6fb02161c6d9038d7ee722b9429c1`／tree
+`209e33f1dd51e5aac6e33da0c56af11696ae1157`について、V-01のCRLF hash問題は解消した。
+MacとWindowsの両方でVoiceは3 PASS／0 FAILとなり、期待hash、inventory、required marker、
+Voice契約、製品runtimeは変更されていない。
+
+しかし、同一candidateに因果する必須Windows workflow run `34076583606`／job `101603781877` は、
+Voiceの次に到達したupdate stepで失敗した。`scripts/sprint-032-update-gate-test.mjs`はGit履歴を走査して
+公開0.7.0 pluginを抽出する既存検査だが、workflowの`actions/checkout@v4`は既定の
+`fetch-depth: 1`でHEADだけを取得していた。このため検査はassert開始前に
+`公開0.7.0 pluginをGit履歴から確認できません。`で停止し、
+`SPRINT032_RELEASE_PASS=0 SPRINT032_RELEASE_FAIL=1`となった。
+
+ローカルの完全なGit履歴では同じcurrent sourceのupdate検査が16 PASS／0 FAILであり、
+履歴commit `604ce1f0c9e449f01fb3146cbcf43364df6c86ad`にはversion `0.7.0`のlegacy manifestが実在する。
+したがって新しいblocking finding V-02は製品update挙動ではなく、既存検査へ必要な履歴を渡さない
+Windows workflowの`verification-infra` findingである。製品の`product` findingは現在も0件だが、
+契約済みの必須Windows回帰がgreenでないためPhase AをPASSにはしない。
+
+## Candidate、実差分、履歴保持
+
+- 前回評価candidate: `a38d7dc6bef58e2bcfd9433c8b29e9d557447b24`、tree
+  `79420843e3c869fbe4fc9987e53d9ebbd4dcc5e7`。
+- 前回FAIL記録commit: `a93d2ab45aaa46e818020e0265d88958d8b6aaef`。
+- 現在の評価candidate: `f64d775043a6fb02161c6d9038d7ee722b9429c1`、tree
+  `209e33f1dd51e5aac6e33da0c56af11696ae1157`、branch `codex/release-0.12.0`。
+- 評価source `/private/tmp/secretary-yas044-crlf-check.AvuSaq/source` は開始・終了時とも上記HEAD／treeでclean。
+- `a93d2ab..f64d775`の実差分はrole記録を除くと、
+  `scripts/sprint-052-secretary-voice-test.mjs`の1行置換と、再適用時にその置換を保持する
+  `secretary-overlay/anchors.json`の6行追加だけである。
+- `plugins/secretary/conversation-core-inventory.json`、`plugins/secretary/rules/`、
+  `plugins/secretary/skills/`に差分はなく、製品runtime、期待hash、inventory、case／assert／timeoutは不変。
+- 前回FAIL、Windows run `34070811154`のVoice 2／1、update skipped、V-01の
+  `verification-scope-issue`分類は上の履歴として保持し、現在のPASSへ書き換えていない。
+- fixed public／private PASSは入力の妥当性にだけ使い、Yasashii verdictへ流用していない。
+
+## 現在のスコア
+
+| 基準 | スコア | 閾値 | 判定 | 根拠 |
+|---|---:|---:|---|---|
+| C1 完成度 | 3/5 | 4 | **FAIL** | V-01は解消したが、必須Windows workflowがupdate検査の起動時に停止しPhase A完了条件が未達。 |
+| C2 構文・整合 | 5/5 | 5 | PASS | current manifest／JSON／参照、Voice inventory、release整合はgreen。V-02は製品参照ではなくCIの履歴取得不足。 |
+| C3 機能の実証 | 4/5 | 4 | PASS | Windowsでnative 12／0、HS 16／0、Git 45／0、migration 9／0、Voice 3／0。変更に無関係な製品面は実diff確認後に前回証跡をcarry。 |
+| C5 安全・規律 | 5/5 | 5 | PASS | WindowsのGit／Clarity／symlink／junction境界と、前回の製品安全証跡に新しいFAILなし。 |
+| C6 無回帰 | 4/5 | 5 | **FAIL** | exact candidateの必須Windows workflowに1 FAILが残る。 |
+| C7 やさしさ | 4/5 | 4 | PASS | 製品copy／styleは差分なし。前回の実Yasashii証跡をcarry。 |
+| C10 更新の安全性 | 4/5 | 5 | **FAIL** | full-historyのMacでは16／0だが、契約上のWindows update面は検査harness起動時に0／1。未実行の16 assertionsをPASSへ昇格しない。 |
+| C12 release履歴・candidate整合 | 5/5 | 5 | PASS | release integrityとGit-free archive 14／0はgreen、旧release履歴自体は存在する。 |
+| C13 edition分離・互換 | 5/5 | 5 | PASS | overlay check managed 309、再適用用anchorはV-01限定修正を保持。製品edition surface不変。 |
+| C14 Markdown可読性 | 5/5 | 5 | PASS | 会話surface不変。前回の実diff連結済み証跡をcarry。 |
+| C15 正式host配布面 | 5/5 | 5 | PASS | manifest／Hook／plugin bytes不変。前回Claude isolated source-loadだけをcarryし、install／new normal／Codex実行へ昇格していない。 |
+| C16 Windows native保存 | 5/5 | 5 | PASS | exact runで12 PASS／0 FAIL、access violation 0。 |
+| C17 identity／routing | 5/5 | 5 | PASS | Voice 3／0。identity／routing製品bytes不変。 |
+| C18 identity migration | 5/5 | 5 | PASS | exact Windows runで9 PASS／0 FAIL。 |
+| C19 memory／下流分離 | 5/5 | 5 | PASS | 製品・handoff・17 Skills不変、overlay check green。 |
+| C20 Clarity正本・状態モデル | 5/5 | 5 | PASS | exact Windows runでHS 16／0、既存Clarity product bytes不変。 |
+| C21 Attention・Yasashii UX | 4/5 | 4 | PASS | UI／copy変更なし。前回の実Yasashii証跡をcarry。 |
+| C22 Hook・host truth | 5/5 | 5 | PASS | Hook bytes不変。前回Claude isolated source-load証跡を限定carry。 |
+| C23 link・sync・Drift | 5/5 | 5 | PASS | 製品面に差分なし。前回green証跡をcarry。 |
+| C24 projection・Xmind | 4/5 | 4 | PASS | 製品面に差分なし。real Xmindは引き続きNOT-RUN。 |
+| C25 Yasashii安全・統合・handoff | 4/5 | 5 | **FAIL** | 製品統合面は不変だが、同一candidateの必須既存回帰に1 FAIL。 |
+| C26 Clarity包括scan・Windows native | 4/5 | 5 | **FAIL** | HS 16／0・SKIP 0・NOT-RUN 0は成立したが、exact candidate因果workflow全体が0 FAILではない。 |
+
+1軸でも閾値未達なら不合格というrubricに従う。
+
+## Acceptance Criteria
+
+| AC | 判定 | 独立根拠 |
+|---:|---|---|
+| 1 | PASS | fixed input、開始HEAD、前回candidate、V-01修正base、現在HEAD／tree、actual diffを固定。 |
+| 2 | PASS | 製品runtimeに差分なし。F82、F83、F84、Clarityの前回実行証跡を増分carryし、Voiceはcurrent Windowsで3／0。 |
+| 3 | PASS | Yasashii固有surface、inventory、17 Skills、62 behavior、generic storage、Xmind OFFに差分なし。 |
+| 4 | PASS | Hook／manifest bytes不変。前回Claude isolated source-loadを限定carryし、host間昇格なし。 |
+| 5 | PASS | 0.12.0整合、equal／downgrade、副作用0はcurrent full-history Macで16／0。Windows未実行分はこのACの製品意味の代替ではなく、AC6／C6／C10で未達として保持。 |
+| 6 | **FAIL** | source clean、Git-free 14／0、native／HS／Git／migration／Voiceはgreenだが、exact Windows workflowがupdate harness 0／1でfailure。 |
+| 7 | PASS | 変更はverification surfaceだけ。既存安全面に差分・新FAILなし。 |
+| 8 | PASS | 新runner／framework／collector／matrixなし。case／assert／timeout削減なし。 |
+
+## 今回の独立実行証跡
+
+テスト開始前と終了後に権限を上げたread-only `pgrep node | wc -l`を実行し、どちらも14だった。
+開始上限40未満で、Evaluatorが起動した常駐server／watcher／browserはない。
+
+| Command | Exit | 結果 |
+|---|---:|---|
+| `git diff --name-status/--numstat a93d2ab..f64d775` と限定diff | 0 | 製品外のrole記録、Voice test 1行置換、overlay anchor 6行追加を確認。 |
+| `git diff --quiet a93d2ab..f64d775 -- plugins/secretary/conversation-core-inventory.json plugins/secretary/rules plugins/secretary/skills` | 0 | product／期待hash／inventory差分0。 |
+| `node scripts/sprint-052-secretary-voice-test.mjs` | 0 | 3 PASS／0 FAIL。 |
+| CRLF限定normalizationの直接assert | 0 | CRLFとLFは同値、単独CRと内容変更は不一致。 |
+| `node scripts/sprint-032-update-gate-test.mjs` | 0 | full-history Macで16 PASS／0 FAIL。 |
+| `python3 scripts/check-release-integrity.py --root .` | 0 | manifest／CHANGELOG整合。 |
+| overlay `--check --candidate <fixed-public-source> --observed-commit 767a7f3...` | 0 | managed 309、handoff digest一致、upstream push disabled。 |
+| `node --check scripts/sprint-052-secretary-voice-test.mjs` | 0 | 構文PASS。 |
+| `git diff --check` | 0 | outputなし。 |
+| sourceの`git status --short`、HEAD／tree | 0 | clean、`f64d775...`／`209e33f...`。 |
+
+Orchestratorが同じexact candidateのGit-free archiveで既存archive gateを実行し、14 PASS／0 FAIL、
+`.git`なしを確認した。この結果はsame-candidateのarchive面として採用するが、Windows update PASSの代わりにはしない。
+
+## Windows exact-candidate証跡
+
+- URL: <https://github.com/mtaiseeei/yasashii-secretary/actions/runs/34076583606>
+- run `34076583606`、job `101603781877`、head SHA
+  `f64d775043a6fb02161c6d9038d7ee722b9429c1`。
+- runner image `windows-2025-vs2026`、Node `22.23.2`、既存`windows-native` job、timeout 10分。
+- 0.9.2 native: 12 PASS／0 FAIL。
+- Clarity HS: 16 PASS／0 FAIL／0 SKIP／0 NOT-RUN。symlink／junction capabilityはいずれもPASS。
+- F82 Git ingest: 45 PASS／0 FAIL。
+- conversation migration: 9 PASS／0 FAIL。
+- F83 Voice: 3 PASS／0 FAIL。V-01はresolved。
+- update: `SPRINT032_RELEASE_PASS=0 SPRINT032_RELEASE_FAIL=1`。製品assert 16件はharness起動前停止により未実行。
+- job全体: `failure`。未実行をPASSへ数えていない。
+
+### V-02の独立診断
+
+Windows logはcheckout入力として`fetch-depth: 1`を記録し、実fetchも次のとおりだった。
+
+```text
+git ... fetch --no-tags --prune --no-recurse-submodules --depth=1 origin \
+  +f64d775043a6fb02161c6d9038d7ee722b9429c1:refs/remotes/origin/codex/release-0.12.0
+```
+
+一方、既存update検査は次の順で履歴を必要とする。
+
+1. `git rev-list HEAD`で取得済みrevisionを列挙する。
+2. 各revisionの`plugins/yasashii-secretary/.claude-plugin/plugin.json`を読む。
+3. version `0.7.0`を見つけ、そのrevisionから公開0.7.0 fixtureを`git archive`する。
+
+current HEADにはlegacy path自体がなく、完全履歴の
+`604ce1f0c9e449f01fb3146cbcf43364df6c86ad`にはversion `0.7.0`のmanifestが実在した。
+Windows checkoutではHEADしか取得していないため、`findPublished070Revision()`が対象revisionへ到達できない。
+これは製品update codeの失敗ではなく、既存検査の明示的な前提とworkflow checkoutの不一致である。
+
+## Findings／バグ一覧（現在）
+
+| # | 状態 | 重要度 | 対象区分 | 内容 | 再現手順 |
+|---|---|---|---|---|---|
+| V-01 | **RESOLVED** | Major | `verification-infra` | Voice inventoryのWindows CRLF raw hash問題。限定normalization後、exact Windowsで3／0。 | run `34076583606`のVoice stepを確認。 |
+| V-02 | **OPEN / blocking** | Major | `verification-infra` | Git履歴を必要とするSprint 032 update検査を、`fetch-depth: 1`のWindows checkoutで起動するため、公開0.7.0 fixtureを抽出できずassert前に停止する。 | exact candidateの既存Windows workflowでupdate stepを実行。 |
+
+`product` findingは0件。blocking `verification-infra` findingはV-02の1件。
+
+## 最小の解消方向と状態分離
+
+既存update検査の意味、fixture、16 assertionsを変えず、Windows workflowの既存checkoutへ
+検査が必要とするGit履歴を供給するのが最小方向である。例えば`actions/checkout@v4`の
+`fetch-depth: 0`はこの前提を満たす。これはV-01限定修正の承認範囲外なので、Evaluatorは実装・再実行していない。
+
+修正が承認された場合は、新しいclean candidateを固定し、同じ既存Windows workflowをexact SHAで1回だけ実行する。
+native 12／0、HS 16／0・SKIP 0・NOT-RUN 0、Git 45／0、migration 9／0、Voice 3／0、
+update 16／0を含むjob全体のgreenが確認できれば、今回のunchanged product証跡は実diff確認後に増分carryできる。
+新runner、collector、attestation、wrapper、schemaは不要である。
+
+## NOT-RUN／Phase分離
+
+- Codex exact source Hook実行、正式install、new normal session: NOT-RUN。前回のClaude isolated source-loadだけをbyte不変条件でcarry。
+- 実Xmind MCP／local `.xmind`、connector／provider、実利用者workspace／顧客repo apply: NOT-RUN。
+- main merge、tag、GitHub Release、Marketplace、artifact公開、install／cache: Phase B、NOT-RUN。
+- Phase Bはこの評価の合否対象に含めず、未評価のまま。
+- public／private PASS、Mac update、Git-free archiveをWindows update PASSへ昇格していない。
+- UI変更なし。デザイン採点とbrowser screenshotは非該当。
+- Evaluatorの編集は本feedbackへの追記だけ。product、test、fixture、workflow、spec、contract、progress、stateを変更していない。
+
+## Evaluator自己レビュー（現在）
+
+- 閾値と合否は一致しているか: yes。
+- 各PASSにcurrent same-candidate証拠、または実diffで有効性を確認したcarry evidenceがあるか: yes。
+- Windows updateの未実行16 assertionsをPASS扱いしていないか: yes。
+- V-01の旧FAIL履歴を保持し、現在のresolved状態と区別したか: yes。
+- public／private PASSをYasashii PASSへ流用していないか: yes。
+- FAIL理由は着手時点の契約／rubricにある必須Windows workflow、C6、C10、C25、C26か: yes。
+- V-02を`verification-infra`とする根拠: 製品更新コードへ到達する前に、履歴依存の既存検査とdepth 1 checkoutの不一致で停止するため。
+- 全体を`verification-scope-issue`とする根拠: blocking findingが検証workflowだけにあり、製品の`product` findingは0件。ただし必須suiteがredなのでPASSにはしない。
+- safe harbor外の証拠基盤や新基準を要求していないか: yes。
+- 各findingに`product`／`verification-infra`区分を付けたか: yes。
+- 実装、workflow修正、他roleの正本へ越境していないか: yes。
+- 強いGeneratorへのescalationが必要か: no。既存checkoutへ必要履歴を供給する限定修正で足りる。

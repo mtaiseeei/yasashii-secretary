@@ -5,12 +5,18 @@
 - Current ID: sprint-044
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 3
+- Lineage Dispatches: 4
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
 
 ## 2026-09-07 0.12.0版適応開始
+
+- fresh独立Evaluator `/root/evaluator_yas044_crlf` の追記全文と実runをmainが確認し、current Phase A FAIL / verification-scope-issueを採用。V-01 RESOLVED、V-02 OPEN（検証側の履歴不足）、product finding0。Mac完全履歴update16/0、実履歴0.7.0存在とCIdepth1を独立確認。Retry0／Spec0／Lineage4／strong／noneを保持し、追加のcheckout履歴設定修正はユーザー回答まで待つ。旧FAILは保持。正式install／公開は未実施。
+
+- Windows34076583606はfailureで終了。承認対象V-01はVoice3/0で解消、native12/0／HS16/0・SKIP0／NOTRUN0／Git45/0／migration9/0も成功。初到達のupdateは「公開0.7.0 pluginをGit履歴から確認できません」で検査準備中に0/1、製品判定前に停止した。全logは `/private/tmp/secretary-yas044-crlf-check.AvuSaq/windows-34076583606.log`。main archive14/0。fresh Evaluatorが原因と正式分類を確認中。checkout既定shallowと履歴依存検査の不整合を限定修正する可否をユーザーへ提示し、未承認の実装／同候補再実行はしない。
+
+- 修正candidate `f64d775043a6fb02161c6d9038d7ee722b9429c1`／tree `209e33f1dd51e5aac6e33da0c56af11696ae1157`をclean固定し候補branchへ通常push。既存Windows run `34076583606`／job `101603781877`を1回開始しhead一致を確認。fixed source／Git-free archiveは `/private/tmp/secretary-yas044-crlf-check.AvuSaq/`。fresh独立EvaluatorをLineage3→4で予約、Sol/high／fresh／launch-unverified、Retry0／Spec0／strong／noneを保持。旧PASS面は実diffとgreen回帰を条件に増分carryし、公開／installのPASSへ拡張しない。
 
 - V-01限定Generator完了。mainは実diffとprogressを確認し、検査1行・因果するoverlay anchor6行だけ、製品runtime0／期待値不変を確認。Mac Voice3/0、release整合、overlay managed309、CRLF／単独CR／内容変更の識別、構文／diff成功。awaiting-evalへ戻し、新candidate固定・承認済み候補push・既存Windows1回へ進む。独立PASSは未確定。
 
