@@ -5,12 +5,18 @@
 - Current ID: sprint-044
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 8
+- Lineage Dispatches: 9
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
 
 ## 2026-09-07 0.12.0版適応開始
+
+- fresh `/root/evaluator_yas044_digest` の追記全文と実ログをmainが確認し、exact27b570d／tree1d3f4696のPhase A PASSを採用。V-01〜V-03 RESOLVED、product0／blocking verification-infra0、全rubric閾値達成。Windows34083455091全step成功とMac限定回帰／archive14/0／inventory20/57を確認。044をdone、Retry0／Spec0／Lineage9／strong／noneを保持。旧FAIL／旧NOT-RUNは不変。これは公開前技術判定であり、main／tag／Release／installのPhase Bは未実施。public054で3版の公開・実PC反映へ引き渡す。
+
+- Windows34083455091/job101622961863はexact27b570dで全step success。native12/0、HS16/0・SKIP0／NOTRUN0／capability2PASS、Git45/0、migration9/0、Voice3/0、update16/0。全log `/private/tmp/secretary-yas044-digest-check.Gkof0n/windows-34083455091.log`（41,281文字）を保存しfresh Evaluatorへ渡した。main exact Git-free archive14/0。まだ独立判定前のためPhase A PASSや公開／install完了へ昇格しない。
+
+- candidate `27b570d51757e225e7d7a71f42755ce3f999eede`／tree `1d3f4696f3ceddfc05095c99d3c63fb65e4d1957`をclean固定し通常push。既存Windows34083455091/job101622961863を1回開始、head一致。fixed source／Git-free archiveは `/private/tmp/secretary-yas044-digest-check.Gkof0n/`。fresh独立EvaluatorをLineage8→9で予約、Sol/high／fresh／launch-unverified、Retry0／Spec0／strong／none。main実測Node26、低並列を維持。
 
 - V-03 Generator完了、mainが実diff／progressを確認。clarity-harness-scanner.contentDigestの1値だけを既存関数で再計算した0771a55b...へ更新、製品runtime0。inventory20/57、HS Mac12/0＋Windows専用4 NOT-RUN、03216/0、Voice3/0、release／overlay／JSON／diffが成功。追加anchor／fixture変更不要。awaiting-evalに戻し、候補固定・push／Windows1回・fresh評価へ進む。
 
@@ -126,7 +132,7 @@
 | sprint-043-patch-001 | done | [contract](sprint-043-patch-001.md) | [progress](../progress/sprint-043-patch-001.md) | [feedback](../feedback/sprint-043-patch-001.md) |
 | sprint-043-patch-002 | done | [contract](sprint-043-patch-002.md) | [progress](../progress/sprint-043-patch-002.md) | [feedback](../feedback/sprint-043-patch-002.md) |
 | sprint-043-patch-003 | superseded | [contract](sprint-043-patch-003.md) | [progress](../progress/sprint-043-patch-003.md) | - |
-| sprint-044 | awaiting-eval | [contract](sprint-044.md) | [progress](../progress/sprint-044.md) | [feedback](../feedback/sprint-044.md) |
+| sprint-044 | done | [contract](sprint-044.md) | [progress](../progress/sprint-044.md) | [feedback](../feedback/sprint-044.md) |
 
 ## 0.12.0 release continuation
 

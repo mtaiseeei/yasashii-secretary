@@ -560,3 +560,186 @@ update 16／0を含むjob全体のgreenが確認できれば、今回のunchange
 - 各findingに`product`／`verification-infra`区分を付けたか: yes。
 - 実装、digest更新、workflow再実行、他roleの正本へ越境していないか: yes。
 - 強いGeneratorへのescalationが必要か: no。current digestの直接因果する1値更新に限定できる。
+
+---
+
+# Sprint 044 V-03限定修正後 fresh独立再評価 — Yasashii 0.12.0 downstream Phase A
+
+**判定:** 合格（Phase A技術gate。Phase Bは未評価）
+
+**評価対象:** Sprint 044 — Yasashii 0.12.0 downstream整合、V-03限定修正後
+
+**Escalation Recommendation:** `none`
+
+## 現在の結論
+
+exact candidate `27b570d51757e225e7d7a71f42755ce3f999eede`／tree
+`1d3f4696f3ceddfc05095c99d3c63fb65e4d1957`について、Phase A技術gateは合格である。
+
+V-03で承認された変更は、既存`digestSurface()`で独立再計算した
+`clarity-harness-scanner.contentDigest` 1値を
+`0771a55beb6717c8f0e44cd7acfb1f4bc0db54772e3103d6ec74ade884432fd4`へ整合したものだけである。
+current 5 pathからの再計算値と記録値は一致し、inventoryは20 surface／57 case、digest／markerとも有効だった。
+製品runtime、test、fixture、他inventory field、workflow、manifest、Hook、Skillに今回の変更はない。
+
+同じexact candidateに因果するWindows workflow run `34083455091`／job `101622961863`は全step成功で終了した。
+Windows native 12／0、Clarity HS 16／0・aggregate SKIP 0・NOT-RUN 0・`WINDOWS_VERIFIED=true`、
+symlink／junction capability 2 PASS、Git 45／0、conversation migration 9／0、Voice 3／0、update 16／0である。
+前回まで未到達だったGit／migration／Voice／updateを旧runやMac結果から昇格せず、current runの実行結果で確認した。
+
+したがって、V-01、V-02、V-03はすべてcurrent candidateで解消した。current `product` findingは0件、
+blocking `verification-infra` findingも0件であり、全rubric軸が閾値以上となる。
+上の3回の不合格、旧Windows run、skipped／NOT-RUN、各`verification-scope-issue`分類は履歴としてそのまま保持する。
+
+## Candidate、実差分、履歴保持
+
+- 前回評価candidate: `146d93296070773d33d3ae4f06050f4ec7e21438`、tree
+  `39d27e720eb8613d9cd95cb817febbce4124f901`。
+- 前回FAIL記録commit／V-03対応開始HEAD:
+  `a9b39532ec4a45397a64b9005e7a241ad6acbf30`。
+- 現在の評価candidate: `27b570d51757e225e7d7a71f42755ce3f999eede`、tree
+  `1d3f4696f3ceddfc05095c99d3c63fb65e4d1957`、branch candidate
+  `codex/release-0.12.0`。
+- 評価source `/private/tmp/secretary-yas044-digest-check.Gkof0n/source` は開始・終了時とも上記HEAD／treeでclean。
+- `a9b3953..27b570d`の実差分は、製品外の
+  `plugins/secretary/collaboration-inventory.json`にある該当`contentDigest` 1値と、
+  Generator所有progress／Orchestrator所有stateだけである。新anchorはなく、product、test、fixture、workflow、
+  他inventory fieldの差分は0件。
+- `146d932..27b570d`には、上記に加えて旧評価履歴の本feedback追記が含まれる。評価履歴を製品差分へ数えていない。
+- V-01の旧Voice 2／1、V-02の旧update 0／1、V-03の旧HS 15／1と後続NOT-RUN、
+  3件の旧正式FAILは上の節に保持し、current PASSへ書き換えていない。
+- fixed public／private PASSは入力の妥当性だけに用い、Yasashii verdictへ流用していない。
+
+## 現在のスコア
+
+| 基準 | スコア | 閾値 | 判定 | 根拠 |
+|---|---:|---:|---|---|
+| C1 完成度 | 5/5 | 4 | PASS | current Windows必須workflowを含むPhase A技術gateが全step green。 |
+| C2 構文・整合 | 5/5 | 5 | PASS | current inventory記録値と独立再計算値が一致。manifest／release／JSON／diffもgreen。 |
+| C3 機能の実証 | 4/5 | 4 | PASS | current Windowsでnative、HS、Git、migration、Voice、updateをすべて実行。unchanged product面は実diff確認後に既存証跡を増分carry。 |
+| C5 安全・規律 | 5/5 | 5 | PASS | Windowsでexternal write 0、network 0、Git／Clarity／path／rollback、symlink／junction境界がgreen。 |
+| C6 無回帰 | 5/5 | 5 | PASS | current Windows全step、Mac限定回帰、release、overlay、Git-free archiveが0 FAIL。 |
+| C7 やさしさ | 4/5 | 4 | PASS | copy／style／Voice product bytesは不変。Voice 3／0と既存Yasashii証跡を増分carry。 |
+| C10 更新の安全性 | 5/5 | 5 | PASS | current WindowsとMacの両方でupdate 16／0。同一版・downgrade副作用0と旧blocker保持を確認。 |
+| C12 release履歴・candidate整合 | 5/5 | 5 | PASS | 0.12.0 release integrity、Git-free archive 14／0、旧履歴比較がgreen。 |
+| C13 edition分離・互換 | 5/5 | 5 | PASS | overlay check managed 309、handoff digest一致、upstream push disabled。Yasashii owned product surface不変。 |
+| C14 Markdown可読性 | 5/5 | 5 | PASS | 会話product surfaceに差分なし。既存same-bytes証跡を増分carry。 |
+| C15 正式host配布面 | 5/5 | 5 | PASS | manifest／Hook／Skill bytes不変。既存Claude isolated source-loadだけをbyte不変条件でcarryし、install／new normal／Codex runtimeへ昇格していない。 |
+| C16 Windows native保存 | 5/5 | 5 | PASS | exact current runで12 PASS／0 FAIL、access violation 0。 |
+| C17 identity／routing | 5/5 | 5 | PASS | exact current runでVoice 3／0。identity／routing product bytes不変。 |
+| C18 identity migration | 5/5 | 5 | PASS | exact current Windows runで9 PASS／0 FAIL。 |
+| C19 memory／下流分離 | 5/5 | 5 | PASS | product、handoff、17 Skills不変。overlayとarchiveがgreen。 |
+| C20 Clarity正本・状態モデル | 5/5 | 5 | PASS | exact current Windows runでHS 16／0、Mac portable 12／0、inventory 20／57。 |
+| C21 Attention・Yasashii UX | 4/5 | 4 | PASS | UI／copy変更なし。既存same-bytes証跡を増分carry。 |
+| C22 Hook・host truth | 5/5 | 5 | PASS | Hook bytes不変。既存Claude isolated source-loadを限定carryし、host結果を相互昇格していない。 |
+| C23 link・sync・Drift | 5/5 | 5 | PASS | product面に差分なし。既存green証跡を実diff確認後に増分carry。 |
+| C24 projection・Xmind | 4/5 | 4 | PASS | product面に差分なし。Xmind既定OFF／MCP-firstを保持し、real Xmindは引き続きNOT-RUN。 |
+| C25 Yasashii安全・統合・handoff | 5/5 | 5 | PASS | current inventory、Windows全step、overlay、release、archiveが同じcandidateでgreen。 |
+| C26 Clarity包括scan・Windows native | 5/5 | 5 | PASS | exact current WindowsでHS 16／0、aggregate SKIP 0／NOT-RUN 0、capability 2 PASS、job全体green。 |
+
+すべての採点軸が着手時点のrubric閾値以上である。
+
+## Acceptance Criteria
+
+| AC | 判定 | 独立根拠 |
+|---:|---|---|
+| 1 | PASS | fixed public source、Yasashii開始HEAD、旧候補、旧FAIL receipt、current HEAD／tree、actual diffを一意に固定。 |
+| 2 | PASS | current WindowsでGit 45／0、Voice 3／0、Clarity HS 16／0、migration 9／0、update 16／0。F84等のunchanged product面は実diff確認後に既存証跡をcarry。 |
+| 3 | PASS | 今回はverification inventory 1値だけ。Yasashii copy／style／identity、17 Skills／62 behavior、generic storage、Xmind policy、fixtureに変更なし。 |
+| 4 | PASS | manifest／Hook bytes不変。既存Claude source-loadを限定carryし、Codex／install／通常sessionへ昇格していない。 |
+| 5 | PASS | release integrityとupdate 16／0がMac／Windowsでgreen。0.12.0整合、equal／downgrade副作用0、旧release履歴保持。 |
+| 6 | PASS | source clean、Git-free 14／0、inventory 20／57、Mac HS 12／0＋Windows専用4 NOT-RUN、exact WindowsはHS 16／0・aggregate SKIP 0・NOT-RUN 0、native 12／0、Git 45／0、migration 9／0、Voice 3／0、update 16／0。 |
+| 7 | PASS | exact Windowsでexternal write 0／network 0。変更はverification inventory 1値だけで、既存安全product bytesは不変。 |
+| 8 | PASS | 新runner／framework／collector／attestation／matrixなし。test／fixture／workflow／case／assert／actor／round／timeout変更なし。 |
+
+## 今回の独立実行証跡
+
+テスト開始前のsandbox内`pgrep node | wc -l`はprocess list取得エラーと偽の0を返したため採用せず、
+権限を上げたread-only再計測で30を確認した。開始上限40未満で、同時実行は最大3系統、
+Evaluatorが常駐server／watcher／browserを起動していない。
+
+| Command | Exit | 結果 |
+|---|---:|---|
+| host実測 `hostname; id -un; uname -m; pwd` | 0 | `mac.lan`／`taisei`／`arm64`／評価cwdを確認。 |
+| source `git status --short; git rev-parse HEAD; git rev-parse HEAD^{tree}` | 0 | clean、`27b570d...`／`1d3f469...`。 |
+| `git diff --name-status/--numstat a9b3953..27b570d` と限定diff | 0 | inventory 1値、progress／stateだけ。product／test／fixture／workflow／他inventory field差分0。 |
+| current 5-path `digestSurface()`＋`validateCollaborationInventory()` | 0 | recorded＝observed `0771a55b...`、20 surface／57 case、digest／marker有効。 |
+| `node scripts/sprint-043-patch-003-test.mjs` | 0 | Mac 12 PASS／0 FAIL／0 SKIP、Windows専用4件はNOT-RUNで非昇格、external write 0／network 0。 |
+| `node scripts/sprint-032-update-gate-test.mjs` | 0 | Mac完全履歴で16 PASS／0 FAIL。 |
+| `node scripts/sprint-052-secretary-voice-test.mjs` | 0 | 3 PASS／0 FAIL。 |
+| `python3 scripts/check-release-integrity.py --root .` | 0 | manifest／CHANGELOG整合。 |
+| overlay `--check --candidate <fixed-public-source> --observed-commit 767a7f3...` | 0 | managed 309、handoff digest `2f228895...`一致、upstream push disabled。 |
+| Git-free `node scripts/archive-release-gate.mjs --root <archive>` | 0 | `.git`なし、14 PASS／0 FAIL。 |
+| `git diff --check 146d932..27b570d` | 0 | outputなし。 |
+
+Git-free archiveとsourceは
+`/private/tmp/secretary-yas044-digest-check.Gkof0n/archive`／`source`を用いた。
+
+### Windows exact-candidate証跡
+
+- URL: <https://github.com/mtaiseeei/yasashii-secretary/actions/runs/34083455091>
+- run `34083455091`、job `101622961863`、head SHA
+  `27b570d51757e225e7d7a71f42755ce3f999eede`。
+- full log: `/private/tmp/secretary-yas044-digest-check.Gkof0n/windows-34083455091.log`。
+- Microsoft Windows Server 2025、Node `22.23.2`、既存`windows-native` job、`fetch-depth: 0`。
+- checkout logのHEAD表示は2箇所ともexact SHAと一致。
+- 0.9.2 native: 12 PASS／0 FAIL。
+- Clarity HS: 16 PASS／0 FAIL／aggregate SKIP 0／NOT-RUN 0、
+  `WINDOWS_VERIFIED=true`、external write 0、network call 0。
+- symlink／junction capability: 2 PASS／0 SKIP。
+- Git ingest: 45 PASS／0 FAIL。
+- conversation migration: 9 PASS／0 FAIL、`WINDOWS_NATIVE=RUN`。
+- Voice: 3 PASS／0 FAIL。
+- update: 16 PASS／0 FAIL。
+- job全体と全step: `success`。
+
+HSの途中ログに`yasashii-HS-007-permission`のcapability診断として
+`host-does-not-enforce-mode-000`の`SKIP`表示が1行あるが、これはCase自体のSKIPではない。
+HS-007は同じrunでPASSし、suite aggregateは16 PASS／0 FAIL／SKIP 0／NOT-RUN 0である。
+Actions側のNode 20非推奨warningとfixture内LF→CRLF warningも、step failureや製品findingではない。
+
+### unchanged Claude source-load証跡の限定carry
+
+前回のClaude Code isolated source-load記録
+`/private/tmp/secretary-yasashii-044-check.SsbIHd/claude-source-load.jsonl`を、
+current差分でClaude manifest／Hook／Skill／product script bytesが不変であることを確認したうえでcarryした。
+記録fileのSHA-256は
+`eb825a5ebb83eccdfc536824fdf58a792d38d4e9b4dfd29ae2acc35e7ddb2443`。
+これはClaude Code 2.1.232のisolated `--plugin-dir` source-load、17 Skills、SessionStart／Stop exit 0、
+parser warning 0の証跡に限る。正式install、cache、新しい通常session、Claude Desktop、Codex runtimeのPASSには用いない。
+
+## Findings／バグ一覧（現在）
+
+| # | 状態 | 重要度 | 対象区分 | 内容 | current証跡 |
+|---|---|---|---|---|---|
+| V-01 | **RESOLVED** | Major | `verification-infra` | Voice inventoryのWindows CRLF raw hash問題。旧FAIL履歴は保持。 | current Windows Voice 3／0、Mac 3／0。 |
+| V-02 | **RESOLVED / CURRENT OUTCOME REACHED** | Major | `verification-infra` | Git履歴不足と032履歴比較のCRLF問題。旧FAIL／未到達履歴は保持。 | current checkout `fetch-depth: 0`、Windows update 16／0、Mac 16／0。 |
+| V-03 | **RESOLVED** | Major | `verification-infra` | workflow変更に因果する`clarity-harness-scanner.contentDigest`の旧値。旧HS 15／1履歴は保持。 | recorded＝observed `0771a55b...`、Mac inventory valid、current Windows HS 16／0。 |
+
+current `product` findingは0件。current blocking `verification-infra` findingは0件である。
+
+## NOT-RUN／Phase分離
+
+- Codex exact source Hook実行、正式install、new normal session: NOT-RUN。
+- Claude証跡はunchanged isolated source-loadだけで、正式install／cache／通常sessionはNOT-RUN。
+- 実Xmind MCP／local `.xmind`、connector／provider、実利用者workspace／顧客repo apply: NOT-RUN。
+- main merge、tag、GitHub Release、Marketplace、artifact公開、正式install／cache: Phase B、NOT-RUN。
+- Phase Bはこの評価の合否対象に含めず、未評価のまま。Phase A PASSを公開／install完了へ昇格しない。
+- public／private PASSはYasashii verdictへ流用していない。
+- UI変更なし。デザイン採点とbrowser screenshotは契約どおり非該当。
+- Evaluatorのrepo内編集は本feedbackへの追記だけ。product、test、fixture、workflow、spec、contract、progress、stateを変更していない。
+
+## Evaluator自己レビュー（現在）
+
+- 閾値と合否は一致しているか: yes。
+- 各PASSにcurrent same-candidate証拠、またはactual diffとgreen regressionで有効性を確認したcarry evidenceがあるか: yes。
+- current Windowsの全stepを実logから確認し、旧runのskipped／NOT-RUNをPASSへ数えていないか: yes。
+- V-01／V-02／V-03の旧FAILと`verification-scope-issue`履歴を保持し、current resolved状態と区別したか: yes。
+- public／private PASSをYasashii PASSへ流用していないか: yes。
+- Phase B、install、cache、new normal session、Codex runtime、real XmindをPASS扱いしていないか: yes。
+- findingに`product`／`verification-infra`区分を付けたか: yes。
+- safe harbor外の新runner、collector、attestation、schema、証拠条件を要求していないか: yes。
+- rubricが過剰または本製品に不適合である疑いはあるか: no。
+- 合格分類: Phase A PASSのため不合格分類は非該当。旧3件は各節の`verification-scope-issue`履歴を保持。
+- 実装、digest更新、workflow実行、CI再dispatch、他roleの正本へ越境していないか: yes。
+- 強いGeneratorへのescalationが必要か: no。current blocking findingは0件。
