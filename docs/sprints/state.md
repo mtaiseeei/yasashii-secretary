@@ -5,12 +5,18 @@
 - Current ID: sprint-044
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 6
+- Lineage Dispatches: 7
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
 
 ## 2026-09-07 0.12.0版適応開始
+
+- fresh `/root/evaluator_yas044_final` の評価追記全文をmainが確認しPhase A FAIL / verification-scope-issueを採用。V-01解消維持、V-02修正適用済み／Windows update未到達、V-03はCI変更に一対一で因果するcurrent digest1値漏れ、product finding0。inventoryは既存downstream-ownedで新anchor不要。Retry0／Spec0／Lineage7／strong／noneを保持し、提示済みの関連current hash整合への回答を待つ。全FAIL履歴は保持し、3版公開／installは未実施。
+
+- Windows34082572913はnative12/0の後、HS-016 inventory-digest-stale:clarity-harness-scannerでHS15/1・SKIP0／NOTRUN0、後続Git／migration／Voice／updateはskippedとなりfailure。mainのreadonly再計算では旧f64の記録／観測4a81d0...は一致、現146では観測0771a55beb6717c8f0e44cd7acfb1f4bc0db54772e3103d6ec74ade884432fd4に変化。追跡5pathの実diffは承認済みworkflowだけで、製品0。CI設定の変更に直接連動するcurrent記録更新漏れを認め、関連hash整合・追加push／修正候補ごとWindows1回／fresh評価の承認を追加質問した。未承認の記録修正・同候補再実行はしない。full logは `/private/tmp/secretary-yas044-final-check.3LBsOv/windows-34082572913.log`、main archive14/0。fresh Evaluatorの正式判定を待つ。
+
+- final candidate `146d93296070773d33d3ae4f06050f4ec7e21438`／tree `39d27e720eb8613d9cd95cb817febbce4124f901`をclean固定、候補branchへ通常pushし、既存Windows run `34082572913`／job `101620533431`を1回開始。head一致。fixed source／Git-free archiveは `/private/tmp/secretary-yas044-final-check.3LBsOv/`。fresh独立EvaluatorをLineage6→7で予約、Sol/high／fresh／launch-unverified、Retry0／Spec0／strong／none。実測Node21、過去FAILと非実行面は保持する。
 
 - 032の2比較だけのCRLF限定修正をfresh Generatorが完了。mainが実diff／progressを確認し、comparison2行と再適用用anchor12行、製品0／旧fixture不変を確認。実測Node21、Mac03216/0、CRLF正例／単独CR・内容変更負例、overlay managed309、JSON／構文／diff成功。candidate固定・承認済みpush／Windows1回へ進み、独立判定は未確定。
 
