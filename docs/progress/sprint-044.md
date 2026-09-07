@@ -148,3 +148,31 @@ Windowsはmainの通常push後、既存`.github/workflows/windows-recording-regr
 
 - 状態は評価待ちであり、Generatorから独立PASSは主張しない。Macの限定検証はgreenだが、Windows nativeと既存workflow全体はこのGeneratorではNOT-RUNである。
 - Orchestratorがcheckout履歴修正と今回の2比較を一つのclean candidateとしてcommit／pushした後、既存Windows workflowをexact headで1回だけ実行する。update 16／0を含むjob全体greenを確認し、旧run、Mac 16／0、portable結果をWindows PASSへ昇格しない。
+
+## V-03限定対応（Clarity collaboration inventoryのcurrent digest）
+
+- 対応開始HEAD: `a9b39532ec4a45397a64b9005e7a241ad6acbf30`。Windows run `34082572913`のnative 12／0、HS 15／1、後続Git／migration／Voice／updateのNOT-RUN、V-03の`verification-scope-issue`分類を履歴として維持する。
+- `scripts/lib/sprint-049-inventory.mjs`の既存`digestSurface()`をcurrent checkoutで実行し、`clarity-harness-scanner`の5 pathから`0771a55beb6717c8f0e44cd7acfb1f4bc0db54772e3103d6ec74ade884432fd4`を独立再計算した。記録されていた旧値`4a81d0c132596f4baa46d0a72d585fe12dca7144d486caa4693cf354591d33de`を推測やblind pinで置換していない。
+- 5 pathの`f64d775043a6fb02161c6d9038d7ee722b9429c1..HEAD`差分を確認し、変更は承認済みの`.github/workflows/windows-recording-regression.yml`の`fetch-depth: 0`だけだった。既存downstream-ownedの`plugins/secretary/collaboration-inventory.json`にある該当`contentDigest` 1値だけをcurrent bytesへ整合し、新anchorは追加していない。
+- 今回の差分はverification inventory 1値とGenerator所有progressだけで、製品runtimeは0行である。連続するverification-only修正であることを維持し、新runner、test、fixture、expected semantics、case／assert／actor／round／timeout、workflow、schema、frameworkは変更していない。
+
+### 限定検証
+
+最初のsandbox内`pgrep node | wc -l`はprocess list取得エラーと偽の0を返したため採用せず、権限を上げたread-only再計測で21を確認してから検査を開始した。
+
+| Command | Result |
+|---|---|
+| `pgrep node \| wc -l`（escalated read-only） | 21。開始上限40未満 |
+| current 5-path `digestSurface()`再計算 | recorded旧`4a81d0...`、observed `0771a55...`を確認 |
+| `validateCollaborationInventory(process.cwd())` | `surfaceCount: 20`、`caseCount: 57`、digest／markerとも有効 |
+| `node scripts/sprint-043-patch-003-test.mjs` | 12 PASS／0 FAIL／0 SKIP／4 Windows-only NOT-RUN、external write 0、network 0 |
+| `node scripts/sprint-032-update-gate-test.mjs` | 16 PASS／0 FAIL |
+| `node scripts/sprint-052-secretary-voice-test.mjs` | 3 PASS／0 FAIL |
+| `python3 scripts/check-release-integrity.py --root .` | PASS |
+| overlay `--check --candidate /private/tmp/secretary-012-public-fixed.3gfsoW/source --observed-commit 767a7f3...` | PASS。managed 309、handoff digest一致、upstream push disabled |
+| collaboration inventory JSON parse／`git diff --check` | PASS |
+
+### Evaluatorへの追加引き渡し
+
+- 状態は評価待ちであり、Generatorから独立PASSは主張しない。MacではV-03の直接因果する1値整合と限定回帰を確認したが、Windows nativeはこのGeneratorではNOT-RUNである。
+- Orchestratorが新candidateをcommit／pushした後、既存`.github/workflows/windows-recording-regression.yml`をexact headで1回だけ実行する。native 12／0、HS 16／0・SKIP 0・NOT-RUN 0、Git 45／0、migration 9／0、Voice 3／0、update 16／0とjob全体greenを確認し、旧run、Mac結果、portable結果をWindows PASSへ昇格しない。その後はfresh独立Evaluatorが判定する。

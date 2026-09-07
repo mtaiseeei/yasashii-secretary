@@ -628,7 +628,7 @@
           "token": "agentic-secretary:clarity-harness-authoritative-scan:v1"
         }
       ],
-      "contentDigest": "4a81d0c132596f4baa46d0a72d585fe12dca7144d486caa4693cf354591d33de",
+      "contentDigest": "0771a55beb6717c8f0e44cd7acfb1f4bc0db54772e3103d6ec74ade884432fd4",
       "tests": [
         "yasashii-HS-001",
         "yasashii-HS-002",

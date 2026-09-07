@@ -5,12 +5,16 @@
 - Current ID: sprint-044
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 7
+- Lineage Dispatches: 8
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
 
 ## 2026-09-07 0.12.0版適応開始
+
+- V-03 Generator完了、mainが実diff／progressを確認。clarity-harness-scanner.contentDigestの1値だけを既存関数で再計算した0771a55b...へ更新、製品runtime0。inventory20/57、HS Mac12/0＋Windows専用4 NOT-RUN、03216/0、Voice3/0、release／overlay／JSON／diffが成功。追加anchor／fixture変更不要。awaiting-evalに戻し、候補固定・push／Windows1回・fresh評価へ進む。
+
+- ユーザー「よいです」でCI変更に直接連動するcurrent hash記録整合、追加push・修正候補ごとのWindows1回・fresh独立評価を承認。V-03の1値を既存digest関数で再計算して整合し、製品動作／検査基準／旧原本は不変に保つ。fresh GeneratorをLineage7→8で予約、Retry0／Spec0／strong／none、resolver Sol/high／fresh／launch-unverified。連続verification-onlyの範囲はこの直接因果する記録修正に限定し、新runner／test／基準は追加しない。
 
 - fresh `/root/evaluator_yas044_final` の評価追記全文をmainが確認しPhase A FAIL / verification-scope-issueを採用。V-01解消維持、V-02修正適用済み／Windows update未到達、V-03はCI変更に一対一で因果するcurrent digest1値漏れ、product finding0。inventoryは既存downstream-ownedで新anchor不要。Retry0／Spec0／Lineage7／strong／noneを保持し、提示済みの関連current hash整合への回答を待つ。全FAIL履歴は保持し、3版公開／installは未実施。
 
