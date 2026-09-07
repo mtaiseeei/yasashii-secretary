@@ -5,12 +5,16 @@
 - Current ID: sprint-044
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 5
+- Lineage Dispatches: 6
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
 
 ## 2026-09-07 0.12.0版適応開始
+
+- 032の2比較だけのCRLF限定修正をfresh Generatorが完了。mainが実diff／progressを確認し、comparison2行と再適用用anchor12行、製品0／旧fixture不変を確認。実測Node21、Mac03216/0、CRLF正例／単独CR・内容変更負例、overlay managed309、JSON／構文／diff成功。candidate固定・承認済みpush／Windows1回へ進み、独立判定は未確定。
+
+- ユーザー「よいです」で032の履歴比較2か所もCRLF→LF限定修正に含める承認を受領。旧原本・製品・検査件数・内容変更の検出を保持し、既存checkout履歴修正c1265f4と一つの最終candidateでpush／Windows1回／fresh評価へ進む。fresh GeneratorをLineage5→6で予約、Retry0／Spec0／strong／none、Sol/high／fresh／launch-unverified。検証側のみの連続修正はこの承認済み限定範囲を上限とし、新runner／網羅検証／基準拡張はしない。
 
 - V-02 Generator完了、mainは実diffとhandoffを確認。既存checkoutにfetch-depth:0の2行だけを追加、YAML／0.7.0履歴存在／diff成功、実測Node18。製品0、test変更0。Windows前のreadonly診断で、032の旧CHANGELOG sectionとmigration比較2か所がGit archiveのLFとWindows checkoutのCRLFだけで不一致になることも確認（LF比較true／CRLF比較false、内容不変）。この2か所のCRLF限定比較修正を同じ候補へ含める可否をユーザーに質問した。未承認箇所は変更せず、既知の不一致を残したCI消費を避けるため候補push／Windows1回は回答後へ保留。V-02の旧正式FAILを保持、fresh独立評価はまだ。
 

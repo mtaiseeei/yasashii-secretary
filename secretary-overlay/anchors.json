@@ -416,6 +416,18 @@
       "replacement": "  check(\"新規0.12.0導入はedition付きledgerを作る\", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === \"yasashii-secretary\" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === \"0.12.0\"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);"
     },
     {
+      "id": "sprint-032-history-changelog-crlf",
+      "path": "scripts/sprint-032-update-gate-test.mjs",
+      "match": "  check(\"0.7.0 CHANGELOG entryは公開履歴から不変\", releaseSection(readFileSync(candidateChangelog, \"utf8\"), \"0.7.0\") === releaseSection(oldChangelog, \"0.7.0\"));",
+      "replacement": "  check(\"0.7.0 CHANGELOG entryは公開履歴から不変\", releaseSection(readFileSync(candidateChangelog, \"utf8\").replaceAll(\"\\r\\n\", \"\\n\"), \"0.7.0\") === releaseSection(oldChangelog.replaceAll(\"\\r\\n\", \"\\n\"), \"0.7.0\"));"
+    },
+    {
+      "id": "sprint-032-history-migration-crlf",
+      "path": "scripts/sprint-032-update-gate-test.mjs",
+      "match": "  check(\"0.6.0→0.7.0 migration fixtureは公開履歴から不変\", oldMigration.equals(readFileSync(join(candidatePlugin, \"migrations/0.6.0-to-0.7.0.json\"))));",
+      "replacement": "  check(\"0.6.0→0.7.0 migration fixtureは公開履歴から不変\", oldMigration.toString(\"utf8\").replaceAll(\"\\r\\n\", \"\\n\") === readFileSync(join(candidatePlugin, \"migrations/0.6.0-to-0.7.0.json\"), \"utf8\").replaceAll(\"\\r\\n\", \"\\n\"));"
+    },
+    {
       "id": "master-release-comment-0100",
       "path": "scripts/master-release-gate.mjs",
       "match": " * Portable release gate for the current 0.10.1 release candidate.",

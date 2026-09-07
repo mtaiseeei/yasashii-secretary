@@ -122,3 +122,29 @@ Windowsはmainの通常push後、既存`.github/workflows/windows-recording-regr
 
 - 状態は評価待ちであり、Generatorから独立PASSは主張しない。Orchestratorがcommit／pushした新candidateで、既存Windows workflowをexact headに対して1回だけ実行し、native 12／0、HS 16／0・SKIP 0・NOT-RUN 0、Git 45／0、migration 9／0、Voice 3／0、update 16／0とjob全体greenを確認する。
 - 既存update検査には、履歴から得る旧0.7.0テキストとcurrent checkoutテキストを比較する面がある。完全履歴のMacでは16／0だった一方、Windows checkoutのCRLFで次の差が現れる可能性は残る。これは承認されたcheckout履歴設定修正の範囲外なので、検査・製品・fixtureは変更せず、fresh Evaluatorが実CI結果から分類する。
+
+## 032履歴比較のCRLF限定対応
+
+- 対応開始HEAD: `c1265f4542c5b64466776e819de35070ed12b186`。V-01の旧Windows Voice 2／1、V-02の旧Windows update 0／1、両方の`verification-scope-issue`分類、V-01 resolved／V-02 checkout履歴供給済みという時系列を維持する。
+- ユーザーが追加承認した2比較だけを変更した。公開0.7.0のCHANGELOG release sectionと`0.6.0-to-0.7.0.json` migration fixtureは、比較時にCRLF（`\r\n`）だけをLF（`\n`）へ変換する。単独CR、内容変更、section欠落、旧fixtureそのものは正規化・更新しない。`trim`、JSON parse、広いtext正規化も追加していない。
+- fixed public sourceからのoverlay再適用で修正を保持するため、上記2行に一対一対応するliteral anchorを2件だけ追加した。製品runtime、旧version fixture、期待値、case／actor／round／assert／timeout、workflow、その他の検査は変更していない。
+- 今回も実装差分はverification surface、因果するoverlay anchor、Generator所有progressだけで、製品コードは0行である。V-01、V-02から連続する検証側限定修正であり、ユーザー承認済みの上限内で実施した。新runner、framework、schema、fixture bulk更新、`.gitattributes`、Git設定は追加していない。
+
+### 限定検証
+
+最初のsandbox内`pgrep node | wc -l`はprocess list取得エラーと偽の0を返したため採用せず、権限を上げたread-only再計測で21を確認してから検査を開始した。
+
+| Command | Result |
+|---|---|
+| `pgrep node \| wc -l`（escalated read-only） | 21。開始上限40未満 |
+| `node scripts/sprint-032-update-gate-test.mjs` | 16 PASS／0 FAIL |
+| `node --check scripts/sprint-032-update-gate-test.mjs` | PASS |
+| in-memory LF／CRLF／単独CR／内容変更probe | PASS。LFとCRLFは同値、単独CRと内容変更は不一致 |
+| `node -e 'JSON.parse(...)'`（`secretary-overlay/anchors.json`） | PASS |
+| overlay `--check --candidate /private/tmp/secretary-012-public-fixed.3gfsoW/source --observed-commit 767a7f3...` | PASS。managed 309、handoff digest一致、upstream push disabled |
+| `git diff --check`／限定diff | PASS。032の2行置換、因果するliteral anchor 2件、製品差分0 |
+
+### Evaluatorへの追加引き渡し
+
+- 状態は評価待ちであり、Generatorから独立PASSは主張しない。Macの限定検証はgreenだが、Windows nativeと既存workflow全体はこのGeneratorではNOT-RUNである。
+- Orchestratorがcheckout履歴修正と今回の2比較を一つのclean candidateとしてcommit／pushした後、既存Windows workflowをexact headで1回だけ実行する。update 16／0を含むjob全体greenを確認し、旧run、Mac 16／0、portable結果をWindows PASSへ昇格しない。

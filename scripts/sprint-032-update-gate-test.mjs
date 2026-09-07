@@ -231,8 +231,8 @@ try {
 
   const oldChangelog = readFileSync(join(published.pluginRoot, "CHANGELOG.md"), "utf8");
   const oldMigration = readFileSync(join(published.pluginRoot, "migrations/0.6.0-to-0.7.0.json"));
-  check("0.7.0 CHANGELOG entryは公開履歴から不変", releaseSection(readFileSync(candidateChangelog, "utf8"), "0.7.0") === releaseSection(oldChangelog, "0.7.0"));
-  check("0.6.0→0.7.0 migration fixtureは公開履歴から不変", oldMigration.equals(readFileSync(join(candidatePlugin, "migrations/0.6.0-to-0.7.0.json"))));
+  check("0.7.0 CHANGELOG entryは公開履歴から不変", releaseSection(readFileSync(candidateChangelog, "utf8").replaceAll("\r\n", "\n"), "0.7.0") === releaseSection(oldChangelog.replaceAll("\r\n", "\n"), "0.7.0"));
+  check("0.6.0→0.7.0 migration fixtureは公開履歴から不変", oldMigration.toString("utf8").replaceAll("\r\n", "\n") === readFileSync(join(candidatePlugin, "migrations/0.6.0-to-0.7.0.json"), "utf8").replaceAll("\r\n", "\n"));
 
   const migration080 = JSON.parse(readFileSync(join(candidatePlugin, "migrations/0.7.0-to-0.8.0.json"), "utf8"));
   check("0.8.0 migration metadataはversion整合しbootstrapを持たない", migration080.fromVersion === "0.7.0" && migration080.toVersion === "0.8.0" && Array.isArray(migration080.operations) && migration080.operations.length === 0);
