@@ -5,12 +5,16 @@
 - Current ID: sprint-044
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 2
+- Lineage Dispatches: 3
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
 
 ## 2026-09-07 0.12.0版適応開始
+
+- V-01限定Generator完了。mainは実diffとprogressを確認し、検査1行・因果するoverlay anchor6行だけ、製品runtime0／期待値不変を確認。Mac Voice3/0、release整合、overlay managed309、CRLF／単独CR／内容変更の識別、構文／diff成功。awaiting-evalへ戻し、新candidate固定・承認済み候補push・既存Windows1回へ進む。独立PASSは未確定。
+
+- ユーザーの「よいです」によりV-01のCRLF→LF限定修正、候補push、変更候補の既存Windows検証1回、fresh独立評価を承認。製品runtime・期待hash・case／assert／timeoutは不変。verification-scope-issueの分類を保持しRetry0／Spec0のまま、Generator予約でLineage2→3。resolverのhigh-risk strong Sol/high、fresh、Rotate none、launch-unverified。resolver入力implementation-issueは承認済み修正のdispatch経路だけに使い、findingの再分類ではない。実測Node16。実装担当は検査と因果するoverlay anchor、progress044だけを所有する。
 
 - fresh独立Evaluator `/root/evaluator_yasashii_044` のfeedback全文をmainが確認し、Phase A FAIL / verification-scope-issueを採用。product finding0、blocking verification-infra V-01が1件。CIのCRLF実hashは同じGit blobのLF→CRLF変換値と一致し、意味markerは成功している。現候補の必須suiteはVoice2/1／update未実行のためPASSではない。Retry0／Spec0／Lineage2／strong／noneを維持し、追加Generatorはユーザー判断までdispatchしない。
 - 推奨する限定修正は既存052検査のtext hashにCRLF→LFだけを適用し、期待hash・marker・surface数・assert・timeout・製品runtimeを不変に保つこと。修正候補push／既存Windows1回／fresh増分評価までの可否を非同期質問として提示済み。追加runnerや全wrapper再実行は提案しない。
@@ -98,7 +102,7 @@
 | sprint-043-patch-001 | done | [contract](sprint-043-patch-001.md) | [progress](../progress/sprint-043-patch-001.md) | [feedback](../feedback/sprint-043-patch-001.md) |
 | sprint-043-patch-002 | done | [contract](sprint-043-patch-002.md) | [progress](../progress/sprint-043-patch-002.md) | [feedback](../feedback/sprint-043-patch-002.md) |
 | sprint-043-patch-003 | superseded | [contract](sprint-043-patch-003.md) | [progress](../progress/sprint-043-patch-003.md) | - |
-| sprint-044 | awaiting-eval | [contract](sprint-044.md) | [progress](../progress/sprint-044.md) | - |
+| sprint-044 | awaiting-eval | [contract](sprint-044.md) | [progress](../progress/sprint-044.md) | [feedback](../feedback/sprint-044.md) |
 
 ## 0.12.0 release continuation
 

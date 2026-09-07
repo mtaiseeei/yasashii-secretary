@@ -74,3 +74,29 @@ git diff --check
 Windowsはmainの通常push後、既存`.github/workflows/windows-recording-regression.yml`をexact candidate branchで1回だけ実行する。MacでNOT-RUNのGit 051、会話migration、HS 16、update／Voiceの結果をrun／job／headと結び付け、SKIP／NOT-RUNをPASSへ数えない。
 
 残余として、前Sprint progressに記録されたSprint 041／release-integrityの旧candidate向けhistorical findingは今回再実行しておらず、PASSへ読み替えていない。Sprint 029 fixtureはimmutableのまま、035 Patch 002の大きな差分はaccepted common helperへの検査委譲、Sprint 038 fixtureはcurrent snapshot更新として区別した。
+
+## V-01限定対応（Windows text hash）
+
+- 対応開始HEAD: `a93d2ab45aaa46e818020e0265d88958d8b6aaef`。Evaluatorの不合格、`verification-scope-issue`分類、Windows run `34070811154`のVoice 2 PASS／1 FAILと後続update未実行を履歴として維持する。
+- 変更対象はverification surfaceだけである。`scripts/sprint-052-secretary-voice-test.mjs`のtext SHA-256入力をUTF-8として読み、CRLFだけをLFへ正規化した。期待hash、inventory、required marker、surface／Skill数、3 assertions、Voice契約、製品runtimeは変更していない。
+- `secretary-overlay/anchors.json`へ同じ1行変換を既存052 anchorとして追加した。fixed public source `767a7f3ecb15c0ffe6d2d8f71529c74bf671c154`からoverlayを再計算しても限定修正を保持し、既存Yasashii style adaptationを維持する。
+- 今回の実装差分は検証コードと、その再適用に因果するoverlay anchor、Generator所有progressだけで、製品コードは0行である。これはユーザー承認済みV-01限定修正であり、追加runner、schema、framework、fixture再生成、`.gitattributes`、Git設定変更は行っていない。
+
+### 限定検証
+
+最初のsandbox内`pgrep node | wc -l`はprocess list取得エラーと偽の0を返したため採用せず、権限を上げたread-only再計測で16を確認してから検査を開始した。
+
+| Command | Result |
+|---|---|
+| `pgrep node \| wc -l`（escalated read-only） | 16。開始上限40未満 |
+| `node scripts/sprint-052-secretary-voice-test.mjs` | 3 PASS／0 FAIL |
+| `python3 scripts/check-release-integrity.py --root .` | PASS |
+| `node scripts/sync-secretary-overlay.mjs --check --candidate /private/tmp/secretary-012-public-fixed.3gfsoW/source --observed-commit 767a7f3ecb15c0ffe6d2d8f71529c74bf671c154` | PASS。managed 309、existing reapply期待bytesにV-01修正を保持 |
+| `node --input-type=module -e 'import assert from "node:assert/strict"; import { createHash } from "node:crypto"; const normalize = (text) => text.replaceAll("\r\n", "\n"); const sha = (text) => createHash("sha256").update(normalize(text)).digest("hex"); assert.equal(sha("a\r\nb"), sha("a\nb")); assert.notEqual(sha("a\rb"), sha("a\nb")); assert.notEqual(sha("a\r\nc"), sha("a\nb")); console.log("PASS CRLF-only normalization; lone CR and content edits remain distinct")'` | PASS。CRLFとLFは同一、単独CRと内容変更は不一致を維持 |
+| `node --check scripts/sprint-052-secretary-voice-test.mjs` | PASS |
+| `git diff --check` | PASS |
+
+### Evaluatorへの追加引き渡し
+
+- 状態は評価待ちであり、Generatorから独立PASSは主張しない。MacではCRLF限定の実装とoverlay期待bytesを確認したが、Windows nativeはこのGeneratorではNOT-RUNである。
+- Orchestratorが新candidateをcommit／pushした後、既存`.github/workflows/windows-recording-regression.yml`をexact headで1回だけ実行し、Voice 3／0と、その後のupdate 16／0を含むjob全体を確認する。旧runのfailureや今回のMac結果をWindows PASSへ昇格しない。

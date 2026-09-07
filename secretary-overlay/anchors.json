@@ -500,6 +500,12 @@
       "replacement": "// yasashii-secretary:canonical-repo-observation:v1"
     },
     {
+      "id": "sprint-052-portable-text-hash",
+      "path": "scripts/sprint-052-secretary-voice-test.mjs",
+      "match": "const sha = (path) => createHash(\"sha256\").update(readFileSync(join(root, path))).digest(\"hex\");",
+      "replacement": "const sha = (path) => createHash(\"sha256\").update(readFileSync(join(root, path), \"utf8\").replaceAll(\"\\r\\n\", \"\\n\")).digest(\"hex\");"
+    },
+    {
       "id": "sprint-052-yasashii-style-scope",
       "path": "scripts/sprint-052-secretary-voice-test.mjs",
       "match": "check(\"両editionは共通契約を読み、会話copyを分離\", () => {\n  for (const style of [\"agentic\", \"yasashii\"]) {\n    assert.match(read(`plugins/secretary/rules/styles/${style}.md`), /conversation-contract\\.md/u);\n    const copy = JSON.parse(read(`plugins/secretary/rules/copy/${style}.json`));\n    assert.ok(copy.surfaces.conversation.voice, `${style} voice copy`);\n  }\n});",

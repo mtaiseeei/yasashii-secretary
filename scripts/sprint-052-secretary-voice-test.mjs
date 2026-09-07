@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const read = (path) => readFileSync(join(root, path), "utf8");
-const sha = (path) => createHash("sha256").update(readFileSync(join(root, path))).digest("hex");
+const sha = (path) => createHash("sha256").update(readFileSync(join(root, path), "utf8").replaceAll("\r\n", "\n")).digest("hex");
 const inventory = JSON.parse(read("plugins/secretary/conversation-core-inventory.json"));
 const contract = read("plugins/secretary/rules/conversation-contract.md");
 let pass = 0; let fail = 0;
