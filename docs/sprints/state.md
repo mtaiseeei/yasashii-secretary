@@ -5,7 +5,7 @@
 - Current ID: sprint-045
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 1
+- Lineage Dispatches: 2
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
@@ -133,7 +133,7 @@
 | sprint-043-patch-002 | done | [contract](sprint-043-patch-002.md) | [progress](../progress/sprint-043-patch-002.md) | [feedback](../feedback/sprint-043-patch-002.md) |
 | sprint-043-patch-003 | superseded | [contract](sprint-043-patch-003.md) | [progress](../progress/sprint-043-patch-003.md) | - |
 | sprint-044 | done | [contract](sprint-044.md) | [progress](../progress/sprint-044.md) | [feedback](../feedback/sprint-044.md) |
-| sprint-045 | active | [contract](sprint-045.md) | - | - |
+| sprint-045 | done | [contract](sprint-045.md) | [progress](../progress/sprint-045.md) | [feedback](../feedback/sprint-045.md) |
 
 ## 0.12.0 release continuation
 
@@ -382,6 +382,11 @@
 
 ## 2026-09-08 Sprint 045 preparation
 
+- fresh独立Evaluatorのfeedback全文と自己レビューをmainが確認し、exact `99a3a214437b65c0c22516b1a39722f703ec1215`／tree `df4462368f000333fdea0ba45685cdc11de9bfe1` のPhase A PASSを採用した。対象10軸全5/5、直接回帰8/8＋5/5、protected49/49、archive14/14、product0／blocking verification-infra0。旧検査入口・pinの非blocking V-01/V-02は記録を保持する。045をdone、Retry0／Spec0／Lineage2／strong／none、Next TBD。公開・導入はpublic056 Phase Bへ引き渡す。旧044 done／Lineage9は不変。
+- fresh Evaluator child `01a08065-b6d4-7733-9fd0-609465358a4e` はhost metadataでSol/high/default一致、launch-verified。起動前Node31。Generator progress receipt `a117577713b7b01ff32eabb60d4373594150575b` はcandidateからprogressだけの差分で、製品は固定されている。
+- Generator child `01a0804c-95e7-7be1-a9c4-de02769bfcb4` はSol/high/default metadata一致、launch-verified。candidate `99a3a214437b65c0c22516b1a39722f703ec1215`／tree `df4462368f000333fdea0ba45685cdc11de9bfe1` とprogress全文を受領。直接回帰8/8＋5/5、構文7、release integrity、inventory20/57とconversation38、protected49保持、Git-free archive14/14の自己報告を独立評価へ渡す。
+- 範囲を広げた旧038/043検査のFAILと入口誤認／repo rootでarchive検査をした失敗はprogressに保持する。担当が一時変更した旧検査5fileは自身のinverse patchで開始bytesへ戻し、candidateに含まれていないことをmainも確認。契約の基準・安全条件は変えず、新たな検証修正へ広げない。
+- Lineage1<10を確認しfresh Evaluator分を2へ予約、awaiting-evalへ移行。resolver Sol/high／native fresh、Retry0／Spec0／strong／noneを維持。Yasashii固有面と今回の配布内容を独立判定し、public／privateのPASSや自己報告を代用しない。
 - public056 Phase A `5e26432307a2f247d244dcb2766e870400d006f2`とprivate052 Phase A `d1a2a996f160fe604c85997190fff5c8dc7e47c3`がfresh独立PASS。両feedback全文をmainが確認し、Yasashii045のGeneratorへ進む。publicを共通入力とし、private固有値・製品差分は取り込まない。旧044 done／Lineage9の履歴を維持する。
 - 新系譜0<10を確認し、fresh Generator分を1へ予約してactiveとする。resolverはこのrepoのhigh-risk設定からSol/high／strong／none／native freshを選ぶ。Retry0／Spec0、metadata確認までlaunch-unverified。version0.13.0、会話copy・identity・Skill版差・root guidanceを保持し、main／tag／Release／installは三版PASS後のpublic056 Phase Bで行う。
 - public mainの利用者はSprint055とHook修正のcommit、三版0.13.0公開、このMacの両host導入を明示承認した。fresh Plannerの版固有契約を確認し、新main 045をplannedとする。旧044 done／Lineage9の履歴を保持し、新系譜は0から開始する。Retry0／Spec0／strong／none。public056とprivate052のPhase A独立PASSまでGeneratorをdispatchしない。実ユーザー本文・既存local checkout・旧releaseは非接触。
