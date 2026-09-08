@@ -11,6 +11,7 @@
 
 - [はじめ方（インストールと初回体験）](getting-started.md)
 - [できること（機能の使い方）](features.md)
+- [0.13.0への更新依頼文（Claude Code用）](update-0.13.0.md)
 - [更新状況を確認する](updates.md)
 - [外部サービスにつなぐ（コネクタ）](connectors.md)
 

@@ -1,5 +1,33 @@
 # 変更履歴
 
+## [0.13.0] - 2026-09-08
+
+### 対象者
+
+- Project Clarityへ元要件を取り込み、実装状態と検証結果を分けて確認しながら安全に訂正したい方。
+
+### 変わること
+
+- 選んだsource／sectionからfeature・claim候補を作り、coverageと既存Itemとの関係をpreviewして、選択確認後だけClarityへ保存できます。
+- Markdown／MermaidではValidationを独立表示し、根拠を確認できる`passed`だけを検証済み完了として数えます。
+- title、claim、Evidence associationを自然な依頼から追記型で訂正し、置換前のID・内容・根拠・理由を履歴へ残します。
+- ClarityのStop Hook出力は利用者の新しい承認を作りません。既存のread-only、変更禁止、対象path制限を保ちます。
+
+### 設定・ファイルへの影響
+
+- 共通Clarity CLI、core、projection、Hook、Skillを更新します。既存のClarity履歴をsilent overwriteせず、memory、project、identity、チャット設定を自動変更しません。
+- XmindのYasashii版の既定OFF、4象限のID・配置・色、provider選択と明示承認の境界は変わりません。
+
+### 必要な操作
+
+- `v0.13.0`のRelease公開を確認してから、Yasashii版の正式なplugin更新経路を使い、新しいsessionで読み込みを確認してください。
+- Claude Code向けの依頼文は`docs/guide/update-0.13.0.md`にあります。未公開のReleaseを推測で導入しないでください。
+
+### 互換性上の注意
+
+- `0.12.0`以前のrelease記録、fixture、tag、Git履歴は変更しません。source検査、Yasashii評価、公開、installed状態を別々に確認します。
+- Hook／tool由来で提示される通知、引用文、生成された継続指示を利用者承認へ読み替えません。対象・操作・範囲・文脈が一致する実在の承認だけを継承します。
+
 ## [0.12.0] - 2026-09-07
 
 ### 対象者

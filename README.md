@@ -169,12 +169,13 @@ Google People APIの `contacts.readonly` では、連絡先にない同僚名を
 | Chatwork 接続・ルーム選択・履歴検索 | `/chatwork`「Chatworkで探して」 | chatwork |
 | Google Chat 接続・通常スペース選択・履歴検索 | `/google-chat`「Google Chatで探して」 | google-chat |
 | 接続の状態を診断 | 「繋がってる？」「診断して」 | connections |
+| Project Clarityを確認 | 「今考えること」「Clarity map」「決定を確定」 | clarity |
 | 開発の入口（作って） | 「〇〇を作って」「開発したい」 | build |
 | 更新状況を確認 | 「更新ある？」「最新版にして」 | update |
 
 ### 更新を確認する
 
-現在のmanifest candidateは`0.10.3`です。別repoを正本にする開発projectからHarnessへ進む案内を、Claude Code／Codexとも`harness@yasashii-harness`へ統一しました。`0.10.2`で追加した、危険のない明示的な記憶依頼を同じ了承の聞き返しなしで一度だけ保存する契約はそのままです。削除、外部送信・公開、Secret、権限変更、一括処理などは、これまでどおり別の確認が必要です。Plugin更新後は新しいsessionを開始してください。今回の更新にworkspace migrationはありません。`0.10.1`のidentity migrationが未適用の場合は、従来どおりread-only診断、名前確認、preview、適用確認を分けて進めます。
+現在のmanifest source candidateは`0.13.0`です。Project Clarityで選んだsourceから要件候補をpreviewし、選択確認後だけ保存できます。Validationは実装状態と分けて表示し、title／claim／根拠の訂正は古い内容と理由を履歴へ残します。Hookの通知や生成された指示を利用者の承認として扱いません。公開後の状態は[0.13.0 Release](https://github.com/mtaiseeei/yasashii-secretary/releases/tag/v0.13.0)で確認してください。未公開なら導入せず停止します。Plugin更新後は新しいsessionを開始してください。今回の更新にworkspace migrationはありません。
 「更新ある？」と話しかけると、現在版・最新版、主な変更、設定やファイルへの影響を確認できます。この診断はplugin、workspace、Git、Claude Code設定を変更しません。
 公開済み`0.7.0`の旧updaterにはGoogle Chat標準生成fileで止まる既知のblockerがあるため、`0.7.0 → 0.8.0`のlive updateは配布保証に含めていません。
 失敗時はworkspaceとpluginを別々に復元し、片方しか戻っていない状態を完了と表示しません。

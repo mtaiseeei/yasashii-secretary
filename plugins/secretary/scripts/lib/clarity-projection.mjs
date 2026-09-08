@@ -68,22 +68,48 @@ function snapshot(rootValue) {
 function legendMarkdown() {
   return Object.values(QUADRANT_VISUALS).map((v) => `- ${v.position} ${v.emoji} ${v.label} — ${v.meaning} — ${v.color}`).join("\n");
 }
-function matrixMarkdown(state) {
+function validationOverlay(state, evidence) {
+  const evidenceById = new Map(evidence.map((row) => [row.evidenceId, row]));
+  const item = new Map(state.items.map((row) => {
+    const reachableEvidence = row.validation.evidenceRefs.length > 0
+      && row.validation.evidenceRefs.every((id) => evidenceById.get(id)?.availability === "available");
+    const complete = row.activeMatrix !== false && row.decision.status === "confirmed"
+      && ["implemented", "verified", "operational"].includes(row.execution.status)
+      && row.validation.status === "passed" && reachableEvidence;
+    return [row.itemId, { status: row.validation.status, complete, reachableEvidence }];
+  }));
+  const active = state.items.filter((row) => row.activeMatrix !== false);
+  const historical = state.items.filter((row) => row.activeMatrix === false
+    && (row.correction?.status === "replaced" || ["rejected", "superseded"].includes(row.decision.status) || row.disposition === "rejected"));
+  const historicalIds = new Set(historical.map((row) => row.itemId));
+  const excluded = state.items.filter((row) => row.activeMatrix === false && !historicalIds.has(row.itemId));
+  const validation = Object.fromEntries(["unknown", "pending", "passed", "failed", "waived"].map((status) => [status, active.filter((row) => row.validation.status === status).length]));
+  return {
+    item,
+    counts: { activeMatrix: active.length, excluded: excluded.length, historical: historical.length, total: state.items.length },
+    validation,
+    validatedComplete: active.filter((row) => item.get(row.itemId).complete).length,
+  };
+}
+function matrixMarkdown(state, evidence) {
   const rows = state.items.filter((item) => item.activeMatrix !== false).sort((a, b) => a.itemId.localeCompare(b.itemId, "en"));
-  return `# 決定×実行クラリティマトリクス\n\n上軸: 決まっている / 下軸: まだ決まっていない\n\n${legendMarkdown()}\n\n| Item ID | 項目 | 象限 | 意味 | 決定 | 実行 | 座標 |\n|---|---|---|---|---|---|---|\n${rows.map((item) => { const v = QUADRANT_VISUALS[item.quadrant]; const p = stableCoordinate(item); return `| ${item.itemId} | ${esc(item.title)} | ${v.emoji} ${v.label} | ${v.meaning} | ${item.decision.status} | ${item.execution.status} | ${p.x}, ${p.y} |`; }).join("\n")}\n`;
+  const overlay = validationOverlay(state, evidence);
+  return `# 決定×実行クラリティマトリクス\n\n上軸: 決まっている / 下軸: まだ決まっていない\n\n象限の緑は決定×実行の位置だけを示し、Validation passedや検証済み完了を意味しません。\n\n- 件数: active matrix ${overlay.counts.activeMatrix} / excluded ${overlay.counts.excluded} / historical ${overlay.counts.historical} / total ${overlay.counts.total}\n- Validation（active matrix）: unknown ${overlay.validation.unknown} / pending ${overlay.validation.pending} / passed ${overlay.validation.passed} / failed ${overlay.validation.failed} / waived ${overlay.validation.waived}\n- 検証済み完了: ${overlay.validatedComplete}件\n\n${legendMarkdown()}\n\n| Item ID | 項目 | 象限 | 意味 | 決定 | 実行 | Validation | 検証済み完了 | 座標 |\n|---|---|---|---|---|---|---|---|---|\n${rows.map((item) => { const v = QUADRANT_VISUALS[item.quadrant]; const p = stableCoordinate(item); const validation = overlay.item.get(item.itemId); return `| ${item.itemId} | ${esc(item.title)} | ${v.emoji} ${v.label} | ${v.meaning} | ${item.decision.status} | ${item.execution.status} | ${validation.status} | ${validation.complete ? "yes" : "no"} | ${p.x}, ${p.y} |`; }).join("\n")}\n`;
 }
 function overviewMarkdown(data) {
   const counts = Object.fromEntries(Object.keys(QUADRANT_VISUALS).map((key) => [key, data.state.items.filter((i) => i.activeMatrix !== false && i.quadrant === key).length]));
-  return `# Project Clarity 概要\n\n- Project: ${esc(data.status.name)}\n- Mode: ${data.status.mode}\n- Item: ${data.state.items.length}件\n- Attention: ${data.attention.activeCount}件\n\n## マトリクス\n\n${Object.entries(QUADRANT_VISUALS).map(([key, v]) => `- ${v.emoji} ${v.label}: ${counts[key]}件 — ${v.meaning}`).join("\n")}\n`;
+  const overlay = validationOverlay(data.state, data.history.evidence);
+  return `# Project Clarity 概要\n\n- Project: ${esc(data.status.name)}\n- Mode: ${data.status.mode}\n- Item: active matrix ${overlay.counts.activeMatrix}件 / excluded ${overlay.counts.excluded}件 / historical ${overlay.counts.historical}件 / total ${overlay.counts.total}件\n- Attention: ${data.attention.activeCount}件\n- Validation（active matrix）: unknown ${overlay.validation.unknown} / pending ${overlay.validation.pending} / passed ${overlay.validation.passed} / failed ${overlay.validation.failed} / waived ${overlay.validation.waived}\n- 検証済み完了: ${overlay.validatedComplete}件\n\n緑の象限はValidation passedを表しません。検証済み完了には、有効なItem、確認済みDecision、実装済み相当のExecution、passed、および到達可能なValidation Evidenceがすべて必要です。\n\n## マトリクス\n\n${Object.entries(QUADRANT_VISUALS).map(([key, v]) => `- ${v.emoji} ${v.label}: ${counts[key]}件 — ${v.meaning}`).join("\n")}\n`;
 }
 function attentionMarkdown(report) {
   const body = report.items.length ? report.items.map((row) => `## ${row.conclusion}\n\n- Item ID: ${row.itemId}\n- 理由: ${row.reasonLabels.join(" / ")}\n- 根拠: ${row.evidence.map((e) => e.summary).join(" / ") || "根拠不足"}\n- 選択: ${row.choices.join(" / ")}`).join("\n\n") : "現在、判断が必要な項目はありません。";
   return `# Attention\n\n${body}\n`;
 }
 
-function quadrantMermaid(state) {
-  const points = state.items.filter((i) => i.activeMatrix !== false).sort((a, b) => a.itemId.localeCompare(b.itemId, "en")).map((item) => { const p = stableCoordinate(item); return `  \"${esc(item.title)} [${item.itemId}]\": [${(p.x / 100).toFixed(3)}, ${(p.y / 100).toFixed(3)}]`; });
-  return `%%{init: {"themeVariables":{"quadrant1Fill":"#2563EB","quadrant2Fill":"#16A34A","quadrant3Fill":"#D97706","quadrant4Fill":"#DC2626"}}}%%\n%% 左上 🟢 定着・検証 / 安定している / #16A34A\n%% 右上 🔵 実行待ち / あとは進めるだけ / #2563EB\n%% 左下 🟡 暫定実装・要再確認 / 注意して確認する / #D97706\n%% 右下 🔴 設計・意思決定 / 人間の判断が必要 / #DC2626\nquadrantChart\n  title 決定×実行クラリティマトリクス\n  x-axis まだ進めていない --> 進めている\n  y-axis まだ決まっていない --> 決まっている\n  quadrant-1 🔵 実行待ち / あとは進めるだけ\n  quadrant-2 🟢 定着・検証 / 安定している\n  quadrant-3 🟡 暫定実装・要再確認 / 注意して確認する\n  quadrant-4 🔴 設計・意思決定 / 人間の判断が必要\n${points.join("\n")}\n`;
+function quadrantMermaid(state, evidence) {
+  const overlay = validationOverlay(state, evidence);
+  const points = state.items.filter((i) => i.activeMatrix !== false).sort((a, b) => a.itemId.localeCompare(b.itemId, "en")).map((item) => { const p = stableCoordinate(item); const validation = overlay.item.get(item.itemId); return `  \"${esc(item.title)} [${item.itemId}] V:${validation.status} complete:${validation.complete ? "yes" : "no"}\": [${(p.x / 100).toFixed(3)}, ${(p.y / 100).toFixed(3)}]`; });
+  return `%%{init: {"themeVariables":{"quadrant1Fill":"#2563EB","quadrant2Fill":"#16A34A","quadrant3Fill":"#D97706","quadrant4Fill":"#DC2626"}}}%%\n%% 左上 🟢 定着・検証 / 安定している / #16A34A\n%% 右上 🔵 実行待ち / あとは進めるだけ / #2563EB\n%% 左下 🟡 暫定実装・要再確認 / 注意して確認する / #D97706\n%% 右下 🔴 設計・意思決定 / 人間の判断が必要 / #DC2626\n%% 緑はValidation passedを意味しない\n%% Counts activeMatrix=${overlay.counts.activeMatrix} excluded=${overlay.counts.excluded} historical=${overlay.counts.historical} total=${overlay.counts.total}\n%% Validation unknown=${overlay.validation.unknown} pending=${overlay.validation.pending} passed=${overlay.validation.passed} failed=${overlay.validation.failed} waived=${overlay.validation.waived} validatedComplete=${overlay.validatedComplete}\nquadrantChart\n  title 決定×実行クラリティマトリクス\n  x-axis 進めている --> まだ進めていない\n  y-axis まだ決まっていない --> 決まっている\n  quadrant-1 🔵 実行待ち / あとは進めるだけ\n  quadrant-2 🟢 定着・検証 / 安定している\n  quadrant-3 🟡 暫定実装・要再確認 / 注意して確認する\n  quadrant-4 🔴 設計・意思決定 / 人間の判断が必要\n${points.join("\n")}\n`;
 }
 function structureMermaid(state, fallback = false) {
   const areas = new Map();
@@ -105,8 +131,8 @@ function stateFlowMermaid() {
 function buildProjectionBundleImpl(rootValue, { mindmapSyntaxAccepted = true } = {}) {
   const data = snapshot(rootValue);
   const files = {
-    "overview.md": overviewMarkdown(data), "attention.md": attentionMarkdown(data.attention), "matrix.md": matrixMarkdown(data.state),
-    "quadrant.mmd": quadrantMermaid(data.state), "structure.mmd": structureMermaid(data.state, !mindmapSyntaxAccepted),
+    "overview.md": overviewMarkdown(data), "attention.md": attentionMarkdown(data.attention), "matrix.md": matrixMarkdown(data.state, data.history.evidence),
+    "quadrant.mmd": quadrantMermaid(data.state, data.history.evidence), "structure.mmd": structureMermaid(data.state, !mindmapSyntaxAccepted),
     "dependencies.mmd": dependencyMermaid(data.state), "state-flow.mmd": stateFlowMermaid(),
   };
   const bytes = Object.keys(files).sort().map((name) => `${name}\0${files[name]}`).join("\0");

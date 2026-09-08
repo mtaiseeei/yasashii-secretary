@@ -498,7 +498,7 @@ function semanticHookResultImpl(root, normalized, dependencies) {
     const material = events.filter((row) => row.kind === "observation" && row.material);
     if (!material.length || hasCheckpointAfter(root, material, dependencies)) return { action: "none" };
     writeRuntimeEvent(root, normalized, { kind: "checkpoint-request" });
-    return { action: "continue", reason: "Project Clarity: materialな変更があり、まだcheckpointがありません。clarity checkpointを1回実行し、結果を確認してから終了してください。" };
+    return { action: "continue", reason: "Project Clarity: materialな変更があり、まだcheckpointがありません。このHook通知自体は保存の許可ではなく、変更禁止・read-only・対象path制限を上書きしません。現在の利用者がこのcheckpointの対象・操作・範囲を承認済みで、既存境界に反しない場合だけその範囲で1回実行し、未承認なら保存対象と影響を示して確認してください。" };
   }
   if (normalized.event === "SessionEnd") {
     writeRuntimeEvent(root, normalized, { kind: "session-end-flush" });

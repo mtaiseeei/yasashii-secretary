@@ -57,6 +57,7 @@ const dispositions = new Set(["required", "candidate", "idea", "deferred", "reje
 const modes = new Set(["standalone", "secretary-local", "linked-external", "portfolio"]);
 const eventTypes = new Set([
   "item.discovered",
+  "item.corrected",
   "decision.pending",
   "decision.proposed",
   "decision.confirmed",
@@ -1313,6 +1314,22 @@ export function validateItem(item) {
     && item.schemaVersion <= CLARITY_SCHEMA_VERSION
     && /^ci_[a-f0-9]{20}$/u.test(item.itemId || ""), "item-schema-invalid", "Clarity Item schemaが不正です。");
   oneLine(item.title, "Item title", 120);
+  if (item.claim !== undefined) oneLine(item.claim, "Item claim", 240);
+  if (item.requirementSource !== undefined) {
+    fail(item.requirementSource && typeof item.requirementSource === "object" && !Array.isArray(item.requirementSource), "item-schema-invalid", "要件source metadataが不正です。");
+    fail(Object.keys(item.requirementSource).sort().join(",") === "digest,section,sourceId", "item-schema-invalid", "要件source metadataはsource ID／section／digestだけを保存できます。");
+    oneLine(item.requirementSource.sourceId, "Requirement source ID", 120);
+    oneLine(item.requirementSource.section, "Requirement source section", 160);
+    fail(/^[a-f0-9]{64}$/u.test(item.requirementSource.digest || ""), "item-schema-invalid", "要件source digestが不正です。");
+  }
+  if (item.correction !== undefined && item.correction !== null) {
+    fail(item.correction && typeof item.correction === "object" && !Array.isArray(item.correction), "item-schema-invalid", "Item correction metadataが不正です。");
+    fail(["current", "replaced"].includes(item.correction.status), "item-schema-invalid", "Item correction statusが不正です。");
+    fail(/^cv_[a-f0-9]{20}$/u.test(item.correction.eventId || ""), "item-schema-invalid", "Item correction Event IDが不正です。");
+    oneLine(item.correction.reason, "Item correction reason", 200);
+    const relatedId = item.correction.status === "replaced" ? item.correction.replacedByItemId : item.correction.replacesItemId;
+    fail(/^ci_[a-f0-9]{20}$/u.test(relatedId || ""), "item-schema-invalid", "Item correctionの関連Item IDが不正です。");
+  }
   safeRelative(item.areaPath, "Item area path");
   fail(dispositions.has(item.disposition), "item-schema-invalid", "Item dispositionが不正です。");
   fail(decisionStatuses.has(item.decision?.status), "item-schema-invalid", "Decision statusが不正です。");
@@ -1352,6 +1369,16 @@ export function validateEvent(event) {
   fail(!Number.isNaN(new Date(event.occurredAt).valueOf()), "event-schema-invalid", "Event occurredAtが不正です。");
   fail(!containsSecret(event), "secret-detected", "EventにSecretらしき値があるため拒否します。");
   if (event.type === "item.discovered") validateItem(event.payload?.item);
+  if (event.type === "item.corrected") {
+    fail(event.payload?.oldItemId === event.itemId, "event-schema-invalid", "訂正Eventの旧Item IDが一致しません。");
+    fail(/^op_[a-f0-9]{20}$/u.test(event.payload?.operationId || ""), "event-schema-invalid", "訂正Eventのoperation IDが不正です。");
+    oneLine(event.payload?.reason, "Item correction reason", 200);
+    fail(event.payload?.oldContent && typeof event.payload.oldContent === "object", "event-schema-invalid", "訂正Eventの旧内容がありません。");
+    fail(event.payload?.oldAssociations && typeof event.payload.oldAssociations === "object", "event-schema-invalid", "訂正Eventの旧Evidence associationがありません。");
+    validateItem(event.payload?.replacement);
+    fail(event.payload.replacement.correction?.status === "current" && event.payload.replacement.correction?.eventId === event.eventId,
+      "event-schema-invalid", "訂正後Itemの履歴参照がEventと一致しません。");
+  }
   if (event.type === "decision.confirmed") fail(event.payload?.humanConfirmed === true || event.payload?.source === "accepted-canonical", "human-confirmation-invalid", "confirmed Eventには人間確認または明示正本が必要です。");
   if (event.type === "attention.override") {
     fail(["critical", "high", "medium", "low", "none"].includes(event.payload?.level), "event-schema-invalid", "Attention override levelが不正です。");
@@ -1428,6 +1455,10 @@ function readCanonical(rootValue) {
   const events = jsonLines(safeWritePath(root, ".clarity/events.jsonl"), validateEvent);
   const evidence = jsonLines(safeWritePath(root, ".clarity/evidence.jsonl"), validateEvidence);
   return { root, clarity, project, events, evidence };
+}
+
+function canonicalRevision(canonical) {
+  return sha256(stableJson({ project: canonical.project, events: canonical.events, evidence: canonical.evidence }));
 }
 
 function findCanonicalItemImpl(rootValue, itemId) {
@@ -1518,7 +1549,8 @@ function evidenceRefs(item) {
 
 function attentionForItem(item, itemsById, evidenceById, clock) {
   const reasons = [];
-  const excluded = item.disposition === "idea" || item.disposition === "rejected"
+  const excluded = item.correction?.status === "replaced"
+    || item.disposition === "idea" || item.disposition === "rejected"
     || ["rejected", "superseded"].includes(item.decision.status)
     || (item.disposition === "deferred" && item.deferredUntil && item.deferredUntil > clock.slice(0, 10));
   if (excluded) return { eligible: false, level: "none", reasons: [], ageDays: 0 };
@@ -1655,6 +1687,25 @@ export function buildState(project, events, evidence, clock = nowIso()) {
       if (!itemMap.has(item.itemId)) itemMap.set(item.itemId, item);
       continue;
     }
+    if (event.type === "item.corrected") {
+      const prior = itemMap.get(event.itemId);
+      fail(prior, "event-item-missing", `訂正Eventが存在しないItemを参照しています: ${event.itemId}`);
+      const replacement = structuredClone(event.payload.replacement);
+      validateItem(replacement);
+      const existing = itemMap.get(replacement.itemId);
+      fail(!existing || stableJson(existing) === stableJson(replacement), "correction-item-conflict", "訂正後Item IDが別内容と競合しています。");
+      prior.correction = {
+        status: "replaced",
+        eventId: event.eventId,
+        operationId: event.payload.operationId,
+        reason: event.payload.reason,
+        replacedByItemId: replacement.itemId,
+        validationInvalidated: Boolean(event.payload.validationInvalidated),
+      };
+      prior.timestamps = { ...prior.timestamps, updatedAt: event.occurredAt };
+      itemMap.set(replacement.itemId, replacement);
+      continue;
+    }
     if (event.type === "checkpoint.recorded" || /^(?:link|sync)\./u.test(event.type)) continue;
     const item = itemMap.get(event.itemId);
     fail(item, "event-item-missing", `Eventが存在しないItemを参照しています: ${event.itemId}`);
@@ -1669,7 +1720,8 @@ export function buildState(project, events, evidence, clock = nowIso()) {
       quadrantLabel: quadrantMeta[quadrant].label,
       quadrantMeaning: quadrantMeta[quadrant].meaning,
       inProgress: item.execution.status === "in_progress",
-      activeMatrix: !["rejected", "superseded"].includes(item.decision.status) && item.disposition !== "rejected",
+      activeMatrix: item.correction?.status !== "replaced"
+        && !["rejected", "superseded"].includes(item.decision.status) && item.disposition !== "rejected",
       attentionEligible: false,
       attentionReasons: [],
       attention: { level: "not_evaluated", reasons: [] },
@@ -2261,6 +2313,18 @@ function appendEventImpl(rootValue, input) {
     const recovery = recoverOwnedOperationUnlocked(root, lease);
     const canonical = readCanonical(root);
     assertCanonicalProjectionSafe(root, canonical);
+    const existingEvent = canonical.events.find((row) => row.eventId === eventId);
+    if (existingEvent) {
+      fail(existingEvent.type === input.type && existingEvent.itemId === input.itemId
+        && existingEvent.actor === (input.actor || "manual-cli") && stableJson(existingEvent.payload) === stableJson(payload),
+      "event-id-conflict", "同じEvent IDが別内容で既に使われています。", { changed: false, eventId });
+      return { event: existingEvent, changed: false, stateChanged: false, state: buildState(canonical.project, canonical.events, canonical.evidence), recovered: recovery.recovered };
+    }
+    if (input.expectedRevision) {
+      fail(canonicalRevision(canonical) === input.expectedRevision, "state-revision-stale", "preview後にClarity正本が変わったため、適用せず再previewが必要です。", {
+        changed: false, repreviewRequired: true, expectedRevision: input.expectedRevision, currentRevision: canonicalRevision(canonical),
+      });
+    }
     if (canonical.project.schemaVersion < CLARITY_SCHEMA_VERSION && ["checkpoint.recorded", "attention.resolved", "attention.override", "drift.waiver.recorded"].includes(input.type)) {
       throw new ClarityError("migration-required", "この操作の前にschema migrationが必要です。変更していません。", 3, { changed: false, nextAction: "clarity migrate previewを確認してください" });
     }
@@ -2285,30 +2349,397 @@ function appendEvidenceImpl(rootValue, input) {
   const preflightRoot = rootPath(rootValue);
   const preflightCanonical = readCanonical(preflightRoot);
   assertStoredStateValidBeforeLock(preflightRoot);
-  const evidenceId = input.evidenceId || stableId("ce", `${preflightCanonical.project.clarityProjectId}:${input.type}:${input.source}:${JSON.stringify(input.locator)}:${input.contentDigest || sha256(input.summary || "")}`);
-  const operationId = `evidence-${evidenceId}`;
+  const contentDigest = input.contentDigest || sha256(input.summary || "");
+  const sameIdentity = (row) => row.type === input.type && row.source === input.source
+    && stableJson(row.locator) === stableJson(input.locator)
+    && row.contentDigest === contentDigest && row.summary === input.summary
+    && row.availability === (input.availability || "available");
+  const priorEquivalent = input.evidenceId ? null : preflightCanonical.evidence.find(sameIdentity);
+  const evidenceId = input.evidenceId || priorEquivalent?.evidenceId || stableId("ce", `${preflightCanonical.project.clarityProjectId}:${input.type}:${input.source}:${JSON.stringify(input.locator)}:${contentDigest}:${input.summary}`);
+  const operationId = input.operationId || `evidence-${evidenceId}`;
   return withCanonicalWriteLock(rootValue, (root, lease) => {
     const recovery = recoverOwnedOperationUnlocked(root, lease);
     const canonical = readCanonical(root);
     assertCanonicalProjectionSafe(root, canonical);
+    if (input.expectedRevision) {
+      fail(canonicalRevision(canonical) === input.expectedRevision, "state-revision-stale", "preview後にClarity正本が変わったため、適用せず再previewが必要です。", {
+        changed: false, repreviewRequired: true, expectedRevision: input.expectedRevision, currentRevision: canonicalRevision(canonical),
+      });
+    }
+    const equivalent = input.evidenceId ? null : canonical.evidence.find(sameIdentity);
+    if (equivalent) {
+      return { evidence: equivalent, changed: false, stateChanged: false, state: buildState(canonical.project, canonical.events, canonical.evidence), recovered: recovery.recovered };
+    }
+    const existingById = canonical.evidence.find((row) => row.evidenceId === (equivalent?.evidenceId || evidenceId));
     const normalized = {
       schemaVersion: canonical.project.schemaVersion,
-      evidenceId,
+      evidenceId: equivalent?.evidenceId || evidenceId,
       type: input.type,
       source: input.source,
       locator: input.locator,
       summary: input.summary,
-      observedAt: input.observedAt || nowIso(),
-      contentDigest: input.contentDigest || sha256(input.summary || ""),
+      observedAt: input.observedAt || equivalent?.observedAt || existingById?.observedAt || nowIso(),
+      contentDigest,
       sensitivity: input.sensitivity || "non-secret-reference",
       availability: input.availability || "available",
     };
     validateEvidence(normalized);
+    const sameId = canonical.evidence.find((row) => row.evidenceId === normalized.evidenceId);
+    const sameMeaning = sameId && sameId.type === normalized.type && sameId.source === normalized.source
+      && stableJson(sameId.locator) === stableJson(normalized.locator) && sameId.summary === normalized.summary
+      && sameId.contentDigest === normalized.contentDigest && sameId.sensitivity === normalized.sensitivity
+      && sameId.availability === normalized.availability;
+    fail(!sameId || sameMeaning, "evidence-id-conflict", "同じEvidence IDが別内容で既に使われています。", { changed: false, evidenceId: normalized.evidenceId });
+    if (sameId) {
+      return { evidence: sameId, changed: false, stateChanged: false, state: buildState(canonical.project, canonical.events, canonical.evidence), recovered: recovery.recovered };
+    }
     const nextEvidence = canonical.evidence.some((row) => row.evidenceId === normalized.evidenceId) ? canonical.evidence : [...canonical.evidence, normalized];
     const state = buildState(canonical.project, canonical.events, nextEvidence);
     const write = logicalAppendUnlocked(canonical.root, lease, { canonicalRel: ".clarity/evidence.jsonl", row: normalized, idKey: "evidenceId", validator: validateEvidence, nextState: state });
     return { evidence: normalized, ...write, recovered: recovery.recovered };
   }, { operationId });
+}
+
+const requirementCoverageStatuses = new Set(["inspected", "excluded", "uninspected", "not-found"]);
+const evidenceSections = ["decision", "execution", "validation", "alignment"];
+
+function exactKeys(value, allowed, label) {
+  fail(value && typeof value === "object" && !Array.isArray(value), "value-invalid", `${label}が不正です。`);
+  const unknown = Object.keys(value).filter((key) => !allowed.includes(key));
+  fail(unknown.length === 0, "value-invalid", `${label}に保存対象外のfieldがあります: ${unknown.join(", ")}`);
+}
+
+function sourceMetadata(value) {
+  exactKeys(value, ["sourceId", "section", "digest"], "選択source metadata");
+  const sourceId = oneLine(value.sourceId, "Source ID", 120);
+  const section = oneLine(value.section, "Source section", 160);
+  fail(!/^(?:[a-z]:[\\/]|[/~]|file:)/iu.test(sourceId) && !/^(?:[a-z]:[\\/]|[/~]|file:)/iu.test(section),
+    "source-metadata-unsafe", "source metadataへabsolute local pathは保存できません。", { changed: false });
+  fail(/^[a-f0-9]{64}$/u.test(value.digest || ""), "source-digest-invalid", "Source digestはSHA-256で指定してください。", { changed: false });
+  return { sourceId, section, digest: value.digest };
+}
+
+function coverageRows(rows, selectedSource) {
+  const input = Array.isArray(rows) && rows.length ? rows : [{ ...selectedSource, status: "inspected", reason: "利用者が選んだ範囲を確認" }];
+  fail(input.length <= CLARITY_LIMITS.maxCandidates, "coverage-too-large", "Coverage表示の安全な上限を超えています。", { changed: false });
+  return input.map((row) => {
+    exactKeys(row, ["sourceId", "section", "digest", "status", "reason"], "Coverage row");
+    const metadata = sourceMetadata({ sourceId: row.sourceId, section: row.section, digest: row.digest });
+    fail(requirementCoverageStatuses.has(row.status), "coverage-status-invalid", "Coverage statusが不正です。", { changed: false });
+    return { ...metadata, status: row.status, reason: oneLine(row.reason, "Coverage reason", 200) };
+  });
+}
+
+function requirementCandidates(rows, projectId, source) {
+  fail(Array.isArray(rows) && rows.length > 0, "requirements-empty", "feature／claim候補がありません。", { changed: false });
+  fail(rows.length <= CLARITY_LIMITS.maxCandidates, "requirements-too-large", "候補件数が安全な上限を超えています。", { changed: false });
+  const normalized = rows.map((row) => {
+    exactKeys(row, ["claim", "title", "areaPath", "gap"], "Requirement candidate");
+    const claim = oneLine(row.claim, "Requirement claim", 240);
+    const title = oneLine(row.title || claim, "Requirement title", 120);
+    const areaPath = safeRelative(row.areaPath || "requirements", "Requirement area path");
+    const gap = row.gap ? oneLine(row.gap, "Requirement gap", 200) : null;
+    const candidateId = stableId("rq", `${projectId}:${source.sourceId}:${source.section}:${source.digest}:${claim}`);
+    const itemId = stableId("ci", `${projectId}:requirement:${source.sourceId}:${source.section}:${source.digest}:${claim}`);
+    return { candidateId, itemId, claim, title, areaPath, gap };
+  });
+  fail(new Set(normalized.map((row) => row.candidateId)).size === normalized.length, "requirements-duplicate", "同じfeature／claim候補が重複しています。", { changed: false });
+  return normalized;
+}
+
+function requirementRelation(candidate, source, state) {
+  if (state.items.some((row) => row.itemId === candidate.itemId)) return "exact-existing";
+  if (state.items.some((row) => stableJson(row.requirementSource || null) === stableJson(source) && row.claim !== candidate.claim)) return "same-source-distinct-claim";
+  if (state.items.some((row) => row.title === candidate.title && row.claim !== candidate.claim)) return "title-conflict";
+  return "new";
+}
+
+function requirementItem(project, source, candidate, evidenceId, timestamp) {
+  const item = {
+    schemaVersion: project.schemaVersion,
+    itemId: candidate.itemId,
+    title: candidate.title,
+    claim: candidate.claim,
+    requirementSource: source,
+    areaPath: candidate.areaPath,
+    kind: "feature-claim",
+    disposition: "candidate",
+    deferredUntil: null,
+    owner: null,
+    decisionOwner: null,
+    dependencies: [],
+    externalRefs: [],
+    confidence: "observed",
+    timestamps: { createdAt: timestamp, updatedAt: timestamp },
+    attention: { level: "not_evaluated", reasons: [] },
+    attentionContext: { impact: 0, urgency: 0, humanOverride: null, signals: [] },
+    decision: { status: "proposed", source: "agent-selected-source", humanConfirmed: false, authority: "repository-reference", evidenceRefs: [evidenceId], updatedAt: timestamp },
+    execution: { status: "not_started", authority: "repository-observation", evidenceRefs: [], updatedAt: timestamp },
+    validation: { status: "unknown", evidenceRefs: [], updatedAt: timestamp },
+    alignment: { status: "unknown", evidenceRefs: [], updatedAt: timestamp },
+  };
+  validateItem(item);
+  return item;
+}
+
+function previewRequirementIntakeImpl(rootValue, input = {}) {
+  exactKeys(input, ["source", "coverage", "candidates"], "Requirement intake");
+  const canonical = readCanonical(rootValue);
+  const source = sourceMetadata(input.source);
+  const coverage = coverageRows(input.coverage, source);
+  fail(coverage.some((row) => row.sourceId === source.sourceId && row.section === source.section && row.digest === source.digest && row.status === "inspected"),
+    "source-not-inspected", "選択source／sectionがinspectedではないため候補を保存できません。", { changed: false });
+  const state = buildState(canonical.project, canonical.events, canonical.evidence);
+  const candidates = requirementCandidates(input.candidates, canonical.project.clarityProjectId, source).map((candidate) => {
+    const equivalent = canonical.evidence.find((row) => row.type === "spec-section" && row.source === source.sourceId
+      && stableJson(row.locator) === stableJson({ sourceId: source.sourceId, section: source.section })
+      && row.contentDigest === source.digest && row.summary === candidate.claim && row.availability === "available");
+    return {
+      ...candidate,
+      evidenceId: equivalent?.evidenceId || stableId("ce", `${canonical.project.clarityProjectId}:spec-section:${source.sourceId}:${JSON.stringify({ sourceId: source.sourceId, section: source.section })}:${source.digest}:${candidate.claim}`),
+      evidenceExisting: Boolean(equivalent),
+      existingRelation: requirementRelation(candidate, source, state),
+    };
+  });
+  const revision = canonicalRevision(canonical);
+  const approvalArtifact = { schema: "agentic-secretary.clarity-requirements.v1", revision, source, coverage, candidates };
+  return {
+    status: "approval-required",
+    changed: false,
+    revision,
+    source,
+    coverage,
+    selectedScopeComplete: coverage.every((row) => row.status === "inspected"),
+    requirementsComplete: false,
+    gaps: coverage.filter((row) => row.status !== "inspected").map((row) => ({ sourceId: row.sourceId, section: row.section, status: row.status, reason: row.reason })),
+    candidates,
+    approvalArtifact,
+    approvalDigest: sha256(stableJson(approvalArtifact)),
+  };
+}
+
+function requirementRevisionWithoutOperation(canonical, preview, selected, operationId) {
+  const projectId = canonical.project.clarityProjectId;
+  const candidatesByEventId = new Map(selected.map((candidate) => [stableId("cv", `${projectId}:requirements:${operationId}:${candidate.candidateId}`), candidate]));
+  const candidatesByEvidenceId = new Map(selected.filter((candidate) => !candidate.evidenceExisting).map((candidate) => [candidate.evidenceId, candidate]));
+  return canonicalRevision({
+    project: canonical.project,
+    events: canonical.events.filter((event) => {
+      const candidate = candidatesByEventId.get(event.eventId);
+      return !candidate || event.type !== "item.discovered" || event.itemId !== candidate.itemId
+        || event.payload?.operationId !== operationId || event.payload?.candidateId !== candidate.candidateId;
+    }),
+    evidence: canonical.evidence.filter((evidence) => {
+      const candidate = candidatesByEvidenceId.get(evidence.evidenceId);
+      return !candidate || evidence.type !== "spec-section" || evidence.source !== preview.approvalArtifact.source.sourceId
+        || stableJson(evidence.locator) !== stableJson({ sourceId: preview.approvalArtifact.source.sourceId, section: preview.approvalArtifact.source.section })
+        || evidence.contentDigest !== preview.approvalArtifact.source.digest || evidence.summary !== candidate.claim || evidence.availability !== "available";
+    }),
+  });
+}
+
+function recordedRequirementCandidate(canonical, candidate, operationId) {
+  const eventId = stableId("cv", `${canonical.project.clarityProjectId}:requirements:${operationId}:${candidate.candidateId}`);
+  const event = canonical.events.find((row) => row.eventId === eventId);
+  if (!event || event.type !== "item.discovered" || event.itemId !== candidate.itemId || event.actor !== "human-approved-agent-intake"
+    || event.payload?.operationId !== operationId || event.payload?.candidateId !== candidate.candidateId
+    || event.payload?.evidenceId !== candidate.evidenceId || event.payload?.item?.claim !== candidate.claim) return null;
+  return { candidateId: candidate.candidateId, itemId: candidate.itemId, status: "unchanged", eventId, evidenceId: candidate.evidenceId };
+}
+
+function applyRequirementIntakeImpl(rootValue, preview, { decision = "unanswered", selectedCandidateIds = [], operationId } = {}) {
+  if (decision !== "approved") return { status: ["rejected", "canceled"].includes(decision) ? "stopped" : "approval-required", changed: false, decision, requirementsComplete: false, confirmed: [], failed: [] };
+  exactKeys(preview, ["status", "changed", "revision", "source", "coverage", "selectedScopeComplete", "requirementsComplete", "gaps", "candidates", "approvalArtifact", "approvalDigest"], "Requirement preview");
+  fail(preview.approvalDigest === sha256(stableJson(preview.approvalArtifact)), "preview-invalid", "要件previewの内容が一致しません。再previewしてください。", { changed: false, repreviewRequired: true });
+  fail(Array.isArray(selectedCandidateIds) && selectedCandidateIds.length > 0, "requirements-selection-empty", "保存する候補を1件以上選んでください。", { changed: false });
+  const selected = [...new Set(selectedCandidateIds)];
+  fail(selected.every((id) => preview.approvalArtifact.candidates.some((row) => row.candidateId === id)), "requirements-selection-invalid", "previewにない候補は保存できません。", { changed: false });
+  const initial = readCanonical(rootValue);
+  const opId = operationId ? oneLine(operationId, "Requirement operation ID", 120) : stableId("op", `${initial.project.clarityProjectId}:requirements:${preview.approvalDigest}:${selected.join(",")}`);
+  const selectedCandidates = preview.approvalArtifact.candidates.filter((row) => selected.includes(row.candidateId));
+  const priorConfirmed = selectedCandidates.map((candidate) => recordedRequirementCandidate(initial, candidate, opId));
+  if (priorConfirmed.every(Boolean)) {
+    return {
+      status: "unchanged", changed: false, operationId: opId, confirmed: priorConfirmed, failed: [], unconfirmed: [], remainingSelected: [],
+      unselected: preview.approvalArtifact.candidates.filter((row) => !selected.includes(row.candidateId)).map((row) => row.candidateId),
+      requirementsComplete: false, coverage: preview.approvalArtifact.coverage,
+    };
+  }
+  const currentRevision = canonicalRevision(initial);
+  fail(currentRevision === preview.approvalArtifact.revision
+    || requirementRevisionWithoutOperation(initial, preview, selectedCandidates, opId) === preview.approvalArtifact.revision,
+  "state-revision-stale", "preview後にClarity正本が変わったため、適用せず再previewが必要です。", { changed: false, repreviewRequired: true });
+  let expectedRevision = currentRevision;
+  const confirmed = [];
+  const failed = [];
+  let canonicalChanged = false;
+  for (const candidate of selectedCandidates) {
+    let stage = "evidence";
+    let evidenceId = candidate.evidenceId;
+    let evidenceSaved = false;
+    try {
+      const before = readCanonical(rootValue);
+      fail(canonicalRevision(before) === expectedRevision, "state-revision-stale", "候補の保存中にClarity正本が変わったため、残りを適用せず再previewが必要です。", { changed: false, repreviewRequired: true });
+      const currentState = buildState(before.project, before.events, before.evidence);
+      const existing = currentState.items.find((row) => row.itemId === candidate.itemId);
+      if (existing) {
+        fail(existing.claim === candidate.claim && stableJson(existing.requirementSource || null) === stableJson(preview.approvalArtifact.source),
+          "requirement-item-conflict", "候補Item IDが別のclaimに使われています。再previewしてください。", { changed: false, repreviewRequired: true });
+        confirmed.push({ candidateId: candidate.candidateId, itemId: existing.itemId, status: "unchanged", eventId: null, evidenceId: existing.decision.evidenceRefs[0] || null });
+        continue;
+      }
+      const proof = appendEvidence(rootValue, {
+        evidenceId: candidate.evidenceId,
+        type: "spec-section",
+        source: preview.approvalArtifact.source.sourceId,
+        locator: { sourceId: preview.approvalArtifact.source.sourceId, section: preview.approvalArtifact.source.section },
+        summary: candidate.claim,
+        contentDigest: preview.approvalArtifact.source.digest,
+        sensitivity: "non-secret-reference",
+        availability: "available",
+        operationId: `${opId}:evidence:${candidate.candidateId}`,
+        expectedRevision,
+      });
+      evidenceId = proof.evidence.evidenceId;
+      evidenceSaved = true;
+      canonicalChanged ||= proof.changed;
+      const evidenceAfter = before.evidence.some((row) => row.evidenceId === proof.evidence.evidenceId)
+        ? before.evidence : [...before.evidence, proof.evidence];
+      expectedRevision = canonicalRevision({ project: before.project, events: before.events, evidence: evidenceAfter });
+      const timestamp = nowIso();
+      const item = requirementItem(before.project, preview.approvalArtifact.source, candidate, proof.evidence.evidenceId, timestamp);
+      const eventId = stableId("cv", `${before.project.clarityProjectId}:requirements:${opId}:${candidate.candidateId}`);
+      stage = "item";
+      const recorded = appendEvent(rootValue, {
+        eventId,
+        type: "item.discovered",
+        itemId: item.itemId,
+        actor: "human-approved-agent-intake",
+        occurredAt: timestamp,
+        expectedRevision,
+        payload: { item, operationId: opId, candidateId: candidate.candidateId, evidenceId: proof.evidence.evidenceId },
+      });
+      canonicalChanged ||= recorded.changed;
+      expectedRevision = canonicalRevision({ project: before.project, events: recorded.changed ? [...before.events, recorded.event] : before.events, evidence: evidenceAfter });
+      confirmed.push({ candidateId: candidate.candidateId, itemId: item.itemId, status: recorded.changed ? "saved" : "unchanged", eventId, evidenceId: proof.evidence.evidenceId });
+    } catch (error) {
+      const lateWrite = error?.details?.changed === true;
+      canonicalChanged ||= lateWrite;
+      if (lateWrite && stage === "evidence") evidenceSaved = true;
+      failed.push({ candidateId: candidate.candidateId, code: error?.code || "requirements-save-failed", reason: error instanceof Error ? error.message : "保存に失敗しました", repreviewRequired: Boolean(error?.details?.repreviewRequired), evidenceId, evidenceSaved, itemSaved: lateWrite && stage === "item" });
+      break;
+    }
+  }
+  const confirmedIds = new Set(confirmed.map((row) => row.candidateId));
+  const unconfirmed = selectedCandidates.filter((row) => !confirmedIds.has(row.candidateId)).map((row) => row.candidateId);
+  return {
+    status: failed.length ? (confirmed.length || failed.some((row) => row.evidenceSaved || row.itemSaved) ? "partial" : "failed") : confirmed.some((row) => row.status === "saved") ? "saved" : "unchanged",
+    changed: canonicalChanged,
+    operationId: opId,
+    confirmed,
+    failed,
+    unconfirmed,
+    remainingSelected: unconfirmed.filter((id) => !failed.some((row) => row.candidateId === id)),
+    unselected: preview.approvalArtifact.candidates.filter((row) => !selected.includes(row.candidateId)).map((row) => row.candidateId),
+    requirementsComplete: false,
+    coverage: preview.approvalArtifact.coverage,
+  };
+}
+
+function itemAssociations(item) {
+  return Object.fromEntries(evidenceSections.map((section) => [section, [...new Set(item[section]?.evidenceRefs || [])].sort()]));
+}
+
+function canonicalItemFromState(item) {
+  const copy = structuredClone(item);
+  for (const key of ["quadrant", "quadrantLabel", "quadrantMeaning", "inProgress", "activeMatrix", "attentionEligible", "attentionReasons"]) delete copy[key];
+  copy.attention = { level: "not_evaluated", reasons: [] };
+  delete copy.correction;
+  return copy;
+}
+
+function normalizedAssociations(value, current, evidenceIds) {
+  if (value === undefined) return current;
+  exactKeys(value, evidenceSections, "Evidence association correction");
+  const next = structuredClone(current);
+  for (const [section, refs] of Object.entries(value)) {
+    fail(Array.isArray(refs) && refs.every((id) => /^ce_[a-f0-9]{20}$/u.test(id)), "association-invalid", "Evidence associationはEvidence ID配列で指定してください。", { changed: false });
+    fail(refs.every((id) => evidenceIds.has(id)), "association-evidence-missing", "参照できないEvidenceは関連付けできません。", { changed: false });
+    next[section] = [...new Set(refs)].sort();
+  }
+  return next;
+}
+
+function previewItemCorrectionImpl(rootValue, input = {}) {
+  exactKeys(input, ["itemId", "reason", "operationId", "changes"], "Item correction");
+  exactKeys(input.changes, ["title", "claim", "evidenceAssociations"], "Item correction changes");
+  const canonical = readCanonical(rootValue);
+  const state = buildState(canonical.project, canonical.events, canonical.evidence);
+  const prior = state.items.find((row) => row.itemId === input.itemId);
+  fail(prior && prior.activeMatrix !== false, "correction-target-missing", "訂正対象の現在Itemが見つかりません。再previewしてください。", { changed: false, repreviewRequired: true });
+  const reason = oneLine(input.reason, "Item correction reason", 200);
+  const title = input.changes.title === undefined ? prior.title : oneLine(input.changes.title, "Corrected title", 120);
+  const claim = input.changes.claim === undefined ? prior.claim : oneLine(input.changes.claim, "Corrected claim", 240);
+  const oldAssociations = itemAssociations(prior);
+  const associations = normalizedAssociations(input.changes.evidenceAssociations, oldAssociations, new Set(canonical.evidence.map((row) => row.evidenceId)));
+  const titleChanged = title !== prior.title;
+  const claimChanged = claim !== prior.claim;
+  const associationsChanged = stableJson(associations) !== stableJson(oldAssociations);
+  fail(titleChanged || claimChanged || associationsChanged, "correction-no-change", "訂正内容に差分がありません。", { changed: false });
+  const operationId = input.operationId || stableId("op", `${canonical.project.clarityProjectId}:correction:${prior.itemId}:${reason}:${stableJson({ title, claim, associations })}`);
+  fail(/^op_[a-f0-9]{20}$/u.test(operationId), "operation-id-invalid", "Correction operation IDが不正です。", { changed: false });
+  const eventId = stableId("cv", `${canonical.project.clarityProjectId}:correction:${operationId}`);
+  const replacement = canonicalItemFromState(prior);
+  replacement.itemId = stableId("ci", `${canonical.project.clarityProjectId}:correction:${prior.itemId}:${operationId}`);
+  replacement.title = title;
+  if (claim !== undefined) replacement.claim = claim;
+  const timestamp = nowIso();
+  replacement.timestamps = { ...replacement.timestamps, updatedAt: timestamp };
+  for (const section of evidenceSections) replacement[section] = { ...replacement[section], evidenceRefs: associations[section] };
+  const validationInvalidated = prior.validation.status === "passed" && (claimChanged || associationsChanged);
+  if (validationInvalidated) replacement.validation = { ...replacement.validation, status: "pending", updatedAt: timestamp };
+  replacement.correction = { status: "current", eventId, operationId, reason, replacesItemId: prior.itemId, validationInvalidated };
+  validateItem(replacement);
+  const payload = {
+    operationId,
+    reason,
+    oldItemId: prior.itemId,
+    oldContent: { title: prior.title, claim: prior.claim ?? null },
+    oldAssociations,
+    changes: { titleChanged, claimChanged, associationsChanged },
+    validationInvalidated,
+    replacement,
+  };
+  const revision = canonicalRevision(canonical);
+  const approvalArtifact = { schema: "agentic-secretary.clarity-correction.v1", revision, event: { eventId, type: "item.corrected", itemId: prior.itemId, actor: "human-approved-correction", occurredAt: timestamp, payload } };
+  return {
+    status: "approval-required",
+    changed: false,
+    revision,
+    target: { itemId: prior.itemId, title: prior.title, claim: prior.claim ?? null, associations: oldAssociations },
+    replacement: { itemId: replacement.itemId, title, claim: claim ?? null, associations, validation: { from: prior.validation.status, to: replacement.validation.status, invalidated: validationInvalidated } },
+    reason,
+    conflict: false,
+    impact: { historicalItemAdded: 1, currentItemReplaced: 1, validationInvalidated },
+    approvalArtifact,
+    approvalDigest: sha256(stableJson(approvalArtifact)),
+  };
+}
+
+function applyItemCorrectionImpl(rootValue, preview, { decision = "unanswered" } = {}) {
+  if (decision !== "approved") return { status: ["rejected", "canceled"].includes(decision) ? "stopped" : "approval-required", changed: false, decision };
+  exactKeys(preview, ["status", "changed", "revision", "target", "replacement", "reason", "conflict", "impact", "approvalArtifact", "approvalDigest"], "Item correction preview");
+  fail(preview.approvalDigest === sha256(stableJson(preview.approvalArtifact)), "preview-invalid", "訂正previewの内容が一致しません。再previewしてください。", { changed: false, repreviewRequired: true });
+  const canonical = readCanonical(rootValue);
+  const eventInput = preview.approvalArtifact.event;
+  const priorSameOperation = canonical.events.find((event) => event.type === "item.corrected" && event.payload?.operationId === eventInput.payload.operationId);
+  if (priorSameOperation) {
+    fail(priorSameOperation.eventId === eventInput.eventId && stableJson(priorSameOperation.payload) === stableJson(eventInput.payload), "operation-id-conflict", "同じ訂正operation IDが別内容で使われています。", { changed: false });
+    return { status: "unchanged", changed: false, operationId: eventInput.payload.operationId, eventId: priorSameOperation.eventId, oldItemId: eventInput.itemId, replacementItemId: eventInput.payload.replacement.itemId, validationInvalidated: Boolean(eventInput.payload.validationInvalidated) };
+  }
+  fail(canonicalRevision(canonical) === preview.approvalArtifact.revision, "state-revision-stale", "preview後に訂正対象が変わったため、適用せず再previewが必要です。", { changed: false, repreviewRequired: true });
+  const recorded = appendEvent(rootValue, { ...eventInput, expectedRevision: preview.approvalArtifact.revision });
+  return { status: recorded.changed ? "saved" : "unchanged", changed: recorded.changed, operationId: eventInput.payload.operationId, eventId: eventInput.eventId, oldItemId: eventInput.itemId, replacementItemId: eventInput.payload.replacement.itemId, validationInvalidated: Boolean(eventInput.payload.validationInvalidated) };
 }
 
 function attentionImpl(rootValue, { limit = 3, clock = nowIso() } = {}) {
@@ -2829,7 +3260,20 @@ function historyImpl(rootValue) {
   const canonical = readCanonical(rootValue);
   return {
     clarityProjectId: canonical.project.clarityProjectId,
-    events: canonical.events.map((event) => ({ eventId: event.eventId, type: event.type, itemId: event.itemId, actor: event.actor, occurredAt: event.occurredAt, ...(event.type === "attention.resolved" ? { resolution: event.payload } : {}) })),
+    events: canonical.events.map((event) => ({
+      eventId: event.eventId, type: event.type, itemId: event.itemId, actor: event.actor, occurredAt: event.occurredAt,
+      ...(event.type === "attention.resolved" ? { resolution: event.payload } : {}),
+      ...(event.type === "item.corrected" ? { correction: {
+        operationId: event.payload.operationId,
+        reason: event.payload.reason,
+        oldItemId: event.payload.oldItemId,
+        replacementItemId: event.payload.replacement.itemId,
+        oldContent: event.payload.oldContent,
+        oldAssociations: event.payload.oldAssociations,
+        changes: event.payload.changes,
+        validationInvalidated: Boolean(event.payload.validationInvalidated),
+      } } : {}),
+    })),
     evidence: canonical.evidence.map((item) => ({ evidenceId: item.evidenceId, type: item.type, source: item.source, locator: item.locator, observedAt: item.observedAt, availability: item.availability })),
     resolvedAttention: canonical.events.filter((event) => event.type === "attention.resolved").map((event) => ({ eventId: event.eventId, itemId: event.itemId, reason: event.payload.reason, occurredAt: event.occurredAt })),
     alignmentHistory: canonical.events.filter((event) => event.type === "alignment.changed" || event.type === "drift.waiver.recorded").map((event) => ({
@@ -2996,6 +3440,10 @@ export function previewInit(rootValue) { return runRootRequest(rootValue, previe
 export function applyInit(rootValue) { return runRootRequest(rootValue, applyInitImpl); }
 export function appendEvent(rootValue, input) { return runRootRequest(rootValue, (root) => appendEventImpl(root, input)); }
 export function appendEvidence(rootValue, input) { return runRootRequest(rootValue, (root) => appendEvidenceImpl(root, input)); }
+export function previewRequirementIntake(rootValue, input = {}) { return runRootRequest(rootValue, (root) => previewRequirementIntakeImpl(root, input)); }
+export function applyRequirementIntake(rootValue, preview, options = {}) { return runRootRequest(rootValue, (root) => applyRequirementIntakeImpl(root, preview, options)); }
+export function previewItemCorrection(rootValue, input = {}) { return runRootRequest(rootValue, (root) => previewItemCorrectionImpl(root, input)); }
+export function applyItemCorrection(rootValue, preview, options = {}) { return runRootRequest(rootValue, (root) => applyItemCorrectionImpl(root, preview, options)); }
 export function attention(rootValue, options = {}) { return runRootRequest(rootValue, (root) => attentionImpl(root, options)); }
 export function setAttentionOverride(rootValue, options = {}) { return runRootRequest(rootValue, (root) => setAttentionOverrideImpl(root, options)); }
 export function checkpoint(rootValue, options = {}) { return runRootRequest(rootValue, (root) => checkpointImpl(root, options)); }

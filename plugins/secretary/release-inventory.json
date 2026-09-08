@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "collaborationMarker": "yasashii-secretary:clarity-collaboration:release:v1",
   "edition": "yasashii-secretary",
-  "candidateVersion": "0.12.0",
-  "publicationStatus": "candidate-unverified",
+  "candidateVersion": "0.13.0",
+  "publicationStatus": "source-candidate-unverified",
   "releaseState": {
     "sourcePrepared": true,
     "evaluatorPassed": false,
@@ -12,7 +12,9 @@
     "marketplacePublishedOrRefreshed": false,
     "installedCacheUpdated": false,
     "loadedInNewSession": false,
-    "downstreamApplied": true
+    "downstreamApplied": true,
+    "publicEvaluatorPassed": true,
+    "privateEvaluatorPassed": true
   },
   "distribution": {
     "claudeCode": {
@@ -168,16 +170,18 @@
   },
   "documentation": [
     "README.md",
+    "docs/guide/update-0.13.0.md",
     "docs/spec/clarity.md",
     "plugins/secretary/skills/clarity/SKILL.md",
     "plugins/secretary/CHANGELOG.md"
   ],
   "handoff": "scripts/fixtures/sprint-041/yasashii-prewrite-receipt.json",
   "fixedSource": {
-    "publicProduct": "767a7f3ecb15c0ffe6d2d8f71529c74bf671c154",
+    "publicProduct": "5e26432307a2f247d244dcb2766e870400d006f2",
     "publicEvaluatorPass": true,
-    "publicEvaluatorReceipt": "a2933904602fc839c72a5e6b9294a4362eb21ad0",
-    "privateProduct": "d5598226213004d55781ca033985589907ae7b5d",
+    "publicEvaluatorReceipt": "5e56c6232d4f0aab6a7dc4a7a4483e2a99371bd0",
+    "privateProduct": "d1a2a996f160fe604c85997190fff5c8dc7e47c3",
+    "privateEvaluatorReceipt": "31c30dba550171b09d1cda24368f9f9121f2b1c9",
     "yasashiiPrewriteReceipt": "scripts/fixtures/sprint-041/yasashii-prewrite-receipt.json"
   }
 }

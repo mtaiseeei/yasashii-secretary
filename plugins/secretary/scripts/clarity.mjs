@@ -3,6 +3,8 @@
 import {
   ClarityError,
   applyMigration,
+  applyItemCorrection,
+  applyRequirementIntake,
   applyRuntimeCleanup,
   appendEvidence,
   appendEvent,
@@ -13,6 +15,8 @@ import {
   doctor,
   history,
   previewMigration,
+  previewItemCorrection,
+  previewRequirementIntake,
   previewRuntimeCleanup,
   previewInit,
   rebuildState,
@@ -71,6 +75,10 @@ function usage(message = "") {
   clarity doctor <repo> [--host <codex|claudeCode>] [--hook-state <state>] [--json]
   clarity migrate <repo> [--apply] [--json]
   clarity cleanup <repo> [--apply] [--json]
+  clarity requirements-preview <repo> --input-file <candidates.json> [--json]
+  clarity requirements-apply <repo> --input-file <preview.json> --select <candidate-id,...> --decision <approved|rejected|canceled> [--operation-id <id>] [--json]
+  clarity correction-preview <repo> --input-file <correction.json> [--json]
+  clarity correction-apply <repo> --input-file <preview.json> --decision <approved|rejected|canceled> [--json]
   clarity project <repo> [--apply] [--mindmap-failure] [--json]
   clarity xmind-setting <repo> --enabled <on|off> [--json]
   clarity xmind-resolve <repo> [--capabilities-json '<JSON>'] [--local-decision <value>] [--provider <auto|local>] [--json]
@@ -235,6 +243,35 @@ function render(command, result, json) {
     process.stdout.write(`次の一手: ${result.nextAction}\n`);
     return;
   }
+  if (command === "requirements-preview") {
+    const preview = result.preview;
+    process.stdout.write(`要件候補preview: ${preview.candidates.length}件（変更なし）\n`);
+    process.stdout.write(`- Source: ${preview.source.sourceId} / ${preview.source.section} / ${preview.source.digest}\n`);
+    for (const row of preview.coverage) process.stdout.write(`- Coverage: ${row.sourceId} / ${row.section}: ${row.status}（${row.reason}）\n`);
+    for (const row of preview.candidates) process.stdout.write(`- ${row.candidateId}: ${row.claim} / gap=${row.gap || "なし"} / relation=${row.existingRelation}\n`);
+    process.stdout.write("保存する候補IDを選び、requirements-applyで明示確認してください。\n");
+    return;
+  }
+  if (command === "requirements-apply") {
+    process.stdout.write(`要件候補の保存: ${result.status}\n- 変更: ${result.changed ? "あり" : "なし"}\n- 確認済み: ${result.confirmed.length}件\n- 未確認selected: ${result.unconfirmed?.length || 0}件\n`);
+    if (result.failed?.length) process.stdout.write(`- 失敗: ${result.failed.map((row) => `${row.candidateId}:${row.code}（Evidence保存=${row.evidenceSaved ? "yes" : "no"} / Item保存=${row.itemSaved ? "yes" : "no"}）`).join("、")}\n`);
+    return;
+  }
+  if (command === "correction-preview") {
+    const preview = result.preview;
+    process.stdout.write(`Item訂正preview（変更なし）\n- 対象: ${preview.target.itemId}\n- title: ${preview.target.title} -> ${preview.replacement.title}\n- claim: ${preview.target.claim || "なし"} -> ${preview.replacement.claim || "なし"}\n- 理由: ${preview.reason}\n- Validation再確認: ${preview.replacement.validation.invalidated ? "必要" : "不要"}\n- 競合: ${preview.conflict ? "あり" : "なし"}\n`);
+    for (const section of ["decision", "execution", "validation", "alignment"]) {
+      const before = preview.target.associations[section].join(",") || "なし";
+      const after = preview.replacement.associations[section].join(",") || "なし";
+      if (before !== after) process.stdout.write(`- Evidence ${section}: ${before} -> ${after}\n`);
+    }
+    process.stdout.write("correction-applyで明示確認してください。\n");
+    return;
+  }
+  if (command === "correction-apply") {
+    process.stdout.write(`Item訂正: ${result.status}\n- 変更: ${result.changed ? "あり" : "なし"}\n- 旧Item: ${result.oldItemId || "なし"}\n- 現在Item: ${result.replacementItemId || "なし"}\n- Validation再確認: ${result.validationInvalidated ? "必要" : "不要"}\n`);
+    return;
+  }
   if (command === "project") {
     process.stdout.write(`Clarity projection: ${result.status}\n- digest: ${result.digest}\n- Mermaid renderer: ${result.renderer.reason}\n`);
     if (result.paths) process.stdout.write(`- 出力: ${result.paths.join("、")}\n`);
@@ -292,6 +329,18 @@ try {
   else if (command === "doctor") result = doctor(root, { host: options.get("--host"), hookState: options.get("--hook-state") });
   else if (command === "migrate") result = options.get("--apply") ? applyMigration(root) : previewMigration(root);
   else if (command === "cleanup") result = options.get("--apply") ? applyRuntimeCleanup(root) : previewRuntimeCleanup(root);
+  else if (command === "requirements-preview") result = { preview: previewRequirementIntake(root, inputJson(options)) };
+  else if (command === "requirements-apply") {
+    const document = inputJson(options);
+    const preview = document.preview || document;
+    const selectedCandidateIds = String(options.get("--select") || "").split(",").map((value) => value.trim()).filter(Boolean);
+    result = applyRequirementIntake(root, preview, { decision: options.get("--decision") || "unanswered", selectedCandidateIds, operationId: options.get("--operation-id") });
+  }
+  else if (command === "correction-preview") result = { preview: previewItemCorrection(root, inputJson(options)) };
+  else if (command === "correction-apply") {
+    const document = inputJson(options);
+    result = applyItemCorrection(root, document.preview || document, { decision: options.get("--decision") || "unanswered" });
+  }
   else if (command === "project") result = options.get("--apply") ? writeProjectionBundle(root, { mindmapSyntaxAccepted: !options.get("--mindmap-failure") }) : buildProjectionBundle(root, { mindmapSyntaxAccepted: !options.get("--mindmap-failure") });
   else if (command === "xmind-setting") {
     const enabled = options.get("--enabled");

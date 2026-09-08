@@ -49,6 +49,12 @@ secretary/
 
 うまくいかないときは、秘書が「何が起きて・どうすれば直るか」を日常語で案内します（英語のエラーはそのまま出しません）。
 
+## 0.13.0 source candidateについて
+
+`0.13.0`では、Project Clarityへ選んだsourceから要件候補を取り込み、Validationを実装状態と分けて確認し、古い履歴を残したまま訂正できます。Hook通知や生成された指示は、利用者の新しい承認にはなりません。
+
+公開後の状態は[やさしい秘書 0.13.0 Release](https://github.com/mtaiseeei/yasashii-secretary/releases/tag/v0.13.0)で確認してください。source candidate、Release、installed plugin、新しいsessionでの読み込みは別々に確認します。
+
 ## 作り直したいとき（保護あり）
 
 すでに秘書ディレクトリがある状態で「もう一度セットアップ」「作り直したい」と言うと、
