@@ -198,6 +198,7 @@ Gmail等の公式コネクタは従来どおり都度参照し、Chatworkと明�
 | [sprint-043](sprints/sprint-043.md) | 同一candidateのsource／clean／Git-free、250＋CLX20＋XV4＋E2E4、fresh評価、source receiptを閉じる | sprint-042 fresh Evaluator PASS |
 | [sprint-043-patch-003](sprints/sprint-043-patch-003.md) | Harness正本をreserved laneで先に読む包括scan、意味別Current bundle、Yasashii固有Windows native／inventory／外部live gate | sprint-043-patch-002 done |
 | [sprint-044](sprints/sprint-044.md) | 0.12.0下流整合: Git取り込み、Secretary Voice、LLM-led read／organize、Clarity、両host配布面 | sprint-043-patch-003 fresh PASS |
+| [sprint-045](sprints/sprint-045.md) | public／private Phase A PASS済みのSprint 055／Stop Hook修正をYasashii固有面を保って0.13.0へ差分適応・独立評価 | sprint-044 done。private sprint-052 PASS後 |
 
 既存 sprint-001〜006 と各 patch の契約・progress・feedback は履歴として保持する。
 sprint-007 は製品方針転換で白紙化され、旧計画と実装は `backup/sprint-007-010-plan` に退避済みである。

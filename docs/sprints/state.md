@@ -2,10 +2,10 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-044
+- Current ID: sprint-045
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 9
+- Lineage Dispatches: 1
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
@@ -133,6 +133,7 @@
 | sprint-043-patch-002 | done | [contract](sprint-043-patch-002.md) | [progress](../progress/sprint-043-patch-002.md) | [feedback](../feedback/sprint-043-patch-002.md) |
 | sprint-043-patch-003 | superseded | [contract](sprint-043-patch-003.md) | [progress](../progress/sprint-043-patch-003.md) | - |
 | sprint-044 | done | [contract](sprint-044.md) | [progress](../progress/sprint-044.md) | [feedback](../feedback/sprint-044.md) |
+| sprint-045 | active | [contract](sprint-045.md) | - | - |
 
 ## 0.12.0 release continuation
 
@@ -378,3 +379,9 @@
 - 2026-07-21: sprint-035初回fresh独立評価は`implementation-issue`でFAIL。root解決、両Codex manifest、Harness 0.5.0、overlay、専用・重点123 assertionsは0 FAILだったが、HighとしてCodexの更新承認後も`update-apply.mjs`がClaude CLI更新を実行し得ること、MediumとしてGoogle／Microsoft／NotionのsetupがCodex判定後もClaude設定画面へ進むことを実fileから確認。旧masterのidentity固定期待とsandbox localhost制約は製品FAILへ混ぜず中断を記録。Retry Countを1、Lineage Dispatchesを次Generator分の3へ更新し、修正範囲をupdateと3 setupのhost分岐・負回帰へ限定してfresh Generatorへ差し戻す。
 - 2026-07-22: sprint-035 Retry 1 fresh GeneratorがAgentic `b32cb33`、Yasashii overlay `38597d5`、progress `1257614`で限定修正を完了。Codex更新はClaude updaterへ進まず、Git／session／backup作成前にexit 3で停止し、現行Codex CLIで実在するmarketplace upgradeと確認付きremove／addだけを案内。Google／Microsoft／NotionはClaude CodeとCodex App／CLIの後続手順を分離した。Agentic Sprint035 15/15・Sprint033 20/20・Codex4/4・archive6 suites、Yasashii Sprint035 15/15・overlay11/11・Claude updater41/41・update config10/10・project pointer68/68、overlay managed225・二回適用`secondChanged=0`、両Harness online互換が0 FAIL。外部操作0件。Lineage Dispatchesを4へ更新し、sprint-035をawaiting-evalへ戻してfresh独立Evaluatorへ再提出する。
 - 2026-07-22: sprint-035 Retry 1 fresh独立Evaluatorは内部受入をPASS（72/75）。初回HighのCodex→Claude updater誤到達、Mediumの3 connector setup誤案内、Lowの回帰不足は全てRESOLVED。fake Claude canaryと実Git fixtureで`--host codex`がexit 3、Claude呼出0、HEAD／tree／status／sentinel不変、session／backup0を確認し、3 setupのCodex節が現在hostの公式App／connector確認・本人認可・read-only smoke・未確認停止へ分離されたことを確認。直接184 assertionsとarchive 6 suitesが0 FAIL、overlay二回適用`secondChanged=0`。中断した長時間suiteはPASS根拠へ含めていない。内部finding 0だが、push、実plugin update／reinstall、実connector認証、public、releaseは`external-live-gate-unavailable`として未実行のため、sprint-035はactiveで最終外部gateの操作別承認を待つ。
+
+## 2026-09-08 Sprint 045 preparation
+
+- public056 Phase A `5e26432307a2f247d244dcb2766e870400d006f2`とprivate052 Phase A `d1a2a996f160fe604c85997190fff5c8dc7e47c3`がfresh独立PASS。両feedback全文をmainが確認し、Yasashii045のGeneratorへ進む。publicを共通入力とし、private固有値・製品差分は取り込まない。旧044 done／Lineage9の履歴を維持する。
+- 新系譜0<10を確認し、fresh Generator分を1へ予約してactiveとする。resolverはこのrepoのhigh-risk設定からSol/high／strong／none／native freshを選ぶ。Retry0／Spec0、metadata確認までlaunch-unverified。version0.13.0、会話copy・identity・Skill版差・root guidanceを保持し、main／tag／Release／installは三版PASS後のpublic056 Phase Bで行う。
+- public mainの利用者はSprint055とHook修正のcommit、三版0.13.0公開、このMacの両host導入を明示承認した。fresh Plannerの版固有契約を確認し、新main 045をplannedとする。旧044 done／Lineage9の履歴を保持し、新系譜は0から開始する。Retry0／Spec0／strong／none。public056とprivate052のPhase A独立PASSまでGeneratorをdispatchしない。実ユーザー本文・既存local checkout・旧releaseは非接触。
