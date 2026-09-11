@@ -52,4 +52,7 @@
 - テスト対象URL: なし。
 - 回帰チェック: 上記Mac 4 commandを順番に実行する。
 - 確認シナリオ: `0.10.3`実tag由来migration、`0.10.1` pending回復→apply→rollback、`0.13.0` empty hop、Yasashii marker、CRLF asset、Git-free archiveを確認する。
-- 外部確認待ち: exact candidateのWindows `windows-update-migration` jobと、candidate commitから作るGit-free tar digest／gate。
+- exact candidate: commit `9eb48b758a8efc4d329fcbc5444122a2a6bc9bd6` / tree `36fe585fb3a45d3ea9d40b73f2903c053cc93fa5`。
+- Git-free archive: `/private/tmp/yasashii-secretary-0.13.1-candidate-9eb48b7.tar.gz` / SHA-256 `fd69611ed1d9149ca67a558932e1bed747ddd0c4d46f61d51dc1643d84703b81`。展開物でarchive gate 15 PASS / 0 FAIL、`--plugin-root`を使うmigration回帰 89 PASS / 0 FAIL。
+- Windows: GitHub Actions run `34559040728`は全体SUCCESS。専用`windows-update-migration` job `103137768577`と既存native job `103137768622`はいずれもexact candidateでSUCCESS。
+- 未解消blocker: なし。Phase Aのfresh独立Evaluator判定を待つ。

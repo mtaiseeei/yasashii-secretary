@@ -2,6 +2,14 @@
 
 ## 2026-09-11 更新migration修正0.13.1公開の新承認
 
+- Phase B別fresh Evaluatorのfeedback全文を確認し最終PASS採用、046 done。公開main/tag849af0b8a5712b450a8d55b091af67ce255d9f49はPhase Aと同tree。実download SHA256 29ea4d424b48b3cd729428748713288e2eeb1a8c6ba2e28d1ae3edb65e04270f、candidate配布木のpath/mode/bytes差分0、integrity PASS／archive15/0／migration89/0／protected38/0、旧0.13.0 Release不変、finding0。Retry0／Spec0／Lineage3／strong／noneを保持。この後の通常main pushは評価・進行・handoffの3記録だけで公開tagと製品bytesは不変。Agentic057も公開後PASS済み、利用者の両版0.13.1公開依頼を完了。
+
+- PR13を通常mergeしmain849af0b8a5712b450a8d55b091af67ce255d9f49（candidateと同tree36fe585fb3a45d3ea9d40b73f2903c053cc93fa5）へ統合。新v0.13.1 tag／Release／yasashii-secretary-0.13.1.tar.gzを公開。Lineage2 < 10を確認しPhase Aとは別fresh Evaluator Sol/high実dispatchで3へ更新。実download artifact評価待ち、046未完了、launch-unverified。
+
+- Phase A独立feedback全文を確認しPASS採用。candidate9eb48b758a8efc4d329fcbc5444122a2a6bc9bd6 / tree36fe585fb3a45d3ea9d40b73f2903c053cc93fa5、Mac全対象・Windows34559040728両job・archive・protected38面成功、finding0。許可済み通常main統合と新v0.13.1公開へ進む。別fresh公開後評価までは046未完了。
+
+- 候補9eb48b758a8efc4d329fcbc5444122a2a6bc9bd6 / tree36fe585fb3a45d3ea9d40b73f2903c053cc93fa5を通常push。Mac89/0・13/0・16/0・9/0、archive15/0・実archive migration89/0、protected38/0を受領。Lineage1 < 10を確認しfresh Evaluator Sol/high実dispatchで2へ更新、awaiting-eval／Retry0／Spec0／strong／none、launch-unverified。candidate bytes固定、以後state/progress/feedbackは公開後receiptへ分離。
+
 - public Phase A独立PASSを全文確認し採用。固定入力05fcfa31ce5e76639cd1f4f492c1f26f2308c26d / tree53a3561c3f5eee68f556df6413aef1f48da6d11c、Windows34557176699全体SUCCESS。Lineage0 < 10を確認しfresh Generator Sol/highの実dispatchで1へ更新、046 active／Retry0／Spec0／strong／none、launch-unverified。
 
 - 利用者「よし、リリースして。yasashii版にも流し込んで。」により、修正の版適応、candidate commit／通常push／PR／main統合、新v0.13.1 tag／Release／artifact公開まで続行する。開始main37a1c55、latestv0.13.0。private／PC導入／実workspaceは範囲外。
@@ -12,7 +20,7 @@
 - Current ID: sprint-046
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 1
+- Lineage Dispatches: 3
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
@@ -141,7 +149,7 @@
 | sprint-043-patch-003 | superseded | [contract](sprint-043-patch-003.md) | [progress](../progress/sprint-043-patch-003.md) | - |
 | sprint-044 | done | [contract](sprint-044.md) | [progress](../progress/sprint-044.md) | [feedback](../feedback/sprint-044.md) |
 | sprint-045 | done | [contract](sprint-045.md) | [progress](../progress/sprint-045.md) | [feedback](../feedback/sprint-045.md) |
-| sprint-046 | active | [contract](sprint-046.md) | - | - |
+| sprint-046 | done | [contract](sprint-046.md) | [progress](../progress/sprint-046.md) | [feedback](../feedback/sprint-046.md) |
 
 ## 0.12.0 release continuation
 
