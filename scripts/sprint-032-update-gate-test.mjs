@@ -223,11 +223,12 @@ try {
   const market = JSON.parse(readFileSync(candidateManifest, "utf8"));
   const pluginManifest = JSON.parse(readFileSync(join(candidatePlugin, ".claude-plugin/plugin.json"), "utf8"));
   const edition = JSON.parse(readFileSync(join(candidatePlugin, "edition.json"), "utf8"));
+  const currentVersion = pluginManifest.version;
 
   check("公開0.7.0 implementationをGit履歴から分離取得", published.revision.length === 40 && manifestVersion(published.pluginRoot) === "0.7.0");
-  check("current marketplace/pluginは0.12.0で一致", market.plugins?.[0]?.version === "0.12.0" && pluginManifest.version === "0.12.0");
-  check("canonical/legacy CHANGELOGは0.12.0先頭かつbyte一致", readFileSync(candidateChangelog).equals(readFileSync(legacyChangelog)) && /^# 変更履歴\r?\n\r?\n## \[0\.12\.0\]/u.test(readFileSync(candidateChangelog, "utf8")));
-  check("editionのcandidate/latest参照はyasashii 0.12.0配布面と整合", edition.edition === "yasashii-secretary" && edition.distribution.marketplaceUrl.includes("yasashii-secretary") && edition.distribution.changelogUrl.endsWith("/plugins/yasashii-secretary/CHANGELOG.md"));
+  check(`current marketplace/pluginは${currentVersion}で一致`, market.plugins?.[0]?.version === currentVersion && /^\d+\.\d+\.\d+$/u.test(currentVersion));
+  check(`canonical/legacy CHANGELOGは${currentVersion}先頭かつbyte一致`, readFileSync(candidateChangelog).equals(readFileSync(legacyChangelog)) && new RegExp(`^# 変更履歴\\r?\\n\\r?\\n## \\[${currentVersion.replaceAll(".", "\\.")}\\]`, "u").test(readFileSync(candidateChangelog, "utf8")));
+  check(`editionのcandidate/latest参照はyasashii ${currentVersion}配布面と整合`, edition.edition === "yasashii-secretary" && edition.distribution.marketplaceUrl.includes("yasashii-secretary") && edition.distribution.changelogUrl.endsWith("/plugins/yasashii-secretary/CHANGELOG.md"));
 
   const oldChangelog = readFileSync(join(published.pluginRoot, "CHANGELOG.md"), "utf8");
   const oldMigration = readFileSync(join(published.pluginRoot, "migrations/0.6.0-to-0.7.0.json"));
@@ -241,9 +242,9 @@ try {
   const marker = JSON.parse(readFileSync(join(fresh.workspace, ".secretary/workspace-edition.json"), "utf8"));
   const ledgerPath = join(fresh.workspace, ".secretary/update-ledger.json");
   const ledger = existsSync(ledgerPath) ? JSON.parse(readFileSync(ledgerPath, "utf8")) : {};
-  check("新規0.12.0 onboardingはneutral markerを作る", fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === "yasashii-secretary", fresh.prepared.stderr);
-  check("新規0.12.0導入はedition付きledgerを作る", fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === "yasashii-secretary" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === "0.12.0"), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);
-  check("新規0.12.0配布物は主要skillと両wizardを含む", [
+  check(`新規${currentVersion} onboardingはneutral markerを作る`, fresh.prepared.status === 0 && marker.schemaVersion === 1 && marker.edition === "yasashii-secretary", fresh.prepared.stderr);
+  check(`新規${currentVersion}導入はedition付きledgerを作る`, fresh.ledger.status === 0 && ledger.schemaVersion === 2 && ledger.edition === "yasashii-secretary" && ledger.records?.length === fresh.managed.length && ledger.records.every((record) => record.installedVersion === currentVersion), `${fresh.ledger.stderr}${fresh.ledger.stdout}`);
+  check(`新規${currentVersion}配布物は主要skillと両wizardを含む`, [
     "skills/secretary/SKILL.md",
     "skills/onboarding/SKILL.md",
     "skills/update/SKILL.md",
@@ -252,14 +253,14 @@ try {
   ].every((path) => existsSync(join(candidatePlugin, path))));
 
   const crlfChangelog = join(temporaryRoot, "current-crlf-changelog.md");
-  writeFileSync(crlfChangelog, readFileSync(candidateChangelog, "utf8").replace(/\n/g, "\r\n"));
+  writeFileSync(crlfChangelog, readFileSync(candidateChangelog, "utf8").replace(/\r?\n/gu, "\r\n"));
   const crlf = run(process.execPath, [diagnoseCli, "--workspace", fresh.workspace, "--plugin-root", candidatePlugin, "--latest-manifest", candidateManifest, "--changelog", crlfChangelog, "--choice", "check-only", "--json"], fresh.workspace);
-  check("CRLF CHANGELOGも0.12.0の5 sectionを同じ意味で解析する", crlf.status === 0 && parse(crlf).status === "same", `${crlf.stderr}${crlf.stdout}`);
+  check(`CRLF CHANGELOGも${currentVersion}の5 sectionを同じ意味で解析する`, crlf.status === 0 && parse(crlf).status === "same", `${crlf.stderr}${crlf.stdout}`);
 
   const sameBefore = workspaceSnapshot(fresh.workspace);
   const same = run(process.execPath, [diagnoseCli, "--workspace", fresh.workspace, "--plugin-root", candidatePlugin, "--latest-manifest", candidateManifest, "--changelog", legacyChangelog, "--choice", "check-only", "--json"], fresh.workspace);
   const sameStart = run(process.execPath, [applyCli, "start", "--workspace", fresh.workspace, "--current-plugin-root", candidatePlugin, "--latest-manifest", candidateManifest, "--changelog", legacyChangelog, "--consent", "update-approved", "--json"], fresh.workspace, { YASASHII_UPDATE_TEST_MODE: "fixture" });
-  check("0.12.0→0.12.0はCTAなし・副作用0", same.status === 0 && parse(same).status === "same" && parse(same).choices?.find((item) => item.id === "proceed-update")?.available === false && sameStart.status === 0 && JSON.stringify(workspaceSnapshot(fresh.workspace)) === JSON.stringify(sameBefore), `${same.stderr}${same.stdout}${sameStart.stderr}${sameStart.stdout}`);
+  check(`${currentVersion}→${currentVersion}はCTAなし・副作用0`, same.status === 0 && parse(same).status === "same" && parse(same).choices?.find((item) => item.id === "proceed-update")?.available === false && sameStart.status === 0 && JSON.stringify(workspaceSnapshot(fresh.workspace)) === JSON.stringify(sameBefore), `${same.stderr}${same.stdout}${sameStart.stderr}${sameStart.stdout}`);
 
   const downgradeManifest = join(temporaryRoot, "downgrade-marketplace.json");
   const oldMarket = structuredClone(market);
@@ -268,7 +269,7 @@ try {
   const downgradeBefore = workspaceSnapshot(fresh.workspace);
   const downgrade = run(process.execPath, [diagnoseCli, "--workspace", fresh.workspace, "--plugin-root", candidatePlugin, "--latest-manifest", downgradeManifest, "--changelog", legacyChangelog, "--choice", "check-only", "--json"], fresh.workspace);
   const downgradeStart = run(process.execPath, [applyCli, "start", "--workspace", fresh.workspace, "--current-plugin-root", candidatePlugin, "--latest-manifest", downgradeManifest, "--changelog", legacyChangelog, "--consent", "update-approved", "--json"], fresh.workspace, { YASASHII_UPDATE_TEST_MODE: "fixture" });
-  check("0.12.0→0.8.0はdowngrade-blocked・副作用0", downgrade.status === 0 && parse(downgrade).status === "downgrade-blocked" && parse(downgrade).choices?.find((item) => item.id === "proceed-update")?.available === false && downgradeStart.status === 0 && JSON.stringify(workspaceSnapshot(fresh.workspace)) === JSON.stringify(downgradeBefore), `${downgrade.stderr}${downgrade.stdout}${downgradeStart.stderr}${downgradeStart.stdout}`);
+  check(`${currentVersion}→0.8.0はdowngrade-blocked・副作用0`, downgrade.status === 0 && parse(downgrade).status === "downgrade-blocked" && parse(downgrade).choices?.find((item) => item.id === "proceed-update")?.available === false && downgradeStart.status === 0 && JSON.stringify(workspaceSnapshot(fresh.workspace)) === JSON.stringify(downgradeBefore), `${downgrade.stderr}${downgrade.stdout}${downgradeStart.stderr}${downgradeStart.stdout}`);
 
   const blockerWorkspace = createPublished070BlockerWorkspace(published.pluginRoot);
   const installed070 = join(temporaryRoot, "installed-070-plugin");

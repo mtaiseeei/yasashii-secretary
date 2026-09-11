@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "0.10.1",
+  "toVersion": "0.10.2",
+  "contentChanged": true,
+  "operations": [
+    {
+      "id": "memory-request-v2",
+      "path": "secretary/AGENTS.md",
+      "type": "replace-section",
+      "marker": "memoryへの許可済み依頼として",
+      "endMarker": "過去依頼の質問はwrite 0件とする",
+      "oldAsset": "assets/memory-request-v1.md",
+      "oldAssetSha256": "6b807869b6c140a8903025a942d0918a1a75eb881a9c4b741570dd6013673e9a",
+      "templateFingerprint": "146ba63693b79998884866d3287863ff9a7900fd5c41c3941d147ca1ee1c4279",
+      "asset": "assets/memory-request-v2.md"
+    },
+    {
+      "id": "conversation-flow-v2",
+      "path": "secretary/AGENTS.md",
+      "type": "replace-section",
+      "marker": "request hedgeとcontent hedgeを分ける",
+      "endMarker": "pendingは1件だけとし",
+      "oldAsset": "assets/conversation-flow-v1.md",
+      "oldAssetSha256": "a709ec7b3f75b583f218756aeb4bc0800c09570a37b6e3b718586c77ee2844d7",
+      "templateFingerprint": "146ba63693b79998884866d3287863ff9a7900fd5c41c3941d147ca1ee1c4279",
+      "asset": "assets/conversation-flow-v2.md"
+    },
+    {
+      "id": "claude-memory-v2",
+      "path": "secretary/CLAUDE.md",
+      "type": "replace-section",
+      "marker": "覚えて」と明示された低リスクmemory依頼",
+      "endMarker": "<!-- yasashii-secretary:update-entry:v1:start -->",
+      "oldAsset": "assets/claude-memory-v1.md",
+      "oldAssetSha256": "3022d08714ca4f504929a111eff0f4aac6fe08813ceb00d2aca4233738906283",
+      "templateFingerprint": "9a1299a134a823fc636486a7c93320588183c6af484a1d4d9ca231b5d36f165e",
+      "asset": "assets/claude-memory-v2.md"
+    }
+  ],
+  "note": "旧template由来と確認できるmemory／会話管理節だけを順次置換します。"
+}

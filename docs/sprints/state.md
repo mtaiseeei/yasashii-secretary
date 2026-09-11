@@ -1,11 +1,18 @@
 # Sprint State
 
+## 2026-09-11 更新migration修正0.13.1公開の新承認
+
+- public Phase A独立PASSを全文確認し採用。固定入力05fcfa31ce5e76639cd1f4f492c1f26f2308c26d / tree53a3561c3f5eee68f556df6413aef1f48da6d11c、Windows34557176699全体SUCCESS。Lineage0 < 10を確認しfresh Generator Sol/highの実dispatchで1へ更新、046 active／Retry0／Spec0／strong／none、launch-unverified。
+
+- 利用者「よし、リリースして。yasashii版にも流し込んで。」により、修正の版適応、candidate commit／通常push／PR／main統合、新v0.13.1 tag／Release／artifact公開まで続行する。開始main37a1c55、latestv0.13.0。private／PC導入／実workspaceは範囲外。
+- public057 Phase A PASSの固定入力を待つため046 planned。新しい公開単位としてLineage0、旧045 done／Lineage2は履歴として保持する。
+
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-045
+- Current ID: sprint-046
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 2
+- Lineage Dispatches: 1
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
@@ -134,6 +141,7 @@
 | sprint-043-patch-003 | superseded | [contract](sprint-043-patch-003.md) | [progress](../progress/sprint-043-patch-003.md) | - |
 | sprint-044 | done | [contract](sprint-044.md) | [progress](../progress/sprint-044.md) | [feedback](../feedback/sprint-044.md) |
 | sprint-045 | done | [contract](sprint-045.md) | [progress](../progress/sprint-045.md) | [feedback](../feedback/sprint-045.md) |
+| sprint-046 | active | [contract](sprint-046.md) | - | - |
 
 ## 0.12.0 release continuation
 

@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "0.9.0",
+  "toVersion": "0.9.1",
+  "contentChanged": false,
+  "operations": [],
+  "note": "Harness互換参照はplugin内の変更であり、workspace管理節は変更しません。"
+}

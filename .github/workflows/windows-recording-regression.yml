@@ -9,6 +9,11 @@ on:
       - "plugins/secretary/rules/conversation-contract.md"
       - "plugins/secretary/rules/styles/yasashii.md"
       - "plugins/secretary/templates/**"
+      - "plugins/secretary/migrations/**"
+      - "scripts/sprint-056-patch-001-migration-test.mjs"
+      - "scripts/sprint-056-patch-001-release-test.mjs"
+      - "scripts/check-release-integrity.py"
+      - "scripts/archive-release-gate.mjs"
       - "plugins/secretary/skills/memory-care/scripts/**"
       - "plugins/secretary/skills/**/SKILL.md"
       - "plugins/secretary/skills/chatwork/scripts/**"
@@ -27,6 +32,35 @@ permissions:
   contents: read
 
 jobs:
+  windows-update-migration:
+    runs-on: windows-2025
+    timeout-minutes: 10
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify native Windows runtime
+        shell: pwsh
+        run: node -e "if (process.platform !== 'win32') process.exit(1); console.log(process.platform, process.arch, process.version)"
+      - name: Supported update migrations and pending recovery
+        shell: pwsh
+        run: node scripts/sprint-056-patch-001-migration-test.mjs
+      - name: Release and archive migration guards
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: node scripts/sprint-056-patch-001-release-test.mjs
+      - name: Previous Windows conversation migration regression
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: node scripts/sprint-038-patch-003-conversation-migration-test.mjs --require-windows
   windows-native:
     runs-on: windows-2025
     timeout-minutes: 10

@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "0.9.2",
+  "toVersion": "0.10.0",
+  "contentChanged": false,
+  "operations": [],
+  "note": "identityは専用の確認付きmigrationが管理するため、update sessionはworkspace管理節を重ねて変更しません。"
+}

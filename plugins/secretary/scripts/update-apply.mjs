@@ -54,6 +54,7 @@ const STATIC_LEDGER_PATHS = new Set([
 ]);
 const TEST_MODE = process.env.YASASHII_UPDATE_TEST_MODE === "fixture";
 const SECRET_PATTERN = /(?:-----BEGIN [A-Z ]*PRIVATE KEY-----|["']?(?:password|api[_-]?key|access[_-]?token|secret|credential)["']?\s*[:=]\s*["']?[^\s"']{8,})/i;
+const CURRENT_MIGRATION_FAMILY = "0.13.0";
 
 // 0.2.0公開時の未置換テンプレート。値そのものではなくhashだけを持つ。
 // 個人向け置換後のAGENTS.mdは一致しないためunknown-baselineとなり、既定で保持される。
@@ -118,6 +119,19 @@ function sha256Buffer(value) {
 
 function sha256File(path) {
   return sha256Buffer(readFileSync(path));
+}
+
+function normalizeDistributionText(value) {
+  return value.replace(/\r\n/gu, "\n");
+}
+
+function compareVersions(left, right) {
+  const a = left.split(".").map(Number);
+  const b = right.split(".").map(Number);
+  for (let index = 0; index < 3; index += 1) {
+    if (a[index] !== b[index]) return a[index] - b[index];
+  }
+  return 0;
 }
 
 function atomicJson(path, value) {
@@ -294,7 +308,7 @@ function backupPlugin(pluginRoot, gitDir, scope, config) {
   }
 }
 
-function ensurePluginBackup(session, sessionDirectory, currentPluginRoot, config) {
+function ensurePluginBackup(session, sessionDirectory, currentPluginRoot, config, gitDir) {
   const expectedPluginName = pluginName(config);
   const backupRoot = join(sessionDirectory, "plugin-backup");
   try {
@@ -324,6 +338,9 @@ function ensurePluginBackup(session, sessionDirectory, currentPluginRoot, config
   if (candidates.length !== 1) {
     fail(`更新前plugin ${session.fromVersion}を一意に確認できないため、workspace migrationは開始していません。`, EXIT_REFUSED);
   }
+  if (compareVersions(session.toVersion, CURRENT_MIGRATION_FAMILY) >= 0) {
+    fail("更新前pluginのsession backupがないため、現行版へのworkspace migrationは開始していません。rollback可能な元sessionからやり直してください。", EXIT_REFUSED);
+  }
   session.pluginBackup = backupPlugin(candidates[0], gitDir, session.scope, config);
   session.pluginBackup.recoveredAfterReload = true;
   return true;
@@ -348,6 +365,7 @@ function safeManagedFile(workspace, rel, { allowMissing = false } = {}) {
     fail("管理対象が見つからないため、既定の現状維持で止めました。", EXIT_REFUSED);
   }
   if (!lstatSync(target).isFile()) fail("管理対象が通常ファイルではないため、更新を止めました。", EXIT_REFUSED);
+  if ((lstatSync(target).mode & 0o222) === 0) fail("read-onlyの管理対象は変更せず停止しました。書込み権限を確認してください。", EXIT_REFUSED);
   return target;
 }
 
@@ -372,7 +390,9 @@ function sessionPath(gitDir, config, { existing = false } = {}) {
 function readSession(path, config) {
   try {
     const value = JSON.parse(readFileSync(path, "utf8"));
-    if (value?.schemaVersion !== 1 || !SEMVER.test(value.fromVersion) || !SEMVER.test(value.toVersion) || !/^[a-f0-9]{40,64}$/.test(value.protectionCommit)) throw new Error("schema");
+    if (value?.schemaVersion !== 1 || !SEMVER.test(value.fromVersion) || !SEMVER.test(value.toVersion) || !/^[a-f0-9]{40,64}$/.test(value.protectionCommit)
+      || !ALLOWED_SCOPES.has(value.scope) || !value.selections || typeof value.selections !== "object" || Array.isArray(value.selections)
+      || Object.entries(value.selections).some(([path, choice]) => !ALLOWED_MANAGED_PATHS.has(path) || !ALLOWED_SELECTIONS.has(choice))) throw new Error("schema");
     if (value.edition !== undefined && value.edition !== config.edition) throw new Error("edition");
     if (value.pluginId !== undefined && value.pluginId !== config.distribution.pluginId) throw new Error("plugin-id");
     return value;
@@ -524,6 +544,8 @@ function output(args, value) {
     explanation ? `戻し方: ${explanation.rollback}` : null,
     value.managed?.length ? `ファイル判定: ${value.managed.map((item) => `${item.path}=${item.status}（既定:${item.default}）`).join(" / ")}` : null,
     plan ? `migration: ${plan.fromVersion}→${plan.toVersion}` : null,
+    plan?.versionPath ? `version経路: ${plan.versionPath.join(" → ")}` : null,
+    plan?.targetRecovery ? `中断session回復: ${plan.targetRecovery.fromTarget} → ${plan.targetRecovery.toTarget}（workspace変更 ${plan.targetRecovery.workspaceWritesBeforeRecovery}件）` : null,
     plan ? `追加: ${plan.add.join(" / ") || "なし"}` : null,
     plan ? `変更: ${plan.change.join(" / ") || "なし"}` : null,
     plan ? `維持: ${plan.keep.join(" / ") || "なし"}` : null,
@@ -708,12 +730,36 @@ function retryPlugin(args) {
 }
 
 function migrationFiles(pluginRoot, fromVersion, toVersion) {
+  if (!SEMVER.test(fromVersion) || !SEMVER.test(toVersion)) fail("migration対象versionが不正なため停止しました。", EXIT_REFUSED);
+  if (compareVersions(fromVersion, toVersion) >= 0) fail("同一versionまたはdowngradeのmigrationは行いません。変更は0件です。", EXIT_REFUSED);
   const directory = join(pluginRoot, "migrations");
   const edges = readdirSync(directory)
     .map((file) => ({ file, match: file.match(/^(\d+\.\d+\.\d+)-to-(\d+\.\d+\.\d+)\.json$/) }))
     .filter(({ match }) => match)
     .map(({ file, match }) => ({ file, from: match[1], to: match[2] }))
     .sort((left, right) => left.file.localeCompare(right.file));
+  const edgeKeys = new Set();
+  for (const edge of edges) {
+    const key = `${edge.from}->${edge.to}`;
+    if (edgeKeys.has(key) || compareVersions(edge.from, edge.to) >= 0) fail("migration graphにduplicate edge、cycle、またはdowngradeがあります。workspaceは変更していません。", EXIT_REFUSED);
+    edgeKeys.add(key);
+  }
+  if (compareVersions(toVersion, CURRENT_MIGRATION_FAMILY) >= 0) {
+    let supported;
+    try {
+      supported = JSON.parse(readFileSync(join(directory, "supported.json"), "utf8"));
+    } catch {
+      fail("現行migrationの対応版宣言を確認できません。workspaceは変更していません。", EXIT_REFUSED);
+    }
+    const allowed = new Set(Array.isArray(supported?.supportedFrom) ? supported.supportedFrom : []);
+    if (supported?.schemaVersion !== 1 || supported.currentFamilyMinimum !== CURRENT_MIGRATION_FAMILY
+      || [...allowed].some((version) => !SEMVER.test(version))) {
+      fail("現行migrationの対応版宣言が不正です。workspaceは変更していません。", EXIT_REFUSED);
+    }
+    if (!allowed.has(fromVersion) && compareVersions(fromVersion, CURRENT_MIGRATION_FAMILY) < 0) {
+      fail(`更新元 ${fromVersion} は現行migrationの対応版ではありません。対応版を確認し、既存版のrollbackまたは段階更新を選んでください。変更は0件です。`, EXIT_REFUSED);
+    }
+  }
   const queue = [{ version: fromVersion, files: [] }];
   const visited = new Set([fromVersion]);
   while (queue.length) {
@@ -731,22 +777,44 @@ function migrationFiles(pluginRoot, fromVersion, toVersion) {
 function loadMigration(pluginRoot, fromVersion, toVersion) {
   const files = migrationFiles(pluginRoot, fromVersion, toVersion);
   const operations = [];
+  const operationIds = new Set();
   for (const file of files) {
     const manifestPath = join(pluginRoot, "migrations", file);
     let manifest;
     try { manifest = JSON.parse(readFileSync(manifestPath, "utf8")); } catch { fail("対応するversion別migrationを確認できません。workspaceは変更していません。", EXIT_REFUSED); }
     const expected = file.match(/^(\d+\.\d+\.\d+)-to-(\d+\.\d+\.\d+)\.json$/);
-    if (manifest.schemaVersion !== 1 || manifest.fromVersion !== expected?.[1] || manifest.toVersion !== expected?.[2] || !Array.isArray(manifest.operations)) fail("migration定義が不正なため停止しました。", EXIT_REFUSED);
+    if (manifest.schemaVersion !== 1 || manifest.fromVersion !== expected?.[1] || manifest.toVersion !== expected?.[2]
+      || (manifest.contentChanged !== undefined && typeof manifest.contentChanged !== "boolean") || !Array.isArray(manifest.operations)
+      || (manifest.contentChanged === true && manifest.operations.length === 0)
+      || (manifest.contentChanged === false && manifest.operations.length !== 0)) fail("migration定義が不正なため停止しました。", EXIT_REFUSED);
     for (const operation of manifest.operations) {
-      if (!ALLOWED_MANAGED_PATHS.has(operation.path) || !["append-section", "replace-section"].includes(operation.type) || typeof operation.marker !== "string" || typeof operation.asset !== "string") fail("migrationに許可外の操作があるため停止しました。", EXIT_REFUSED);
-      const asset = realpathSync(join(pluginRoot, "migrations", operation.asset));
-      const migrationRoot = realpathSync(join(pluginRoot, "migrations"));
+      if (!operation || typeof operation !== "object"
+        || typeof operation.id !== "string" || !operation.id.trim() || operationIds.has(operation.id)
+        || !ALLOWED_MANAGED_PATHS.has(operation.path) || !["append-section", "replace-section"].includes(operation.type)
+        || typeof operation.marker !== "string" || !operation.marker.trim()
+        || typeof operation.asset !== "string" || !operation.asset.trim()) fail("migrationに許可外または重複した操作があるため停止しました。", EXIT_REFUSED);
+      operationIds.add(operation.id);
+      let asset;
+      let migrationRoot;
+      try {
+        asset = realpathSync(join(pluginRoot, "migrations", operation.asset));
+        migrationRoot = realpathSync(join(pluginRoot, "migrations"));
+      } catch {
+        fail("migration assetが見つからないため停止しました。", EXIT_REFUSED);
+      }
       if (!asset.startsWith(`${migrationRoot}${sep}`)) fail("migration assetがplugin外を指すため停止しました。", EXIT_REFUSED);
       let oldAssetPath = null;
       if (operation.type === "replace-section") {
-        if (typeof operation.oldAsset !== "string" || typeof operation.endMarker !== "string" || typeof operation.templateFingerprint !== "string") fail("置換migration定義が不正なため停止しました。", EXIT_REFUSED);
-        oldAssetPath = realpathSync(join(pluginRoot, "migrations", operation.oldAsset));
+        if (typeof operation.oldAsset !== "string" || !operation.oldAsset.trim()
+          || typeof operation.endMarker !== "string" || !operation.endMarker.trim()
+          || typeof operation.templateFingerprint !== "string" || !operation.templateFingerprint.trim()) fail("置換migration定義が不正なため停止しました。", EXIT_REFUSED);
+        try { oldAssetPath = realpathSync(join(pluginRoot, "migrations", operation.oldAsset)); }
+        catch { fail("migration旧assetが見つからないため停止しました。", EXIT_REFUSED); }
         if (!oldAssetPath.startsWith(`${migrationRoot}${sep}`)) fail("migration旧assetがplugin外を指すため停止しました。", EXIT_REFUSED);
+        if (operation.oldAssetSha256 !== undefined) {
+          const expectedFingerprint = sha256Buffer(normalizeDistributionText(readFileSync(oldAssetPath, "utf8")).trimEnd()).replace(/^sha256:/, "");
+          if (operation.oldAssetSha256 !== expectedFingerprint) fail("migration旧asset fingerprintが一致しないため停止しました。", EXIT_REFUSED);
+        }
       }
       operations.push({ ...operation, assetPath: asset, oldAssetPath });
     }
@@ -755,10 +823,18 @@ function loadMigration(pluginRoot, fromVersion, toVersion) {
 }
 
 function buildPlan(workspace, session, pluginRoot) {
+  const routeFiles = migrationFiles(pluginRoot, session.fromVersion, session.toVersion);
   const operations = loadMigration(pluginRoot, session.fromVersion, session.toVersion);
+  const bodies = new Map();
+  const originalHashes = new Map();
   const items = operations.map((operation) => {
     const target = safeManagedFile(workspace, operation.path);
-    const body = readFileSync(target, "utf8");
+    const originalBody = bodies.has(operation.path) ? null : readFileSync(target, "utf8");
+    if (originalBody !== null) {
+      bodies.set(operation.path, originalBody);
+      originalHashes.set(operation.path, sha256Buffer(originalBody));
+    }
+    const body = bodies.get(operation.path);
     const managed = session.managed.find((item) => item.path === operation.path);
     const selection = session.selections[operation.path] ?? (["customized", "unknown-baseline"].includes(managed?.status) ? "keep" : "replace");
     if (selection === "keep") return { id: operation.id, path: operation.path, action: "keep", reason: "現状を残す選択", beforeHash: sha256Buffer(body) };
@@ -767,14 +843,105 @@ function buildPlan(workspace, session, pluginRoot) {
       const newSection = readFileSync(operation.assetPath, "utf8").trimEnd();
       const migrationPlan = planConversationMigration({ body, oldSection, newSection, marker: operation.marker, endMarker: operation.endMarker, templateFingerprint: operation.templateFingerprint });
       if (migrationPlan.action === "conflict") return { id: operation.id, path: operation.path, action: "keep", reason: migrationPlan.conflict, conflict: migrationPlan.conflict, beforeHash: sha256Buffer(body), expectedOldHash: `sha256:${migrationPlan.oldHash}`, templateFingerprint: operation.templateFingerprint };
-      return { id: operation.id, path: operation.path, action: migrationPlan.action, reason: migrationPlan.action === "change" ? "template由来の旧会話契約節だけを置換" : "同じmigrationは適用済み", beforeHash: sha256Buffer(body), expectedOldHash: `sha256:${migrationPlan.oldHash}`, templateFingerprint: operation.templateFingerprint };
+      if (migrationPlan.action === "change") {
+        const eol = body.includes("\r\n") ? "\r\n" : "\n";
+        const normalizedOld = oldSection.replace(/\r?\n/gu, eol);
+        const normalizedNew = newSection.replace(/\r?\n/gu, eol);
+        bodies.set(operation.path, body.replace(normalizedOld, normalizedNew));
+      }
+      return { id: operation.id, path: operation.path, action: migrationPlan.action, reason: migrationPlan.action === "change" ? "template由来と確認できた管理節だけを置換" : "管理節の内容まで一致するため適用済み", beforeHash: sha256Buffer(body), afterHash: migrationPlan.afterHash ? `sha256:${migrationPlan.afterHash}` : sha256Buffer(body), expectedOldHash: `sha256:${migrationPlan.oldHash}`, templateFingerprint: operation.templateFingerprint };
     }
-    if (body.includes(operation.marker)) return { id: operation.id, path: operation.path, action: "already-applied", reason: "同じmigrationは適用済み", beforeHash: sha256Buffer(body) };
-    return { id: operation.id, path: operation.path, action: "change", reason: "確認後に更新安全性の固定セクションを追記", beforeHash: sha256Buffer(body), assetHash: sha256File(operation.assetPath) };
+    const asset = readFileSync(operation.assetPath, "utf8").trimEnd();
+    const eol = body.includes("\r\n") ? "\r\n" : "\n";
+    const normalizedAsset = asset.replace(/\r?\n/gu, eol);
+    if (body.includes(normalizedAsset)) return { id: operation.id, path: operation.path, action: "already-applied", reason: "管理節の内容まで一致するため適用済み", beforeHash: sha256Buffer(body), afterHash: sha256Buffer(body) };
+    if (body.includes(operation.marker)) return { id: operation.id, path: operation.path, action: "keep", reason: "marker-content-mismatch", conflict: "marker-content-mismatch", beforeHash: sha256Buffer(body) };
+    const after = `${body.replace(/[\r\n]+$/u, "")}${eol}${eol}${normalizedAsset}${eol}`;
+    bodies.set(operation.path, after);
+    return { id: operation.id, path: operation.path, action: "change", reason: "確認後に製品所有の固定セクションを追記", beforeHash: sha256Buffer(body), afterHash: sha256Buffer(after), assetHash: sha256File(operation.assetPath) };
   });
-  const plan = { fromVersion: session.fromVersion, toVersion: session.toVersion, add: [], change: items.filter((item) => item.action === "change").map((item) => item.path), keep: items.filter((item) => item.action !== "change").map((item) => item.path), items };
+  const conflictedPaths = new Set(items.filter((item) => item.conflict).map((item) => item.path));
+  for (const item of items) {
+    if (conflictedPaths.has(item.path) && item.action === "change") {
+      item.action = "keep";
+      item.reason = "同じfile内の管理節にconflictがあるためfile全体を維持";
+      item.conflict = "path-conflict";
+    }
+  }
+  const changedPaths = [...new Set(items.filter((item) => item.action === "change").map((item) => item.path))];
+  const keptPaths = [...new Set(items.filter((item) => item.action === "keep").map((item) => item.path))];
+  const alreadyAppliedPaths = [...new Set(items.filter((item) => item.action === "already-applied").map((item) => item.path))];
+  const finalHashes = Object.fromEntries([...bodies].map(([path, body]) => [path, conflictedPaths.has(path) ? originalHashes.get(path) : sha256Buffer(body)]));
+  const versionPath = [session.fromVersion, ...routeFiles.map((file) => file.match(/-to-(\d+\.\d+\.\d+)\.json$/)?.[1]).filter(Boolean)];
+  const targetRecovery = session.targetRecovery ? {
+    fromTarget: session.targetRecovery.fromTarget,
+    toTarget: session.targetRecovery.toTarget,
+    workspaceWritesBeforeRecovery: session.targetRecovery.workspaceWritesBeforeRecovery,
+  } : null;
+  const plan = { fromVersion: session.fromVersion, toVersion: session.toVersion, versionPath, targetRecovery, add: [], change: changedPaths, keep: keptPaths, alreadyApplied: alreadyAppliedPaths, contentWriteCount: items.filter((item) => item.action === "change").length, finalHashes, items };
   plan.planHash = sha256Buffer(JSON.stringify(plan));
   return plan;
+}
+
+function sessionHasNoMigrationWrites(session) {
+  const migration = session.migration ?? {};
+  return (migration.changedPaths ?? []).length === 0
+    && Object.keys(migration.appliedHashes ?? {}).length === 0
+    && migration.ledgerChanged !== true
+    && migration.markerChanged !== true;
+}
+
+function recoverPendingTarget(workspace, gitDir, statePath, session, plugin, config) {
+  if (plugin.version === session.toVersion) return false;
+  const recoverablePhase = ["awaiting-reload", "awaiting-migration-confirmation"].includes(session.phase);
+  if (compareVersions(session.toVersion, CURRENT_MIGRATION_FAMILY) < 0
+    || compareVersions(plugin.version, session.toVersion) <= 0
+    || !recoverablePhase
+    || !sessionHasNoMigrationWrites(session)) {
+    fail("reload後のplugin versionが予定版と一致せず、安全な未変更sessionとして回復できません。migrationは行っていません。", EXIT_REFUSED);
+  }
+  if (!ALLOWED_SCOPES.has(session.scope) || !session.selections || typeof session.selections !== "object"
+    || Object.entries(session.selections).some(([path, choice]) => !ALLOWED_MANAGED_PATHS.has(path) || !ALLOWED_SELECTIONS.has(choice))) {
+    fail("元sessionのscopeまたは管理対象選択を検証できないため、更新targetを差し替えません。", EXIT_REFUSED);
+  }
+  const head = git(workspace, ["rev-parse", "HEAD"]);
+  const status = git(workspace, ["status", "--porcelain=v1", "--untracked-files=all"]);
+  if (head.status !== 0 || head.stdout.trim() !== session.protectionCommit || status.status !== 0 || status.stdout.trim()) {
+    fail("保護commit後のworkspaceが変わっているため、更新targetを差し替えません。rollbackで開始前状態を確認してください。", EXIT_REFUSED);
+  }
+  if (!Array.isArray(session.managed) || session.managed.some((managed) => (
+    !ALLOWED_MANAGED_PATHS.has(managed.path)
+    || managed.currentHash !== sha256File(safeManagedFile(workspace, managed.path))
+  ))) {
+    fail("管理対象fileが旧dry-run前から変わっているため、更新targetを差し替えません。", EXIT_REFUSED);
+  }
+  const backupRoot = join(dirname(statePath), "plugin-backup");
+  try {
+    if (session.pluginBackup?.directory !== "plugin-backup" || session.pluginBackup.version !== session.fromVersion
+      || session.pluginBackup.scope !== session.scope) throw new Error("backup-state");
+    const backup = inspectPluginTree(backupRoot, session.fromVersion, pluginName(config));
+    if (backup.treeHash !== session.pluginBackup.treeHash || backup.fileCount !== session.pluginBackup.fileCount) throw new Error("backup-identity");
+  } catch {
+    fail("更新前plugin backupの版またはtree identityが一致しないため、更新targetを差し替えません。", EXIT_REFUSED);
+  }
+  // Mutating the session is the last step: graph/asset validation must succeed first.
+  loadMigration(plugin.root, session.fromVersion, plugin.version);
+  const previousTarget = session.toVersion;
+  session.originalTargetVersion ??= previousTarget;
+  session.targetRecovery = {
+    fromTarget: previousTarget,
+    toTarget: plugin.version,
+    workspaceWritesBeforeRecovery: 0,
+    protectionCommit: session.protectionCommit,
+    pluginBackupTreeHash: session.pluginBackup.treeHash,
+  };
+  session.toVersion = plugin.version;
+  session.phase = "awaiting-reload";
+  session.plugin = { updated: true, requiresReload: false, recoveredTarget: true };
+  delete session.plan;
+  delete session.verification;
+  atomicJson(statePath, session);
+  return true;
 }
 
 function resume(args) {
@@ -788,9 +955,9 @@ function resume(args) {
     fail("plugin更新が完了していないため、workspace migrationへ進みません。", EXIT_REFUSED);
   }
   const plugin = guardedPlugin;
-  if (plugin.version !== session.toVersion) fail("reload後のplugin versionが予定版と一致しません。migrationは行っていません。", EXIT_REFUSED);
-  if (ensurePluginBackup(session, dirname(statePath), plugin.root, config)) atomicJson(statePath, session);
-  session.migration = { changedPaths: [], appliedHashes: {}, ledgerChanged: false, ledgerHash: null, markerChanged: false, markerHash: null, ...(session.migration ?? {}) };
+  recoverPendingTarget(workspace, gitDir, statePath, session, plugin, config);
+  if (ensurePluginBackup(session, dirname(statePath), plugin.root, config, gitDir)) atomicJson(statePath, session);
+  session.migration = { changedPaths: [], appliedHashes: {}, appliedOperationIds: [], contentWriteCount: 0, ledgerChanged: false, ledgerHash: null, markerChanged: false, markerHash: null, ...(session.migration ?? {}) };
   const plan = session.phase === "migration-partial" && session.plan
     ? session.plan
     : buildPlan(workspace, session, plugin.root);
@@ -811,13 +978,34 @@ function resume(args) {
   const head = git(workspace, ["rev-parse", "HEAD"]);
   if (head.status !== 0 || head.stdout.trim() !== session.protectionCommit) fail("保護commit後に別のcommitがあります。意図不明の変更を避けるため停止しました。", EXIT_REFUSED);
   const operations = loadMigration(plugin.root, session.fromVersion, session.toVersion);
+  for (const path of new Set(plan.items.map((item) => item.path))) {
+    const appliedItems = plan.items.filter((item) => item.path === path && session.migration.appliedOperationIds.includes(item.id));
+    if (!appliedItems.length) continue;
+    const expectedCheckpoint = appliedItems.at(-1).afterHash;
+    if (!expectedCheckpoint || sha256File(safeManagedFile(workspace, path)) !== expectedCheckpoint) {
+      fail("部分適用後の管理対象が記録済みcheckpointと一致しないため、追加migrationを行いません。rollbackで確認してください。", EXIT_REFUSED);
+    }
+  }
   let applied = 0;
   for (const item of plan.items) {
     if (item.action !== "change") continue;
     const operation = operations.find((candidate) => candidate.id === item.id);
     const target = safeManagedFile(workspace, item.path);
     const body = readFileSync(target, "utf8");
-    if (body.includes(operation.marker)) continue;
+    if (session.migration.appliedOperationIds.includes(item.id)) continue;
+    if (operation.type === "replace-section") {
+      const oldSection = readFileSync(operation.oldAssetPath, "utf8").trimEnd();
+      const newSection = readFileSync(operation.assetPath, "utf8").trimEnd();
+      const observed = planConversationMigration({ body, oldSection, newSection, marker: operation.marker, endMarker: operation.endMarker, templateFingerprint: operation.templateFingerprint });
+      if (observed.action === "already-applied" && sha256Buffer(body) === item.afterHash) {
+        session.migration.appliedOperationIds = [...new Set([...session.migration.appliedOperationIds, item.id])];
+        session.migration.changedPaths = [...new Set([...session.migration.changedPaths, item.path])];
+        session.migration.appliedHashes = { ...(session.migration.appliedHashes ?? {}), [item.path]: sha256File(target) };
+        session.migration.contentWriteCount = Number(session.migration.contentWriteCount ?? 0) + 1;
+        atomicJson(statePath, session);
+        continue;
+      }
+    }
     if (sha256Buffer(body) !== item.beforeHash) fail("dry-run後に対象ファイルが変わったため、本実行せず停止しました。", EXIT_REFUSED);
     if (SECRET_PATTERN.test(body)) fail("資格情報らしき内容を検出したため、migrationを止めました。", EXIT_REFUSED);
     const asset = readFileSync(operation.assetPath, "utf8").trimEnd();
@@ -825,22 +1013,25 @@ function resume(args) {
       const oldSection = readFileSync(operation.oldAssetPath, "utf8").trimEnd();
       applyConversationMigration({ target, plan: { ...item, beforeHash: item.beforeHash.replace(/^sha256:/, "") }, oldSection, newSection: asset });
     } else {
-      writeFileAtomicSafe(workspace, target, `${body.trimEnd()}\n\n${asset}\n`, { encoding: "utf8" });
+      const eol = body.includes("\r\n") ? "\r\n" : "\n";
+      writeFileAtomicSafe(workspace, target, `${body.replace(/[\r\n]+$/u, "")}${eol}${eol}${asset.replace(/\r?\n/gu, eol)}${eol}`, { encoding: "utf8" });
     }
     session.migration.changedPaths = [...new Set([...session.migration.changedPaths, item.path])];
     session.migration.appliedHashes = { ...(session.migration.appliedHashes ?? {}), [item.path]: sha256File(target) };
+    session.migration.appliedOperationIds = [...new Set([...session.migration.appliedOperationIds, item.id])];
+    session.migration.contentWriteCount = Number(session.migration.contentWriteCount ?? 0) + 1;
     session.phase = "migration-partial";
     atomicJson(statePath, session);
     applied += 1;
     if (TEST_MODE && args.values.get("--test-fail-after") === "workspace-write") {
-      output(args, { title: "migrationを中断しました", message: "途中状態を保存しました。同じplanで再開しても追記は重複しません。", applied, pushCount: 0 });
+      output(args, { title: "migrationを中断しました", message: "途中状態を保存しました。同じplanで再開しても追記は重複しません。", applied, contentWriteCount: applied, pushCount: 0 });
       process.exitCode = EXIT_FAILED;
       return;
     }
   }
   const ledgerResult = updateLedger(workspace, session, plan, config);
-  session.migration.ledgerChanged = ledgerResult.changed;
-  session.migration.ledgerHash = ledgerResult.hash;
+  session.migration.ledgerChanged = session.migration.ledgerChanged === true || ledgerResult.changed;
+  session.migration.ledgerHash = ledgerResult.hash ?? session.migration.ledgerHash;
   atomicJson(statePath, session);
   if (TEST_MODE && args.values.get("--test-fail-after") === "ledger-write") {
     session.phase = "migration-partial";
@@ -850,8 +1041,8 @@ function resume(args) {
     return;
   }
   const markerResult = updateEditionMarker(workspace, config);
-  session.migration.markerChanged = markerResult.changed;
-  session.migration.markerHash = markerResult.hash;
+  session.migration.markerChanged = session.migration.markerChanged === true || markerResult.changed;
+  session.migration.markerHash = markerResult.hash ?? session.migration.markerHash;
   atomicJson(statePath, session);
   const verification = verifyUpdate(workspace, plugin.root, session, plan, args, config);
   if (!verification.ok) {
@@ -865,7 +1056,8 @@ function resume(args) {
   session.phase = "completed";
   session.verification = verification;
   atomicJson(statePath, session);
-  output(args, { title: "安全な更新が完了しました", message: "plugin version、台帳、選択、migration、主要導線を確認しました。pushは行っていません。", protectionCommit: session.protectionCommit, plan, verification, pushCount: 0 });
+  const contentWriteCount = Number(session.migration.contentWriteCount ?? 0);
+  output(args, { title: "安全な更新が完了しました", message: contentWriteCount > 0 ? "plugin version、台帳、選択、管理節、主要導線を確認しました。pushは行っていません。" : "version経路と台帳を確認しました。管理fileの内容変更は0件で、pushも行っていません。", protectionCommit: session.protectionCommit, plan, verification, contentWriteCount, migrationCount: contentWriteCount, pushCount: 0 });
 }
 
 function updateLedger(workspace, session, plan, config) {
@@ -938,12 +1130,8 @@ function verifyUpdate(workspace, pluginRoot, session, plan, args, config) {
     pluginVersion: safePluginRoot(pluginRoot, config).version === session.toVersion,
     ledger: ledgerValid,
     workspaceEdition: inspectWorkspaceEdition(workspace, config).state === "same-edition",
-    selectionHonored: plan.items.every((item) => item.action !== "keep" || !session.migration.changedPaths.includes(item.path)),
-    migrationState: plan.items.every((item) => {
-      if (item.action !== "change") return true;
-      const operation = loadMigration(pluginRoot, session.fromVersion, session.toVersion).find((candidate) => candidate.id === item.id);
-      return Boolean(operation && readFileSync(safeManagedFile(workspace, item.path), "utf8").includes(operation.marker));
-    }),
+    selectionHonored: Object.entries(session.selections ?? {}).every(([path, choice]) => choice !== "keep" || !session.migration.changedPaths.includes(path)),
+    migrationState: Object.entries(plan.finalHashes ?? {}).every(([path, expectedHash]) => sha256File(safeManagedFile(workspace, path)) === expectedHash),
     updateSkill: existsSync(join(pluginRoot, "skills", "update", "SKILL.md")),
     secretary: existsSync(join(pluginRoot, "skills", "secretary", "SKILL.md")),
     memory: existsSync(join(pluginRoot, "skills", "memory-care", "SKILL.md")),
