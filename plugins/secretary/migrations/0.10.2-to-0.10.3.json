@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "0.10.2",
+  "toVersion": "0.10.3",
+  "contentChanged": false,
+  "operations": [],
+  "note": "0.10.3はplugin内の修正であり、workspace管理節は0.10.2と同一です。"
+}

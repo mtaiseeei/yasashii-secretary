@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import { closeSync, fsyncSync, openSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
+import { closeSync, fchmodSync, fsyncSync, lstatSync, openSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 
 const TEMP_CREATE_ATTEMPTS = 16;
@@ -21,19 +21,28 @@ function occurrences(body, needle) {
 }
 
 export function planConversationMigration({ body, oldSection, newSection, marker, endMarker, templateFingerprint }) {
+  const eol = body.includes("\r\n") ? "\r\n" : "\n";
+  const withEol = (value) => value.replace(/\r?\n/gu, eol);
+  oldSection = withEol(oldSection);
+  newSection = withEol(newSection);
   const beforeHash = sha256(body);
   const oldHash = sha256(oldSection);
   const startCount = occurrences(body, marker);
   const endCount = occurrences(body, endMarker);
-  if (startCount === 1 && endCount === 1 && body.indexOf(marker) < body.indexOf(endMarker)) {
+  const newCount = occurrences(body, newSection);
+  if (newCount === 1 && startCount === occurrences(newSection, marker) && endCount === occurrences(newSection, endMarker)) {
     return { action: "already-applied", beforeHash, oldHash, templateFingerprint, conflict: null };
   }
-  if (startCount !== 0 || endCount !== 0) {
+  if (newCount > 1 || (newCount === 1 && (startCount !== occurrences(newSection, marker) || endCount !== occurrences(newSection, endMarker)))) {
     return { action: "conflict", beforeHash, oldHash, templateFingerprint, conflict: "marker-collision" };
   }
   const oldCount = occurrences(body, oldSection);
   if (oldCount !== 1) {
-    return { action: "conflict", beforeHash, oldHash, templateFingerprint, conflict: oldCount === 0 ? "template-ownership-unverified" : "old-section-ambiguous" };
+    const markerCollision = startCount !== occurrences(oldSection, marker) || endCount !== occurrences(oldSection, endMarker);
+    return { action: "conflict", beforeHash, oldHash, templateFingerprint, conflict: markerCollision ? "marker-collision" : oldCount === 0 ? "template-ownership-unverified" : "old-section-ambiguous" };
+  }
+  if (startCount !== occurrences(oldSection, marker) || endCount !== occurrences(oldSection, endMarker)) {
+    return { action: "conflict", beforeHash, oldHash, templateFingerprint, conflict: "marker-collision" };
   }
   const after = body.replace(oldSection, newSection);
   return {
@@ -50,12 +59,20 @@ export function planConversationMigration({ body, oldSection, newSection, marker
 function createOwnedSiblingTemp(target, purpose) {
   const parent = dirname(target);
   const targetName = basename(target);
+  const mode = lstatSync(target).mode & 0o777;
   for (let attempt = 0; attempt < TEMP_CREATE_ATTEMPTS; attempt += 1) {
     const nonce = attempt === 0 ? INITIAL_TEMP_NONCE : randomBytes(8).toString("hex");
     const path = join(parent, `.${targetName}.${purpose}-${process.pid}-${nonce}`);
+    let descriptor = null;
     try {
-      return { path, descriptor: openSync(path, "wx", 0o600), createAttempts: attempt + 1 };
+      descriptor = openSync(path, "wx", 0o600);
+      fchmodSync(descriptor, mode);
+      return { path, descriptor, createAttempts: attempt + 1 };
     } catch (error) {
+      if (descriptor !== null) {
+        try { closeSync(descriptor); } catch {}
+        try { unlinkSync(path); } catch {}
+      }
       if (error?.code === "EEXIST") continue;
       throw error;
     }
@@ -112,6 +129,9 @@ export function applyConversationMigration({ target, plan, oldSection, newSectio
   }
   if (plan.action !== "change") throw new Error("migration-plan-stale");
   const beforeText = before.toString("utf8");
+  const eol = beforeText.includes("\r\n") ? "\r\n" : "\n";
+  oldSection = oldSection.replace(/\r?\n/gu, eol);
+  newSection = newSection.replace(/\r?\n/gu, eol);
   if (occurrences(beforeText, oldSection) !== 1) throw new Error("migration-ownership-changed");
   const after = Buffer.from(beforeText.replace(oldSection, newSection), "utf8");
   const owned = createOwnedSiblingTemp(target, "conversation-migration");

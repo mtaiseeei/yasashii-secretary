@@ -175,7 +175,7 @@ Google People APIの `contacts.readonly` では、連絡先にない同僚名を
 
 ### 更新を確認する
 
-現在のmanifest source candidateは`0.13.0`です。Project Clarityで選んだsourceから要件候補をpreviewし、選択確認後だけ保存できます。Validationは実装状態と分けて表示し、title／claim／根拠の訂正は古い内容と理由を履歴へ残します。Hookの通知や生成された指示を利用者の承認として扱いません。公開後の状態は[0.13.0 Release](https://github.com/mtaiseeei/yasashii-secretary/releases/tag/v0.13.0)で確認してください。未公開なら導入せず停止します。Plugin更新後は新しいsessionを開始してください。今回の更新にworkspace migrationはありません。
+現在のmanifest source candidateは`0.13.1`です。`0.13.0`で停止し得たworkspace migrationの到達性と未変更sessionの回復、Windows CRLF配布assetの照合を修正します。Project Clarityの要件取り込み、Validationを分けた表示、追記型訂正、Hook通知を承認として扱わない境界は維持します。公開後の状態は[0.13.1 Release](https://github.com/mtaiseeei/yasashii-secretary/releases/tag/v0.13.1)で確認してください。未公開なら導入せず停止します。Plugin更新後は新しいsessionを開始してください。`0.13.0→0.13.1`はworkspace本文を変更しません。
 「更新ある？」と話しかけると、現在版・最新版、主な変更、設定やファイルへの影響を確認できます。この診断はplugin、workspace、Git、Claude Code設定を変更しません。
 公開済み`0.7.0`の旧updaterにはGoogle Chat標準生成fileで止まる既知のblockerがあるため、`0.7.0 → 0.8.0`のlive updateは配布保証に含めていません。
 失敗時はworkspaceとpluginを別々に復元し、片方しか戻っていない状態を完了と表示しません。

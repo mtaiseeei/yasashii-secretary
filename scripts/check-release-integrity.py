@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -22,10 +24,139 @@ EXPECTED_SKILLS = {
     "onboarding", "projects", "secretary", "settings", "setup-google", "setup-microsoft",
     "setup-notion", "update", "weekly",
 }
+SUPPORTED_UPDATE_SOURCES = ["0.8.0", "0.9.0", "0.9.1", "0.9.2", "0.10.0", "0.10.1", "0.10.2", "0.10.3", "0.12.0", "0.13.0"]
+MANAGED_MIGRATION_PATHS = {"secretary/AGENTS.md", "secretary/CLAUDE.md"}
 
 
 def version_key(value: str) -> tuple[int, int, int]:
     return tuple(int(part) for part in value.split("."))
+
+
+def validate_migration_graph(root: Path, current_version: str | None) -> list[str]:
+    errors: list[str] = []
+    migration_root = root / "plugins/secretary/migrations"
+    try:
+        supported = json.loads((migration_root / "supported.json").read_text())
+    except (OSError, json.JSONDecodeError) as error:
+        return [f"migration supported-source declaration is unreadable: {error}"]
+    if supported != {"schemaVersion": 1, "currentFamilyMinimum": "0.13.0", "supportedFrom": SUPPORTED_UPDATE_SOURCES}:
+        errors.append("migration supported-source declaration is invalid")
+
+    edges: dict[str, list[str]] = {}
+    seen_edges: set[tuple[str, str]] = set()
+    operation_ids: set[str] = set()
+    pattern = re.compile(r"^(\d+\.\d+\.\d+)-to-(\d+\.\d+\.\d+)\.json$")
+    for path in sorted(migration_root.glob("*-to-*.json")):
+        match = pattern.fullmatch(path.name)
+        if not match:
+            errors.append(f"migration filename is invalid: {path.name}")
+            continue
+        from_version, to_version = match.groups()
+        edge = (from_version, to_version)
+        if edge in seen_edges:
+            errors.append(f"duplicate migration edge: {from_version}->{to_version}")
+        seen_edges.add(edge)
+        if version_key(from_version) >= version_key(to_version):
+            errors.append(f"migration edge must move forward: {from_version}->{to_version}")
+        edges.setdefault(from_version, []).append(to_version)
+        try:
+            manifest = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError) as error:
+            errors.append(f"migration manifest is unreadable: {path.name}: {error}")
+            continue
+        operations = manifest.get("operations")
+        if manifest.get("schemaVersion") != 1 or manifest.get("fromVersion") != from_version or manifest.get("toVersion") != to_version or not isinstance(operations, list):
+            errors.append(f"migration metadata is invalid: {path.name}")
+            continue
+        content_changed = manifest.get("contentChanged")
+        if content_changed is not None and not isinstance(content_changed, bool):
+            errors.append(f"migration contentChanged is invalid: {path.name}")
+        if content_changed is True and not operations:
+            errors.append(f"migration with managed content changes has no operations: {path.name}")
+        if content_changed is False and operations:
+            errors.append(f"migration without managed content changes has operations: {path.name}")
+        for operation in operations:
+            operation_id = operation.get("id") if isinstance(operation, dict) else None
+            if not isinstance(operation_id, str) or not operation_id.strip() or operation_id in operation_ids:
+                errors.append(f"migration operation id is invalid or duplicate: {path.name}")
+                continue
+            operation_ids.add(operation_id)
+            operation_type = operation.get("type")
+            if operation.get("path") not in MANAGED_MIGRATION_PATHS or operation_type not in {"append-section", "replace-section"}:
+                errors.append(f"migration operation is outside the managed surface: {path.name}:{operation_id}")
+            for field in ("marker", "asset"):
+                value = operation.get(field)
+                if not isinstance(value, str) or not value.strip():
+                    errors.append(f"migration operation field is invalid: {path.name}:{operation_id}:{field}")
+            if operation_type == "replace-section":
+                for field in ("oldAsset", "endMarker", "templateFingerprint"):
+                    value = operation.get(field)
+                    if not isinstance(value, str) or not value.strip():
+                        errors.append(f"migration replace field is invalid: {path.name}:{operation_id}:{field}")
+            for field in (["asset"] if operation_type == "append-section" else ["asset", "oldAsset"]):
+                value = operation.get(field)
+                if not isinstance(value, str) or not value.strip():
+                    errors.append(f"migration asset field is invalid: {path.name}:{operation_id}:{field}")
+                    continue
+                candidate = (migration_root / value).resolve()
+                try:
+                    candidate.relative_to(migration_root.resolve())
+                except ValueError:
+                    errors.append(f"migration asset escapes the distribution: {path.name}:{operation_id}:{field}")
+                    continue
+                if not candidate.is_file():
+                    errors.append(f"migration asset is missing: {path.name}:{operation_id}:{field}")
+            old_asset_hash = operation.get("oldAssetSha256")
+            if old_asset_hash is not None:
+                old_asset = (migration_root / str(operation.get("oldAsset", ""))).resolve()
+                if not re.fullmatch(r"[a-f0-9]{64}", str(old_asset_hash)) or not old_asset.is_file():
+                    errors.append(f"migration old asset fingerprint is invalid: {path.name}:{operation_id}")
+                else:
+                    digest = hashlib.sha256(old_asset.read_text().rstrip().encode()).hexdigest()
+                    if digest != old_asset_hash:
+                        errors.append(f"migration old asset fingerprint differs: {path.name}:{operation_id}")
+
+    visiting: set[str] = set()
+    visited: set[str] = set()
+    def visit(version: str) -> None:
+        if version in visiting:
+            errors.append(f"migration graph contains a cycle at {version}")
+            return
+        if version in visited:
+            return
+        visiting.add(version)
+        for target in edges.get(version, []):
+            visit(target)
+        visiting.remove(version)
+        visited.add(version)
+    for version in list(edges):
+        visit(version)
+
+    if isinstance(current_version, str) and SEMVER.fullmatch(current_version):
+        for source in SUPPORTED_UPDATE_SOURCES:
+            queue = [source]
+            reached = {source}
+            while queue:
+                version = queue.pop(0)
+                if version == current_version:
+                    break
+                for target in edges.get(version, []):
+                    if target not in reached:
+                        reached.add(target)
+                        queue.append(target)
+            if current_version not in reached:
+                errors.append(f"supported migration source cannot reach current version: {source}->{current_version}")
+
+    if (root / ".git").exists():
+        tags = subprocess.run(["git", "-C", str(root), "tag", "--list"], capture_output=True, text=True, check=False)
+        if tags.returncode != 0:
+            errors.append("published update-source tags could not be checked")
+        else:
+            published = set(tags.stdout.splitlines())
+            for source in SUPPORTED_UPDATE_SOURCES:
+                if f"v{source}" not in published:
+                    errors.append(f"supported migration source has no published tag: {source}")
+    return errors
 
 
 def validate(root: Path) -> list[str]:
@@ -40,8 +171,8 @@ def validate(root: Path) -> list[str]:
         legacy_changelog_path = legacy_root / "CHANGELOG.md"
         changelog_bytes = changelog_path.read_bytes()
         legacy_changelog_bytes = legacy_changelog_path.read_bytes()
-        changelog = changelog_bytes.decode()
-        legacy_changelog = legacy_changelog_bytes.decode()
+        changelog = changelog_bytes.decode().replace("\r\n", "\n")
+        legacy_changelog = legacy_changelog_bytes.decode().replace("\r\n", "\n")
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         return [f"release surface unreadable: {error}"]
 
@@ -100,8 +231,8 @@ def validate(root: Path) -> list[str]:
 
     if codex_plugin.get("name") != PLUGIN_NAME:
         errors.append("Codex plugin manifest name is missing or invalid")
-    if codex_plugin.get("version") != "0.13.0":
-        errors.append("Codex plugin manifest version must be 0.13.0")
+    if codex_plugin.get("version") != "0.13.1":
+        errors.append("Codex plugin manifest version must be 0.13.1")
     if codex_plugin.get("skills") != "./skills/":
         errors.append("Codex plugin manifest skills must be ./skills/")
     if codex_plugin.get("author", {}).get("name") != AUTHOR:
@@ -171,6 +302,8 @@ def validate(root: Path) -> list[str]:
         errors.append("plugin version is missing or not semver")
     if market_version != plugin_version or plugin_version != codex_plugin.get("version"):
         errors.append("marketplace and plugin versions differ")
+
+    errors.extend(validate_migration_graph(root, plugin_version if isinstance(plugin_version, str) else None))
 
     matches = list(HEADING.finditer(changelog))
     versions = [match.group(1) for match in matches]

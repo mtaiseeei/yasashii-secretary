@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "0.10.3",
+  "toVersion": "0.12.0",
+  "contentChanged": true,
+  "operations": [
+    {
+      "id": "secretary-voice-v1",
+      "path": "secretary/AGENTS.md",
+      "type": "replace-section",
+      "marker": "話者の一人称は既定「私」",
+      "endMarker": "## 会話の節目と1日の流れ",
+      "oldAsset": "assets/voice-contract-v1.md",
+      "oldAssetSha256": "dce1b4be52391ac94d9970d2a9c5fa24d5be9cbda7034aaa4030c046df8dc1ad",
+      "templateFingerprint": "0bd57ec94676dab3ba91bf12a54314ce3e9229984bd254898b964e79b5d8d62f",
+      "asset": "assets/voice-contract-v2.md"
+    },
+    {
+      "id": "source-led-organization-v1",
+      "path": "secretary/AGENTS.md",
+      "type": "replace-section",
+      "marker": "canonical rootから安全に必要な原本を取得済みなら",
+      "endMarker": "<!-- yasashii-secretary:update-safety:v1:start -->",
+      "oldAsset": "assets/source-clarity-v1.md",
+      "oldAssetSha256": "648aff0c1d51a0a95e4c2cd3d673cb04e0e79e177d332ece0ed487d0e6e6a60e",
+      "templateFingerprint": "0bd57ec94676dab3ba91bf12a54314ce3e9229984bd254898b964e79b5d8d62f",
+      "asset": "assets/source-clarity-v2.md"
+    },
+    {
+      "id": "clarity-collaboration-v1",
+      "path": "secretary/AGENTS.md",
+      "type": "replace-section",
+      "marker": "<!-- yasashii-secretary:clarity-collaboration:workspace-template:v1 -->",
+      "endMarker": "一つの成果に向けた複数行動",
+      "oldAsset": "assets/clarity-project-v1.md",
+      "oldAssetSha256": "d7f639534370518430e871af030ec2661f4833c431b966e5fd8e5014bbb99f02",
+      "templateFingerprint": "0bd57ec94676dab3ba91bf12a54314ce3e9229984bd254898b964e79b5d8d62f",
+      "asset": "assets/clarity-project-v2.md"
+    },
+    {
+      "id": "claude-clarity-collaboration-v1",
+      "path": "secretary/CLAUDE.md",
+      "type": "replace-section",
+      "marker": "<!-- yasashii-secretary:clarity-collaboration:workspace-template:v1 -->",
+      "endMarker": "<!-- yasashii-secretary:update-entry:v1:start -->",
+      "oldAsset": "assets/claude-clarity-v1.md",
+      "oldAssetSha256": "ca6fbe59b17c4f6d2ed2c82574807f4d07b8b2932eae2cc70ebe13ce99165450",
+      "templateFingerprint": "d1d60ccc0f0d39cb844dcb10e6b6132f392657b8dfdec9548e5f3cc3e1843886",
+      "asset": "assets/claude-clarity-v2.md"
+    }
+  ],
+  "note": "実Yasashii v0.10.3 template由来と確認できるvoice、source整理、Clarity管理節だけを順次置換します。"
+}

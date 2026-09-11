@@ -1,5 +1,32 @@
 # 変更履歴
 
+## [0.13.1] - 2026-09-11
+
+### 対象者
+
+- `0.13.0`への更新後、workspace migrationが経路不足で停止した方、または対応版から安全に更新したい方。
+
+### 変わること
+
+- 対応する10版（`0.8.0`、`0.9.0`、`0.9.1`、`0.9.2`、`0.10.0`、`0.10.1`、`0.10.2`、`0.10.3`、`0.12.0`、`0.13.0`）から現行版までのmigration経路を検証します。
+- workspace未変更のまま止まった`0.10.1→0.13.0` sessionは、元の版、保護commit、backup、scope、editionを再検証し、`0.13.1`用の新しいplanと確認で再開できます。
+- WindowsのCRLF配布assetは改行だけを正規化して照合し、それ以外の改変は従来どおり拒否します。
+
+### 設定・ファイルへの影響
+
+- `0.13.0→0.13.1`は内容差分のないmigrationです。workspace管理本文へのwrite、`changedPaths`、内容適用件数は発生しません。
+- 名前、話し方、記憶、日誌、project本文、自由設定、認証情報を自動変更しません。既存のbackup、hash、HEAD、scope、edition検証を維持します。
+
+### 必要な操作
+
+- `v0.13.1`のRelease公開を確認してから、利用中の版とscopeに合う正式なplugin更新経路を使い、新しいsessionで読み込みを確認してください。
+- `0.13.0`向けmigrationが停止中の場合は、[回復ガイド](../../docs/guide/update-0.13.0-migration-recovery.md)に従い、旧plan hashを再利用せず`0.13.1`で新しいdry-runを確認してください。
+
+### 互換性上の注意
+
+- `0.13.0`以前のmigration、fixture、tag、Release、artifact、CHANGELOG履歴は変更しません。
+- partial session、backup不一致、保護commit後のHEAD変更、scope／edition不一致、改行以外のasset改変は成功扱いにせず、workspaceへの追加write前に停止します。
+
 ## [0.13.0] - 2026-09-08
 
 ### 対象者

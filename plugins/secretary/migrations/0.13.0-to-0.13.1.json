@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "0.13.0",
+  "toVersion": "0.13.1",
+  "contentChanged": false,
+  "operations": [],
+  "note": "0.13.1は更新migrationの到達性と中断session回復を修正するpatchで、workspace管理節の内容は0.13.0と同一です。"
+}

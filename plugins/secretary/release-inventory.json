@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "collaborationMarker": "yasashii-secretary:clarity-collaboration:release:v1",
   "edition": "yasashii-secretary",
-  "candidateVersion": "0.13.0",
+  "candidateVersion": "0.13.1",
   "publicationStatus": "source-candidate-unverified",
   "releaseState": {
     "sourcePrepared": true,
@@ -170,6 +170,8 @@
   },
   "documentation": [
     "README.md",
+    "docs/guide/update-0.13.1.md",
+    "docs/guide/update-0.13.0-migration-recovery.md",
     "docs/guide/update-0.13.0.md",
     "docs/spec/clarity.md",
     "plugins/secretary/skills/clarity/SKILL.md",

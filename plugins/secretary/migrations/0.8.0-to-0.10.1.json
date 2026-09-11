@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "0.8.0",
+  "toVersion": "0.10.1",
+  "contentChanged": true,
+  "operations": [
+    {
+      "id": "memory-request-v1",
+      "path": "secretary/AGENTS.md",
+      "type": "replace-section",
+      "marker": "操作、対象、保存先が現在の依頼で明示された低リスクな記憶追加",
+      "endMarker": "必要なら1問だけ確認する",
+      "oldAsset": "assets/memory-confirmation-v1.md",
+      "oldAssetSha256": "0f390becd2aaa0e024dad803d1df33c51649cba141e68b69ceb922a3e9abfbff",
+      "templateFingerprint": "0e613e03e15ae54da6660a4f694aafb66d3a0f9e37238909bf6d649c532efff6",
+      "asset": "assets/memory-request-v1.md"
+    },
+    {
+      "id": "conversation-flow-v1",
+      "path": "secretary/AGENTS.md",
+      "type": "replace-section",
+      "marker": "保存操作、対象、保存先が現在の依頼で明示された低リスク操作",
+      "endMarker": "副作用0で必要な不足を1問だけ聞く",
+      "oldAsset": "assets/conversation-contract-v1.md",
+      "oldAssetSha256": "38f9a40faf013b38348b0394c325d6920c4b6e0ba9a5bab31b9a3d7e7ea50634",
+      "templateFingerprint": "0e613e03e15ae54da6660a4f694aafb66d3a0f9e37238909bf6d649c532efff6",
+      "asset": "assets/conversation-flow-v1.md"
+    }
+  ],
+  "note": "0.8.0の既知template由来のmemory／会話管理節を0.10.1相当へ進め、以後の公開版migrationへ接続します。"
+}
