@@ -187,7 +187,7 @@ check("Codex and Claude formal manifests share the same 17 skills with host-spec
   const claude = json(join(plugin, ".claude-plugin/plugin.json"));
   assert.equal(codex.name, edition.edition);
   assert.equal(claude.name, edition.edition);
-  assert.equal(codex.version, "0.12.0");
+  assert.equal(codex.version, claude.version);
   assert.equal(codex.skills, "./skills/");
   assert.equal(codex.hooks, "./hooks/hooks.json");
   assert.equal(claude.skills, "./skills/");
@@ -305,10 +305,11 @@ check("Harness 0.5.1 limits and guidance preserve repository rules", () => {
   for (const phrase of ["verification-scope-issue", "verification-infra", "safe harbor", "Spec-Issue Count", "Lineage Dispatches", "done-by-user-decision"]) {
     assert(agents.includes(phrase), `AGENTS: ${phrase}`);
   }
-  for (const phrase of ["verification-scope-issue", "safe harbor", "same-candidate evidence", "done-by-user-decision"]) {
+  for (const phrase of ["verification-scope-issue", "safe harbor", "carrying forward evidence", "done-by-user-decision"]) {
     assert(guidance.includes(phrase), `guidance: ${phrase}`);
   }
-  assert(claude.includes("読み取りを含む全面接触禁止"));
+  assert(claude.includes("参照対象として承認したcanonical checkout"));
+  assert(claude.includes("read-only参照の承認を編集"));
   assert(claude.includes("Repository SecretのAPI Token"));
 });
 

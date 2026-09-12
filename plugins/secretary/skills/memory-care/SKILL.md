@@ -9,13 +9,12 @@ description: >
 
 ## plugin root（必須）
 
-このSKILL.mdの実ファイル絶対pathを `SECRETARY_SKILL_FILE` に入れ、最初に1回だけ解決する。
-空・相対path・未解決placeholderならcommandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。
+このSKILL.mdの実ファイル絶対pathをhostから受け取り、`SECRETARY_SKILL_FILE` として扱う。空・相対path・未解決placeholderなら
+commandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。Node.jsの `path.dirname`／`path.join` と配列引数で、
+次のresolverへ `--skill-file` とpathを別々の引数として渡す（下記はhost-neutralな呼び出しの形）。
 
-```bash
-SECRETARY_SKILL_FILE="<このSKILL.mdの実ファイル絶対path>"
-case "$SECRETARY_SKILL_FILE" in /*/skills/*/SKILL.md) ;; *) exit 2 ;; esac
-SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/resolve-plugin-root.mjs" --skill-file "$SECRETARY_SKILL_FILE")" || exit 2
+```text
+SECRETARY_PLUGIN_ROOT = node(path.join(path.dirname(SECRETARY_SKILL_FILE), "../../scripts/resolve-plugin-root.mjs"), ["--skill-file", SECRETARY_SKILL_FILE])
 ```
 
 以後の共通file参照は `${SECRETARY_PLUGIN_ROOT}` を使う。
@@ -23,8 +22,9 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 秘書の「記憶」を安全に育てるスキル。記憶はユーザーの `secretary/memory/` 配下に置く。
 決定・活動・確認済みの相談要点を役割別に覚え、うっかり消えないように守り、中断しても続きから再開できるようにする。
 
-`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
-`secretary/memory/preferences.md` を読む。記憶操作の結果と安全条件だけをrouterへ返し、
+`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` を、同じplugin実体・workspaceで該当fileが未変更ならsessionで一度だけ読む。plugin、workspace、または該当fileが変わった場合だけ、そのfileを再読する。
+個人設定を反映する応答または設定関連の依頼では、必要な節だけ
+`secretary/memory/preferences.md` を追加で読む。記憶操作の結果と安全条件だけをrouterへ返し、
 通常報告を独自に包装しない。最終出力形は同rule入口から解決される「最終応答serializer」だけを正本とする。
 
 ## 記憶の置き場所（`secretary/memory/`・フラット構造）
@@ -167,9 +167,12 @@ canonical root、symlink、active / archive、日付範囲の安全境界で拒�
 ## 5. 再起動しおり（`_resume.md`）
 
 - 「Claude を再起動してください」と案内する**直前**や、作業を中断するときは、`resume-write` で `_resume.md` に付箋を残す（進行中の作業・次にやること・未確定のこと）。
-- 秘書として起動したら、**まず** `resume-check` でしおりの有無を見る（ルーターがこれを最優先で行う）。あれば `resume-read` で読み、日常語で「前回の続き」を提案する。例:
+- 秘書として起動したときは、現在の依頼が「前回の続き」「再開」を求める、現在依頼に関係する、またはまだ具体的な用件が無い場合にだけ
+  `resume-check` でしおりの有無を見る。明示された別の現在依頼をしおりより先に扱い、既存の無関係なしおりを消したり上書きしたりしない。
+  しおりが関係する場合は `resume-read` で読み、日常語で「前回の続き」を提案する。例:
   > おかえりなさい。前回は「企画書づくり」の途中でした。次は「見出しを決める」からですね。始めてよいですか？
-- その作業が終わったら `resume-clear` でしおりを閉じる（中途半端に残さない）。
+- その作業が終わったら、その作業のために作ったしおりだけを `resume-clear` で閉じる。
+  別の作業を示す既存しおりは残し、関係が不明なら削除せず1問確認する。
 
 ## 6. オンデマンド振り返り
 

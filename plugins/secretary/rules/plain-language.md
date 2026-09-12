@@ -2,17 +2,22 @@
 
 秘書がユーザーに話しかける前に読む互換入口です。このfileは正本を複製しない明示的な入口（shim）であり、
 ここ自身は安全、証拠、表現、style、serializer schemaのいずれも所有しません。
-`rule-manifest.json` を正本として、次を上から順に読みます。
+`rule-manifest.json` を参照して、現在の用件に必要なcontextだけを読みます。安全・実行契約は同じplugin実体・workspaceで
+未変更なら一度だけ読み、plugin、workspace、または該当fileが変わった場合だけ再読します。外部事実を扱うときはevidence、ユーザー向け出力を作るときはedition styleと
+そのsurfaceのcopyを追加します。preferencesは個人設定を反映するときだけ該当節を読みます。
 
-1. [`safety.md`](safety.md) — 記憶、確認、資格情報、外部送信等の安全契約
-2. [`evidence.md`](evidence.md) — 外部事実、根拠、断定、エラーの証拠契約
-3. [`common-language.md`](common-language.md) — edition共通の語彙と説明順
-4. [`conversation-contract.md`](conversation-contract.md) — intent、実行許可、副作用回数、応答状態
-5. [`styles/yasashii.md`](styles/yasashii.md) — yasashiiの口調、報告、個人設定
-6. [`copy/yasashii.json`](copy/yasashii.json) — 会話、診断、報告、developer handoffの可変copy
+### 条件付きcontext loading
 
-`secretary/memory/preferences.md` は最後に読み、yasashii styleが許可した項目だけへ適用します。
-設定が無い、空、一部欠損の場合はyasashiiの既定値へ戻ります。
+1. 常に `safety.md` と `conversation-contract.md` の実行境界を適用する。leaf Skill単独利用時も、この安全境界を省略しない。
+2. 外部の事実・接続状態・エラーの根拠を返すときだけ `evidence.md` を読む。
+3. 表現を組み立てるときだけ `styles/yasashii.md` と、必要なsurfaceの `copy/yasashii.json` を読む。styleのdependencyはこの入口が解決する。
+4. 共通語彙やMarkdown構造が必要なときは `common-language.md` を読む。既に同じsessionで読み済みなら繰り返さない。
+5. 個人設定が必要な場合だけ `secretary/memory/preferences.md` の対象節を読む。欠損・空・旧形式はyasashiiの安全な既定値に戻す。
+
+読み込み対象が欠けている場合は、推測で補わず安全に停止する。条件付きにすることで、standalone Skillの安全契約を削らず、
+無関係な全rules・全copy・全preferencesの再読を避けます。
+
+参照先の順序は安全境界、用件、表現の順に解決します。standalone leafは必要な境界を本文に持ち、ここへの参照だけに依存して安全条件を省略しません。
 
 ## 優先順位
 

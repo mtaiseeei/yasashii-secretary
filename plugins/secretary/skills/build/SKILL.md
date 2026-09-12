@@ -2,7 +2,7 @@
 name: build
 description: >
   「〇〇を作って」「開発したい」「アプリ／ツールにして」等のまとまった開発依頼の入口。
-  別プラグイン yasashii-harness 0.5.1 の導入状態を確認し、未導入ならhost別の正式手順を案内、導入済みなら
+  別プラグイン yasashii-harness（Secretary editionが記録する互換基準は0.5.1）の導入状態を確認し、未導入ならhost別の正式手順を案内、導入済みなら
   Planner → Generator → Evaluator のループへ接続する。
 ---
 
@@ -10,24 +10,24 @@ description: >
 
 ## plugin root（必須）
 
-このSKILL.mdの実ファイル絶対pathを `SECRETARY_SKILL_FILE` に入れ、最初に1回だけ解決する。
-空・相対path・未解決placeholderならcommandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。
+このSKILL.mdの実ファイル絶対pathをhostから受け取り、`SECRETARY_SKILL_FILE` として扱う。空・相対path・未解決placeholderなら
+commandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。Node.jsの `path.dirname`／`path.join` と配列引数で、
+次のresolverへ `--skill-file` とpathを別々の引数として渡す（下記はhost-neutralな呼び出しの形）。
 
-```bash
-SECRETARY_SKILL_FILE="<このSKILL.mdの実ファイル絶対path>"
-case "$SECRETARY_SKILL_FILE" in /*/skills/*/SKILL.md) ;; *) exit 2 ;; esac
-SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/resolve-plugin-root.mjs" --skill-file "$SECRETARY_SKILL_FILE")" || exit 2
+```text
+SECRETARY_PLUGIN_ROOT = node(path.join(path.dirname(SECRETARY_SKILL_FILE), "../../scripts/resolve-plugin-root.mjs"), ["--skill-file", SECRETARY_SKILL_FILE])
 ```
 
 以後の共通file参照は `${SECRETARY_PLUGIN_ROOT}` を使う。
 
 「〇〇を作って」「これを実装して」「アプリ／ツールにしたい」といった、まとまった開発依頼を受け取る入口です。
 開発そのものは別リポジトリ [mtaiseeei/yasashii-harness](https://github.com/mtaiseeei/yasashii-harness) の
-`harness` プラグインが担当します。対応versionは `0.5.1` です。この秘書プラグインにHarnessの
+`harness` プラグインが担当します。`edition.json` に記録したSecretary editionの互換基準は `0.5.1` で、
+実際に利用できるversionは現在のhostで別途確認します。この秘書プラグインにHarnessの
 skills、agents、commands、hooks、runtime scriptは同梱せず、暗黙の自動installも行いません。
 
-`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
-`secretary/memory/preferences.md` を読む。内容・口調・安全条件だけをrouterへ返し、
+`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` は同じplugin実体・workspaceで未変更なら一度だけ読み、変更時だけ再読する。
+存在する場合の `secretary/memory/preferences.md` は個人設定が必要なときに該当節だけ読む。内容・口調・安全条件だけをrouterへ返し、
 通常報告を独自に包装しない。最終出力形は同rule入口から解決される「最終応答serializer」だけを正本とする。
 
 ## 1. 導入状態を確認する

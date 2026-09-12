@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "fromVersion": "0.13.1",
+  "toVersion": "0.13.2",
+  "contentChanged": true,
+  "operations": [
+    {
+      "id": "agents-session-read-v2",
+      "path": "secretary/AGENTS.md",
+      "type": "replace-section",
+      "marker": "このファイルは、あなた専属の秘書への指示の正本です。",
+      "endMarker": "このファイルは、あなた専属の秘書への指示の正本です。",
+      "oldAsset": "assets/agents-session-read-v1.md",
+      "oldAssetSha256": "2346af91d5bee3d2080258e5b727d9205c4ebf4bca160bf733b5ad53be885fd4",
+      "templateFingerprint": "720c9def95327ebbf9daa529c3c2a239fd2f9ae0ca5ca6f99b013388031bf11c",
+      "asset": "assets/agents-session-read-v2.md"
+    },
+    {
+      "id": "agents-progress-report-v2",
+      "path": "secretary/AGENTS.md",
+      "type": "replace-section",
+      "marker": "- 通常報告では",
+      "endMarker": "- 進行が複数手順にわたる",
+      "oldAsset": "assets/agents-progress-report-v1.md",
+      "oldAssetSha256": "c161a929e37b3c3e1c5746b2d9a2408c7a7793b68b1aaaec16403c858a278676",
+      "templateFingerprint": "720c9def95327ebbf9daa529c3c2a239fd2f9ae0ca5ca6f99b013388031bf11c",
+      "asset": "assets/agents-progress-report-v2.md"
+    },
+    {
+      "id": "agents-preferences-read-v2",
+      "path": "secretary/AGENTS.md",
+      "type": "replace-section",
+      "marker": "毎セッション、作業前に",
+      "endMarker": "明示された項目だけを適用する。",
+      "oldAsset": "assets/agents-preferences-read-v1.md",
+      "oldAssetSha256": "aa8fd1fbb1190d9559933a3fe135948c041815c4aecf1acb45f27cfaf7f2b9a6",
+      "templateFingerprint": "720c9def95327ebbf9daa529c3c2a239fd2f9ae0ca5ca6f99b013388031bf11c",
+      "asset": "assets/agents-preferences-read-v2.md"
+    },
+    {
+      "id": "claude-progress-report-v2",
+      "path": "secretary/CLAUDE.md",
+      "type": "replace-section",
+      "marker": "Readやルーティング中に",
+      "endMarker": "schemaをここへ複製しません。",
+      "oldAsset": "assets/claude-progress-report-v1.md",
+      "oldAssetSha256": "d2ecbb897818a1323fb76dae6c87628c9b2d850aec4f27eade2d773625ea7095",
+      "templateFingerprint": "69ae05b39fe31f4c0db784bf8e6270c0f3309713a0fbb955bf306285bb8f9f3e",
+      "asset": "assets/claude-progress-report-v2.md"
+    }
+  ],
+  "note": "公開済みYasashii 0.13.1 template由来と確認できるsession再読、進捗、preferences参照の管理節だけを置換し、利用者の個人設定本文は変更しません。"
+}

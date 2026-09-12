@@ -24,7 +24,7 @@ EXPECTED_SKILLS = {
     "onboarding", "projects", "secretary", "settings", "setup-google", "setup-microsoft",
     "setup-notion", "update", "weekly",
 }
-SUPPORTED_UPDATE_SOURCES = ["0.8.0", "0.9.0", "0.9.1", "0.9.2", "0.10.0", "0.10.1", "0.10.2", "0.10.3", "0.12.0", "0.13.0"]
+SUPPORTED_UPDATE_SOURCES = ["0.8.0", "0.9.0", "0.9.1", "0.9.2", "0.10.0", "0.10.1", "0.10.2", "0.10.3", "0.12.0", "0.13.0", "0.13.1"]
 MANAGED_MIGRATION_PATHS = {"secretary/AGENTS.md", "secretary/CLAUDE.md"}
 
 
@@ -231,8 +231,8 @@ def validate(root: Path) -> list[str]:
 
     if codex_plugin.get("name") != PLUGIN_NAME:
         errors.append("Codex plugin manifest name is missing or invalid")
-    if codex_plugin.get("version") != "0.13.1":
-        errors.append("Codex plugin manifest version must be 0.13.1")
+    if codex_plugin.get("version") != "0.13.2":
+        errors.append("Codex plugin manifest version must be 0.13.2")
     if codex_plugin.get("skills") != "./skills/":
         errors.append("Codex plugin manifest skills must be ./skills/")
     if codex_plugin.get("author", {}).get("name") != AUTHOR:

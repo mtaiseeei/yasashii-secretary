@@ -180,7 +180,7 @@ try {
   await test("CLX-009", "Notion Taskは明示時だけ既存downstream境界へ委譲", () => {
     const root = secretary("clx009"); createProject(root, "Notion境界"); initClarity(root, "Notion境界"); const id = state(root, "Notion境界").items[0].itemId; const before = tree(root);
     const implicit = runJson(process.execPath, [claritySecretary, "task-route", root, "Notion境界", "--item-id", id, "--target", "downstream-task", "--json"]); assert.equal(implicit.status, "not-routed"); assert.equal(tree(root), before);
-    const routed = routeSecretaryIntent("このClarity ItemをNotionタスクにして"); assert.equal(routed.selectedSkill, "projects"); assert.equal(routed.route, "notion-task-not-included"); assert.equal(routed.delegation, "project-tools:add-todo-after-user-choice"); zeroEffect(routed);
+    const routed = routeSecretaryIntent("このClarity ItemをNotionタスクにして"); assert.equal(routed.selectedSkill, "notion-tasks"); assert.equal(routed.route, "downstream-notion-task-handoff"); assert.equal(routed.delegation, "fixed-downstream-task-adapter"); zeroEffect(routed);
     const explicit = runJson(process.execPath, [claritySecretary, "task-route", root, "Notion境界", "--item-id", id, "--target", "downstream-task", "--explicit", "--json"]); assert.equal(explicit.status, "fixed-handoff-required"); assert.equal(explicit.taskWrites, 0); assert.equal(tree(root), before);
   });
 
@@ -228,7 +228,7 @@ try {
 
   await test("CLX-017", "edition handoffはcommon／protectedを分離しdownstream writeを閉じる", () => {
     const release = json(join(repo, "plugins/secretary/release-inventory.json")); const receipt = json(join(repo, "scripts/fixtures/sprint-041/yasashii-prewrite-receipt.json"));
-    assert.equal(release.collaborationMarker, "yasashii-secretary:clarity-collaboration:release:v1"); assert.equal(release.fixedSource.publicEvaluatorPass, false); assert.equal(release.publicationStatus, "candidate-unverified");
+    assert.equal(release.collaborationMarker, "yasashii-secretary:clarity-collaboration:release:v1"); assert.equal(release.fixedSource.publicEvaluatorPass, true); assert.equal(release.publicationStatus, "source-candidate-unverified");
     assert.equal(receipt.authorization.writesAuthorized, false); assert.equal(receipt.authorization.releaseAuthorized, false); assert.equal(receipt.authorization.nextScope.operation, "yasashii-product-apply-only");
   });
 
@@ -241,13 +241,25 @@ try {
     ];
     for (const input of clarityFixtures) { const routed = routeSecretaryIntent(input); assert.equal(routed.selectedSkill, "clarity", input); assert.equal(routed.route, "clarity-manual-entry", input); zeroEffect(routed); }
     const fixtures = [
-      ["Chatworkで探して", "chatwork"], ["Chatworkにつないで", "chatwork"], ["Chatworkと連携して", "chatwork"],
-      ["Google Chatにつないで", "google-chat"], ["Google Chatで探して", "google-chat"],
-      ["Googleカレンダーを見て", "setup-google"], ["Google Driveからファイルを取得して", "setup-google"], ["Gmailを設定して", "setup-google"], ["Googleカレンダーと連携して", "setup-google"],
-      ["Outlookにつないで", "setup-microsoft"], ["Microsoft 365を設定して", "setup-microsoft"],
-      ["Notionにつないで", "setup-notion"], ["Notionを設定して", "setup-notion"],
+      ["Chatworkで探して", "chatwork", "chatwork-explicit-entry", "existing-explicit-connector-entry"],
+      ["Chatworkにつないで", "chatwork", "chatwork-explicit-entry", "existing-explicit-connector-entry"],
+      ["Chatworkと連携して", "chatwork", "chatwork-explicit-entry", "existing-explicit-connector-entry"],
+      ["Google Chatにつないで", "google-chat", "google-chat-explicit-entry", "existing-explicit-connector-entry"],
+      ["Google Chatで探して", "google-chat", "google-chat-explicit-entry", "existing-explicit-connector-entry"],
+      ["Googleカレンダーを見て", "secretary", "google-read-only-handoff", "host-connector-read"],
+      ["Google Driveからファイルを取得して", "secretary", "google-read-only-handoff", "host-connector-read"],
+      ["Gmailを設定して", "setup-google", "google-explicit-entry", "existing-explicit-connector-entry"],
+      ["Googleカレンダーと連携して", "setup-google", "google-explicit-entry", "existing-explicit-connector-entry"],
+      ["Outlookの予定を確認して", "secretary", "microsoft-read-only-handoff", "host-connector-read"],
+      ["Outlookにつないで", "setup-microsoft", "microsoft-explicit-entry", "existing-explicit-connector-entry"],
+      ["Microsoft 365を設定して", "setup-microsoft", "microsoft-explicit-entry", "existing-explicit-connector-entry"],
+      ["Notionにつないで", "setup-notion", "notion-connection-explicit-entry", "existing-explicit-connector-entry"],
+      ["Notionを設定して", "setup-notion", "notion-connection-explicit-entry", "existing-explicit-connector-entry"],
     ];
-    for (const [input, skill] of fixtures) { const routed = routeSecretaryIntent(input); assert.equal(routed.selectedSkill, skill, input); assert.equal(routed.delegation, "existing-explicit-connector-entry"); zeroEffect(routed); }
+    for (const [input, skill, route, delegation] of fixtures) {
+      const routed = routeSecretaryIntent(input); assert.equal(routed.selectedSkill, skill, input); assert.equal(routed.route, route, input);
+      assert.equal(routed.delegation, delegation, input); zeroEffect(routed);
+    }
     const connectorPaths = ["chatwork", "google-chat", "connections", "setup-google", "setup-microsoft", "setup-notion"];
     for (const skill of connectorPaths) assert(text(join(repo, `plugins/secretary/skills/${skill}/SKILL.md`)).includes("yasashii-secretary:clarity-collaboration:connector:v1"));
   });

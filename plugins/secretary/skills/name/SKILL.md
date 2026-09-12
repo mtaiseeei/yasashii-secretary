@@ -9,20 +9,20 @@ description: >
 
 ## plugin root（必須）
 
-このSKILL.mdの実ファイル絶対pathから、既存の共通resolverでplugin rootを1回だけ解決する。
+このSKILL.mdの実ファイル絶対pathをhostから受け取り、`SECRETARY_SKILL_FILE` として扱う。空・相対path・未解決placeholderなら
+commandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。Node.jsの `path.dirname`／`path.join` と配列引数で、
+次のresolverへ `--skill-file` とpathを別々の引数として渡す（下記はhost-neutralな呼び出しの形）。
 
-```bash
-SECRETARY_SKILL_FILE="<このSKILL.mdの実ファイル絶対path>"
-case "$SECRETARY_SKILL_FILE" in /*/skills/*/SKILL.md) ;; *) exit 2 ;; esac
-SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/resolve-plugin-root.mjs" --skill-file "$SECRETARY_SKILL_FILE")" || exit 2
+```text
+SECRETARY_PLUGIN_ROOT = node(path.join(path.dirname(SECRETARY_SKILL_FILE), "../../scripts/resolve-plugin-root.mjs"), ["--skill-file", SECRETARY_SKILL_FILE])
 ```
 
 以後の共通file参照は `${SECRETARY_PLUGIN_ROOT}` を使う。
 
 利用者の「呼び方」と秘書自身の名前は別設定である。呼び方はこのSkillで変更しない。
 秘書名は英語名だけを扱い、stable IDと `ai-secretary` 種別はrename後も維持する。
-作業前に `${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
-`secretary/memory/preferences.md` を読む。口調や報告設定で確認・安全境界を弱めない。
+作業前に `${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` を、同じplugin実体・workspaceで該当fileが未変更ならsessionで一度だけ読む。plugin、workspace、または該当fileが変わった場合だけ、そのfileを再読する。
+個人設定を応答へ反映する場合だけ `secretary/memory/preferences.md` の該当節を読む。口調や報告設定で確認・安全境界を弱めない。
 通常報告は同ruleから解決される「最終応答serializer」を唯一の正本とし、このSkillでschemaを複製しない。
 
 ## 現在状態

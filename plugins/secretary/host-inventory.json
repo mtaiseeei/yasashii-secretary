@@ -45,14 +45,14 @@
           "supported": true,
           "verified": false,
           "degraded": false,
-          "reason": "Claude Code DesktopでのYasashii candidate 0.13.1 Clarity Hook実機確認は未実行です。"
+          "reason": "Claude Code DesktopでのYasashii candidate 0.13.2 Clarity Hook実機確認は未実行です。"
         },
         "cli": {
           "status": "supported",
           "supported": true,
           "verified": false,
           "degraded": false,
-          "reason": "Claude Code CLIでのYasashii candidate 0.13.1 Clarity Hook実機確認は未実行です。"
+          "reason": "Claude Code CLIでのYasashii candidate 0.13.2 Clarity Hook実機確認は未実行です。"
         },
         "disabled": {
           "status": "degraded",
@@ -69,14 +69,14 @@
           "supported": true,
           "verified": false,
           "degraded": false,
-          "reason": "Codex AppでのYasashii candidate 0.13.1 Clarity Hook実機確認は未実行です。"
+          "reason": "Codex AppでのYasashii candidate 0.13.2 Clarity Hook実機確認は未実行です。"
         },
         "cli": {
           "status": "supported",
           "supported": true,
           "verified": false,
           "degraded": false,
-          "reason": "Codex CLIの主要eventは過去candidateで一部確認済みですが、compact後resume SessionStartを含むYasashii candidate 0.13.1の完全な実機確認は未完了です。"
+          "reason": "Codex CLIの主要eventは過去candidateで一部確認済みですが、compact後resume SessionStartを含むYasashii candidate 0.13.2の完全な実機確認は未完了です。"
         },
         "untrusted": {
           "status": "degraded",

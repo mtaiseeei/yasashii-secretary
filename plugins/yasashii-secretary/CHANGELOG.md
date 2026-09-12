@@ -1,5 +1,32 @@
 # 変更履歴
 
+## [0.13.2] - 2026-09-12
+
+### 対象者
+
+- 現在の用件を優先して秘書を使い、既存の設定を保って指示を更新したい方。
+
+### 変わること
+
+- 履歴・設定・参照文書を用件に必要な範囲で読み、再開、接続診断、設定後の読取を正しく振り分けます。
+- 許可済み操作のrun-once、部分成功の報告、安全境界を保持しながら、重複した確認と案内を整理しました。
+- root guidanceの安全・role・counterを保持し、限定的な検証修理、既存証拠の再利用、承認済み参照との矛盾を局所修正しました。
+
+### 設定・ファイルへの影響
+
+- `0.13.1→0.13.2`は管理された指示節を更新する内容変更migrationです。旧配布節と一致する箇所だけが対象で、名前、自由記述、preferences、記憶、日誌、認証情報を保持します。
+- 17 Skills、Project Clarity、Secretary Voiceを維持しています。
+
+### 必要な操作
+
+- 公開済みtagと導入editionを確認し、現在hostの正式なplugin更新を既存scopeへ限定して実行します。新sessionで実読込版を確認してください。
+- workspace migrationはplugin本体更新と分けてpreviewし、既存の承認・checkpoint・rollback手順を使います。詳細は[0.13.2更新ガイド](../../docs/guide/update-0.13.2.md)。
+
+### 互換性上の注意
+
+- 公開版とprivate my-vault版は別editionです。別版への置換や利用者workspaceの一括更新は行いません。
+- customized／unknown、partial、backup／HEAD／scope／edition不一致は成功扱いにせず、既存の安全な復旧経路を使います。公開済み旧migration、tag、artifactと履歴は保持します。
+
 ## [0.13.1] - 2026-09-11
 
 ### 対象者

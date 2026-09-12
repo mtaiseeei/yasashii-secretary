@@ -1,8 +1,8 @@
 ---
 name: secretary
 description: >
-  あなた専属のAI秘書の窓口。初めてなら数問だけのセットアップへ、2回目以降は用件のふりわけへ案内する。
-  「秘書」「今日やること」「思い出して」「接続」「作って」などの言葉、Claude Codeで「/secretary」、
+  あなた専属のAI秘書の窓口。初めてなら数問だけのセットアップへ、2回目以降は明示された用件のふりわけへ案内する。
+  「秘書」「今日やること」「前回の続き」などの入口、Claude Codeで「/secretary」、
   Codexで「$secretary」と依頼したときに使う。
 ---
 
@@ -10,13 +10,12 @@ description: >
 
 ## plugin root（必須）
 
-このSKILL.mdの実ファイル絶対pathを `SECRETARY_SKILL_FILE` に入れ、最初に1回だけ解決する。
-空・相対path・未解決placeholderならcommandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。
+このSKILL.mdの実ファイル絶対pathをhostから受け取り、`SECRETARY_SKILL_FILE` として扱う。空・相対path・未解決placeholderなら
+commandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。Node.jsの `path.dirname`／`path.join` と配列引数で、
+次のresolverへ `--skill-file` とpathを別々の引数として渡す（下記はhost-neutralな呼び出しの形）。
 
-```bash
-SECRETARY_SKILL_FILE="<このSKILL.mdの実ファイル絶対path>"
-case "$SECRETARY_SKILL_FILE" in /*/skills/*/SKILL.md) ;; *) exit 2 ;; esac
-SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/resolve-plugin-root.mjs" --skill-file "$SECRETARY_SKILL_FILE")" || exit 2
+```text
+SECRETARY_PLUGIN_ROOT = node(path.join(path.dirname(SECRETARY_SKILL_FILE), "../../scripts/resolve-plugin-root.mjs"), ["--skill-file", SECRETARY_SKILL_FILE])
 ```
 
 以後の共通file参照は `${SECRETARY_PLUGIN_ROOT}` を使う。
@@ -26,10 +25,11 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 Claude Codeの明示入口は `/secretary`、Codexは `$secretary` です。通常会話からの自然な起動も使えます。
 
 ユーザー向け出力の唯一の正本は `${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` から解決される
-「最終応答serializer」節である。最初に同ruleと、2回目以降は
-`secretary/memory/preferences.md` を読み、明示された内容・口調・安全条件を集める。
-通常報告のRead、しおり確認、preferences再読、ルーティング、段階ロードは無言で行い、
-下位skillの内容をrouterが再包装せず、すべてのtool実行後にserializerを1回だけ適用する。
+「最終応答serializer」節である。安全・実行契約はこの入口から、同じplugin実体・workspaceで未変更の間は一度だけ読み、plugin、workspace、または該当fileの変更時だけ該当fileを再読し、
+証拠が必要な外部事実ではevidence、表現が必要な応答ではedition styleを条件付きで読む。
+`secretary/memory/preferences.md` は個人設定を使う応答または設定変更時だけ読む。
+短いroutingや単純なReadは無言でよいが、複数のsource・toolを使う長いread-only作業では進捗を一言示す。
+下位skillの内容をrouterが再包装せず、必要なtool実行を終えてからserializerを1回だけ適用する。
 
 ## まずやること: canonical workspaceと初回を見分ける
 
@@ -42,7 +42,8 @@ registryが無い場合だけ、現在のフォルダで初回オンボーディ
   onboardingの質問turnとして予告し、通常報告の途中メッセージにはしない。
 
 - **`secretary/` がある → 2回目以降**。plugin更新後のローカルidentity状態を下記のread-only診断で確認し、
-  そのあと「起動時のしおりチェック」→「用件のふりわけ」へ進む。
+そのあと現在の依頼を先に判定し、依頼が「前回の続き」を求める、または現在依頼に関係する場合だけ
+「起動時のしおりチェック」を行い、通常の用件へ進む。
   はじめに `secretary/memory/MEMORY.md`（記憶の目次）を読み、前回までの文脈を思い出してから話し始める。
 
 ## plugin更新後のidentity診断（2回目以降・read-only）
@@ -59,22 +60,32 @@ canonical workspace rootで次を実行する。
 この診断はidentity、guidance、ledger、Git、user-scope、registryを変更しない。plugin更新済み、ローカル移行済み、
 別repo routing有効を別状態として扱う。
 
-## 起動時のしおりチェック（2回目以降・最優先）
+## 起動時のしおりチェック（2回目以降・条件付き）
 
-用件を聞くより先に、中断した作業の付箋（再起動しおり `secretary/memory/_resume.md`）が残っていないかを確認する。
+現在の依頼が「前回の続き」「再開」を求める場合、または用件がまだ示されていない場合にだけ、
+中断した作業の付箋（再起動しおり `secretary/memory/_resume.md`）が残っていないかを確認する。
+別の現在依頼が明示されている場合は、しおりを先に提示したり上書きしたりしない。
 
 - 確認コマンド: `node "${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.mjs" resume-check <secretary>`（あれば終了コード0）。
-- **しおりがある** → 記憶ケアを段階ロードして「前回の続き」を日常語で提案する。
-  読み込む: `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/SKILL.md`（「3. 再起動しおり」に従う）。
+- **しおりがある** → 記憶ケアを段階ロードして、現在依頼に関係する場合だけ「前回の続き」を日常語で提案する。
+  読み込む: `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/SKILL.md`（「再起動しおり（_resume.md）」に従う）。
   例: 「おかえりなさい。前回は『企画書づくり』の途中でした。続きから始めてよいですか？」
-- **しおりが無い** → 通常どおり「用件のふりわけ」へ。
+- **しおりが無い、または現在依頼と無関係** → 通常どおり「用件のふりわけ」へ。
 
 ## 用件のふりわけ（2回目以降）
 
 ユーザーの自然な言い回しから、やりたいことを推測し、必要な機能スキルだけを段階ロードする。
 Clarityを含む用件は、まず次のread-only routerで所有Skillを確認できる。このrouterはSkillを実行せず、
-file、adapter、command、external serviceを変更・呼出ししない。結果の`selectedSkill`だけを段階ロード先として使い、
+file、adapter、command、external serviceを変更・呼出ししない。結果の`selectedSkill`、`route`、`delegation`を
+段階ロード先として使い、`followUp`があれば同じ依頼に含まれる後続操作として保持する。
 現在の別用件をClarityへ寄せない。
+
+`selectedSkill=secretary` かつ `route=*-read-only-handoff` の場合は、このSKILLを再帰的に読み込まず、
+現在のhostが提供する公式connectorへ読み取り依頼を1回渡す。`selectedSkill=notion-tasks` はprivate downstreamの
+存在と利用可能性を確認できた場合だけ委譲し、public editionで盲目的に読み込んだり追加書込みしたりしない。
+接続状態のread-only診断は`connections`へ先に送り、明示された接続設定は単独readより先に`setup-google`／
+`setup-microsoft`へ送る。setup routeに`followUp.route`があるときは、設定完了後にその公式connector readを1回だけ続け、
+read routeを先に選んでsetup意図を失わせない。Chatwork／Google Chatの明示依頼は専用Skillへそのまま送る。
 
 ```text
 node "${SECRETARY_PLUGIN_ROOT}/scripts/collaboration-router.mjs" "<現在の用件>" --json
@@ -93,8 +104,10 @@ LLMがその内容を問いに合わせて整理してよい。`timeline` / `wee
 | 「今日やったこと」「先週なにしてた」「いつ決めた」「7月に決まったこと」「Zoomの件いつ決めた」 | timeline（活動・決定の時系列） | `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/SKILL.md` |
 | 「今週を振り返って」「先週の活動をまとめて」「古い月を整理したい」 | 週次ふりかえり・索引退避（weekly） | `${SECRETARY_PLUGIN_ROOT}/skills/weekly/SKILL.md` |
 | 「今日始めよう」「朝の段取り」「今日やること」「今日の予定」「TODO」「段取り」「今日はここまで」「終わりにしよう」 | 朝・日中・夕方の整理（daily） | `${SECRETARY_PLUGIN_ROOT}/skills/daily/SKILL.md` |
-| 「Google につなぎたい」「Gmail／カレンダーを見て」 | Google 接続ガイド（setup-google） | `${SECRETARY_PLUGIN_ROOT}/skills/setup-google/SKILL.md` |
-| 「Microsoft につなぎたい」「Outlook／Teams を見て」 | Microsoft 接続ガイド（setup-microsoft） | `${SECRETARY_PLUGIN_ROOT}/skills/setup-microsoft/SKILL.md` |
+| 「Google につなぎたい」「Googleの認証をやり直したい」 | Google 接続ガイド（setup-google） | `${SECRETARY_PLUGIN_ROOT}/skills/setup-google/SKILL.md` |
+| 「Gmail／カレンダーを見て」 | 接続済みhostの公式Google connector読取 | 現在のhostのconnectorへ委譲（setupへ送らない） |
+| 「Microsoft につなぎたい」「Microsoftの認証をやり直したい」 | Microsoft 接続ガイド（setup-microsoft） | `${SECRETARY_PLUGIN_ROOT}/skills/setup-microsoft/SKILL.md` |
+| 「Outlook／Teams を見て」 | 接続済みhostの公式Microsoft connector読取 | 現在のhostのconnectorへ委譲（setupへ送らない） |
 | 「Notion につなぎたい」 | Notion 接続ガイド（任意・setup-notion） | `${SECRETARY_PLUGIN_ROOT}/skills/setup-notion/SKILL.md` |
 | 「Chatworkにつなぎたい」「ルームを選びたい」「Chatworkで探して」「/chatwork」 | Chatwork接続・ルーム設定・履歴検索（chatwork） | `${SECRETARY_PLUGIN_ROOT}/skills/chatwork/SKILL.md` |
 | 「Google Chatを設定したい」「Google Chatにつなぎたい」「GChatで探して」「/google-chat」 | Google Chat高度接続・通常スペース履歴検索（google-chat） | `${SECRETARY_PLUGIN_ROOT}/skills/google-chat/SKILL.md` |
@@ -125,7 +138,8 @@ Chatwork、Google Chat、Google、Microsoft、Notionを起動しない。タス�
 
 ## 会話中の節目（全モード共通）
 
-このルーターは薄いまま保つが、`rules/conversation-contract.md` を適用し、現在の依頼をしおり、decision 0件確認、project候補より先に扱う。
+このルーターは薄いまま保つが、`rules/conversation-contract.md` を適用し、現在の明示依頼を
+しおり、decision 0件確認、project候補より先に扱う。
 
 - 「覚えて」と対象が現在の依頼で明示された低リスクmemory操作は、user-visible scope `memory`だけで許可済みとし、
   decision／topic等の内部分類を質問せず同じassistant turnで`memory-tools.mjs save-memory`をちょうど1回呼ぶ。
@@ -138,7 +152,7 @@ Chatwork、Google Chat、Google、Microsoft、Notionを起動しない。タス�
 - 結論のない相談を秘書から保存提案するときだけ、**「要点を案件メモに残しますか: <確認する要点>」** と確認する。
   pendingは1件に束縛し、別話題で失効させる。「はい、ただしX」は修正版を同じturnで保存する。
   利用者の明示memory依頼は確認へ戻さず、会話全文や逐語ログは保存しない。
-- `secretary/memory/preferences.md` の「決定の確認」を毎セッション読む。「都度」なら上記の短い確認、
+- `secretary/memory/preferences.md` の「決定の確認」は、決定確認が必要なときだけ読む。「都度」なら上記の短い確認、
   「まとめて」なら候補を未確認のまま記録せず、締めで一括確認する。当日decisionが0件の拾い漏れ確認はどちらでも省略しない。
 
 ## 作り直し（再セットアップ）の保護

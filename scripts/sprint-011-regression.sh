@@ -59,7 +59,7 @@ tree_digest(){
 serializer_contract_ok(){
   local file="$1"
   grep -q '最終応答serializer（通常報告の唯一の正本）' "$file" &&
-    grep -q 'すべてのtool実行後に1回だけ適用' "$file" &&
+    grep -Eq '必要なtool実行後に1回だけ適用|短い操作は最終応答へまとめます' "$file" &&
     grep -q '固定項目' "$file" && grep -q '部分完了' "$file"
 }
 
@@ -112,22 +112,22 @@ check "現役固定schema所有ファイルは0件" \
   "[ '$SCHEMA_OWNER_COUNT' -eq 0 ]"
 ROUTER="$PLUGIN/skills/secretary/SKILL.md"
 SERIALIZER_REF_LINE="$(grep -n -m1 '最終応答serializer.*節である' "$ROUTER" | cut -d: -f1)"
-SILENT_LINE="$(grep -n -m1 'ルーティング、段階ロードは無言' "$ROUTER" | cut -d: -f1)"
+SILENT_LINE="$(grep -n -m1 '短いroutingや単純なReadは無言' "$ROUTER" | cut -d: -f1)"
 ROUTE_LINE="$(grep -n -m1 '^## まずやること' "$ROUTER" | cut -d: -f1)"
 check "routerはserializer読込→無言境界→routingの順" \
   "[ '$SERIALIZER_REF_LINE' -lt '$SILENT_LINE' ] && [ '$SILENT_LINE' -lt '$ROUTE_LINE' ]"
 check "共通表現とyasashii styleは同一turn read-onlyで途中出力しない" \
-  "grep -q '同じturn内のRead、routing、read-only確認では途中メッセージを出さず' '$COMMON_RULES' && grep -q 'すべてのtool実行後に1回だけ適用' '$RULES'"
+  "grep -q '短いRead、routing、read-only確認は途中メッセージを出さず' '$COMMON_RULES' && grep -q '長いread-only作業の節目通知' '$RULES'"
 check "routerの競合する旧予告と末尾schema複製は0" \
   "! grep -q 'ひとこと予告してから' '$ROUTER' && ! grep -q '^## 最終出力の絶対条件' '$ROUTER'"
 
 # 意図的失敗fixture: 正本欠落、schema重複、無言境界欠落、適用順逆転を必ず拒否する。
-cp "$RULES" "$WORK/bad-owner.md"; perl -pi -e 's/すべてのtool実行後に1回だけ適用/serializerを適用/g' "$WORK/bad-owner.md"
+cp "$RULES" "$WORK/bad-owner.md"; perl -pi -e 's/必要なtool実行後に1回だけ適用/serializerを適用/g; s/短い操作は最終応答へまとめます/操作は最終応答へまとめます/g' "$WORK/bad-owner.md"
 cp "$SETTINGS" "$WORK/bad-duplicate.md"; printf '\nやったこと: 複製\n結果: 複製\n次に何が起きるか: 複製\n' >> "$WORK/bad-duplicate.md"
-cp "$ROUTER" "$WORK/bad-silent.md"; perl -pi -e 's/ルーティング、段階ロードは無言/ルーティング、段階ロードを実行/' "$WORK/bad-silent.md"
+cp "$ROUTER" "$WORK/bad-silent.md"; perl -pi -e 's/短いroutingや単純なReadは無言でよい/短いroutingや単純なReadを実行/' "$WORK/bad-silent.md"
 check "意図的失敗fixtureはserializer無言境界の欠落を検出" "! serializer_contract_ok '$WORK/bad-owner.md'"
 check "意図的失敗fixtureは下位skillのschema重複を検出" "! serializer_reference_ok '$WORK/bad-duplicate.md'"
-check "意図的失敗fixtureはrouterの途中出力境界欠落を検出" "! grep -q 'ルーティング、段階ロードは無言' '$WORK/bad-silent.md'"
+check "意図的失敗fixtureはrouterの途中出力境界欠落を検出" "! grep -q '短いroutingや単純なReadは無言' '$WORK/bad-silent.md'"
 
 printf -- '商談メモを保存し、local commitを作成しました。pushはしていません。\n' > "$WORK/report-short-ok.txt"
 printf -- '青空みらいさん、完了しました。\n商談メモを保存しました。\n' > "$WORK/report-greeting-ng.txt"
@@ -156,10 +156,10 @@ PREVIEW_LINE="$(grep -n -m1 '現在のpreferencesを読み' "$SETTINGS" | cut -d
 CONFIRM_LINE="$(grep -n -m1 '同じturnで部分更新シームを1回呼ぶ' "$SETTINGS" | cut -d: -f1)"
 APPLY_LINE="$(grep -n -m1 'それ以外:' "$SETTINGS" | cut -d: -f1)"
 DECLARE_LINE="$(grep -n -m1 'こう覚えました' "$SETTINGS" | cut -d: -f1)"
-JOURNAL_LINE="$(grep -n -m1 '宣言後.*journal-add' "$SETTINGS" | cut -d: -f1)"
-COMMIT_LINE="$(grep -n -m1 '最後に.*commit' "$SETTINGS" | cut -d: -f1)"
+JOURNAL_LINE="$(grep -n -m1 'journal-add' "$SETTINGS" | cut -d: -f1)"
+COMMIT_LINE="$(grep -n -m1 'commit <secretary>' "$SETTINGS" | cut -d: -f1)"
 check "settingsの実行・宣言・journal・commitは契約順" \
-  "[ '$PREVIEW_LINE' -lt '$CONFIRM_LINE' ] && [ '$CONFIRM_LINE' -lt '$APPLY_LINE' ] && [ '$APPLY_LINE' -lt '$DECLARE_LINE' ] && [ '$DECLARE_LINE' -lt '$JOURNAL_LINE' ] && [ '$JOURNAL_LINE' -lt '$COMMIT_LINE' ]"
+  "[ '$PREVIEW_LINE' -lt '$CONFIRM_LINE' ] && [ '$CONFIRM_LINE' -lt '$APPLY_LINE' ] && [ '$APPLY_LINE' -lt '$JOURNAL_LINE' ] && [ '$JOURNAL_LINE' -lt '$COMMIT_LINE' ] && [ '$COMMIT_LINE' -lt '$DECLARE_LINE' ]"
 check "settingsは曖昧確認前の副作用0" "grep -q '1問だけ聞き、副作用0で止まる' '$SETTINGS'"
 check "settingsはpushしない" "grep -q 'pushしない' '$SETTINGS' && ! grep -qE 'git +push' '$SETTINGS'"
 check "3つの口調プリセットが存在" "[ -f '$TEMPLATES/tones/standard.md' ] && [ -f '$TEMPLATES/tones/friendly.md' ] && [ -f '$TEMPLATES/tones/formal.md' ]"

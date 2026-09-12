@@ -9,13 +9,12 @@ description: >
 
 ## plugin root（必須）
 
-このSKILL.mdの実ファイル絶対pathを `SECRETARY_SKILL_FILE` に入れ、最初に1回だけ解決する。
-空・相対path・未解決placeholderならcommandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。
+このSKILL.mdの実ファイル絶対pathをhostから受け取り、`SECRETARY_SKILL_FILE` として扱う。空・相対path・未解決placeholderなら
+commandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。Node.jsの `path.dirname`／`path.join` と配列引数で、
+次のresolverへ `--skill-file` とpathを別々の引数として渡す（下記はhost-neutralな呼び出しの形）。
 
-```bash
-SECRETARY_SKILL_FILE="<このSKILL.mdの実ファイル絶対path>"
-case "$SECRETARY_SKILL_FILE" in /*/skills/*/SKILL.md) ;; *) exit 2 ;; esac
-SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/resolve-plugin-root.mjs" --skill-file "$SECRETARY_SKILL_FILE")" || exit 2
+```text
+SECRETARY_PLUGIN_ROOT = node(path.join(path.dirname(SECRETARY_SKILL_FILE), "../../scripts/resolve-plugin-root.mjs"), ["--skill-file", SECRETARY_SKILL_FILE])
 ```
 
 以後の共通file参照は `${SECRETARY_PLUGIN_ROOT}` を使う。
@@ -28,8 +27,8 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 必要なときだけ`timeline`を任意のread-only helperとして使う。安全境界で拒否された対象を直接Readで迂回せず、取得できた範囲と
 未取得範囲を分けて伝える。
 
-`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
-`secretary/memory/preferences.md` を読む。整理した内容と安全条件だけをrouterへ返し、
+`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` を、同じplugin実体・workspaceで該当fileが未変更ならsessionで一度だけ読む。plugin、workspace、または該当fileが変わった場合だけ、そのfileを再読する。
+個人設定が必要な応答だけ `secretary/memory/preferences.md` の該当節を読む。整理した内容と安全条件だけをrouterへ返し、
 通常報告を独自に包装しない。最終出力形は同rule入口から解決される「最終応答serializer」だけを正本とする。
 
 ## モードを見分ける
@@ -66,15 +65,19 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
   - 完了は同helperの `todo-done <secretary> <番号> [--confirm]`、持ち越しは `todo-carry <secretary> <番号> <YYYY-MM-DD> [--confirm]`。どちらも対象を先に見せ、確認後だけ変更する。
 - **進行中PJ**: `project-tools.mjs list <secretary>`と各`PROJECT.md`。状態・待ち・次の入口を確認する。実行項目はPJ内へ複製せず、PJ参照つきで上記TODO正本に置く。
 
-## ステップ1: つながっているか見る（未接続でも壊さない）
+## ステップ1: つながっているか見る（未確認と未接続を分ける）
 
-まずコネクタが使えるかを軽く確かめる（例: 直近の予定を1件読めるか）。
+利用者が具体的な予定・メール照会を同じ依頼で指定している場合は、その照会を最初のprobe、つまり軽い読み取り確認として
+1回だけ使う。別の合成probeを先に実行して同じ内容を重ねない。具体的な照会がない場合だけ、直近の予定を1件読む。
 
-- **つながっている** → ステップ2へ。
-- **つながっていない／読めない** → 失敗として扱わず、親切に接続へ案内する。例:
+- **成功した** → ステップ2へ。
+- **実コネクタが `not connected` 等を返した** → 接続案内を選択肢として示す。例:
   > いまはまだ予定表につながっていないようです。先に Google をつなぎますか？（設定画面から3分ほどでできます）
   そのうえで接続ガイドを段階ロードする: `${SECRETARY_PLUGIN_ROOT}/skills/setup-google/SKILL.md`。
   接続前でも、ローカル TODO だけで「今ある TODO」は提示できる（できる範囲でお返しする）。
+- **toolが利用できない、または実結果を得られない** → `未確認` として扱い、未接続とは断定しない。接続ガイドを自動で開始せず、
+  ローカル TODOと、確認できなかった外部範囲を分けて返す。
+- **一時的な認証・network error** → `error` として原因と再試行条件を示し、ローカル TODOの整理は続ける。保存や接続設定の副作用は発生させない。
 
 ## ステップ2: 予定と TODO を突き合わせる（根拠ルール）
 

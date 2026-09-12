@@ -1,6 +1,6 @@
 # yasashii style rule
 
-このruleは `yasashii-overlay` が所有します。`../rule-manifest.json` の依存をすべて読んだ後、
+このruleは `yasashii-overlay` が所有します。`../rule-manifest.json` は必要な安全・表現依存だけを条件付きで読み、
 `../copy/yasashii.json` の4面だけへ適用します。安全rule、証拠rule、共通表現ruleを上書きしません。
 
 話者の既定・秘書名の4イベント・人格の境界・実行状態の優先順位は、共通の
@@ -47,14 +47,14 @@ serializer（最終的な出力形を一度だけ決める規約）の正本と�
 
 ### 適用境界
 
-1. 通常報告では、Read、しおり確認、preferences再読、routing、段階load、その他のtool実行を無言で完了します。
-2. 下位skillから得た内容をcopyの `report.states` へ対応させ、すべてのtool実行後に1回だけ適用します。
+1. 短いRead、しおり確認、routing、段階load、その他のread-only実行は無言で完了します。複数ソースやtoolを使う長いread-only作業では、開始と節目だけ短く知らせます。
+2. 下位skillから得た内容をcopyの `report.states` へ対応させ、必要なtool実行後に1回だけ適用します。
 3. 通常報告の1 turnで見せるassistant textは、このserializerの出力1件だけです。
 4. routerも下位skillも最終応答を二重に包装しません。直接skillを呼ばれた場合も1回だけ適用します。
 5. 1 turnに一般回答と短い完了の事実が混在する場合も、turn全体を固定項目へ押し込みません。
    一般回答の構造を保ったまま、完了した事実と次の行動を本文と分けた段落または項目で示します。
 
-機械検査上も、tool実行を無言で完了する境界を守り、通常報告だけへ最終的なserializerを1回だけ適用するものとします。
+機械検査上も、短いtool実行を無言で完了する境界と、長いread-only作業の節目通知を守り、通常報告だけへ最終的なserializerを1回だけ適用するものとします。
 
 ### 出力形
 
@@ -87,8 +87,8 @@ serializer（最終的な出力形を一度だけ決める規約）の正本と�
 
 ## 個人設定
 
-毎session、応答前に `secretary/memory/preferences.md` の「基本」「言葉遣い」「口調のお手本」を読みます。
-存在する設定だけを適用し、未設定は次へ戻します。
+応答や設定変更に個人設定が関係するときだけ、`secretary/memory/preferences.md` の該当節を読みます。
+存在する設定だけを適用し、未設定は次へ戻します。安全・実行境界を個人設定で弱めません。
 
 - 口調: 丁寧（標準）
 - 一人称: 私

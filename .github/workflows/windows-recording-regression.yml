@@ -2,6 +2,11 @@ name: Windows recording regression
 
 on:
   workflow_dispatch:
+    inputs:
+      update_only:
+        description: Run only the current update and migration job
+        type: boolean
+        default: false
   pull_request:
     paths:
       - ".github/workflows/windows-recording-regression.yml"
@@ -10,6 +15,7 @@ on:
       - "plugins/secretary/rules/styles/yasashii.md"
       - "plugins/secretary/templates/**"
       - "plugins/secretary/migrations/**"
+      - "scripts/sprint-048-migration-test.mjs"
       - "scripts/sprint-056-patch-001-migration-test.mjs"
       - "scripts/sprint-056-patch-001-release-test.mjs"
       - "scripts/check-release-integrity.py"
@@ -50,9 +56,9 @@ jobs:
       - name: Verify native Windows runtime
         shell: pwsh
         run: node -e "if (process.platform !== 'win32') process.exit(1); console.log(process.platform, process.arch, process.version)"
-      - name: Supported update migrations and pending recovery
+      - name: Current managed guidance update migrations
         shell: pwsh
-        run: node scripts/sprint-056-patch-001-migration-test.mjs
+        run: node scripts/sprint-048-migration-test.mjs
       - name: Release and archive migration guards
         if: ${{ !cancelled() }}
         shell: pwsh
@@ -62,6 +68,7 @@ jobs:
         shell: pwsh
         run: node scripts/sprint-038-patch-003-conversation-migration-test.mjs --require-windows
   windows-native:
+    if: ${{ !inputs.update_only }}
     runs-on: windows-2025
     timeout-minutes: 10
     steps:

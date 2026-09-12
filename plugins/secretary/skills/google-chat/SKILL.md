@@ -12,13 +12,12 @@ Attention、HookからOAuth、取得、network、設定変更を行わない。C
 
 ## plugin root（必須）
 
-このSKILL.mdの実ファイル絶対pathを `SECRETARY_SKILL_FILE` に入れ、最初に1回だけ解決する。
-空・相対path・未解決placeholderならcommandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。
+このSKILL.mdの実ファイル絶対pathをhostから受け取り、`SECRETARY_SKILL_FILE` として扱う。空・相対path・未解決placeholderなら
+commandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。Node.jsの `path.dirname`／`path.join` と配列引数で、
+次のresolverへ `--skill-file` とpathを別々の引数として渡す（下記はhost-neutralな呼び出しの形）。
 
-```bash
-SECRETARY_SKILL_FILE="<このSKILL.mdの実ファイル絶対path>"
-case "$SECRETARY_SKILL_FILE" in /*/skills/*/SKILL.md) ;; *) exit 2 ;; esac
-SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/resolve-plugin-root.mjs" --skill-file "$SECRETARY_SKILL_FILE")" || exit 2
+```text
+SECRETARY_PLUGIN_ROOT = node(path.join(path.dirname(SECRETARY_SKILL_FILE), "../../scripts/resolve-plugin-root.mjs"), ["--skill-file", SECRETARY_SKILL_FILE])
 ```
 
 以後の共通file参照は `${SECRETARY_PLUGIN_ROOT}` を使う。
@@ -27,8 +26,8 @@ Google Workspace版Google Chatの選択した通常スペースだけを、秘�
 Gmail等の公式Googleコネクタとは別の機能であり、各利用組織が所有するGoogle Cloudプロジェクト、Audience `Internal`、
 利用者本人のOAuthを使う。OAuthは、Googleのパスワードを渡さず、許可した範囲だけ読み取る認証である。
 
-最初に `${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
-`secretary/memory/preferences.md` を読む。通常報告の形式は同rule入口から解決される最終応答serializerだけに任せる。
+`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` を、同じplugin実体・workspaceで該当fileが未変更ならsessionで一度だけ読む。plugin、workspace、または該当fileが変わった場合だけ、そのfileを再読する。
+個人設定が必要な応答だけ `secretary/memory/preferences.md` の該当節を読む。通常報告の形式は同rule入口から解決される最終応答serializerだけに任せる。
 
 ## 状態を先に示す
 

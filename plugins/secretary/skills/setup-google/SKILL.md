@@ -1,8 +1,8 @@
 ---
 name: setup-google
 description: >
-  Google（Gmail・Googleカレンダー・Googleドライブ）を秘書につなぐ案内。現在のhostが提供する
-  公式コネクタ／Appで接続する。「Google につなぎたい」「メール／カレンダーを見て」等で呼び出す。
+  Google（Gmail・Googleカレンダー・Googleドライブ）の接続・再認証を依頼されたときの案内。
+  現在のhostが提供する公式コネクタ／Appを使う。「Googleにつなぎたい」「Googleの認証をやり直したい」等で呼び出す。
 ---
 
 # Google 接続ガイド（setup-google）
@@ -14,13 +14,12 @@ description: >
 
 ## plugin root（必須）
 
-このSKILL.mdの実ファイル絶対pathを `SECRETARY_SKILL_FILE` に入れ、最初に1回だけ解決する。
-空・相対path・未解決placeholderならcommandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。
+このSKILL.mdの実ファイル絶対pathをhostから受け取り、`SECRETARY_SKILL_FILE` として扱う。空・相対path・未解決placeholderなら
+commandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。Node.jsの `path.dirname`／`path.join` と配列引数で、
+次のresolverへ `--skill-file` とpathを別々の引数として渡す（下記はhost-neutralな呼び出しの形）。
 
-```bash
-SECRETARY_SKILL_FILE="<このSKILL.mdの実ファイル絶対path>"
-case "$SECRETARY_SKILL_FILE" in /*/skills/*/SKILL.md) ;; *) exit 2 ;; esac
-SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/resolve-plugin-root.mjs" --skill-file "$SECRETARY_SKILL_FILE")" || exit 2
+```text
+SECRETARY_PLUGIN_ROOT = node(path.join(path.dirname(SECRETARY_SKILL_FILE), "../../scripts/resolve-plugin-root.mjs"), ["--skill-file", SECRETARY_SKILL_FILE])
 ```
 
 以後の共通file参照は `${SECRETARY_PLUGIN_ROOT}` を使う。
@@ -33,8 +32,8 @@ Gmail・Googleカレンダー・Googleドライブを秘書が参照できるよ
 - Codexでは利用可能なGoogle App／connectorを確認し、hostに無ければ `未確認` と伝えて停止する。
 - 一方のhostの画面名、再起動手順、接続済み判定を他方へ推測適用しない。
 
-`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
-`secretary/memory/preferences.md` を読む。案内内容と安全条件だけをrouterへ返し、
+`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` を、同じplugin実体・workspaceで該当fileが未変更ならsessionで一度だけ読む。plugin、workspace、または該当fileが変わった場合だけ、そのfileを再読する。
+個人設定が必要な応答だけ `secretary/memory/preferences.md` の該当節を読む。案内内容と安全条件だけをrouterへ返し、
 通常報告を独自に包装しない。最終出力形は同rule入口から解決される「最終応答serializer」だけを正本とする。
 
 ## はじめに一言（予告と不安の先回り）
@@ -44,17 +43,20 @@ Gmail・Googleカレンダー・Googleドライブを秘書が参照できるよ
 > これから Google（メール・カレンダー）を秘書につなぎます。
 > 現在のアプリにある公式の接続方法を確認し、表示に沿って許可します（3分ほど）。
 
-## ステップ0: 接続しおりを書く（中断に備える・計画）
+## ステップ0: hostとconnectorを確認してから、必要ならしおりを書く
 
-**設定に進む前に**、記憶ケアのしおり機能で「いま接続の途中」という文脈を残す。
-これで認可画面への移動などで会話が途切れても、戻ってきたときに秘書のほうから続きを案内できる。
+まず現在のhostで公式Google connector／Appが利用可能かをread-onlyで確かめる。設定対象がまだ確認できない段階では
+workspaceやしおりを変更しない。connectorが使え、認証画面への移動で会話が中断する見込みがある場合に限り、
+この接続フロー専用のしおりを1件だけ書く。既存のしおりが別の作業を示す場合は残し、上書き・消去しない。
 
 ```
 node "${SECRETARY_PLUGIN_ROOT}/skills/memory-care/scripts/memory-tools.mjs" resume-write <secretary> \
   "Google接続の設定" "現在のhostでGoogleの公式App／connectorを確認→認可" "どのGoogleアカウントでログインするか"
 ```
 
-（`<secretary>` は作業中フォルダの `secretary/`。しおりの詳しい扱いは `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/SKILL.md` の「3. 再起動しおり」に従う。）
+`<secretary>` が解決できない場合は、説明とhost capability確認は続けるが、任意のしおり作成だけを見送る。setupのためにworkspaceを初期化・新規作成しない。必須の対象rootが必要な実操作は解決できるまで開始しない。
+
+（`<secretary>` は作業中フォルダの `secretary/`。しおりの詳しい扱いは `${SECRETARY_PLUGIN_ROOT}/skills/memory-care/SKILL.md` の「再起動しおり（_resume.md）」に従う。）
 
 ## ステップ1: host別の公式接続面を使う（道具）
 
@@ -115,7 +117,8 @@ Google Driveのうち利用するサービスが存在する場合だけ、そ�
 実コネクタの成功結果が無ければ接続済みと断定しない。ここでは通常報告を作らず、
 内容と安全条件だけをrouterへ返し、出力形は`plain-language.md` から解決される「最終応答serializer」に任せる。
 
-接続が完了したら、記憶ケアのNode.js helperでしおりを閉じる（`memory-tools.mjs resume-clear <secretary>`）。
+このフローで作成したしおりについて、接続成功または中断不要を確認できた場合だけ、記憶ケアのNode.js helperで閉じる
+（`memory-tools.mjs resume-clear <secretary>`）。別の作業を示す既存しおりは残し、関係が不明なら閉じずに確認する。
 
 ## やらないこと（この案内の範囲）
 

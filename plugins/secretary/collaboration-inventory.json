@@ -32,7 +32,7 @@
           "token": "yasashii-secretary:clarity-collaboration-router:v1"
         }
       ],
-      "contentDigest": "6a2ffae556f6580d44ea3ba959caa4b1fe79d9f0c342a8cfede3cd1d99cca4e5",
+      "contentDigest": "22cc39f4b254db573b0474c77a1ecde0b75fbc45f51564b834123f82cd0afd34",
       "tests": [
         "CLX-001",
         "CLX-018"
@@ -59,7 +59,7 @@
           "token": "yasashii-secretary:clarity-collaboration:clarity:v1"
         }
       ],
-      "contentDigest": "cf25d0dfb4170c25c016d7042b87e59ea9bc77809e246a3037d1ffbf98fa1137",
+      "contentDigest": "7ffa1bac9fac037d082de0910ce8787b9df4ad936f8043db690297bb7723343c",
       "tests": [
         "CLX-001",
         "CLX-009",
@@ -93,7 +93,7 @@
           "token": "yasashii-secretary:clarity-collaboration:projects:v1"
         }
       ],
-      "contentDigest": "4f6d1271f1c176941566380a8ae18db9e09f477073cf2bba69da2acff067a96e",
+      "contentDigest": "392934507a139ce0ac78a4814cacc1468f06a81ebfbaf62a18825aba06687a51",
       "tests": [
         "CLX-002",
         "CLX-003",
@@ -126,7 +126,7 @@
           "token": "yasashii-secretary:clarity-collaboration:daily:v1"
         }
       ],
-      "contentDigest": "7c63c0c61a559f5b247805f2ee4eb47e1cf54898128e99d123a23c08d13e3684",
+      "contentDigest": "473c6948024ced35eaeebe24ee6a7e3f0c83504ea9e8679c8f4d49f7a09c565b",
       "tests": [
         "CLX-007"
       ],
@@ -154,7 +154,7 @@
           "token": "yasashii-secretary:clarity-collaboration:weekly:v1"
         }
       ],
-      "contentDigest": "57acb8e4b73759f2c617fb4a50e9b44147d51c1477716432eaaebb3a15c0a289",
+      "contentDigest": "11d67e62674e397433aead9a8bab7f1ba59dde236acecb732a39fb5899b9470c",
       "tests": [
         "CLX-008"
       ],
@@ -183,7 +183,7 @@
           "token": "yasashii-secretary:clarity-collaboration:projects:v1"
         }
       ],
-      "contentDigest": "f8c06078a25c99be9dea89fcc21b9e7cfb684a8efbef2b604e178fd055806e9d",
+      "contentDigest": "dbf43dfd7a50aeb863bd477df7c7261ce6fff2107477406848ca242874a67acc",
       "tests": [
         "CLX-009",
         "CLX-010"
@@ -213,7 +213,7 @@
           "token": "agentic-secretary:clarity-collaboration:conversation:v1"
         }
       ],
-      "contentDigest": "8b55ddf878bd81ad964b75f0b1f71e410b4b78bc9721f739d01060fc15eb9cc4",
+      "contentDigest": "5033cf0b328cc64658f43fb256eab0fad2fd52c01b119e3cb66c473f85e8b46a",
       "tests": [
         "CLX-011"
       ],
@@ -238,7 +238,7 @@
           "token": "yasashii-secretary:clarity-collaboration:build:v1"
         }
       ],
-      "contentDigest": "1bf0297c54fa61bc345d25a566c5b1be1bf2418f073c53d6ee25545c675aabd9",
+      "contentDigest": "9bb4a9819e73440901ae18038653ac9f31217cb3a3c72b5fd85cf0c9ef52e657",
       "tests": [
         "CLX-012"
       ],
@@ -265,7 +265,7 @@
           "token": "yasashii-secretary:clarity-collaboration:update:v1"
         }
       ],
-      "contentDigest": "1d45f0f5da517f59d8ce1b8919a848bde5b576deda3b0cb0bbc13a57a168695a",
+      "contentDigest": "2550a89d27f5d79b5380b45db121fb87c48c2b214f03cb23657a3db6ae92ec8b",
       "tests": [
         "CLX-013"
       ],
@@ -297,7 +297,7 @@
           "token": "yasashii-secretary:clarity-collaboration:workspace-template:v1"
         }
       ],
-      "contentDigest": "7268e46205d8aa7ae049147d1fd959f5ed65e3df498bdcd4a9241666ca17fb3c",
+      "contentDigest": "2adad6bfce7fd8aae63d9593351c287d7c742e8628eb4b39181d5cfe629c9f17",
       "tests": [
         "CLX-014"
       ],
@@ -328,7 +328,7 @@
           "token": "agentic-secretary:clarity-collaboration:language:v1"
         }
       ],
-      "contentDigest": "edcdfb0a0ca4b7b782354244913b310b1b77034a9b3f6a0f57bfd96eb1b2d671",
+      "contentDigest": "0c6b27d46048be8414f9cb11f840cceedb2caa9b8c6972ca245389e420305dc2",
       "tests": [
         "CLX-015"
       ],
@@ -354,7 +354,7 @@
           "token": "yasashii-secretary:clarity-collaboration:host:v1"
         }
       ],
-      "contentDigest": "07772e960e96d8726c118dea7e9ec1fcbfd3bea12e14a0151180369214b2cde4",
+      "contentDigest": "016a6b80bef848728cad8016104955ea6a2497910b3018da2f470d5a9882c5f6",
       "tests": [
         "CLX-016"
       ],
@@ -384,7 +384,7 @@
           "token": "yasashii-project-clarity-prewrite-receipt"
         }
       ],
-      "contentDigest": "bbb90277e992fe950a11def82b7c21f51aa5977348ce0db5815a15934d337e20",
+      "contentDigest": "5681950ab0098edb3217710d30b3de30f23ed662ad0d591e390576e7117801ac",
       "tests": [
         "CLX-017",
         "CLX-020"
@@ -420,7 +420,7 @@
           "token": "yasashii-secretary:clarity-collaboration:connector:v1"
         }
       ],
-      "contentDigest": "99ef377311bb5d5ef4a327e373c6b528e34e4d5a9a6fe4e6a5a247525449e6d6",
+      "contentDigest": "1953ed43ad6110f33bcade5a4281f41f53c94bbb22a266db8859b7d05705c2d0",
       "tests": [
         "CLX-018"
       ],
@@ -480,7 +480,7 @@
           "token": "yasashii-secretary:clarity-collaboration:clarity:v1"
         }
       ],
-      "contentDigest": "0fc93b87ce4e4dd63aaf056a22ac2ae82b58c9adf27663b17402b8feee6e496a",
+      "contentDigest": "0cb0b246bc0cb801b750dfb37713ba36c70e869b2df73b4e106b9e52bac6a05d",
       "tests": [
         "CLX-014",
         "CLX-017",
@@ -511,7 +511,7 @@
           "token": "yasashii-secretary:clarity-collaboration:release:v1"
         }
       ],
-      "contentDigest": "f76ba498c17a49666d78d94e240f7d8cd06f6a6db0f35b320027f0525aaf457f",
+      "contentDigest": "a6a5284924c47e5fbf2fb149688e0c87b274f9cfc103c624873c04ff8bc287e2",
       "tests": [
         "CLX-016",
         "CLX-017",
@@ -628,7 +628,7 @@
           "token": "agentic-secretary:clarity-harness-authoritative-scan:v1"
         }
       ],
-      "contentDigest": "ec9fecd1aa8b5d246bc4218ac8f8d46bd7b92f659835d2fb9249679416ea23b8",
+      "contentDigest": "c41c06ed597348f9321e89ecfd2b2449bba7105404b340c654707abe7d9837b2",
       "tests": [
         "yasashii-HS-001",
         "yasashii-HS-002",

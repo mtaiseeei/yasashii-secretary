@@ -9,13 +9,12 @@ description: >
 
 ## plugin root（必須）
 
-このSKILL.mdの実ファイル絶対pathを `SECRETARY_SKILL_FILE` に入れ、最初に1回だけ解決する。
-空・相対path・未解決placeholderならcommandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。
+このSKILL.mdの実ファイル絶対pathをhostから受け取り、`SECRETARY_SKILL_FILE` として扱う。空・相対path・未解決placeholderなら
+commandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。Node.jsの `path.dirname`／`path.join` と配列引数で、
+次のresolverへ `--skill-file` とpathを別々の引数として渡す（下記はhost-neutralな呼び出しの形）。
 
-```bash
-SECRETARY_SKILL_FILE="<このSKILL.mdの実ファイル絶対path>"
-case "$SECRETARY_SKILL_FILE" in /*/skills/*/SKILL.md) ;; *) exit 2 ;; esac
-SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/resolve-plugin-root.mjs" --skill-file "$SECRETARY_SKILL_FILE")" || exit 2
+```text
+SECRETARY_PLUGIN_ROOT = node(path.join(path.dirname(SECRETARY_SKILL_FILE), "../../scripts/resolve-plugin-root.mjs"), ["--skill-file", SECRETARY_SKILL_FILE])
 ```
 
 以後の共通file参照は `${SECRETARY_PLUGIN_ROOT}` を使う。
@@ -24,8 +23,8 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 最後に作業中フォルダを1つのprivate GitHub repo（GitHub上で、自分や許可した人だけが見られる非公開の保存場所）にし、秘書ディレクトリ、Chatwork／Google Chatの設定とworkflowなど、この初期設定が所有するファイルだけを最初のコミットへ入れて初回pushします。push（手元の変更をGitHubへ送る操作）は、この初回セットアップの必須の仕上げです。作業前からある無関係なファイルは初回コミットへ含めません。
 このrepoが秘書、通常のproject、選択したChatworkルームとGoogle Chat通常スペースの履歴をまとめる共通workspaceです。Google ChatのCloud準備と接続用JSON取得は、この初回セットアップとは別に、AIとの会話で一つずつ進めます。
 
-`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` と、既存の秘書ディレクトリがある場合は
-`secretary/memory/preferences.md` を読む。質問turnと作業結果だけをrouterへ返し、
+`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` を、同じplugin実体・workspaceで該当fileが未変更ならsessionで一度だけ読む。plugin、workspace、または該当fileが変わった場合だけ、そのfileを再読する。
+既存の秘書ディレクトリがあり個人設定を反映する場合だけ `secretary/memory/preferences.md` の該当節を読む。質問turnと作業結果だけをrouterへ返し、
 通常報告を独自に包装しない。最終出力形は同rule入口から解決される「最終応答serializer」だけを正本とする。
 
 ## はじめに: 既に秘書ディレクトリがある場合の保護（作り直し）

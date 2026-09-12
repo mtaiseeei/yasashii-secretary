@@ -17,6 +17,7 @@ function result(selectedSkill, route, reason, options = {}) {
     explicit: options.explicit === true,
     delegation: options.delegation || "none",
     confirmationBoundary: options.confirmationBoundary || "none",
+    ...(options.followUp ? { followUp: options.followUp } : {}),
     sideEffect: { performed: false, ...ZERO_EFFECT },
   };
 }
@@ -38,19 +39,35 @@ const CONNECTOR_ROUTES = [
     skill: "setup-google",
     route: "google-explicit-entry",
     service: /(?:gmail|google\s*(?:calendar|drive)|google(?:カレンダー|ドライブ)|グーグル(?:カレンダー|ドライブ)|google|グーグル)/u,
-    operation: /(?:(?:gmail|google\s*(?:calendar|drive)|google(?:カレンダー|ドライブ)|グーグル(?:カレンダー|ドライブ)|google|グーグル)\s*(?:を|で|から)\s*.{0,24}(?:探|検索|取得|読|見|確認)|(?:gmail|google\s*(?:calendar|drive)|google(?:カレンダー|ドライブ)|グーグル(?:カレンダー|ドライブ))\s*の\s*(?:メール|予定|ファイル).{0,24}(?:探|検索|取得|読|見|確認)|(?:gmail|google\s*(?:calendar|drive)|google(?:カレンダー|ドライブ)|グーグル(?:カレンダー|ドライブ)|google|グーグル).{0,24}(?:に|へ|と|を)?\s*(?:つな(?:い|ぎ|ぐ)|接続(?:して|したい|する|し直)|設定(?:して|したい|する|し直)|連携(?:して|したい|する|し直)|取得(?:して|したい|する)|同期(?:して|したい|する))|(?:探|検索|取得).{0,24}(?:gmail|google\s*(?:calendar|drive)|google(?:カレンダー|ドライブ)|グーグル(?:カレンダー|ドライブ)))/u,
+    operation: /(?:gmail|google\s*(?:calendar|drive)|google(?:カレンダー|ドライブ)|グーグル(?:カレンダー|ドライブ)|google|グーグル).{0,24}(?:に|へ|と|を)?\s*(?:つな(?:い|ぎ|ぐ)|接続(?:して|したい|する|し直)|設定(?:して|したい|する|し直)|連携(?:して|したい|する|し直)|同期(?:して|したい|する)|再認証(?:して|したい|する))/u,
   },
   {
     skill: "setup-microsoft",
     route: "microsoft-explicit-entry",
     service: /(?:microsoft|outlook|onedrive|teams)/u,
-    operation: /(?:(?:microsoft|outlook|onedrive|teams)\s*(?:を|で|から)\s*.{0,24}(?:探|検索|取得|読|見|確認)|(?:microsoft|outlook|onedrive|teams).{0,24}(?:に|へ|と|を)?\s*(?:つな(?:い|ぎ|ぐ)|接続(?:して|したい|する|し直)|設定(?:して|したい|する|し直)|連携(?:して|したい|する|し直)|取得(?:して|したい|する)|同期(?:して|したい|する))|(?:探|検索|取得).{0,24}(?:microsoft|outlook|onedrive|teams))/u,
+    operation: /(?:microsoft|outlook|onedrive|teams).{0,24}(?:に|へ|と|を)?\s*(?:つな(?:い|ぎ|ぐ)|接続(?:して|したい|する|し直)|設定(?:して|したい|する|し直)|連携(?:して|したい|する|し直)|同期(?:して|したい|する)|再認証(?:して|したい|する))/u,
   },
   {
     skill: "setup-notion",
     route: "notion-connection-explicit-entry",
     service: /notion/u,
     operation: /(?:notion.{0,24}(?:に|へ|と|を)?\s*(?:つな(?:い|ぎ|ぐ)|接続(?:して|したい|する|し直)|設定(?:して|したい|する|し直)|連携(?:して|したい|する|し直))|(?:つな(?:い|ぎ|ぐ)|接続(?:して|したい|する|し直)|設定(?:して|したい|する|し直)|連携(?:して|したい|する|し直)).{0,24}notion)/u,
+  },
+];
+
+// Google/Microsoftの単独read要求は接続設定と別の経路です。public editionには
+// 専用read Skillがないため、hostの実コネクタを使う通常routerへ返す。setupと
+// readの複合要求は、先にsetupを選び、setup結果のfollowUpへreadを保持する。
+const CONNECTOR_READ_ROUTES = [
+  {
+    service: /(?:gmail|google\s*(?:calendar|drive)|google(?:カレンダー|ドライブ)|グーグル(?:カレンダー|ドライブ)|google|グーグル)/u,
+    operation: /(?:(?:gmail|google\s*(?:calendar|drive)|google(?:カレンダー|ドライブ)|グーグル(?:カレンダー|ドライブ)|google|グーグル)\s*(?:を|で|から|の)\s*.{0,24}(?:探|検索|取得|読|見|確認)|(?:gmail|google\s*(?:calendar|drive)|google(?:カレンダー|ドライブ)|グーグル(?:カレンダー|ドライブ))\s*の\s*(?:メール|予定|ファイル).{0,24}(?:探|検索|取得|読|見|確認)|(?:探|検索|取得).{0,24}(?:gmail|google\s*(?:calendar|drive)|google(?:カレンダー|ドライブ)|グーグル(?:カレンダー|ドライブ)))/u,
+    route: "google-read-only-handoff",
+  },
+  {
+    service: /(?:microsoft|outlook|onedrive|teams)/u,
+    operation: /(?:(?:microsoft|outlook|onedrive|teams)\s*(?:を|で|から|の)\s*.{0,24}(?:探|検索|取得|読|見|確認)|(?:探|検索|取得).{0,24}(?:microsoft|outlook|onedrive|teams))/u,
+    route: "microsoft-read-only-handoff",
   },
 ];
 
@@ -64,7 +81,21 @@ const BUILD = /(?:アプリ|ツール|サイト|機能).*(?:作って|開発|実
 const UPDATE = /(?:最新版|バージョン).*(?:確認|更新|して)|(?:プラグイン|agentic-secretary).*(?:更新|アップデート)|更新ある/u;
 const DAILY = /(?:今日やること|今日の予定|朝の段取り|今日始め|今日はここまで|終わりにしよう|今日.*(?:要確認|段取り))/u;
 const WEEKLY = /(?:今週|先週).*(?:振り返|活動|まとめ)|週次/u;
-const CONNECTIONS = /(?:繋がってる|つながってる|接続の調子|どれが使える|接続.*診断)/u;
+// 接続状態の確認は、個別サービスのread（予定・メール等）より先に共通診断へ送る。
+// 「接続して、予定を見る」のような複合依頼はこの判定に入らず、明示setupを保持する。
+const CONNECTIONS = /(?:繋がってる|つながってる|接続の調子|どれが使える|接続.*診断|(?:接続|連携)(?:の)?(?:状態|状況|可否|有無)?\s*(?:を)?\s*(?:確認|診断|チェック|調べ|見))/u;
+
+function readFollowUp(text) {
+  const connector = CONNECTOR_READ_ROUTES.find((candidate) => candidate.service.test(text) && candidate.operation.test(text));
+  if (!connector) return null;
+  return {
+    selectedSkill: "secretary",
+    route: connector.route,
+    delegation: "host-connector-read",
+    confirmationBoundary: "external-read-only",
+    order: "after-setup",
+  };
+}
 
 export function routeSecretaryIntent(input) {
   const text = normalized(input);
@@ -91,14 +122,31 @@ export function routeSecretaryIntent(input) {
 
   if (CONNECTIONS.test(text)) return result("connections", "connections-read-only-diagnosis", "接続診断が明示されています。", { explicit: true });
 
-  // サービス名だけではconnectorを選ばない。対象サービスと検索／取得／接続／設定等の現在操作が
-  // 同じ依頼にある場合だけ、既存の明示入口へ委譲する。
+  // 明示setupは単独readより先に扱う。readも同じ依頼に含まれる場合は、setup後の
+  // host connector readとしてroute意味を保持し、setup Skillが後続readを捨てない。
   for (const connector of CONNECTOR_ROUTES) {
     if (connector.service.test(text) && connector.operation.test(text)) {
-      return result(connector.skill, connector.route, "外部サービスへの現在操作が明示されています。", {
+      const followUp = connector.skill === "setup-google" || connector.skill === "setup-microsoft"
+        ? readFollowUp(text)
+        : null;
+      return result(connector.skill, connector.route, followUp
+        ? "接続設定を先に進め、完了後に指定されたread-only照会へ続けます。"
+        : "外部サービスへの現在操作が明示されています。", {
         explicit: true,
         delegation: "existing-explicit-connector-entry",
         confirmationBoundary: "existing-connector-boundary",
+        ...(followUp ? { followUp } : {}),
+      });
+    }
+  }
+
+  // 接続済みデータの単独readは setup Skill（認証・接続設定）へ送らない。
+  for (const connector of CONNECTOR_READ_ROUTES) {
+    if (connector.service.test(text) && connector.operation.test(text)) {
+      return result("secretary", connector.route, "接続設定ではなく、現在のhostの公式コネクタで読む依頼です。", {
+        explicit: true,
+        delegation: "host-connector-read",
+        confirmationBoundary: "external-read-only",
       });
     }
   }

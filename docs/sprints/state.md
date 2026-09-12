@@ -1,5 +1,15 @@
 # Sprint State
 
+## 2026-09-12 Astra指示改善の追加承認・正式リリース
+
+- Phase A実装freeze、未解消対象path0。正式inputはAgentic公開v0.13.2／独立A/B PASS済み `cd4700c3d541525d00bb69732d7c0f94c11feb37`。Yas latest0.13.1の17 Skills/Clarity/Voiceと旧overlay履歴を保持して限定適応。focused8/0、migration25/0、01173/0、02925/0、04220/0、03515/0、052Voice3/0、inventory20面57cases、Ruby17/0、releaseguard13/0。genericPyYAMLのみINCOMPLETE。Lineage1 < 10を確認して2、fresh独立Evaluator Sol/highへ引渡す。Windowsは候補commit後の既存update jobのみ。
+
+- 最新の明示指示により、Agentic独立A待ちの間にYasの独立したsource適応・prompt準備を先行する。仮入力はAgentic candidate `19211cf5dce6db09e095f50524b4c2ecc9a00664`、正式同期receipt／凍結は独立PASS確定後だけ。新048をactive、Retry0／Spec0／Lineage0 < 10を確認し1、strong Sol/high fresh Generatorへ委譲。旧046はdone／Lineage3の履歴を保持。
+
+- 利用者は保留規則の再点検、関連root guidanceの局所整理、必要migration／限定downstream同期、対象path限定commit／origin branch・main・tag push／GitHub Releaseを明示承認。前回のpublication禁止と関連dirty一律非接触は今回scopeで更新された。公開範囲変更、private転記、force push／reset／rebase、無関係なdirty混入は禁止を維持。
+- 最新originの隔離cloneをリリース正本とする。Agentic main9903b34、Yas main4bf0552、公開両版v0.13.1を実測。元repoは `/private/tmp/astra-secretary-release-baseline.json` で保護し、cache直編集・全repo更新を行わない。
+- 旧コピー0.10.3でのSprint047独立PASSは旧候補の履歴として保持する。最新0.13.1の17 Skill／Clarityへの適応は新Sprint048で別評価し、旧16 SkillのPASSを流用しない。
+
 ## 2026-09-11 更新migration修正0.13.1公開の新承認
 
 - Phase B別fresh Evaluatorのfeedback全文を確認し最終PASS採用、046 done。公開main/tag849af0b8a5712b450a8d55b091af67ce255d9f49はPhase Aと同tree。実download SHA256 29ea4d424b48b3cd729428748713288e2eeb1a8c6ba2e28d1ae3edb65e04270f、candidate配布木のpath/mode/bytes差分0、integrity PASS／archive15/0／migration89/0／protected38/0、旧0.13.0 Release不変、finding0。Retry0／Spec0／Lineage3／strong／noneを保持。この後の通常main pushは評価・進行・handoffの3記録だけで公開tagと製品bytesは不変。Agentic057も公開後PASS済み、利用者の両版0.13.1公開依頼を完了。
@@ -17,10 +27,10 @@
 
 <!-- オーケストレーターだけが書く進行状態の正本 -->
 
-- Current ID: sprint-046
+- Current ID: sprint-048
 - Retry Count: 0
 - Spec-Issue Count: 0
-- Lineage Dispatches: 3
+- Lineage Dispatches: 2
 - Model Tier: strong
 - Rotate: none
 - Next Planned: TBD
@@ -150,6 +160,8 @@
 | sprint-044 | done | [contract](sprint-044.md) | [progress](../progress/sprint-044.md) | [feedback](../feedback/sprint-044.md) |
 | sprint-045 | done | [contract](sprint-045.md) | [progress](../progress/sprint-045.md) | [feedback](../feedback/sprint-045.md) |
 | sprint-046 | done | [contract](sprint-046.md) | [progress](../progress/sprint-046.md) | [feedback](../feedback/sprint-046.md) |
+| sprint-047 | done | [contract](sprint-047.md) | [progress](../progress/sprint-047.md) | [feedback](../feedback/sprint-047.md) |
+| sprint-048 | awaiting-eval | [contract](sprint-048.md) | [progress](../progress/sprint-048.md) | [feedback](../feedback/sprint-048.md) |
 
 ## 0.12.0 release continuation
 

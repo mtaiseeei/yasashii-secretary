@@ -11,6 +11,7 @@
 
 - [はじめ方（インストールと初回体験）](getting-started.md)
 - [できること（機能の使い方）](features.md)
+- [0.13.2への更新（Codex／Claude Code）](update-0.13.2.md)
 - [0.13.1への更新依頼文（Claude Code用）](update-0.13.1.md)
 - [0.13.0更新でmigrationが止まった場合の回復](update-0.13.0-migration-recovery.md)
 - [0.13.0への更新依頼文（履歴）](update-0.13.0.md)

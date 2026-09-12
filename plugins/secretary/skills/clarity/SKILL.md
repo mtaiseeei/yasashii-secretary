@@ -7,13 +7,12 @@ description: Project Clarityを安全に初期化し、人間が考える必要�
 
 ## plugin root（必須）
 
-このSKILL.mdの実ファイル絶対pathを `SECRETARY_SKILL_FILE` に入れ、最初に1回だけ解決する。
-空・相対path・未解決placeholderならcommandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。
+このSKILL.mdの実ファイル絶対pathをhostから受け取り、`SECRETARY_SKILL_FILE` として扱う。空・相対path・未解決placeholderなら
+commandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。Node.jsの `path.dirname`／`path.join` と配列引数で、
+resolverへ `--skill-file` とpathを別々の引数として渡す。
 
-```bash
-SECRETARY_SKILL_FILE="<このSKILL.mdの実ファイル絶対path>"
-case "$SECRETARY_SKILL_FILE" in /*/skills/*/SKILL.md) ;; *) exit 2 ;; esac
-SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/resolve-plugin-root.mjs" --skill-file "$SECRETARY_SKILL_FILE")" || exit 2
+```text
+SECRETARY_PLUGIN_ROOT = node(path.join(path.dirname(SECRETARY_SKILL_FILE), "../../scripts/resolve-plugin-root.mjs"), ["--skill-file", SECRETARY_SKILL_FILE])
 ```
 
 以後の共通file参照は `${SECRETARY_PLUGIN_ROOT}` を使う。
@@ -33,8 +32,8 @@ Project作成・open／closed・完了・再開・`canonicalRepo`はprojects、�
 Clarityのstatus、Item作成、Attention、projection、Hookだけからこれらを自動実行しない。タスク化、memory、開発、更新、
 connectorが現在の依頼で明示された場合だけ、secretaryのcollaboration routerを通して既存入口へ委譲する。
 
-通常の利用者向け応答は`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md`を参照する。Secretary workspaceを扱う場合は既存の
-`secretary/memory/preferences.md`を読み、最終応答serializerだけを正本にする。Clarity Skill独自の固定帳票へ包み直さない。
+通常の利用者向け応答は、同じplugin実体・workspaceで未変更なら`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md`を参照し、変更時だけ再読する。個人設定が必要な場合だけSecretary workspaceの
+`secretary/memory/preferences.md`の該当節を読み、最終応答serializerだけを正本にする。Clarity Skill独自の固定帳票へ包み直さない。
 
 ## 初期化
 

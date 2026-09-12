@@ -1,8 +1,8 @@
 ---
 name: connections
 description: >
-  どのコネクタ（Google / Microsoft / Notion）と読取専用チャット（Chatwork / Google Chat）が繋がっているかを確認して一覧で返す接続診断。
-  「繋がってる？」「接続の調子」「診断して」「どれが使える？」等で呼び出す。
+  指定したコネクタ（Google / Microsoft / Notion）または読取専用チャット（Chatwork / Google Chat）の接続状態を
+  一覧で確認する案内。「Googleの接続状態を診断して」「接続の調子を確認して」等、対象を含む依頼で呼び出す。
 ---
 
 # 接続診断（connections）
@@ -14,13 +14,12 @@ connector toolを呼ばず、接続済み・verifiedを推定しない。
 
 ## plugin root（必須）
 
-このSKILL.mdの実ファイル絶対pathを `SECRETARY_SKILL_FILE` に入れ、最初に1回だけ解決する。
-空・相対path・未解決placeholderならcommandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。
+このSKILL.mdの実ファイル絶対pathをhostから受け取り、`SECRETARY_SKILL_FILE` として扱う。空・相対path・未解決placeholderなら
+commandへ渡さず停止し、cwdやhost固有の環境変数から推測しない。Node.jsの `path.dirname`／`path.join` と配列引数で、
+resolverへ `--skill-file` とpathを別々の引数として渡す。
 
-```bash
-SECRETARY_SKILL_FILE="<このSKILL.mdの実ファイル絶対path>"
-case "$SECRETARY_SKILL_FILE" in /*/skills/*/SKILL.md) ;; *) exit 2 ;; esac
-SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/resolve-plugin-root.mjs" --skill-file "$SECRETARY_SKILL_FILE")" || exit 2
+```text
+SECRETARY_PLUGIN_ROOT = node(path.join(path.dirname(SECRETARY_SKILL_FILE), "../../scripts/resolve-plugin-root.mjs"), ["--skill-file", SECRETARY_SKILL_FILE])
 ```
 
 以後の共通file参照は `${SECRETARY_PLUGIN_ROOT}` を使う。
@@ -28,8 +27,8 @@ SECRETARY_PLUGIN_ROOT="$(node "$(dirname "$SECRETARY_SKILL_FILE")/../../scripts/
 Google・Microsoft・Notionと、明示設定したChatwork・Google Chatのうち、どれが繋がっているかを一目で分かるように確認する案内です。
 コネクタは各サービスに置いたまま**都度参照**します（同期・コピーはしません）。
 
-`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` と、存在する場合は
-`secretary/memory/preferences.md` を読む。診断結果と安全条件だけをrouterへ返し、
+`${SECRETARY_PLUGIN_ROOT}/rules/plain-language.md` を、同じplugin実体・workspaceで該当fileが未変更ならsessionで一度だけ読む。plugin、workspace、または該当fileが変わった場合だけ、そのfileを再読する。
+個人設定が必要な応答だけ `secretary/memory/preferences.md` の該当節を読む。診断結果と安全条件だけをrouterへ返し、
 通常報告を独自に包装しない。最終出力形は同rule入口から解決される「最終応答serializer」だけを正本とする。
 
 ## 診断の型（大切: 推測で断定しない）
