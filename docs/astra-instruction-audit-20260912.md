@@ -145,3 +145,13 @@ Generatorが実行した結果（すべて `python3 /private/tmp/astra-secretary
 - 検証: root実行 `python3 /private/tmp/astra-secretary-heavy.py node scripts/sprint-047-audit-test.mjs` はexit0、`SPRINT047_AUDIT_PASS=8 FAIL=0`、Node39→38。未変更面の既存成功証拠を引き継ぎ、独立再評価結果は `docs/feedback/sprint-047.md` に記録する。
 
 最終状態: fresh独立増分再評価PASS、今回対象の未解消finding 0。初回FAILと解消根拠は `docs/feedback/sprint-047.md` に保持し、`docs/sprints/state.md` でSprint 047をdoneとした。
+
+## Sprint048 正式公開記録
+
+- Release: https://github.com/mtaiseeei/yasashii-secretary/releases/tag/v0.13.2 。対象commit `c0aa91a5395c3ca2aadd7114a9c3cf4afe850e0a`、tree `c0ae2268477c6d3d0ae0d21a8292601491ca0235`。asset `yasashii-secretary-0.13.2.tar.gz` SHA256 `2ee124a1479219e2e7ea9edd9d310a2c36dd33eb7843fb6a62a4ea29597ad102`、14482465 bytes。
+- fresh独立Phase A PASS、product／blocking verification-infra finding0。Windows exact run34675780941/job103505272538はmigration25/0、release/archive13/0、previous native9/0。無関係windows-native jobは明示scopeどおりskip。Git-free archive877 filesのpath/mode/blobがcandidateと一致。
+- automatic reviewが拒否したのは、Agentic root AGENTS.md／docs/harness-guidance.mdの全面短縮による重要な安全・運用・role・counter規則の削除。Yasにも同じ安全保持の局所代替を適用し、必要な矛盾を解消した。独立Aがroot安全境界の保持を確認し、今回依頼に実害のある未修正項目は0件。全面短縮は利用者が不要と確定したため行わない。
+- 元の0.10.3 checkoutは旧版のまま既存dirtyを保持し、そこから最新版として配布していない。最新remote0.13.1からの隔離候補だけを正式公開した。元root3pathは開始hash確認後に必要差分だけ重ねた。installed cache、実利用者workspaceの一括更新、Clarity新規初期化は行わない。
+- 最終の実artifact評価は `docs/feedback/sprint-048-phase-b.md`、状態は `docs/sprints/state.md` が正本。generic PyYAMLはINCOMPLETE、system Ruby/Psych17型検査PASSを別記する。
+
+- 公開後fresh独立Phase BもPASS、Sprint048 done。実download877 filesの内容・実行modeはtag treeと差分0、route8/0、archive15/0、migration/checkpoint25/0、未解消finding0。初回feedback書込み中断は同じEvaluatorが実行済み証拠・採点・自己レビューを補完して解消し、再検査は行っていない。APIの直接取得Forbiddenは親の実測receiptを出典として区別した。正式証拠は `docs/feedback/sprint-048-phase-b.md`。
